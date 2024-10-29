@@ -1,0 +1,27 @@
+env:
+  MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  ENG_BK_AGENT: eng-default
+
+steps:
+  - label: ':lint-roller: Lint'
+    key: 'lint'
+    commands:
+      - .buildkite/bin/lint.sh
+    artifact_paths:
+      - "./test_output/**/*"
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 25
+
+  - label: ':hammer: Unit tests'
+    key: 'unit-tests'
+    depends_on:
+      - 'lint'
+    commands:
+      - . ~/.zshrc
+      - rbenv local 3.2.2
+      - bundle install --path vendor/bundle
+      - bundle exec fastlane test
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 25
