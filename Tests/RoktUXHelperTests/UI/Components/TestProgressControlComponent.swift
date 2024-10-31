@@ -16,7 +16,45 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestProgressControlComponent: XCTestCase {
-
+#if compiler(>=6)
+    func test_progress_control() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressControl(try get_model()))
+        
+        let progressControl = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ProgressControlComponent.self)
+        
+        let modifierContent = try progressControl.modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 5, right: 5, bottom: 5, left: 5))
+        
+        // test the effect of custom modifier
+        let marginModifier = try modifierContent.modifier(MarginModifier.self)
+        XCTAssertEqual(
+            try marginModifier.actualView().getMargin(),
+            FrameAlignmentProperty(top: 0, right: 10, bottom: 8, left: 20)
+        )
+        
+        XCTAssertEqual(
+            try progressControl
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel()
+                .string(),
+            "Next page button"
+        )
+    }
+#else
     func test_progress_control() throws {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressControl(try get_model()))
@@ -40,7 +78,7 @@ final class TestProgressControlComponent: XCTestCase {
         
         XCTAssertEqual(try progressControl.accessibilityLabel().string(), "Next page button")
     }
-    
+#endif
     func get_model() throws -> ProgressControlViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let progressControl = ModelTestData.ProgressControlData.progressControl()
