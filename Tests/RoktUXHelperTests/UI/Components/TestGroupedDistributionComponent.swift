@@ -20,7 +20,7 @@ import DcuiSchema
 final class TestGroupedDistributionComponent: XCTestCase {
     
     private var cancellables = Set<AnyCancellable>()
-    
+#if compiler(>=6)
     func test_grouped_distribution() throws {
         var closeActionCalled = false
         
@@ -138,7 +138,121 @@ final class TestGroupedDistributionComponent: XCTestCase {
         groupedComponent.goToNextGroup()
         XCTAssertFalse(closeActionCalled)
     }
+#else
+    func test_grouped_distribution() throws {
+        var closeActionCalled = false
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.groupDistribution(try get_model(eventHandler: { event in
+            
+            if event.eventType == .SignalDismissal {
+                closeActionCalled = true
+            }
+        })))
+        
+        let groupedComponent = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(GroupedDistributionComponent.self)
+            .actualView()
+        
+        let grouped = try groupedComponent
+            .inspect()
+            .vStack()
+        
+        // test custom modifier class
+        let paddingModifier = try grouped.modifier(PaddingModifier.self)
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
+        
+        // test the effect of custom modifier
+        let padding = try grouped.padding()
+        XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
+        
+        XCTAssertEqual(try grouped.accessibilityLabel().string(), "Page 1 of 1")
+
+        groupedComponent.goToNextOffer()
+        XCTAssertTrue(closeActionCalled)
+    }
     
+    func test_goToNextGroup_with_closeOnComplete_default() throws {
+        var closeActionCalled = false
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.groupDistribution(try get_model(eventHandler: { event in
+            
+            if event.eventType == .SignalDismissal {
+                closeActionCalled = true
+            }
+        })))
+        
+        let groupedComponent = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(GroupedDistributionComponent.self)
+            .actualView()
+
+        groupedComponent.goToNextGroup()
+        XCTAssertTrue(closeActionCalled)
+    }
+    
+    func test_goToNextOffer_with_closeOnComplete_false() throws {
+        var closeActionCalled = false
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        let view = TestPlaceHolder(layout:
+                                    LayoutSchemaViewModel.groupDistribution(
+                                        try get_model(
+                                            layoutSettings: closeOnCompleteSettings,
+                                            eventHandler: { event in
+                                                if event.eventType == .SignalDismissal {
+                                                    closeActionCalled = true
+                                                }
+                                            }
+                                        )
+                                    )
+        )
+        
+        let groupedComponent = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(GroupedDistributionComponent.self)
+            .actualView()
+
+        groupedComponent.goToNextOffer()
+        XCTAssertFalse(closeActionCalled)
+    }
+    
+    func test_goToNextGroup_with_closeOnComplete_false() throws {
+        var closeActionCalled = false
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        
+        let view = TestPlaceHolder(layout:
+                                    LayoutSchemaViewModel.groupDistribution(
+                                        try get_model(layoutSettings: closeOnCompleteSettings,
+                                                      eventHandler: { event in
+                                                          
+                                                          if event.eventType == .SignalDismissal {
+                                                              closeActionCalled = true
+                                                          }
+                                                      }
+                                                     )
+                                    )
+        )
+        
+        let groupedComponent = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(GroupedDistributionComponent.self)
+            .actualView()
+
+        groupedComponent.goToNextGroup()
+        XCTAssertFalse(closeActionCalled)
+    }
+#endif
     func get_model(layoutSettings: LayoutSettings? = nil,
                    eventHandler: @escaping (EventRequest) -> Void) throws -> GroupedDistributionViewModel {
         let eventService = EventService(

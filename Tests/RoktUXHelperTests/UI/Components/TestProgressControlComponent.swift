@@ -16,7 +16,7 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestProgressControlComponent: XCTestCase {
-
+#if compiler(>=6)
     func test_progress_control() throws {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressControl(try get_model()))
@@ -50,7 +50,31 @@ final class TestProgressControlComponent: XCTestCase {
             "Next page button"
         )
     }
-    
+#else
+    func test_progress_control() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressControl(try get_model()))
+        
+        let progressControl = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(ProgressControlComponent.self)
+            .actualView()
+            .inspect()
+            .hStack()
+        
+        // test custom modifier class
+        let paddingModifier = try progressControl.modifier(PaddingModifier.self)
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 5, right: 5, bottom: 5, left: 5))
+        
+        // test the effect of custom modifier
+        let paddingMargin = try progressControl.padding()
+        XCTAssertEqual(paddingMargin, EdgeInsets(top: 5.0, leading: 25.0, bottom: 13.0, trailing: 15.0))
+        
+        XCTAssertEqual(try progressControl.accessibilityLabel().string(), "Next page button")
+    }
+#endif
     func get_model() throws -> ProgressControlViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let progressControl = ModelTestData.ProgressControlData.progressControl()

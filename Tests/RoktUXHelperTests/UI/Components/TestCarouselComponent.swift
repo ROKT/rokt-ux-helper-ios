@@ -17,6 +17,7 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestCarouselComponent: XCTestCase {
+#if compiler(>=6)
     func test_carousel() throws {
         var closeActionCalled = false
         
@@ -83,7 +84,64 @@ final class TestCarouselComponent: XCTestCase {
         carouselComponent.goToNextOffer()
         XCTAssertFalse(closeActionCalled)
     }
+#else
+    func test_carousel() throws {
+        var closeActionCalled = false
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.carousel(try get_model(eventHandler: { event in
+            if event.eventType == .SignalDismissal {
+                closeActionCalled = true
+            }
+        })))
+        
+        let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CarouselComponent.self)
+            .actualView()
+        
+        let carousel = try carouselComponent
+            .inspect()
+            .find(LayoutSchemaComponent.self)
+        
+        // test custom modifier class
+        let paddingModifier = try carousel.modifier(PaddingModifier.self)
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
+        
+        // test the effect of custom modifier
+        let padding = try carousel.padding()
+        XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
+        
+        XCTAssertEqual(try carousel.accessibilityLabel().string(), "Page 1 of 1")
+
+        carouselComponent.goToNextOffer()
+        XCTAssertTrue(closeActionCalled)
+    }
     
+    func test_goToNextOffer_with_closeOnComplete_false() throws {
+        var closeActionCalled = false
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.carousel(
+            try get_model(layoutSettings: closeOnCompleteSettings, eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            }))
+        )
+        
+        let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CarouselComponent.self)
+            .actualView()
+
+        carouselComponent.goToNextOffer()
+        XCTAssertFalse(closeActionCalled)
+    }
+#endif
     func get_model(layoutSettings: LayoutSettings? = nil,
                    eventHandler: @escaping (EventRequest) -> Void) throws -> CarouselViewModel {
         let eventService = EventService(

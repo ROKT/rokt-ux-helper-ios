@@ -16,7 +16,7 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestCloseButtonComponent: XCTestCase {
-    
+#if compiler(>=6)
     func test_creative_response() throws {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
@@ -57,6 +57,31 @@ final class TestCloseButtonComponent: XCTestCase {
             "Close button"
         )
     }
+#else
+    func test_creative_response() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
+        
+        let closeButton = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CloseButtonComponent.self)
+            .actualView()
+            .inspect()
+            .hStack()
+        
+        // test custom modifier class
+        let paddingModifier = try closeButton.modifier(PaddingModifier.self)
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
+        
+        // test the effect of custom modifier
+        let padding = try closeButton.padding()
+        XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
+        
+        XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close button")
+    }
+#endif
     
     func get_model() throws -> CloseButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

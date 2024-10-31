@@ -44,10 +44,6 @@ extension InspectableView where View: SingleViewContent {
         let call = ViewType.inspectionCall(base: base, index: index)
         return try .init(modifierContent, parent: self, call: call)
     }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, *)
-extension InspectableView where View: SingleViewContent {
     
     func ignoreAny<T: BaseViewType>(_ type: T.Type? = nil) throws -> InspectableView<T> {
         var targetInspectableView = try child()
