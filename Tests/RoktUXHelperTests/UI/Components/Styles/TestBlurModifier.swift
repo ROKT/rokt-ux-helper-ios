@@ -20,23 +20,23 @@ final class TestBlurModifier: XCTestCase {
     func test_column_with_offset() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ColumnComponent.self)
-            .actualView()
-            .inspect()
-            .vStack()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ColumnComponent.self)
         
+        let modifier = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
         // test blur modifier
-        let blurModifier = try hstack.modifier(BlurModifier.self).actualView()
+        let blurModifier = try modifier.modifier(BlurModifier.self).actualView()
         XCTAssertEqual(blurModifier.blur, 5)
         
         // test blur
-        let blur = try hstack.blur()
+        let blur = try modifier.blur()
         XCTAssertEqual(blur.radius, 5)
-        
     }
     
     func get_model() throws -> ColumnViewModel {

@@ -27,31 +27,25 @@ final class TestOneByOneComponent: XCTestCase {
                 closeActionCalled = true
             }
         })))
-        let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(OneByOneComponent.self)
-            .actualView()
+        let oneByOneComponent = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(OneByOneComponent.self)
         
         let group = try oneByOneComponent
-            .inspect()
-            .group()
+            .ignoreAny(ViewType.Group.self)
         
-        let oneByOne = try group
-            .find(LayoutSchemaComponent.self)
-        
-        // test custom modifier class
-        let paddingModifier = try oneByOne.modifier(PaddingModifier.self)
+        let modifierContent = try group[0].modifierIgnoreAny(LayoutSchemaModifier.self).ignoreAny(ViewType.ViewModifierContent.self)
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
         XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
         
-        // test the effect of custom modifier
-        let padding = try oneByOne.padding()
+        let padding = try modifierContent.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
-        
+
         XCTAssertEqual(try group.accessibilityLabel().string(), "Offer 1 of 1")
         
-        oneByOneComponent.goToNextOffer()
+        try oneByOneComponent.actualView().goToNextOffer()
         XCTAssertTrue(closeActionCalled)
     }
     
@@ -73,11 +67,11 @@ final class TestOneByOneComponent: XCTestCase {
                           }))
         )
         
-        let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(OneByOneComponent.self)
+        let oneByOneComponent = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(OneByOneComponent.self)
             .actualView()
 
         XCTAssertFalse(SignalResponseCalled)

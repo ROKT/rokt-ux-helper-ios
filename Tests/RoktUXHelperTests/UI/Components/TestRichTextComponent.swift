@@ -20,28 +20,31 @@ final class TestRichTextComponent: XCTestCase {
     func test_rich_text() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_model()))
         
-        let text = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
-            .actualView()
-            .inspect()
-            .text()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
         
-        // test custom modifier class
-        let paddingModifier = try text.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
-        
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
         // test the effect of custom modifier
-        let padding = try text.padding()
+        XCTAssertEqual(
+            try modifierContent.modifier(PaddingModifier.self).actualView().padding,
+            FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8)
+        )
+        
+        let padding = try modifierContent.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
         
-        let model = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
+        let model = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
             .actualView()
             .model
         let nsAttrString  = model.attributedString
@@ -73,18 +76,19 @@ final class TestRichTextComponent: XCTestCase {
         }
         
         // check min/max width/height
-        let flexFrame = try text.flexFrame()
+        let flexFrame = try modifierContent.flexFrame()
         XCTAssertEqual(flexFrame.minWidth, 10)
         XCTAssertEqual(flexFrame.maxWidth, 100)
         XCTAssertEqual(flexFrame.minHeight, 15)
         XCTAssertEqual(flexFrame.maxHeight, 150)
         
         // raw richtext
-        let rawText = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
+        let rawText = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
             .actualView()
         XCTAssertNil(rawText.linkStyle)
         
@@ -99,28 +103,34 @@ final class TestRichTextComponent: XCTestCase {
     func test_rich_text_with_state() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_state_model()))
         
-        let text = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
-            .actualView()
-            .inspect()
-            .text()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
         
         // test custom modifier class
-        let paddingModifier = try text.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
         
         // test the effect of custom modifier
-        let padding = try text.padding()
+        XCTAssertEqual(
+            try modifierContent.modifier(PaddingModifier.self).actualView().padding,
+            FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8)
+        )
+        
+        // test the effect of custom modifier
+        let padding = try modifierContent.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
         
-        let model = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
+        let model = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
             .actualView()
             .model
         let nsAttrString  = model.attributedString
@@ -137,18 +147,19 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitItalic), false)
 
         // check min/max width/height
-        let flexFrame = try text.flexFrame()
+        let flexFrame = try modifierContent.flexFrame()
         XCTAssertEqual(flexFrame.minWidth, 10)
         XCTAssertEqual(flexFrame.maxWidth, 100)
         XCTAssertEqual(flexFrame.minHeight, 15)
         XCTAssertEqual(flexFrame.maxHeight, 150)
         
         // raw richtext
-        let rawText = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RichTextComponent.self)
+        let rawText = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RichTextComponent.self)
             .actualView()
         XCTAssertNil(rawText.linkStyle)
         
@@ -168,7 +179,8 @@ final class TestRichTextComponent: XCTestCase {
             
             let view = TestPlaceHolder(layout: model)
             
-            let text = try view.inspect().view(TestPlaceHolder.self)
+            let text = try view.inspect()
+                .view(TestPlaceHolder.self)
                 .view(EmbeddedComponent.self)
                 .vStack()[0]
                 .view(LayoutSchemaComponent.self)
@@ -179,13 +191,17 @@ final class TestRichTextComponent: XCTestCase {
             
             // test custom modifier class
             let paddingModifier = try text.modifier(PaddingModifier.self)
-            XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
+            XCTAssertEqual(
+                try paddingModifier.actualView().padding,
+                FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8)
+            )
             
             // test the effect of custom modifier
             let padding = try text.padding()
             XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
             
-            let model = try view.inspect().view(TestPlaceHolder.self)
+            let model = try view.inspect()
+                .view(TestPlaceHolder.self)
                 .view(EmbeddedComponent.self)
                 .vStack()[0]
                 .view(LayoutSchemaComponent.self)
@@ -199,7 +215,6 @@ final class TestRichTextComponent: XCTestCase {
             // Test color mode to be dark
             let foregroundColor = nsAttrString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor
             XCTAssertEqual(foregroundColor?.isEqualIgnoringSpaceContext(UIColor(hexString: "#000000")), true)
-           
         }
     }
     

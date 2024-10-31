@@ -20,20 +20,21 @@ final class TestRotateModifier: XCTestCase {
     func test_column_with_rotate() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ColumnComponent.self)
-            .actualView()
-            .inspect()
-            .vStack()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ColumnComponent.self)
         
         // test rotate modifier
-        let rotateModifier = try hstack.modifier(RotateModifier.self).actualView()
+        let modifierContent = try sut.modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let rotateModifier = try modifierContent.modifier(RotateModifier.self).actualView()
+        
         XCTAssertEqual(rotateModifier.rotateZ, 10)
         
-        let rotate = try hstack.rotation()
+        let rotate = try modifierContent.rotation()
         XCTAssertEqual(rotate.angle, .degrees(10))
     }
     

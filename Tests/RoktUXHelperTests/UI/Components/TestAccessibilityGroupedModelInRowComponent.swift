@@ -29,48 +29,50 @@ final class TestAccessibilityGroupedModelInRowComponent: XCTestCase {
 
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(rowUIModel))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RowComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
-        
-        XCTAssertEqual(hstack.count, 1)
+        let target = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RowComponent.self)
         
         // test custom modifier class
-        let paddingModifier = try hstack.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24))
+        let modifierContent = try target
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
         
         // test the effect of custom modifier
-        let padding = try hstack.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
+        XCTAssertEqual(
+            paddingModifier,
+            FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24)
+        )
         
         // background
-        let backgroundModifier = try hstack.modifier(BackgroundModifier.self)
+        let backgroundModifier = try modifierContent.modifier((BackgroundModifier.self))
         let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#F5C1C4", dark: "#F5C1C4"))
         
         // border
-        let borderModifier = try hstack.modifier(BorderModifier.self)
+        let borderModifier = try modifierContent.modifier((BorderModifier.self))
         let borderStyle = try borderModifier.actualView().borderStyle
         
         XCTAssertNil(borderStyle)
         
         // alignment
-        let alignment = try hstack.alignment()
-        XCTAssertEqual(alignment, .center)
+        let hStack = try target
+            .find(ViewType.HStack.self)
+
+        XCTAssertEqual(hStack.count, 1)
+        XCTAssertEqual(try hStack.alignment(), .center)
         
         // frame
-        let flexFrame = try hstack.flexFrame()
+        let flexFrame = try modifierContent.flexFrame()
         XCTAssertEqual(flexFrame.minHeight, 24)
         XCTAssertEqual(flexFrame.maxHeight, 24)
         XCTAssertEqual(flexFrame.minWidth, 140)
         XCTAssertEqual(flexFrame.maxWidth, 140)
-
     }
     
     func test_rowComponent_computedProperties_accessibility() throws {
@@ -84,11 +86,12 @@ final class TestAccessibilityGroupedModelInRowComponent: XCTestCase {
 
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(rowUIModel))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(RowComponent.self)
+        let sut = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(RowComponent.self)
             .actualView()
         
         let defaultStyle = sut.model.defaultStyle?[0]

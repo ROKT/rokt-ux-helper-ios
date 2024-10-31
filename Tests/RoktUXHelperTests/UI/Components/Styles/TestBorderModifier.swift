@@ -21,17 +21,19 @@ final class TestBorderModifier: XCTestCase {
     func test_column_with_multi_dimension_border() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ColumnComponent.self)
-            .actualView()
-            .inspect()
-            .vStack()
+        let target = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ColumnComponent.self)
         
         // test border modifier
-        let borderModifier = try hstack.modifier(BorderModifier.self).actualView()
+        let borderModifier = try target
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+            .modifier(BorderModifier.self)
+            .actualView()
         XCTAssertEqual(borderModifier.borderWidth, FrameAlignmentProperty(top: 2, right: 1, bottom: 2, left: 1))
         XCTAssertEqual(borderModifier.borderColor, ThemeColor(light: "#000000", dark: "#000000"))
         XCTAssertEqual(borderModifier.borderRadius, 10)

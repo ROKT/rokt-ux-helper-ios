@@ -24,11 +24,9 @@ final class TestOverlayComponent: XCTestCase {
     func testOverlayComponent() throws {
         let view = TestOverlayPlaceholder(layout: try getModel(.singleText))
         
-        let zStack = try view.inspect().view(TestOverlayPlaceholder.self)
-            .view(OverlayComponent.self)
-            .actualView()
-            .inspect()
-            .zStack()
+        let zStack = try view.inspect().find(TestOverlayPlaceholder.self)
+            .find(OverlayComponent.self)
+            .find(ViewType.ZStack.self)
         
         // Outer + Child
         XCTAssertEqual(zStack.count, 2)
@@ -46,11 +44,9 @@ final class TestOverlayComponent: XCTestCase {
     func test_overlayComponent_withFlexEndAlignSelf_andCenterAlignWrapper_isAlignmentFlexEnd() throws {
         let view = TestOverlayPlaceholder(layout: try getModel(.alignSelf))
         
-        let zStack = try view.inspect().view(TestOverlayPlaceholder.self)
-            .view(OverlayComponent.self)
-            .actualView()
-            .inspect()
-            .zStack()
+        let zStack = try view.inspect().find(TestOverlayPlaceholder.self)
+            .find(OverlayComponent.self)
+            .find(ViewType.ZStack.self)
         
         // Outer + Child
         XCTAssertEqual(zStack.count, 2)
@@ -62,11 +58,9 @@ final class TestOverlayComponent: XCTestCase {
     func test_overlayComponent_withCenterAlignWrapper_isAlignmentCenter() throws {
         let view = TestOverlayPlaceholder(layout: try getModel(.alignWrapper))
         
-        let zStack = try view.inspect().view(TestOverlayPlaceholder.self)
-            .view(OverlayComponent.self)
-            .actualView()
-            .inspect()
-            .zStack()
+        let zStack = try view.inspect().find(TestOverlayPlaceholder.self)
+            .find(OverlayComponent.self)
+            .find(ViewType.ZStack.self)
         
         // Outer + Child
         XCTAssertEqual(zStack.count, 2)

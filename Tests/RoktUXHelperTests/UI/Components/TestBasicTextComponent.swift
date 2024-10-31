@@ -19,33 +19,43 @@ final class TestBasicTextComponent: XCTestCase {
     func test_basic_text() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
         
-        let text = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(BasicTextComponent.self)
-            .actualView()
-            .inspect()
-            .text()
+        let sut = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(BasicTextComponent.self)
+        
+        let text = try sut.find(ViewType.Text.self)
         
         // test custom modifier class
-        let paddingModifier = try text.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        
+        XCTAssertEqual(
+            paddingModifier,
+            FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8)
+        )
         
         // test the effect of custom modifier
-        let padding = try text.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
+        XCTAssertEqual(
+            try modifierContent.padding(),
+            EdgeInsets(top: 1, leading: 8, bottom: 17, trailing: 0)
+        )
         
         XCTAssertEqual(try text.attributes().foregroundColor(), Color(hex: "#AABBCC"))
         
         XCTAssertEqual(try text.string(), "ORDER Number: Uk171359906")
         
         // alignment self modifier
-        let alignSelfModifier = try text.modifier(AlignSelfModifier.self)
+        let alignSelfModifier = try modifierContent.modifier((AlignSelfModifier.self))
         XCTAssertEqual(try alignSelfModifier.actualView().wrapperAlignment?.horizontal, .center)
         
         // frame
-        let flexFrame = try text.flexFrame()
+        let flexFrame = try modifierContent.flexFrame()
         XCTAssertEqual(flexFrame.minHeight, 24)
         XCTAssertEqual(flexFrame.maxHeight, 24)
         XCTAssertEqual(flexFrame.minWidth, 40)
@@ -55,11 +65,11 @@ final class TestBasicTextComponent: XCTestCase {
     func test_basicText_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(BasicTextComponent.self)
+        let sut = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(BasicTextComponent.self)
             .actualView()
         
         let model = sut.model
@@ -84,5 +94,4 @@ final class TestBasicTextComponent: XCTestCase {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         return try transformer.getBasicText(ModelTestData.TextData.basicText())
     }
-    
 }

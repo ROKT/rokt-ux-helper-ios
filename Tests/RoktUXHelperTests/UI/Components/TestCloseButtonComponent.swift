@@ -21,24 +21,41 @@ final class TestCloseButtonComponent: XCTestCase {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
         
-        let closeButton = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CloseButtonComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
+        let closeButton = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(CloseButtonComponent.self)
         
         // test custom modifier class
-        let paddingModifier = try closeButton.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
+        let modifierContent = try closeButton
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
         
         // test the effect of custom modifier
-        let padding = try closeButton.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
-        
-        XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close button")
+        XCTAssertEqual(
+            try modifierContent.padding(),
+            EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
+        )
+
+        XCTAssertEqual(
+            try closeButton
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel()
+                .string(),
+            "Close button"
+        )
     }
     
     func get_model() throws -> CloseButtonViewModel {
@@ -47,5 +64,4 @@ final class TestCloseButtonComponent: XCTestCase {
         return try transformer.getCloseButton(styles: closeButton.styles,
                                               children: transformer.transformChildren(closeButton.children, slot: nil))
     }
-    
 }

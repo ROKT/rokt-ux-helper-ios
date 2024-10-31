@@ -20,22 +20,23 @@ final class TestOffsetModifier: XCTestCase {
     func test_column_with_offset() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ColumnComponent.self)
-            .actualView()
-            .inspect()
-            .vStack()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ColumnComponent.self)
         
         // test offset modifier
-        let offsetModifier = try hstack.modifier(OffsetModifier.self).actualView()
+        let modifier = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let offsetModifier = try modifier.modifier(OffsetModifier.self).actualView()
         XCTAssertEqual(offsetModifier.offset?.x, 30)
         XCTAssertEqual(offsetModifier.offset?.y, 20)
         
         // test offset
-        let offset = try hstack.offset()
+        let offset = try modifier.offset()
         XCTAssertEqual(offset.width, 30)
         XCTAssertEqual(offset.height, 20)
         

@@ -21,24 +21,34 @@ final class TestProgressControlComponent: XCTestCase {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressControl(try get_model()))
         
-        let progressControl = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ProgressControlComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
+        let progressControl = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ProgressControlComponent.self)
         
-        // test custom modifier class
-        let paddingModifier = try progressControl.modifier(PaddingModifier.self)
+        let modifierContent = try progressControl.modifierIgnoreAny(LayoutSchemaModifier.self).ignoreAny(ViewType.ViewModifierContent.self)
+        
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
         XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 5, right: 5, bottom: 5, left: 5))
         
         // test the effect of custom modifier
-        let paddingMargin = try progressControl.padding()
-        XCTAssertEqual(paddingMargin, EdgeInsets(top: 5.0, leading: 25.0, bottom: 13.0, trailing: 15.0))
+        let marginModifier = try modifierContent.modifier(MarginModifier.self)
+        XCTAssertEqual(try marginModifier.actualView().getMargin(), FrameAlignmentProperty(top: 0, right: 10, bottom: 8, left: 20))
         
-        XCTAssertEqual(try progressControl.accessibilityLabel().string(), "Next page button")
+        XCTAssertEqual(
+            try progressControl
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel()
+                .string(),
+            "Next page button"
+        )
     }
     
     func get_model() throws -> ProgressControlViewModel {

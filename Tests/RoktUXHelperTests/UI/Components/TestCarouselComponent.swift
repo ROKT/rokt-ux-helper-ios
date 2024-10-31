@@ -26,28 +26,37 @@ final class TestCarouselComponent: XCTestCase {
             }
         })))
         
-        let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CarouselComponent.self)
-            .actualView()
-        
-        let carousel = try carouselComponent
-            .inspect()
+        let carouselComponent = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
             .find(LayoutSchemaComponent.self)
-        
+            .find(CarouselComponent.self)
         // test custom modifier class
-        let paddingModifier = try carousel.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
+        
+        let modifierContent = try carouselComponent
+            .find(ViewType.ForEach.self, skipFound: 1)[0]
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
         
         // test the effect of custom modifier
-        let padding = try carousel.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
+        XCTAssertEqual(
+            try modifierContent.padding(),
+            EdgeInsets(top: 3, leading: 6, bottom: 5, trailing: 4)
+        )
         
-        XCTAssertEqual(try carousel.accessibilityLabel().string(), "Page 1 of 1")
-
-        carouselComponent.goToNextOffer()
+        XCTAssertEqual(
+            try carouselComponent.find(ViewType.ForEach.self, skipFound: 1)[0]
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel()
+                .string(),
+            "Page 1 of 1"
+        )
+        
+        try carouselComponent.actualView().goToNextOffer()
         XCTAssertTrue(closeActionCalled)
     }
     
@@ -63,11 +72,12 @@ final class TestCarouselComponent: XCTestCase {
             }))
         )
         
-        let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CarouselComponent.self)
+        let carouselComponent = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(CarouselComponent.self)
             .actualView()
 
         carouselComponent.goToNextOffer()

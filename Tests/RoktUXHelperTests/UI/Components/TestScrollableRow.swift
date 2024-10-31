@@ -20,35 +20,42 @@ final class TestScrollableRow: XCTestCase {
     func test_row() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableRow(try get_model()))
         
-        let hstack = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ScrollableRowComponent.self)
-            .scrollView()
-            .view(RowComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ScrollableRowComponent.self)
+            .find(ViewType.ScrollView.self)
+            .find(RowComponent.self)
+        
+        let hstack = try sut.find(ViewType.HStack.self)
         
         XCTAssertEqual(hstack.count, 1)
         
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        
         // test custom modifier class
-        let paddingModifier = try hstack.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24))
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
+        XCTAssertEqual(
+            try paddingModifier.actualView().padding,
+            FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24)
+        )
         
         // test the effect of custom modifier
-        let padding = try hstack.padding()
+        let padding = try modifierContent.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
         
         // background
-        let backgroundModifier = try hstack.modifier(BackgroundModifier.self)
+        let backgroundModifier = try modifierContent.modifier(BackgroundModifier.self)
         let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#F5C1C4", dark: "#F5C1C4"))
         
         // border
-        let borderModifier = try hstack.modifier(BorderModifier.self)
+        let borderModifier = try modifierContent.modifier(BorderModifier.self)
         let borderStyle = try borderModifier.actualView().borderStyle
         
         XCTAssertNil(borderStyle)
@@ -58,24 +65,24 @@ final class TestScrollableRow: XCTestCase {
         XCTAssertEqual(alignment, .center)
         
         // frame
-        let flexFrame = try hstack.flexFrame()
+        let flexFrame = try modifierContent.flexFrame()
         XCTAssertEqual(flexFrame.minHeight, 24)
         XCTAssertEqual(flexFrame.maxHeight, 24)
         XCTAssertEqual(flexFrame.minWidth, 140)
         XCTAssertEqual(flexFrame.maxWidth, 140)
-        
     }
     
     func test_rowComponent_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableRow(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ScrollableRowComponent.self)
-            .scrollView()
-            .view(RowComponent.self)
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ScrollableRowComponent.self)
+            .find(ViewType.ScrollView.self)
+            .find(RowComponent.self)
             .actualView()
         
         let defaultStyle = sut.model.defaultStyle?[0]

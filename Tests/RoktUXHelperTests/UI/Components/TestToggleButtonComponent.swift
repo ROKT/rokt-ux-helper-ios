@@ -21,11 +21,12 @@ final class TestToggleButtonComponent: XCTestCase {
     func test_toggleButton_styles() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ToggleButtonComponent.self)
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ToggleButtonComponent.self)
             .actualView()
         
         let model = sut.model
@@ -39,10 +40,12 @@ final class TestToggleButtonComponent: XCTestCase {
         XCTAssertEqual(sut.verticalAlignment, .top)
         XCTAssertEqual(sut.horizontalAlignment, .center)
         
-        let toggleButton = try sut.inspect().hStack()
-        
         // test the effect of custom modifier
-        let backgroundModifier = try toggleButton.modifier(BackgroundModifier.self)
+        let modifier = try sut.inspect()
+            .implicitAnyView()
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let backgroundModifier = try modifier.modifier(BackgroundModifier.self)
         let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#FFFFFF", dark: "#000000"))

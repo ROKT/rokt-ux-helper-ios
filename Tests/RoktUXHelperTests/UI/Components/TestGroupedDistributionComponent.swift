@@ -31,28 +31,32 @@ final class TestGroupedDistributionComponent: XCTestCase {
             }
         })))
         
-        let groupedComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(GroupedDistributionComponent.self)
-            .actualView()
+        let groupedComponent = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(GroupedDistributionComponent.self)
         
-        let grouped = try groupedComponent
-            .inspect()
-            .vStack()
+        let modifierContent = try groupedComponent
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
         
-        // test custom modifier class
-        let paddingModifier = try grouped.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
         
         // test the effect of custom modifier
-        let padding = try grouped.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
+        XCTAssertEqual(try modifierContent.padding(), EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
         
-        XCTAssertEqual(try grouped.accessibilityLabel().string(), "Page 1 of 1")
+        XCTAssertEqual(
+            try groupedComponent
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel().string(),
+            "Page 1 of 1"
+        )
 
-        groupedComponent.goToNextOffer()
+        try groupedComponent.actualView().goToNextOffer()
         XCTAssertTrue(closeActionCalled)
     }
     
@@ -67,11 +71,11 @@ final class TestGroupedDistributionComponent: XCTestCase {
         })))
         
         let groupedComponent = try view.inspect()
-            .view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(GroupedDistributionComponent.self)
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(GroupedDistributionComponent.self)
             .actualView()
 
         groupedComponent.goToNextGroup()
@@ -95,11 +99,11 @@ final class TestGroupedDistributionComponent: XCTestCase {
         )
         
         let groupedComponent = try view.inspect()
-            .view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(GroupedDistributionComponent.self)
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(GroupedDistributionComponent.self)
             .actualView()
 
         groupedComponent.goToNextOffer()
@@ -124,11 +128,11 @@ final class TestGroupedDistributionComponent: XCTestCase {
         )
         
         let groupedComponent = try view.inspect()
-            .view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(GroupedDistributionComponent.self)
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(GroupedDistributionComponent.self)
             .actualView()
 
         groupedComponent.goToNextGroup()

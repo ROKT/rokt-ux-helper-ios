@@ -20,25 +20,27 @@ final class TestCreativeResponseComponent: XCTestCase {
     func test_creative_response() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
         
-        let creativeResponse = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CreativeResponseComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
+        let creativeResponse = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(CreativeResponseComponent.self)
         
         // test custom modifier class
-        let paddingModifier = try creativeResponse.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
+        let modifierContent = try creativeResponse
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
         
         // test the effect of custom modifier
-        let padding = try creativeResponse.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
-        
+        XCTAssertEqual(try modifierContent.padding(), EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
+
         // background
-        let backgroundModifier = try creativeResponse.modifier(BackgroundModifier.self)
+        let backgroundModifier = try modifierContent.modifier(BackgroundModifier.self)
         let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#000000", dark: nil))
@@ -47,11 +49,11 @@ final class TestCreativeResponseComponent: XCTestCase {
     func test_creativeResponse_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CreativeResponseComponent.self)
+        let sut = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)
+            .find(LayoutSchemaComponent.self)
+            .find(CreativeResponseComponent.self)
             .actualView()
         
         let defaultStyle = sut.model.defaultStyle?[0]
@@ -79,5 +81,4 @@ final class TestCreativeResponseComponent: XCTestCase {
                                                           styles: creativeResponse?.styles, children: transformer.transformChildren(creativeResponse?.children, slot: nil), slot: nil)
         
     }
-    
 }

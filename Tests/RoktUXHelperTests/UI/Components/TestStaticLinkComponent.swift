@@ -26,32 +26,37 @@ final class TestStaticLinkComponent: XCTestCase {
     func test_static_link() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
         
-        let staticLink = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(StaticLinkComponent.self)
-            .actualView()
-            .inspect()
-            .hStack()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
         
         // test custom modifier class
-        let paddingModifier = try staticLink.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 13, right: 14, bottom: 15, left: 16))
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
+        XCTAssertEqual(
+            try paddingModifier.actualView().padding,
+            FrameAlignmentProperty(top: 13, right: 14, bottom: 15, left: 16)
+        )
         
         // test the effect of custom modifier
-        let padding = try staticLink.padding()
+        let padding = try modifierContent.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 13.0, leading: 16.0, bottom: 15.0, trailing: 14.0))
     }
     
     func test_staticLink_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(StaticLinkComponent.self)
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
             .actualView()
         
         let model = sut.model
@@ -70,16 +75,16 @@ final class TestStaticLinkComponent: XCTestCase {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
                                    layoutState: get_layout_state())
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(StaticLinkComponent.self)
-            .actualView()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
 
         XCTAssertFalse(stubComponent.roktEvents.contains(.OpenUrl))
         
-        try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
+        try sut.implicitAnyView().implicitAnyView().callOnTapGesture()
         
         XCTAssertTrue(stubComponent.roktEvents.contains(.OpenUrl))
     }
@@ -88,18 +93,20 @@ final class TestStaticLinkComponent: XCTestCase {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
                                    layoutState: get_layout_state())
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(StaticLinkComponent.self)
-            .actualView()
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
+            
+        try sut
+            .implicitAnyView()
+            .implicitAnyView()
+            .callOnTapGesture()
         
-        let model = sut.model
-        
-        try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
-        
-        XCTAssertEqual(sut.style, model.pressedStyle?[0])
+        let model = try sut.actualView().model
+        XCTAssertEqual(try sut.actualView().style, model.pressedStyle?[0])
     }
     
     func get_model() throws -> StaticLinkViewModel {

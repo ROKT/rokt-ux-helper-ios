@@ -28,11 +28,12 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(zStackUIModel))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ZStackComponent.self)
+        let sut = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ZStackComponent.self)
             .actualView()
         
         let defaultStyle = sut.model.defaultStyle?[0]
@@ -52,7 +53,6 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
         XCTAssertEqual(sut.horizontalAlignment, .center)
         
         XCTAssertEqual(sut.accessibilityBehavior, .combine)
-        
     }
     
     func get_model() throws -> LayoutSchemaViewModel {

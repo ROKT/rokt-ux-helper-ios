@@ -20,32 +20,31 @@ final class TestDataImageComponent: XCTestCase {
     func test_data_image() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model()))
         
-        let image = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(DataImageViewComponent.self)
-            .actualView()
-            .inspect()
-            .find(AsyncImageView.self)
+        let image = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(DataImageViewComponent.self)
         
-        // test custom modifier class
-        let paddingModifier = try image.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24))
-        
+        let modifierContent = try image
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24))
+    
         // test the effect of custom modifier
-        let padding = try image.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
+        XCTAssertEqual(try modifierContent.padding(), EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
     }
     
     func test_dataImage_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model()))
         
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(DataImageViewComponent.self)
+        let sut = try view.inspect().find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(DataImageViewComponent.self)
             .actualView()
         
         let model = sut.model
