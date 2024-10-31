@@ -22,7 +22,93 @@ final class TestStaticLinkComponent: XCTestCase {
     override func setUpWithError() throws {
         self.stubComponent = MockUXHelper()
     }
+#if compiler(>=6)
+    func test_static_link() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
+        
+        // test custom modifier class
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
+        XCTAssertEqual(
+            try paddingModifier.actualView().padding,
+            FrameAlignmentProperty(top: 13, right: 14, bottom: 15, left: 16)
+        )
+        
+        // test the effect of custom modifier
+        let padding = try modifierContent.padding()
+        XCTAssertEqual(padding, EdgeInsets(top: 13.0, leading: 16.0, bottom: 15.0, trailing: 14.0))
+    }
     
+    func test_staticLink_computedProperties_usesModelProperties() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
+            .actualView()
+        
+        let model = sut.model
+        
+        XCTAssertEqual(sut.style, model.defaultStyle?[0])
+        XCTAssertEqual(sut.dimensionStyle, model.defaultStyle?[0].dimension)
+        XCTAssertEqual(sut.flexStyle, model.defaultStyle?[0].flexChild)
+        XCTAssertEqual(sut.backgroundStyle, model.defaultStyle?[0].background)
+        XCTAssertEqual(sut.spacingStyle, model.defaultStyle?[0].spacing)
+        
+        XCTAssertEqual(sut.verticalAlignment, .top)
+        XCTAssertEqual(sut.horizontalAlignment, .center)
+    }
+    
+    func test_tapGesture_shouldTriggerLinkhandler() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
+                                   layoutState: get_layout_state())
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
+
+        XCTAssertFalse(stubComponent.roktEvents.contains(.OpenUrl))
+        
+        try sut.implicitAnyView().implicitAnyView().callOnTapGesture()
+        
+        XCTAssertTrue(stubComponent.roktEvents.contains(.OpenUrl))
+    }
+    
+    func test_longPressGesture_shouldUpdatePressedStyle() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
+                                   layoutState: get_layout_state())
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticLinkComponent.self)
+            
+        try sut
+            .implicitAnyView()
+            .implicitAnyView()
+            .callOnTapGesture()
+        
+        let model = try sut.actualView().model
+        XCTAssertEqual(try sut.actualView().style, model.pressedStyle?[0])
+    }
+#else
     func test_static_link() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
         
@@ -101,7 +187,7 @@ final class TestStaticLinkComponent: XCTestCase {
         
         XCTAssertEqual(sut.style, model.pressedStyle?[0])
     }
-    
+#endif
     func get_model() throws -> StaticLinkViewModel {
         let eventService = get_mock_event_processor(uxEventDelegate: stubComponent, eventHandler: { _ in })
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(), eventService: eventService)
