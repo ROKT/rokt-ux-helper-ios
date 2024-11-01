@@ -4,6 +4,7 @@ env:
 
 steps:
   - label: ":lint-roller: Lint"
+    key: "lint"
     plugins:
       - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
     agents:

@@ -24,6 +24,9 @@ public class RoktUXEvent {
         }
     }
     
+    
+    
+    
     /// Triggered when the user positively engages with the offer for the first time
     public class FirstPositiveEngagement: RoktUXEvent {
         public var sessionId: String
