@@ -1,0 +1,49 @@
+# This file controls the behavior of Trunk: https://docs.trunk.io/cli
+# To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
+version: 0.1
+cli:
+  version: 1.22.8-beta.4
+  sha256:
+    darwin_arm64: 633286b0bb4c6e3928fab62bd7ed32e803521e79ebd569bacf797037b50c3921
+    darwin_x86_64: d73bb6a468fb453fe86eb019fb88cfcce4e211f3d36948eeedad9cd01025daf2
+    linux_arm64: 7fe43f01194c36ab8de751c29b17eb6064ba38be9ce65c66e47bda1e2bed1a0e
+    linux_x86_64: 2a917fee7c40786422bbbd108d2d4588315494d536825f4e4dd3f41c71399aa2
+    mingw_x86_64: 2cdfe81bb893df592e36f5e2cc63b8168a86202df2f77c23e80b32307e6a15a2
+    windows_x86_64: 0cbf2db62ac29b8346e7321f6135a95c9afd9386e8f01db998a95fbd43b3f604
+# Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
+plugins:
+  sources:
+    - id: trunk
+      ref: v1.6.4
+      uri: https://github.com/trunk-io/plugins
+# Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
+runtimes:
+  enabled:
+    - go@1.21.0
+    - node@18.12.1
+    - python@3.10.8
+# This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
+lint:
+  enabled:
+    - git-diff-check
+    - markdownlint@0.42.0
+    - oxipng@9.1.2
+    - prettier@3.3.3
+    - shellcheck@0.10.0
+    - shfmt@3.6.0
+    - svgo@3.3.2
+    - swiftlint@0.57.0
+  disabled:
+    - yamllint
+  ignore:
+    - linters: [ALL]
+      paths:
+        - Tests/RoktUXHelperTests/Supporting Files
+        - Example/Example/Resources
+actions:
+  enabled:
+    - trunk-announce
+    - trunk-fmt-pre-commit
+    - trunk-check-pre-push
+    - trunk-check-pre-commit
+    - trunk-upgrade-available

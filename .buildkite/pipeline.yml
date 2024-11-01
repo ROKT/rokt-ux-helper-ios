@@ -3,23 +3,22 @@ env:
   ENG_BK_AGENT: eng-default
 
 steps:
-  - label: ':lint-roller: Lint'
-    key: 'lint'
-    commands:
-      - .buildkite/bin/lint.sh
-    artifact_paths:
-      - "./test_output/**/*"
+  - label: ":lint-roller: Lint"
+    plugins:
+      - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
     agents:
-      queue: ${MAC_BK_AGENT}
-    timeout_in_minutes: 25
+      queue: eng-default
+    soft_fail:
+      - exit_status: -1
 
-  - label: ':hammer: Unit tests'
-    key: 'unit-tests'
+  - label: ":hammer: Unit tests"
+    key: "unit-tests"
     depends_on:
-      - 'lint'
+      - "lint"
     commands:
       - . ~/.zshrc
       - rbenv local 3.2.2
+      - git submodule update --init --recursive
       - bundle install --path vendor/bundle
       - bundle exec fastlane test
     agents:

@@ -1,5 +1,4 @@
 disabled_rules: # rule identifiers to exclude from running
-  - trailing_whitespace
   - identifier_name
   - force_cast
   - weak_delegate
