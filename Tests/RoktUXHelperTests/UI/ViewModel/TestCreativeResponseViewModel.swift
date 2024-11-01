@@ -15,11 +15,9 @@ import XCTest
 @available(iOS 15, *)
 final class TestCreativeResponseViewModel: XCTestCase {
     var events = [EventRequest]()
-    var stubUXHelper: MockUXHelper!
     
     override func setUpWithError() throws {
         events = [EventRequest]()
-        self.stubUXHelper = MockUXHelper()
     }
     
     func test_send_signal_impression_event() throws {

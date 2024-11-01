@@ -18,11 +18,9 @@ import XCTest
 final class TestDistributionViewModel: XCTestCase {
     
     var events = [EventRequest]()
-    var stubUXHelper: MockUXHelper!
     
     override func setUpWithError() throws {
         events = [EventRequest]()
-        self.stubUXHelper = MockUXHelper()
     }
     
     func test_slot_impression_event() throws {

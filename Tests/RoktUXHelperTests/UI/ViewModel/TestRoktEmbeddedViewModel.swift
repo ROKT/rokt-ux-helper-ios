@@ -17,12 +17,10 @@ import XCTest
 @available(iOS 15, *)
 final class TestRoktEmbeddedViewModel: XCTestCase {
     var events = [EventRequest]()
-    var stubUXHelper: MockUXHelper!
     let startDate = Date()
     
     override func setUpWithError() throws {
         events = [EventRequest]()
-        self.stubUXHelper = MockUXHelper()
     }
     
     func test_plugin_impression_event() throws {
