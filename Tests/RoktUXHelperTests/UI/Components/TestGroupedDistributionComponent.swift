@@ -19,8 +19,6 @@ import DcuiSchema
 @available(iOS 15.0, *)
 final class TestGroupedDistributionComponent: XCTestCase {
     
-    private var cancellables = Set<AnyCancellable>()
-    
     func test_grouped_distribution() throws {
         var closeActionCalled = false
         
