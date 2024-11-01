@@ -24,7 +24,7 @@ struct ScrollableRowComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @State private var contentSize: CGFloat = .zero
+    @State private var contentMaxWidth: CGFloat = .zero
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
         
     var style: RowStyle? {
@@ -82,12 +82,12 @@ struct ScrollableRowComponent: View {
                          parentHeight: $parentHeight,
                          styleState: $styleState,
                          parentOverride: parentOverride)
-            .readSize(weightProperties: weightProperties) { newSize, alignment in
-                contentSize = newSize.width
-                contentAlignment = alignment
+            .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment  in
+                contentMaxWidth = newSizeWithMax.maxWidth ?? newSizeWithMax.size.width
+                contentAlignment = newAlignment
             }
         }
-        .frame(maxWidth: contentSize, alignment: contentAlignment)
+        .frame(maxWidth: contentMaxWidth, alignment: contentAlignment)
     }
     
 }
