@@ -17,12 +17,9 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestZStackComponent: XCTestCase {
-    enum LayoutName {
-        case style, alignment
-    }
     
     func test_zStackComponent_withStyles_isApplied() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(try get_model(LayoutName.style)))
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(try get_model()))
         
         let zstack = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -56,7 +53,7 @@ final class TestZStackComponent: XCTestCase {
         XCTAssertEqual(alignment, .center)
     }
     
-    func get_model(_ layoutName: LayoutName) throws -> ZStackViewModel {
+    func get_model() throws -> ZStackViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let zstack = ModelTestData.ZStackData.zStackWithStyles()
         return try transformer.getZStack(zstack.styles,
