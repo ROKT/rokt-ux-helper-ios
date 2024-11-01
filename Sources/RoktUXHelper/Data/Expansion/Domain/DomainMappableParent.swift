@@ -17,14 +17,6 @@ import Foundation
 @available(iOS 15, *)
 protocol DomainMappableParent {
     var children: [LayoutSchemaViewModel]? { get set }
-    mutating func updateChildren(_ updatedChildren: [LayoutSchemaViewModel]?)
-}
-
-@available(iOS 15, *)
-extension DomainMappableParent {
-    mutating func updateChildren(_ updatedChildren: [LayoutSchemaViewModel]?) {
-        self.children = updatedChildren
-    }
 }
 
 @available(iOS 15, *)

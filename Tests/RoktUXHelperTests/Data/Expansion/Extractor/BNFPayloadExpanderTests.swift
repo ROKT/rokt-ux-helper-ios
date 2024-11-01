@@ -45,7 +45,6 @@ final class BNFPayloadExpanderTests: XCTestCase {
 
         sut?.expand(
             layoutVariant: transformedUIModel,
-            parent: nil,
             creativeParent: nil,
             using: firstSlot?.offer,
             dataSourceIndex: 0,

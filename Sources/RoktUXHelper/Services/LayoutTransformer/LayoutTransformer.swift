@@ -42,7 +42,6 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         for (slotIndex, slot) in layoutPlugin.slots.enumerated() {
             expander.expand(
                 layoutVariant: transformedUIModels,
-                parent: nil,
                 creativeParent: nil,
                 using: slot.offer,
                 dataSourceIndex: slotIndex,

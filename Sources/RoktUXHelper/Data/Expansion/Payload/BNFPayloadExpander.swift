@@ -21,7 +21,6 @@ protocol PayloadExpander {
     // `creativeParent` is required by elements nested in `CreativeResponse`
     func expand(
         layoutVariant: LayoutSchemaViewModel?,
-        parent: (any DomainMappableParent)?,
         creativeParent: CreativeResponseViewModel?,
         using dataSource: T?,
         dataSourceIndex: Int,
@@ -40,7 +39,6 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
 
     func expand(
         layoutVariant: LayoutSchemaViewModel?,
-        parent: (any DomainMappableParent)?,
         creativeParent: CreativeResponseViewModel?,
         using dataSource: OfferModel?,
         dataSourceIndex: Int,
@@ -194,7 +192,6 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
 
                 expand(
                     layoutVariant: child,
-                    parent: parent,
                     creativeParent: creativeParent,
                     using: offer,
                     dataSourceIndex: offerIndex,
@@ -209,7 +206,6 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
 
                 expand(
                     layoutVariant: child,
-                    parent: parent,
                     creativeParent: creativeParent,
                     using: offer,
                     dataSourceIndex: offerIndex,
@@ -224,7 +220,6 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
 
                 expand(
                     layoutVariant: child,
-                    parent: parent,
                     creativeParent: creativeParent,
                     using: offer,
                     dataSourceIndex: offerIndex,
@@ -235,7 +230,6 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
             for child in children {
                 expand(
                     layoutVariant: child,
-                    parent: parent,
                     creativeParent: creativeParent,
                     using: offer,
                     dataSourceIndex: offerIndex,
