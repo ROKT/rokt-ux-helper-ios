@@ -43,7 +43,7 @@ extension View {
     }
     
     func readSize(weightProperties: WeightModifier.Properties? = nil,
-                  onChange: @escaping (CGSize, Alignment) -> Void) -> some View {
+                  onChange: @escaping (CGSizeWithMax, Alignment) -> Void) -> some View {
         background(
             GeometryReader { geometryProxy in
                 Color.clear
@@ -51,18 +51,18 @@ extension View {
             }
         )
         .onPreferenceChange(SizePreferenceKey.self) { value in
-            var newSize = CGSize(width: value.width, height: value.height)
+            var newSizeWithMax = CGSizeWithMax(size: CGSize(width: value.width, height: value.height))
             var alignment = Alignment.center // SwiftUI default frame alignment
             
             if let weightProperties {
                 let weight = WeightModifier(props: weightProperties)
-                newSize.height = weight.frameMaxHeight ?? newSize.height
-                newSize.width = weight.frameMaxWidth ?? newSize.width
+                newSizeWithMax.maxWidth = weight.frameMaxWidth
+                newSizeWithMax.maxHeight = weight.frameMaxHeight
                 alignment = weight.alignment
             }
             
             DispatchQueue.main.async {
-                onChange(newSize, alignment)
+                onChange(newSizeWithMax, alignment)
             }
         }
     }
@@ -124,4 +124,11 @@ extension View {
 private struct SizePreferenceKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
+}
+
+@available(iOS 15, *)
+struct CGSizeWithMax {
+    let size: CGSize
+    var maxWidth: CGFloat?
+    var maxHeight: CGFloat?
 }
