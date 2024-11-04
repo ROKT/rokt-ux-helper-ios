@@ -20,7 +20,71 @@ final class TestStaticImageComponent: XCTestCase {
     enum LayoutName {
         case staticImage, emptyUrl, withAlt
     }
+#if compiler(>=6)
+    func test_static_image() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(try get_model(.staticImage)))
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticImageViewComponent.self)
+        
+        // test custom modifier class
+        let modifierContent = try sut
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
+        XCTAssertEqual(
+            try paddingModifier.actualView().padding,
+            FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24)
+        )
+        
+        // test the effect of custom modifier
+        let padding = try modifierContent.padding()
+        XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
+        
+        let image = try sut.find(AsyncImageView.self).ignoreAny(ViewType.AsyncImage.self)
+        
+        XCTAssertEqual(try image.accessibilityLabel().string(), "")
+        XCTAssertEqual(try image.accessibilityHidden(), true)
+    }
     
+    func test_static_image_empty() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(try get_model(.emptyUrl)))
+        
+        let image = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticImageViewComponent.self)
+            .actualView()
+
+        // test custom modifiers are removed with image
+        XCTAssertEqual(image.padding() as? EdgeInsets, nil)
+    }
+    
+    func test_static_image_with_alt() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(try get_model(.withAlt)))
+        
+        let image = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(StaticImageViewComponent.self)
+            .find(AsyncImageView.self)
+            .ignoreAny(ViewType.AsyncImage.self)
+
+        XCTAssertEqual(try image.accessibilityLabel().string(), "image")
+        XCTAssertEqual(try image.accessibilityHidden(), false)
+    }
+#else
     func test_static_image() throws {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(try get_model(.staticImage)))
@@ -81,7 +145,7 @@ final class TestStaticImageComponent: XCTestCase {
         XCTAssertEqual(try image.accessibilityLabel().string(), "image")
         XCTAssertEqual(try image.accessibilityHidden(), false)
     }
-    
+#endif
     func get_model(_ layoutName: LayoutName) throws -> StaticImageViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         
@@ -94,5 +158,4 @@ final class TestStaticImageComponent: XCTestCase {
             return try transformer.getStaticImage(ModelTestData.StaticImageData.withAlt())
         }
     }
-    
 }

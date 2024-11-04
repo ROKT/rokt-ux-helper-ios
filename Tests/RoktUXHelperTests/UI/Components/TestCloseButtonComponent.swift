@@ -16,7 +16,48 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestCloseButtonComponent: XCTestCase {
-    
+#if compiler(>=6)
+    func test_creative_response() throws {
+        
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
+        
+        let closeButton = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(CloseButtonComponent.self)
+        
+        // test custom modifier class
+        let modifierContent = try closeButton
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+
+        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
+        
+        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
+        
+        // test the effect of custom modifier
+        XCTAssertEqual(
+            try modifierContent.padding(),
+            EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
+        )
+
+        XCTAssertEqual(
+            try closeButton
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .implicitAnyView()
+                .accessibilityLabel()
+                .string(),
+            "Close button"
+        )
+    }
+#else
     func test_creative_response() throws {
         
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
@@ -40,6 +81,7 @@ final class TestCloseButtonComponent: XCTestCase {
         
         XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close button")
     }
+#endif
     
     func get_model() throws -> CloseButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
@@ -47,5 +89,4 @@ final class TestCloseButtonComponent: XCTestCase {
         return try transformer.getCloseButton(styles: closeButton.styles,
                                               children: transformer.transformChildren(closeButton.children, slot: nil))
     }
-    
 }
