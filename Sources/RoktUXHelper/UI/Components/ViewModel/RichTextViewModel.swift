@@ -21,7 +21,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
     private let eventService: EventDiagnosticServicing?
-    
+
     let id: UUID = UUID()
     let defaultStyle: [RichTextStyle]?
     let linkStyle: [InLineTextStyle]?
@@ -37,24 +37,24 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     lazy var currentIndex: Binding<Int> = layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     lazy var totalOffer: Int = layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
     lazy var viewableItems: Binding<Int> = layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
-    
+
     var totalPages: Int {
         return Int(ceil(Double(totalOffer)/Double(viewableItems.wrappedValue)))
     }
-    
+
     var stateReplacedAttributedString: NSAttributedString {
         let text = attributedString.description.isEmpty ? NSAttributedString(string: boundValue) : attributedString
-        
+
         let replacedText = TextComponentBNFHelper.replaceStates(text,
                                                                 currentOffer: "\(currentIndex.wrappedValue + 1)",
                                                                 totalOffers: "\(totalPages)")
         return replacedText
     }
-    
+
     var stateReplacedText: String {
         TextComponentBNFHelper.replaceStates(boundValue,
                                              currentOffer: "\(currentIndex.wrappedValue + 1)",
@@ -81,7 +81,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.eventService = eventService
         updateBoundValueWithStyling()
     }
-    
+
     func updateDataBinding(dataBinding: DataBinding<String>) {
         self.dataBinding = dataBinding
         runDataExpansion()
@@ -144,12 +144,12 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         let valueToTransform = boundValue
 
         guard defaultStyle?.count ?? -1 > breakpointIndex,
-              let breakpointDefaultStyle = defaultStyle?[breakpointIndex] 
+              let breakpointDefaultStyle = defaultStyle?[breakpointIndex]
         else { return }
 
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
-        
+
         guard let htmlTransformedValue = try? valueToTransform.htmlToAttributedString(
             textColorHex: breakpointDefaultStyle.text?.textColor?.getAdaptiveColor(colorScheme),
             uiFont: breakpointDefaultStyle.text?.styledUIFont,
@@ -162,30 +162,30 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
 
         attributedString = htmlTransformedValue
     }
-    
+
     func updateAttributedString(_ colorScheme: ColorScheme) {
         transformValueToAttributedString(colorScheme)
     }
-    
+
     func validateFont(textStyle: TextStylingProperties?) {
         if let fontFamily = textStyle?.fontFamily,
             UIFont(name: fontFamily,
-                  size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
+                   size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
             eventService?.sendFontDiagnostics(fontFamily)
         }
     }
-    
+
     func handleURL(_ url: URL) -> OpenURLAction.Result {
         eventService?.openURL(url: url, type: .init(openLinks), completionHandler: {})
         return .handled
     }
-    
+
     func updateBreakpointLinkIndex(for newSize: CGFloat?) -> Int {
         let linkIndex = min(layoutState.getGlobalBreakpointIndex(newSize),
-                        (linkStyle?.count ?? 1) - 1)
+                            (linkStyle?.count ?? 1) - 1)
         return linkIndex >= 0 ? linkIndex : 0
     }
-    
+
     func onAppear(textStyle: RichTextStyle?) {
         if attributedString.description.isEmpty && stateReplacedAttributedString.description.isEmpty {
             eventService?.sendDiagnostics(

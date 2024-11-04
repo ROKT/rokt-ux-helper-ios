@@ -16,7 +16,7 @@ enum LayoutSchemaViewModel: Hashable {
     // top-level
     case overlay(OverlayViewModel)
     case bottomSheet(BottomSheetViewModel)
- 
+
     case row(RowViewModel)
     case column(ColumnViewModel)
     case zStack(ZStackViewModel)
@@ -38,46 +38,46 @@ enum LayoutSchemaViewModel: Hashable {
     case progressControl(ProgressControlViewModel)
     case toggleButton(ToggleButtonViewModel)
     case empty
-    
+
     static func == (lhs: LayoutSchemaViewModel, rhs: LayoutSchemaViewModel) -> Bool {
-        switch(lhs, rhs) {
-        case (.richText(let lhsModel), .richText( let rhsModel)):
+        switch (lhs, rhs) {
+        case (.richText(let lhsModel), .richText(let rhsModel)):
             return lhsModel == rhsModel
-        case (.basicText(let lhsModel), .basicText( let rhsModel)):
+        case (.basicText(let lhsModel), .basicText(let rhsModel)):
             return lhsModel == rhsModel
-        case (.column(let lhsModel), .column( let rhsModel)):
+        case (.column(let lhsModel), .column(let rhsModel)):
             return lhsModel == rhsModel
-        case (.row(let lhsModel), .row( let rhsModel)):
-            return lhsModel == rhsModel 
-        case (.zStack(let lhsModel), .zStack( let rhsModel)):
+        case (.row(let lhsModel), .row(let rhsModel)):
             return lhsModel == rhsModel
-        case (.scrollableRow(let lhsModel), .scrollableRow( let rhsModel)):
+        case (.zStack(let lhsModel), .zStack(let rhsModel)):
             return lhsModel == rhsModel
-        case (.scrollableColumn(let lhsModel), .scrollableColumn( let rhsModel)):
+        case (.scrollableRow(let lhsModel), .scrollableRow(let rhsModel)):
             return lhsModel == rhsModel
-        case (.creativeResponse(let lhsModel), .creativeResponse( let rhsModel)):
+        case (.scrollableColumn(let lhsModel), .scrollableColumn(let rhsModel)):
             return lhsModel == rhsModel
-        case (.staticImage(let lhsModel), .staticImage( let rhsModel)):
+        case (.creativeResponse(let lhsModel), .creativeResponse(let rhsModel)):
             return lhsModel == rhsModel
-        case (.dataImage(let lhsModel), .dataImage( let rhsModel)):
+        case (.staticImage(let lhsModel), .staticImage(let rhsModel)):
             return lhsModel == rhsModel
-        case (.progressIndicator(let lhsModel), .progressIndicator( let rhsModel)):
+        case (.dataImage(let lhsModel), .dataImage(let rhsModel)):
             return lhsModel == rhsModel
-        case (.oneByOne(let lhsModel), .oneByOne( let rhsModel)):
+        case (.progressIndicator(let lhsModel), .progressIndicator(let rhsModel)):
             return lhsModel == rhsModel
-        case (.carousel(let lhsModel), .carousel( let rhsModel)):
-            return lhsModel == rhsModel      
-        case (.groupDistribution(let lhsModel), .groupDistribution( let rhsModel)):
+        case (.oneByOne(let lhsModel), .oneByOne(let rhsModel)):
             return lhsModel == rhsModel
-        case (.when(let lhsModel), .when( let rhsModel)):
+        case (.carousel(let lhsModel), .carousel(let rhsModel)):
             return lhsModel == rhsModel
-        case (.closeButton(let lhsModel), .closeButton( let rhsModel)):
+        case (.groupDistribution(let lhsModel), .groupDistribution(let rhsModel)):
             return lhsModel == rhsModel
-        case (.staticLink(let lhsModel), .staticLink( let rhsModel)):
-            return lhsModel == rhsModel        
-        case (.progressControl(let lhsModel), .progressControl( let rhsModel)):
+        case (.when(let lhsModel), .when(let rhsModel)):
             return lhsModel == rhsModel
-        case (.toggleButton(let lhsModel), .toggleButton( let rhsModel)):
+        case (.closeButton(let lhsModel), .closeButton(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.staticLink(let lhsModel), .staticLink(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.progressControl(let lhsModel), .progressControl(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.toggleButton(let lhsModel), .toggleButton(let rhsModel)):
             return lhsModel == rhsModel
         case (.empty, .empty):
             return true

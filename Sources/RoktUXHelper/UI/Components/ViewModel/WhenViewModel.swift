@@ -23,7 +23,7 @@ class WhenViewModel: Identifiable, Hashable {
     let slots: [SlotOfferModel]
     let globalBreakPoints: BreakPoint?
     let layoutState: any LayoutStateRepresenting
-    
+
     init(children: [LayoutSchemaViewModel]? = nil,
          predicates: [WhenPredicate]?,
          transition: WhenTransition?,
@@ -37,7 +37,7 @@ class WhenViewModel: Identifiable, Hashable {
         self.globalBreakPoints = globalBreakPoints
         self.layoutState = layoutState
     }
-    
+
     var fadeInDuration: Double {
         transition?.inTransition.map { transitions in
             transitions.compactMap {
@@ -48,7 +48,7 @@ class WhenViewModel: Identifiable, Hashable {
             }
         }?.first ?? 0
     }
-    
+
     var fadeOutDuration: Double {
         transition?.outTransition.map { transitions in
             transitions.compactMap {
@@ -59,19 +59,19 @@ class WhenViewModel: Identifiable, Hashable {
             }
         }?.first ?? 0
     }
-    
+
     var currentProgress: Binding<Int> {
         layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
-    
+
     var totalItems: Int {
         layoutState.items[LayoutState.totalItemsKey] as? Int ?? 0
     }
-    
+
     var customStateMap: Binding<CustomStateMap?> {
         layoutState.items[LayoutState.customStateMap] as? Binding<CustomStateMap?> ?? .constant(nil)
     }
-    
+
     private var darkModePredicates: [DarkModePredicate] {
         predicates?.compactMap {
             switch $0 {
@@ -87,42 +87,42 @@ class WhenViewModel: Identifiable, Hashable {
         default: return nil
         }
     } ?? [] }
-    
+
     private var breakPointPredicates: [BreakpointPredicate] { predicates?.compactMap {
         switch $0 {
         case .breakpoint(let predicate): return predicate
         default: return nil
         }
     } ?? [] }
-    
+
     private var positionPredicates: [PositionPredicate] { predicates?.compactMap {
         switch $0 {
         case .position(let predicate): return predicate
         default: return nil
         }
     } ?? [] }
-    
+
     private var staticBooleanPredicates: [StaticBooleanPredicate] { predicates?.compactMap {
         switch $0 {
         case .staticBoolean(let predicate): return predicate
         default: return nil
         }
     } ?? [] }
-    
+
     private var creativeCopyPredicates: [CreativeCopyPredicate] { predicates?.compactMap {
         switch $0 {
         case .creativeCopy(let predicate): return predicate
         default: return nil
         }
     } ?? [] }
-    
+
     private var staticStringPredicates: [StaticStringPredicate] { predicates?.compactMap {
         switch $0 {
         case .staticString(let predicate): return predicate
         default: return nil
         }
     } ?? [] }
-    
+
     private var customStatePredicates: [CustomStatePredicate] { predicates?.compactMap {
         switch $0 {
         case .customState(let predicate): return predicate
@@ -132,7 +132,7 @@ class WhenViewModel: Identifiable, Hashable {
 
     private func progressionPredicatesMatched(currentProgress: Int) -> Bool? {
         // currentProgress refer to currentOffer in Onebyone and current page in carousel
-        
+
         // don't apply if the predicates is empty
         guard !progressionPredicates.isEmpty else { return nil }
 
@@ -157,15 +157,15 @@ class WhenViewModel: Identifiable, Hashable {
 
         return matched
     }
-    
+
     private func positionPredicatesMatched(offerPosition: Int?, totalOffers: Int) -> Bool? {
-        
+
         // don't apply if the predicates is empty
         guard !positionPredicates.isEmpty else { return nil }
 
         // position should not apply on outer layer to match web behaviour
         guard let offerPosition else { return false}
-        
+
         // Predicates need to applied if all of the preicates are met.
         // The default is true and will be used by && operation on each predicates
         var matched = true
@@ -176,7 +176,7 @@ class WhenViewModel: Identifiable, Hashable {
                 // Eg: Total offers = 4, Predicate value = -1 then the result should be 3(last position)
                 //     Total offers = 4, Predicate value = -2 then the result should be 2(second last position)
                 let position = value >= 0 ? value : totalOffers + value
-                
+
                 switch predicate.condition {
                 case .is:
                     matched = matched && offerPosition == position
@@ -234,10 +234,10 @@ class WhenViewModel: Identifiable, Hashable {
                 matched = matched && isDarkMode != predicate.value
             }
         }
-        
+
         return matched
     }
-    
+
     private func staticBooleanPredicatesMatched() -> Bool? {
 
         guard !staticBooleanPredicates.isEmpty else { return nil }
@@ -257,7 +257,7 @@ class WhenViewModel: Identifiable, Hashable {
 
         return matched
     }
-    
+
     private func creativeCopyMatched(offerPosition: Int) -> Bool? {
         guard !creativeCopyPredicates.isEmpty else { return nil }
 
@@ -267,7 +267,7 @@ class WhenViewModel: Identifiable, Hashable {
 
         creativeCopyPredicates.forEach { predicate in
             let value = predicate.value
-            
+
             switch predicate.condition {
             case .exists:
                 matched = matched && !(getCreativeCopy(offerPosition)[value] ?? "").isEmpty
@@ -278,12 +278,12 @@ class WhenViewModel: Identifiable, Hashable {
 
         return matched
     }
-    
+
     private func getCreativeCopy(_ offerPosition: Int) -> [String: String] {
         guard slots.count > offerPosition else { return [:] }
         return slots[offerPosition].offer?.creative.copy ?? [:]
     }
-    
+
     private func staticStringPredicatesMatched() -> Bool? {
 
         guard !staticStringPredicates.isEmpty else { return nil }
@@ -303,10 +303,10 @@ class WhenViewModel: Identifiable, Hashable {
 
         return matched
     }
-    
+
     private func customStatePredicatesMatched(customStateMap: CustomStateMap?, position: Int?) -> Bool? {
         guard !customStatePredicates.isEmpty else { return nil }
-        
+
         // Predicates need to applied if all of the predicates are met.
         // The default is true and will be used by && operation on each predicate
         var matched = true
@@ -340,7 +340,7 @@ class WhenViewModel: Identifiable, Hashable {
         let creativeCopyMatched = creativeCopyMatched(offerPosition: uiState.currentProgress)
         let staticStringMatched = staticStringPredicatesMatched()
         let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap, position: uiState.position)
-        
+
         if progressionMatched == nil &&
             breakPointsMatched == nil &&
             positionMatched == nil &&
@@ -349,17 +349,17 @@ class WhenViewModel: Identifiable, Hashable {
             creativeCopyMatched == nil &&
             staticStringMatched == nil &&
             customStateMatched == nil { return true }
-        
+
         var matched = true
-        
+
         if let progressionMatched {
             matched = matched && progressionMatched
         }
-        
+
         if let positionMatched {
             matched = matched && positionMatched
         }
-        
+
         if let breakPointsMatched {
             matched = matched && breakPointsMatched
         }
@@ -367,19 +367,19 @@ class WhenViewModel: Identifiable, Hashable {
         if let darkModeMatched {
             matched = matched && darkModeMatched
         }
-        
+
         if let staticBooleanMatched {
             matched = matched && staticBooleanMatched
         }
-        
+
         if let creativeCopyMatched {
             matched = matched && creativeCopyMatched
         }
-        
+
         if let staticStringMatched {
             matched = matched && staticStringMatched
         }
-        
+
         if let customStateMatched {
             matched = matched && customStateMatched
         }

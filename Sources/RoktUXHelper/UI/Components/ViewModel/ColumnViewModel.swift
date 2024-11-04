@@ -22,11 +22,11 @@ class ColumnViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let disabledStyle: [ColumnStyle]?
     let accessibilityGrouped: Bool
     let layoutState: any LayoutStateRepresenting
-    
+
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [ColumnStyle]?,
          pressedStyle: [ColumnStyle]?,

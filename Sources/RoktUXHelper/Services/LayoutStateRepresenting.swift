@@ -19,7 +19,7 @@ protocol LayoutStateRepresenting: Hashable, Equatable {
     var imageLoader: ImageLoader? { get }
     var colorMode: RoktUXConfig.ColorMode? { get }
     var config: RoktUXConfig? { get }
-    
+
     func setLayoutType(_ type: PlacementLayoutCode)
     func layoutType() -> PlacementLayoutCode
     func closeOnComplete() -> Bool

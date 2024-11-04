@@ -15,7 +15,7 @@ import Foundation
 public struct EventNameValue: Codable, Hashable, Equatable {
     public let name: String
     public let value: String
-    
+
     public init(name: String, value: String) {
         self.name = name
         self.value = value

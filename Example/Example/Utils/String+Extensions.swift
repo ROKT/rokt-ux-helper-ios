@@ -12,7 +12,7 @@
 import Foundation
 
 extension String {
-    
+
     static func getExperienceResponse(for fileName: String) -> String? {
         if let path = Bundle.main.path(forResource: fileName, ofType: "json"),
            let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe) {

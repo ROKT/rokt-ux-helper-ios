@@ -22,7 +22,7 @@ struct BasicTextComponent: View {
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
-    
+
     var lineLimit: Int? {
         guard let lineLimit = style?.text?.lineLimit else { return nil }
         return Int(lineLimit)
@@ -35,7 +35,7 @@ struct BasicTextComponent: View {
         }
         return CGFloat(lineHeight) - fontLineHeight
     }
-    
+
     var lineHeightPadding: CGFloat {
         guard let lineHeight = style?.text?.lineHeight,
               let fontLineHeight = style?.text?.styledUIFont?.lineHeight,
@@ -47,7 +47,7 @@ struct BasicTextComponent: View {
     }
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
-    
+
     let config: ComponentConfig
     @ObservedObject var model: BasicTextViewModel
 
@@ -55,10 +55,10 @@ struct BasicTextComponent: View {
     @Binding var parentHeight: CGFloat?
 
     @Binding var styleState: StyleState
-    
+
     @Binding var currentIndex: Int
     @Binding var viewableItems: Int
-    
+
     var totalOffers: Int
     var totalPages: Int {
         return Int(ceil(Double(totalOffers)/Double(viewableItems)))
@@ -66,8 +66,8 @@ struct BasicTextComponent: View {
 
     var stateReplacedValue: String {
         TextComponentBNFHelper.replaceStates(model.boundValue,
-                                          currentOffer: "\(currentIndex + 1)",
-                                          totalOffers: "\(totalPages)")
+                                             currentOffer: "\(currentIndex + 1)",
+                                             totalOffers: "\(totalPages)")
     }
 
     let parentOverride: ComponentParentOverride?
@@ -91,7 +91,7 @@ struct BasicTextComponent: View {
     var horizontalAlignmentOverride: HorizontalAlignment? {
         style?.text?.horizontalTextAlign?.asAlignment.horizontal
     }
-    
+
     init(
         config: ComponentConfig,
         model: BasicTextViewModel,

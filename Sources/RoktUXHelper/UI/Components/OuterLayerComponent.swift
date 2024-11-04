@@ -27,12 +27,12 @@ struct OuterLayerComponent: View {
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
 
     let parent: ComponentParentType
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @State var lastUpdatedHeight: CGFloat = 0
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -42,7 +42,7 @@ struct OuterLayerComponent: View {
     var horizontalAlignment: HorizontalAlignmentProperty {
         containerStyle?.alignItems?.asHorizontalAlignmentProperty ?? .start
     }
-    
+
     init(
         layouts: [LayoutSchemaViewModel]?,
         style: StylingPropertiesModel?,
@@ -54,7 +54,7 @@ struct OuterLayerComponent: View {
         onSizeChange: ((CGFloat) -> Void)? = nil
     ) {
         self.viewModel = RoktEmbeddedViewModel(layouts: layouts,
-                                               eventService: eventService, 
+                                               eventService: eventService,
                                                layoutState: layoutState)
         self.style = style
         self.parent = parent
@@ -62,7 +62,7 @@ struct OuterLayerComponent: View {
         _parentHeight = parentHeight
         self.onSizeChange = onSizeChange
     }
-    
+
     var body: some View {
         if let layouts = viewModel.layouts {
             build(layouts: layouts)
@@ -89,7 +89,7 @@ struct OuterLayerComponent: View {
                     DispatchQueue.background.async {
                         notifyHeightChanged(size.height)
                     }
-                    
+
                 }
                 .onLoad {
                     viewModel.sendOnLoadEvents()
@@ -111,14 +111,14 @@ struct OuterLayerComponent: View {
                                       parentWidth: $availableWidth,
                                       parentHeight: $availableHeight,
                                       styleState: .constant(.default),
-                                      parentOverride: ComponentParentOverride(parentVerticalAlignment: nil, 
+                                      parentOverride: ComponentParentOverride(parentVerticalAlignment: nil,
                                                                               parentHorizontalAlignment: nil,
                                                                               parentBackgroundStyle: backgroundStyle,
                                                                               stretchChildren: nil))
             }
         }
     }
-    
+
     func notifyHeightChanged(_ newHeight: CGFloat) {
         if lastUpdatedHeight != newHeight {
             onSizeChange?(newHeight)

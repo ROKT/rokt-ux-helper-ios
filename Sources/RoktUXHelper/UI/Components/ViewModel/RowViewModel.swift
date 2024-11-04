@@ -25,7 +25,7 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [RowStyle]?,
          pressedStyle: [RowStyle]?,
@@ -40,5 +40,5 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.disabledStyle = disabledStyle
         self.accessibilityGrouped = accessibilityGrouped
         self.layoutState = layoutState
-    }    
+    }
 }

@@ -15,37 +15,37 @@ import DcuiSchema
 @available(iOS 15, *)
 struct GroupedDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     var style: GroupedDistributionStyles? {
         return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex = 0
     @State var frameChangeIndex: Int = 0
-    
+
     var containerStyle: ContainerStylingProperties? { style?.container }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
-    
+
     var transition: DcuiSchema.Transition? { model.transition }
-    
+
     let config: ComponentConfig
     let model: GroupedDistributionViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
-    
+
     @State var currentGroup = 0
     @State private var toggleTransition = false
     @State private var currentLeadingOffer = 0
-    
+
     @State var customStateMap: CustomStateMap?
-    
+
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
         String(format: kPageAnnouncement,
@@ -75,7 +75,7 @@ struct GroupedDistributionComponent: View {
         self.parentOverride = parentOverride
         self.model = model
     }
-    
+
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
             return justifyContent
@@ -95,7 +95,7 @@ struct GroupedDistributionComponent: View {
             return .start
         }
     }
-    
+
     @State var viewableItems: Int = 1
     var children: [LayoutSchemaViewModel] {
         guard let children = model.children, !children.isEmpty else {
@@ -103,37 +103,37 @@ struct GroupedDistributionComponent: View {
         }
         return children
     }
-    
+
     var totalOffers: Int {
         children.count
     }
-    
+
     var pages: [[LayoutSchemaViewModel]] {
         stride(from: 0, to: totalOffers, by: viewableItems).map {
-            Array(children[$0 ..< $0.advanced(by: min(viewableItems, children.endIndex - $0))])
+            Array(children[$0..<$0.advanced(by: min(viewableItems, children.endIndex - $0))])
         }
     }
-    
+
     var totalPages: Int {
         pages.count
     }
-    
+
     var gap: CGFloat {
         CGFloat(containerStyle?.gap ?? 0)
     }
-    
+
     var viewableChildren: [LayoutSchemaViewModel] {
         guard !children.isEmpty else { return [] }
         guard currentGroup < totalPages else { return [] }
         return pages[currentGroup]
     }
-    
+
     func getViewableChildren() -> [LayoutSchemaViewModel] {
         guard !children.isEmpty else { return [] }
         guard currentGroup < totalPages else { return [] }
         return pages[currentGroup]
     }
-    
+
     var body: some View {
         if !children.isEmpty {
             build(page: getViewableChildren())
@@ -162,7 +162,7 @@ struct GroupedDistributionComponent: View {
                 .accessibilityLabel(accessibilityAnnouncement)
                 .onChange(of: currentLeadingOffer) { newValue in
                     model.sendViewableImpressionEvents(viewableItems: viewableItems,
-                                                           currentLeadingOffer: newValue)
+                                                       currentLeadingOffer: newValue)
                     shouldFocusAccessibility = true
                     UIAccessibility.post(notification: .announcement,
                                          argument: accessibilityAnnouncement)
@@ -171,17 +171,17 @@ struct GroupedDistributionComponent: View {
                     // run it in background thread for smooth transition
                     DispatchQueue.background.async {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
-                        frameChangeIndex +=  1
+                        frameChangeIndex += 1
                         setViewableItemsForBreakpoint(newSize)
                         // set viewableItems first then send impressions for offers based on viewableItems
                         // duplicated events will be filtered out
                         model.sendViewableImpressionEvents(viewableItems: viewableItems,
-                                                               currentLeadingOffer: currentLeadingOffer)
+                                                           currentLeadingOffer: currentLeadingOffer)
                     }
                 }
         }
     }
-    
+
     func build(page: [LayoutSchemaViewModel]) -> some View {
         return VStack(alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                       spacing: gap) {
@@ -202,16 +202,16 @@ struct GroupedDistributionComponent: View {
                     }
                 }
             }
-            
+
         }
     }
-            
+
     func registerActions() {
         model.layoutState.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState.actionCollection[.nextGroup] = goToNextGroup
         model.layoutState.actionCollection[.previousGroup] = goToPreviousGroup
         model.layoutState.actionCollection[.toggleCustomState] = toggleCustomState
-        
+
         model.setupBindings(
             currentProgress: $currentGroup,
             totalItems: model.children?.count ?? 0,
@@ -234,13 +234,13 @@ struct GroupedDistributionComponent: View {
             exit()
         }
     }
-    
+
     func goToPreviousGroup(_: Any? = nil) {
         if currentGroup > 0 {
             transitionToPreviousGroup()
         }
     }
-    
+
     // note this action only applies when viewableItems = 1
     func goToNextOffer(_: Any? = nil) {
         guard viewableItems == 1 else { return }
@@ -257,24 +257,25 @@ struct GroupedDistributionComponent: View {
             exit()
         }
     }
-    
+
     func exit() {
         model.layoutState.actionCollection[.close](nil)
     }
-    
+
     func transitionIn() {
         switch transition {
         case .fadeInOut(let settings):
             let duration = Double(settings.duration)/1000/2
             withAnimation(
-                .easeIn(duration: Double(duration))) {
+                .easeIn(duration: Double(duration))
+            ) {
                 toggleTransition = true
             }
         default:
             return
         }
     }
-    
+
     func transitionToNextGroup() {
         switch transition {
         case .fadeInOut(let settings):
@@ -293,8 +294,8 @@ struct GroupedDistributionComponent: View {
             self.currentGroup = currentGroup + 1
             self.currentLeadingOffer = currentGroup * viewableItems
         }
-    }   
-    
+    }
+
     func transitionToPreviousGroup() {
         switch transition {
         case .fadeInOut(let settings):
@@ -314,12 +315,12 @@ struct GroupedDistributionComponent: View {
             self.currentLeadingOffer = currentGroup * viewableItems
         }
     }
-    
+
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: CustomStateMap = customStateMap ?? CustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
     }
-    
+
     func getOpacity() -> Double {
         switch transition {
         case .fadeInOut:
@@ -328,21 +329,21 @@ struct GroupedDistributionComponent: View {
             return 1
         }
     }
-    
+
     func setViewableItemsForBreakpoint(_ newSize: CGFloat?) {
         let maxViewableItemsIndex = (model.viewableItems.count) - 1
-        
+
         let currentBreakpointIndex = model.getGlobalBreakpointIndex(newSize)
 
         let index = max(min(currentBreakpointIndex, maxViewableItemsIndex), 0)
         let previousLeadingOffer = pages[currentGroup].first
-        
+
         viewableItems = Int(model.viewableItems[index])
-        
+
         // navigate to the currect page
         navigateToBreakPointPage(previousLeadingOffer)
     }
-    
+
     func navigateToBreakPointPage(_ currentLeadingOffer: LayoutSchemaViewModel?) {
         if let currentLeadingOffer {
             var newPageIndex = 0

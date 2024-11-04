@@ -17,19 +17,19 @@ import DcuiSchema
 
 @available(iOS 13.0, *)
 class LayoutState: LayoutStateRepresenting {
-    
-    static let breakPointsSharedKey = "breakPoints"     // BreakPoint
-    static let currentProgressKey = "currentProgress"   // Binding<Int>
-    static let totalItemsKey = "totalItems"             // Int
-    static let layoutType = "layoutCode"                // PlacementLayoutCode
-    static let viewableItemsKey = "viewableItems"       // Binding<Int>
-    static let layoutSettingsKey = "layoutSettings"     // LayoutSettings
-    static let customStateMap = "customStateMap"        // CustomStateMap
-    
+
+    static let breakPointsSharedKey = "breakPoints" // BreakPoint
+    static let currentProgressKey = "currentProgress" // Binding<Int>
+    static let totalItemsKey = "totalItems" // Int
+    static let layoutType = "layoutCode" // PlacementLayoutCode
+    static let viewableItemsKey = "viewableItems" // Binding<Int>
+    static let layoutSettingsKey = "layoutSettings" // LayoutSettings
+    static let customStateMap = "customStateMap" // CustomStateMap
+
     private var _items = [String: Any]()
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
     let config: RoktUXConfig?
-    
+
     var items: [String: Any] {
         get {
             queue.sync {
@@ -42,17 +42,17 @@ class LayoutState: LayoutStateRepresenting {
             }
         }
     }
-    
+
     var actionCollection: ActionCollecting
-    
+
     var colorMode: RoktUXConfig.ColorMode? {
         config?.colorMode
     }
-    
+
     var imageLoader: (any ImageLoader)? {
         config?.imageLoader
     }
-    
+
     init(actionCollection: ActionCollecting = ActionCollection(), config: RoktUXConfig? = nil) {
         self.actionCollection = actionCollection
         self.config = config
@@ -65,7 +65,7 @@ class LayoutState: LayoutStateRepresenting {
     func layoutType() -> PlacementLayoutCode {
         (items[LayoutState.layoutType] as? PlacementLayoutCode) ?? .unknown
     }
-    
+
     func closeOnComplete() -> Bool {
         guard let layoutSettings = items[LayoutState.layoutSettingsKey] as? LayoutSettings,
               let closeOnComplete = layoutSettings.closeOnComplete
@@ -74,13 +74,13 @@ class LayoutState: LayoutStateRepresenting {
         }
         return closeOnComplete
     }
-    
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         guard let width,
               let globalBreakPoints = items[LayoutState.breakPointsSharedKey] as? BreakPoint,
               !globalBreakPoints.isEmpty
         else { return 0 }
-        
+
         let sortedGlobalBreakPoints = globalBreakPoints.sorted { $0.1 < $1.1 }
         var index = 0
         for breakpoint in sortedGlobalBreakPoints {
@@ -89,7 +89,7 @@ class LayoutState: LayoutStateRepresenting {
             }
             index += 1
         }
-        
+
         return index
     }
 }

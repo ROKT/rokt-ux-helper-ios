@@ -25,7 +25,7 @@ class ZStackViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [ZStackStyle]?,
          pressedStyle: [ZStackStyle]?,

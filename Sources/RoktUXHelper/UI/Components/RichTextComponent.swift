@@ -28,11 +28,11 @@ struct RichTextComponent: View {
     var linkStyle: InlineTextStylingProperties? {
         model.linkStyle?.count ?? -1 > breakpointLinkIndex ? model.linkStyle?[breakpointLinkIndex].text : nil
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex: Int = 0
     @State var breakpointLinkIndex: Int = 0
-    
+
     var lineLimit: Int? {
         guard let lineLimit = style?.text?.lineLimit else { return nil }
         return Int(lineLimit)
@@ -59,7 +59,7 @@ struct RichTextComponent: View {
 
     let config: ComponentConfig
     @ObservedObject var model: RichTextViewModel
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
 
@@ -69,7 +69,7 @@ struct RichTextComponent: View {
     let borderStyle: BorderStylingProperties?
 
     @State private var hasValidated = false
-    
+
     var textView: Text {
         if model.attributedString.description.contains(BNFSeparator.startDelimiter.rawValue) ||
             model.attributedString.description.contains(BNFSeparator.endDelimiter.rawValue) {
@@ -80,7 +80,7 @@ struct RichTextComponent: View {
             Text(AttributedString(model.attributedString))
         }
     }
-    
+
     var verticalAlignment: VerticalAlignmentProperty {
         parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty ?? .top
     }
@@ -137,7 +137,7 @@ struct RichTextComponent: View {
                     DispatchQueue.background.async {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
                         breakpointLinkIndex = model.updateBreakpointLinkIndex(for: newSize)
-                        
+
                         DispatchQueue.main.async {
                             model.breakpointIndex = breakpointIndex
                             model.breakpointLinkIndex = breakpointLinkIndex

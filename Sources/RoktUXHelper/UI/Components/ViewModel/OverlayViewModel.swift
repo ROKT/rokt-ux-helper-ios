@@ -24,7 +24,7 @@ class OverlayViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          allowBackdropToClose: Bool?,
          defaultStyle: [OverlayStyles]?,

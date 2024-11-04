@@ -19,12 +19,12 @@ public struct RoktUXConfig {
     let colorMode: ColorMode
     /// Optional image loader for the UX.
     let imageLoader: ImageLoader?
-    
+
     private init(colorMode: ColorMode, imageLoader: ImageLoader?) {
         self.colorMode = colorMode
         self.imageLoader = imageLoader
     }
-    
+
     /// Enum representing the color modes available.
     public enum ColorMode: Int {
         /// Application is in Light Mode.
@@ -34,12 +34,12 @@ public struct RoktUXConfig {
         /// Application defaults to System Color Mode.
         case system
     }
-    
+
     /// Builder class for constructing `RoktUXConfig`
     public class Builder: NSObject {
         var colorMode: ColorMode?
         weak var imageLoader: ImageLoader?
-        
+
         /// Sets the color mode for the configuration.
         /// - Parameter colorMode: The color mode to be set.
         /// - Returns: The builder instance for chaining.
@@ -47,7 +47,7 @@ public struct RoktUXConfig {
             self.colorMode = colorMode
             return self
         }
-        
+
         /// Sets the image loader for the configuration.
         /// - Parameter imageLoader: The image loader to be set.
         /// - Returns: The builder instance for chaining.
@@ -55,7 +55,7 @@ public struct RoktUXConfig {
             self.imageLoader = imageLoader
             return self
         }
-        
+
         /// Builds the `RoktUXConfig` instance with the specified settings.
         /// - Returns: A configured `RoktUXConfig` instance.
         public func build() -> RoktUXConfig {

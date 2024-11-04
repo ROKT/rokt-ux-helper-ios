@@ -15,12 +15,12 @@ import Foundation
 class DistributionViewModel: Hashable {
     let eventService: EventServicing?
     let slots: [SlotModel]
-    
+
     var layoutState: any LayoutStateRepresenting
     var config: RoktUXConfig? {
         layoutState.config
     }
-    
+
     init(
         eventService: EventServicing?,
         slots: [SlotModel],
@@ -30,12 +30,12 @@ class DistributionViewModel: Hashable {
         self.slots = slots
         self.layoutState = layoutState
     }
-    
+
     func sendImpressionEvents(currentOffer: Int) {
         sendSlotImpressionEvent(currentOffer: currentOffer)
         sendCreativeImpressionEvent(currentOffer: currentOffer)
     }
-    
+
     func sendSlotImpressionEvent(currentOffer: Int) {
         guard let slotJWTToken = getSlotJWTToken(currentOffer: currentOffer) else { return }
 
@@ -49,7 +49,7 @@ class DistributionViewModel: Hashable {
 
     func sendCreativeImpressionEvent(currentOffer: Int) {
         guard let creativeJWTToken = getCreativeJWTToken(currentOffer: currentOffer) else { return }
-        
+
         if let instanceGuid = getCreativeInstance(currentOffer: currentOffer) {
             eventService?.sendSlotImpressionEvent(
                 instanceGuid: instanceGuid,
@@ -57,7 +57,7 @@ class DistributionViewModel: Hashable {
             )
         }
     }
-    
+
     func sendCreativeViewedEvent(currentOffer: Int) {
         guard let creativeJWTToken = getCreativeJWTToken(currentOffer: currentOffer) else { return }
 
@@ -68,7 +68,7 @@ class DistributionViewModel: Hashable {
             )
         }
     }
-    
+
     func sendDismissalNoMoreOfferEvent() {
         eventService?.dismissOption = .noMoreOffer
         eventService?.sendDismissalEvent()
@@ -78,7 +78,7 @@ class DistributionViewModel: Hashable {
         eventService?.dismissOption = .collapsed
         eventService?.sendDismissalEvent()
     }
-    
+
     func getSlotInstance(currentOffer: Int) -> String? {
         guard slots.count > currentOffer else { return nil }
         return slots[currentOffer].instanceGuid

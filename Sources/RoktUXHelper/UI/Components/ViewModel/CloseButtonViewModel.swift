@@ -25,7 +25,7 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [CloseButtonStyles]?,
          pressedStyle: [CloseButtonStyles]?,
@@ -41,7 +41,7 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func sendCloseEvent() {
         eventService?.dismissOption = .closeButton
         eventService?.sendDismissalEvent()

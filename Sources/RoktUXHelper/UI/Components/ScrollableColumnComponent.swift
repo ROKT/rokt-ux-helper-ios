@@ -15,7 +15,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct ScrollableColumnComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let config: ComponentConfig
     let model: ColumnViewModel
 
@@ -27,25 +27,25 @@ struct ScrollableColumnComponent: View {
     @State private var contentHeight: CGFloat? = nil
     @State private var contentMaxHeight: CGFloat? = nil
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
-        
+
     var style: ColumnStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @State var breakpointIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
-    
+
     let parentOverride: ComponentParentOverride?
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -67,7 +67,7 @@ struct ScrollableColumnComponent: View {
             return .start
         }
     }
-    
+
     var weightProperties: WeightModifier.Properties {
         WeightModifier.Properties(weight: flexStyle?.weight,
                                   parent: .column,

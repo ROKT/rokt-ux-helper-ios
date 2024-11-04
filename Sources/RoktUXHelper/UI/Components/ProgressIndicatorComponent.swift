@@ -15,7 +15,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct ProgressIndicatorComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let config: ComponentConfig
     let model: ProgressIndicatorViewModel
 
@@ -30,7 +30,7 @@ struct ProgressIndicatorComponent: View {
     @State var frameChangeIndex: Int = 0
 
     let parentOverride: ComponentParentOverride?
-    
+
     var style: ProgressIndicatorStyles? {
         return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
@@ -71,7 +71,7 @@ struct ProgressIndicatorComponent: View {
             return .start
         }
     }
-    
+
     var startIndex: Int {
         // ensure startIndex is a valid positive integer
         guard let startPosition = model.startPosition,
@@ -82,7 +82,7 @@ struct ProgressIndicatorComponent: View {
         // -1 for index as "startPosition" starts at 1 like indicator position
         return Int(startPosition) - 1
     }
-    
+
     @Binding var viewableItems: Int
     var totalItems = 0
     var totalPages: Int {
@@ -93,7 +93,7 @@ struct ProgressIndicatorComponent: View {
                currentIndex + 1,
                totalPages > 1 ? totalPages : 1)
     }
-    
+
     private var isAccessibilityHidden: Bool {
         model.accessibilityHidden ?? false
     }
@@ -179,7 +179,8 @@ struct ProgressIndicatorComponent: View {
                 let isActiveIndex = index == currentIndex
                 let style = isSeenIndex ? model.seenIndicatorStyle : (
                     isActiveIndex ? model.activeIndicatorStyle :
-                        model.indicatorStyle)
+                        model.indicatorStyle
+                )
 
                 let breakpointStyle = style?.count ?? -1 > breakpointIndex ? style?[breakpointIndex] : nil
                 let model = ProgressIndicatorComponent.createAndBindRichTextUIModel(
@@ -198,13 +199,16 @@ struct ProgressIndicatorComponent: View {
                                     ComponentParentOverride(
                                         parentVerticalAlignment:
                                             rowPerpendicularAxisAlignment(
-                                                alignItems: breakpointStyle?.container?.alignItems ?? containerStyle?.alignItems),
+                                                alignItems: breakpointStyle?.container?.alignItems ?? containerStyle?.alignItems
+                                            ),
                                         parentHorizontalAlignment:
                                             rowPrimaryAxisAlignment(
                                                 justifyContent: breakpointStyle?.container?.justifyContent ??
-                                                                containerStyle?.justifyContent).asHorizontalType,
+                                                                containerStyle?.justifyContent
+                                            ).asHorizontalType,
                                         parentBackgroundStyle: passableBackgroundStyle,
-                                        stretchChildren: containerStyle?.alignItems == .stretch),
+                                        stretchChildren: containerStyle?.alignItems == .stretch
+                                    ),
                                   borderStyle: breakpointStyle?.border)
                                   // overrides default text color with indicator style's text color
                 .foregroundColor(hex: breakpointStyle?.text?.textColor?.getAdaptiveColor(colorScheme))
@@ -228,7 +232,7 @@ struct ProgressIndicatorComponent: View {
             defaultStyle: toTextStyleModel(defaultStyle),
             linkStyle: nil,
             openLinks: nil,
-            stateDataExpansionClosure: ProgressIndicatorViewModel.performDataExpansion, 
+            stateDataExpansionClosure: ProgressIndicatorViewModel.performDataExpansion,
             layoutState: layoutState,
             eventService: eventService
         )
@@ -237,11 +241,11 @@ struct ProgressIndicatorComponent: View {
 
         return model
     }
-    
+
     private static func toTextStyleModel(_ styles: [IndicatorStyles]?) -> [RichTextStyle]? {
         guard let styles else { return nil }
         var richTextStyles = [RichTextStyle]()
-        
+
         styles.forEach { style in
             richTextStyles.append(RichTextStyle(dimension: style.dimension,
                                                 flexChild: style.flexChild,

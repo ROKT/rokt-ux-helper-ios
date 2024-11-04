@@ -16,16 +16,16 @@ class RoktEmbeddedViewModel {
     let layouts: [LayoutSchemaViewModel]?
     let eventService: EventServicing?
     let layoutState: any LayoutStateRepresenting
-    
+
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     var config: RoktUXConfig? {
         layoutState.config
     }
-    
-    init(layouts: [LayoutSchemaViewModel]?, 
+
+    init(layouts: [LayoutSchemaViewModel]?,
          eventService: EventServicing?,
          layoutState: any LayoutStateRepresenting) {
         self.layouts = layouts
@@ -36,11 +36,11 @@ class RoktEmbeddedViewModel {
     func sendOnLoadEvents() {
         eventService?.sendEventsOnLoad()
     }
-    
+
     func sendSignalActivationEvent() {
         eventService?.sendSignalActivationEvent()
     }
-    
+
     func updateAttributedStrings(_ newColor: ColorScheme) {
         DispatchQueue.main.async {
             if let layouts = self.layouts {

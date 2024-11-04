@@ -21,7 +21,7 @@ import SwiftUI
 @available(iOS 15, *)
 @objc public class RoktLayoutUIView: UIView {
     var roktEmbeddedSwiftUIView: UIView?
-    
+
     var topConstaint: NSLayoutConstraint?
     var leadingConstaint: NSLayoutConstraint?
     var trailingConstaint: NSLayoutConstraint?
@@ -36,15 +36,15 @@ import SwiftUI
     private var onPlatformEvent: (([String: Any]) -> Void)?
     private var onEmbeddedSizeChange: ((CGFloat) -> Void)?
     private var semaphore = DispatchSemaphore(value: 1)
-    
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
     }
-    
+
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-    
+
     /// Initializes a new instance with the specified parameters.
     /// - Parameters:
     ///   - experienceResponse: The response string from the experience.
@@ -84,7 +84,7 @@ import SwiftUI
             }
         }
     }
-    
+
     /// Loads the layout with the specified parameters.
     /// - Parameters:
     ///   - experienceResponse: The response string from the experience.
@@ -113,7 +113,7 @@ import SwiftUI
             }
         )
     }
-    
+
     private func decideTranslatesAutoresizingMask() {
         // translateAutoresizingMaskIntoConstraints only when view doesn't have any constraints.
         if !self.constraints.isEmpty {
@@ -122,7 +122,7 @@ import SwiftUI
             self.translatesAutoresizingMaskIntoConstraints = true
         }
     }
-    
+
     private func cleanupEmbeddedView() {
         subviews.forEach({ $0.removeFromSuperview() })
         removeEmbeddedLayoutConstraint(topConstaint)
@@ -149,7 +149,7 @@ import SwiftUI
         addEmbeddedLayoutConstraint(trailingConstaint)
         addEmbeddedLayoutConstraint(heightConstaint)
     }
-    
+
     private func addEmbeddedLayoutConstraint(_ layoutConstraint: NSLayoutConstraint?) {
         if let layoutConstraint {
             self.addConstraint(layoutConstraint)
@@ -165,7 +165,7 @@ import SwiftUI
 
 @available(iOS 15, *)
 extension RoktLayoutUIView: LayoutLoader {
-    
+
     /// Loads the layout content with the specified parameters.
     /// - Parameters:
     ///   - onSizeChanged: Closure to handle size changes.
@@ -173,25 +173,25 @@ extension RoktLayoutUIView: LayoutLoader {
     public func load<Content>(onSizeChanged: @escaping ((CGFloat) -> Void),
                               injectedView: @escaping () -> Content) where Content: View {
         cleanupEmbeddedView()
-        
+
         let vc = ResizableHostingController(rootView: AnyView(injectedView()))
         let swiftuiView = vc.view!
         self.roktEmbeddedSwiftUIView = swiftuiView
-        
+
         parentViewControllers?.addChild(vc)
         swiftuiView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         decideTranslatesAutoresizingMask()
-        
+
         addSubview(swiftuiView)
-        
+
         self.frame = CGRect(x: self.frame.minX, y: self.frame.minY, width: self.frame.width, height: 0)
-        
+
         addEmbeddedLayoutConstraints(embeddedView: swiftuiView)
-        
+
         vc.didMove(toParent: parentViewControllers)
     }
-    
+
     /// Updates the size of the embedded view.
     /// - Parameter size: The new height for the embedded view.
     public func updateEmbeddedSize(_ size: CGFloat) {
@@ -205,7 +205,7 @@ extension RoktLayoutUIView: LayoutLoader {
             latestHeight = size
         }
     }
-    
+
     /// Closes the embedded view and notifies the size change.
     public func closeEmbedded() {
         // change the size to zero
@@ -217,4 +217,3 @@ extension RoktLayoutUIView: LayoutLoader {
         onEmbeddedSizeChange?(0)
     }
 }
-

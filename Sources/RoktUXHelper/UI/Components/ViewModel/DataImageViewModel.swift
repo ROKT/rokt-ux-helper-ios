@@ -15,7 +15,7 @@ import DcuiSchema
 @available(iOS 15, *)
 class DataImageViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     let id: UUID = UUID()
-    
+
     let image: CreativeImage?
     let defaultStyle: [DataImageStyles]?
     let pressedStyle: [DataImageStyles]?

@@ -15,7 +15,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive {
-    
+
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [OneByOneDistributionStyles]?
@@ -41,7 +41,7 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
             layoutState: layoutState
         )
     }
-    
+
     func setupBindings(
         currentProgess: Binding<Int>,
         customStateMap: Binding<CustomStateMap?>,

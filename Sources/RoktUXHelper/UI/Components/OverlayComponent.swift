@@ -22,12 +22,12 @@ struct OverlayComponent: View {
     var style: OverlayStyles? {
         model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
-    
+
     @State var breakpointIndex = 0
-    
+
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @StateObject var globalScreenSize = GlobalScreenSize()
     var body: some View {
         ZStack(alignment: getOverlayAlignment()) {
@@ -41,16 +41,16 @@ struct OverlayComponent: View {
             }
             build()
         }
-        .frame(maxWidth: .infinity, 
+        .frame(maxWidth: .infinity,
                maxHeight: .infinity,
                alignment: getOverlayAlignment())
-        .background(backgroundStyle: wrapperStyle?.background, 
+        .background(backgroundStyle: wrapperStyle?.background,
                     imageLoader: model.imageLoader)
         .overflow(overflow: wrapperStyle?.container?.overflow)
         .readSize(spacing: style?.spacing) { size in
             availableWidth = size.width
             availableHeight = size.height
-            
+
             // 0 at the start
             globalScreenSize.width = size.width
             globalScreenSize.height = size.height
@@ -62,33 +62,34 @@ struct OverlayComponent: View {
                 breakpointIndex = model.updateBreakpointIndex(for: newSize)
             }
         }
-        
+
     }
-    
+
     private func build() -> OuterLayerComponent {
         return OuterLayerComponent(layouts: model.children,
                                    style: StylingPropertiesModel(
-                                    container: style?.container,
-                                    background: style?.background,
-                                    dimension: style?.dimension,
-                                    flexChild: style?.flexChild,
-                                    spacing: style?.spacing,
-                                    border: style?.border),
+                                       container: style?.container,
+                                       background: style?.background,
+                                       dimension: style?.dimension,
+                                       flexChild: style?.flexChild,
+                                       spacing: style?.spacing,
+                                       border: style?.border
+                                   ),
                                    layoutState: model.layoutState,
                                    eventService: model.eventService,
                                    parentWidth: $availableWidth,
                                    parentHeight: $availableHeight)
     }
-    
+
     private func getOverlayAlignment() -> Alignment {
         // default top
         getOverlayAlignmentFromSelf(alignSelf: style?.flexChild?.alignSelf) ??
         getOverlayAlignmentFromWrapper(
-            alignItem: wrapperStyle?.container?.alignItems, 
+            alignItem: wrapperStyle?.container?.alignItems,
             justifyContent: wrapperStyle?.container?.justifyContent
         ) ?? .top
     }
-    
+
     private func getOverlayAlignmentFromSelf(alignSelf: FlexAlignment?) -> Alignment? {
         switch alignSelf {
         case .flexStart:
@@ -101,10 +102,10 @@ struct OverlayComponent: View {
             return nil
         }
     }
-    
+
     private func getOverlayAlignmentFromWrapper(alignItem: FlexAlignment?,
                                                 justifyContent: FlexJustification?) -> Alignment? {
-        guard alignItem != nil || justifyContent != nil  else { return nil }
+        guard alignItem != nil || justifyContent != nil else { return nil }
         if let alignItem, let justifyContent {
             switch alignItem {
             case .center, .stretch:
@@ -122,7 +123,7 @@ struct OverlayComponent: View {
             return nil
         }
     }
-    
+
     private func getCenterAlignment(_ justifyContent: FlexJustification) -> Alignment {
         switch justifyContent {
         case .center:
@@ -132,7 +133,7 @@ struct OverlayComponent: View {
         case .flexEnd:
             return .trailing
         }
-    }    
+    }
     private func getTopAlignment(_ justifyContent: FlexJustification) -> Alignment {
         switch justifyContent {
         case .center:
@@ -142,7 +143,7 @@ struct OverlayComponent: View {
         case .flexEnd:
             return .topTrailing
         }
-    }    
+    }
     private func getBottomAlignment(_ justifyContent: FlexJustification) -> Alignment {
         switch justifyContent {
         case .center:
@@ -152,7 +153,7 @@ struct OverlayComponent: View {
         case .flexEnd:
             return .bottomTrailing
         }
-    }   
+    }
     private func getDefaultItemAlignment(_ alignItem: FlexAlignment) -> Alignment {
         switch alignItem {
         case .center, .stretch:
@@ -163,5 +164,5 @@ struct OverlayComponent: View {
             return .bottom
         }
     }
-    
+
 }

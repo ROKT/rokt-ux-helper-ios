@@ -1,5 +1,4 @@
 disabled_rules: # rule identifiers to exclude from running
-  - trailing_whitespace
   - identifier_name
   - force_cast
   - weak_delegate
@@ -15,7 +14,7 @@ line_length:
   ignores_comments: true
   ignores_urls: true
 
-type_name:  
+type_name:
   min_length: 1
   max_length: 40
 
