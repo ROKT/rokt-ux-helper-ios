@@ -13,7 +13,7 @@
 
 import Foundation
 
-protocol LayoutStateRepresenting: Hashable, Equatable {
+protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     var items: [String: Any] { get set }
     var actionCollection: ActionCollecting { get set }
     var imageLoader: ImageLoader? { get }

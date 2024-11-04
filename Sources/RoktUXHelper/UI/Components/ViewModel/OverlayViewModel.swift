@@ -20,9 +20,9 @@ class OverlayViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let defaultStyle: [OverlayStyles]?
     let wrapperStyle: [OverlayWrapperStyles]?
     let eventService: EventServicing?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -30,7 +30,7 @@ class OverlayViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          defaultStyle: [OverlayStyles]?,
          wrapperStyle: [OverlayWrapperStyles]?,
          eventService: EventServicing?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.allowBackdropToClose = allowBackdropToClose
         self.defaultStyle = defaultStyle

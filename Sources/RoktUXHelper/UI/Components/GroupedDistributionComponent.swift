@@ -207,10 +207,10 @@ struct GroupedDistributionComponent: View {
     }
 
     func registerActions() {
-        model.layoutState.actionCollection[.nextOffer] = goToNextOffer
-        model.layoutState.actionCollection[.nextGroup] = goToNextGroup
-        model.layoutState.actionCollection[.previousGroup] = goToPreviousGroup
-        model.layoutState.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
+        model.layoutState?.actionCollection[.nextGroup] = goToNextGroup
+        model.layoutState?.actionCollection[.previousGroup] = goToPreviousGroup
+        model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
             currentProgress: $currentGroup,
@@ -223,9 +223,9 @@ struct GroupedDistributionComponent: View {
     func goToNextGroup(_: Any? = nil) {
         if currentGroup + 1 < totalPages {
             transitionToNextGroup()
-        } else if model.layoutState.closeOnComplete() {
+        } else if model.layoutState?.closeOnComplete() == true {
             // when on last page AND closeOnComplete is true
-            if case .embeddedLayout = model.layoutState.layoutType() {
+            if case .embeddedLayout = model.layoutState?.layoutType() {
                 model.sendDismissalCollapsedEvent()
             } else {
                 model.sendDismissalNoMoreOfferEvent()
@@ -246,9 +246,9 @@ struct GroupedDistributionComponent: View {
         guard viewableItems == 1 else { return }
         if currentGroup + 1 < model.children?.count ?? 0 {
             transitionToNextGroup()
-        } else if model.layoutState.closeOnComplete() {
+        } else if model.layoutState?.closeOnComplete() == true {
             // when on last offer AND closeOnComplete is true
-            if case .embeddedLayout = model.layoutState.layoutType() {
+            if case .embeddedLayout = model.layoutState?.layoutType() {
                 model.sendDismissalCollapsedEvent()
             } else {
                 model.sendDismissalNoMoreOfferEvent()
@@ -259,7 +259,7 @@ struct GroupedDistributionComponent: View {
     }
 
     func exit() {
-        model.layoutState.actionCollection[.close](nil)
+        model.layoutState?.actionCollection[.close](nil)
     }
 
     func transitionIn() {

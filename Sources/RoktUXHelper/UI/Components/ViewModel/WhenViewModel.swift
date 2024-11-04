@@ -22,14 +22,14 @@ class WhenViewModel: Identifiable, Hashable {
     let transition: WhenTransition?
     let slots: [SlotOfferModel]
     let globalBreakPoints: BreakPoint?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
 
     init(children: [LayoutSchemaViewModel]? = nil,
          predicates: [WhenPredicate]?,
          transition: WhenTransition?,
          slots: [SlotOfferModel],
          globalBreakPoints: BreakPoint?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.predicates = predicates
         self.transition = transition
@@ -61,15 +61,15 @@ class WhenViewModel: Identifiable, Hashable {
     }
 
     var currentProgress: Binding<Int> {
-        layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
 
     var totalItems: Int {
-        layoutState.items[LayoutState.totalItemsKey] as? Int ?? 0
+        layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 0
     }
 
     var customStateMap: Binding<CustomStateMap?> {
-        layoutState.items[LayoutState.customStateMap] as? Binding<CustomStateMap?> ?? .constant(nil)
+        layoutState?.items[LayoutState.customStateMap] as? Binding<CustomStateMap?> ?? .constant(nil)
     }
 
     private var darkModePredicates: [DarkModePredicate] {

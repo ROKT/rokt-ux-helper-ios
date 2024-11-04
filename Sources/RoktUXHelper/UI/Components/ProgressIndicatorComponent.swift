@@ -160,7 +160,7 @@ struct ProgressIndicatorComponent: View {
                     // run it in background thread for smooth transition
                     DispatchQueue.background.async {
                         // update breakpoint index
-                        let index = min(model.layoutState.getGlobalBreakpointIndex(newSize),
+                        let index = min(model.layoutState?.getGlobalBreakpointIndex(newSize) ?? 0,
                                         (model.defaultStyle?.count ?? 1) - 1)
                         breakpointIndex = index >= 0 ? index : 0
                         frameChangeIndex += 1
@@ -223,7 +223,7 @@ struct ProgressIndicatorComponent: View {
         value: String?,
         dataBinding: DataBinding<String>,
         defaultStyle: [IndicatorStyles]?,
-        layoutState: any LayoutStateRepresenting,
+        layoutState: (any LayoutStateRepresenting)?,
         eventService: EventDiagnosticServicing?,
         imageLoader: ImageLoader?
     ) -> RichTextViewModel {

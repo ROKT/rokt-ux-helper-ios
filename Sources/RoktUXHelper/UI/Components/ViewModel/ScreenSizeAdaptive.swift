@@ -17,7 +17,7 @@ protocol ScreenSizeAdaptive {
     associatedtype Item
 
     var defaultStyle: [Item]? { get }
-    var layoutState: any LayoutStateRepresenting { get }
+    var layoutState: (any LayoutStateRepresenting)? { get }
 
     func updateBreakpointIndex(for newSize: CGFloat?) -> Int
 }
@@ -27,7 +27,7 @@ extension ScreenSizeAdaptive {
 
     func updateBreakpointIndex(for newSize: CGFloat?) -> Int {
         let index = min(
-            layoutState.getGlobalBreakpointIndex(newSize),
+            layoutState?.getGlobalBreakpointIndex(newSize) ?? 0,
             (defaultStyle?.count ?? 1) - 1
         )
         return index >= 0 ? index : 0

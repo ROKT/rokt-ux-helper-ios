@@ -214,8 +214,12 @@ struct ToggleButtonComponent: View {
     }
 
     private func handleToggle() {
-        model.layoutState.actionCollection[.toggleCustomState](CustomStateIdentifiable(position: config.position,
-                                                                                       key: model.customStateKey))
+        model.layoutState?.actionCollection[.toggleCustomState](
+            CustomStateIdentifiable(
+                position: config.position,
+                key: model.customStateKey
+            )
+        )
     }
 
     private func updateStyleState() {

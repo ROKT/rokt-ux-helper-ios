@@ -45,6 +45,9 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
+        onRoktEvent = { [weak self] event in
+            onRoktUXEvent(event)
+        }
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -64,8 +67,8 @@ public class RoktUX: UXEventsDelegate {
                         responseReceivedDate: layoutPage.responseReceivedDate,
                         layoutLoader: layoutLoader,
                         config: config,
-                        onLoad: {},
-                        onUnload: {},
+                        onLoad: { [weak self] in },
+                        onUnload: { [weak self] in },
                         onEmbeddedSizeChange: onEmbeddedSizeChange,
                         onRoktUXEvent: onRoktUXEvent,
                         processor: processor
@@ -113,6 +116,9 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void
     ) {
+        onRoktEvent = { [weak self] event in
+            onRoktUXEvent(event)
+        }
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -194,7 +200,6 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         processor: EventProcessing
     ) {
-        self.onRoktEvent = onRoktUXEvent
         let actionCollection = ActionCollection()
 
         let layoutState = LayoutState(actionCollection: actionCollection, config: config)
@@ -311,28 +316,26 @@ public class RoktUX: UXEventsDelegate {
         DispatchQueue.main.async {
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
+
+                    var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                        layoutLoader?.updateEmbeddedSize(size)
+                        onEmbeddedSizeChange(targetElement, size)
+                    }
+
                     layoutLoader.load(onSizeChanged: onSizeChange,
                                       injectedView: {
                         EmbeddedComponent(
                             layout: layoutUIModel,
                             layoutState: layoutState,
                             eventService: eventService,
-                            config: config,
                             onLoad: onLoad,
                             onSizeChange: onSizeChange
                         )
                         .customColorMode(colorMode: config?.colorMode)
                     })
-                    layoutState.actionCollection[.close] = closeEmbedded
-
-                    func closeEmbedded(_: Any? = nil) {
-                        layoutLoader.closeEmbedded()
+                    layoutState.actionCollection[.close] = { [weak layoutLoader] _ in
+                        layoutLoader?.closeEmbedded()
                         onUnload()
-                    }
-
-                    func onSizeChange(size: CGFloat) {
-                        layoutLoader.updateEmbeddedSize(size)
-                        onEmbeddedSizeChange(targetElement, size)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
@@ -482,5 +485,9 @@ public class RoktUX: UXEventsDelegate {
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))
+    }
+
+    deinit {
+        print("roktux deinit")
     }
 }

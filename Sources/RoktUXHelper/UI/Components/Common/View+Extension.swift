@@ -41,7 +41,7 @@ extension View {
             }
         }
     }
-    
+
     func readSize(
         weightProperties: WeightModifier.Properties? = nil,
         onChange: @escaping (CGSizeWithMax, Alignment) -> Void

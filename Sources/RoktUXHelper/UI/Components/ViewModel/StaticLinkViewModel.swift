@@ -24,9 +24,9 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let pressedStyle: [StaticLinkStyles]?
     let hoveredStyle: [StaticLinkStyles]?
     let disabledStyle: [StaticLinkStyles]?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -36,7 +36,7 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          pressedStyle: [StaticLinkStyles]?,
          hoveredStyle: [StaticLinkStyles]?,
          disabledStyle: [StaticLinkStyles]?,
-         layoutState: any LayoutStateRepresenting,
+         layoutState: (any LayoutStateRepresenting)?,
          eventService: EventDiagnosticServicing?) {
         self.children = children
         self.src = src

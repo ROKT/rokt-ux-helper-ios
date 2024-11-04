@@ -21,7 +21,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
     let viewableItems: [UInt8]
     let peekThroughSize: [PeekThroughSize]
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -45,7 +45,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
     }
 
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
-        layoutState.getGlobalBreakpointIndex(width)
+        layoutState?.getGlobalBreakpointIndex(width) ?? 0
     }
 
     func setupBindings(
@@ -54,9 +54,9 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
         viewableItems: Binding<Int>,
         customStateMap: Binding<CustomStateMap?>
     ) {
-        layoutState.items[LayoutState.currentProgressKey] = currentProgress
-        layoutState.items[LayoutState.totalItemsKey] = totalItems
-        layoutState.items[LayoutState.viewableItemsKey] = viewableItems
-        layoutState.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.currentProgressKey] = currentProgress
+        layoutState?.items[LayoutState.totalItemsKey] = totalItems
+        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
+        layoutState?.items[LayoutState.customStateMap] = customStateMap
     }
 }

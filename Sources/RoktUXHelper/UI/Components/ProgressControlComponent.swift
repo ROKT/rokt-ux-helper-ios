@@ -202,9 +202,9 @@ struct ProgressControlComponent: View {
 
     private func handleProgressControlAction() {
         if model.direction == .backward {
-            model.layoutState.actionCollection[.previousGroup](nil)
+            model.layoutState?.actionCollection[.previousGroup](nil)
         } else {
-            model.layoutState.actionCollection[.nextGroup](nil)
+            model.layoutState?.actionCollection[.nextGroup](nil)
         }
     }
 

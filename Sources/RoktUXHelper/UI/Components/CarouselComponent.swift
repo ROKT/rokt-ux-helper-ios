@@ -280,8 +280,8 @@ struct CarouselComponent: View {
     }
 
     func registerActions() {
-        model.layoutState.actionCollection[.nextOffer] = goToNextOffer
-        model.layoutState.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
+        model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
             currentProgress: $currentPage,
@@ -299,9 +299,9 @@ struct CarouselComponent: View {
                 self.currentPage = currentPage + 1
                 self.currentLeadingOffer = self.currentPage
             }
-        } else if model.layoutState.closeOnComplete() {
+        } else if model.layoutState?.closeOnComplete() == true {
             // when on last offer AND closeOnComplete is true
-            if case .embeddedLayout = model.layoutState.layoutType() {
+            if case .embeddedLayout = model.layoutState?.layoutType() {
                 model.sendDismissalCollapsedEvent()
             } else {
                 model.sendDismissalNoMoreOfferEvent()
@@ -311,7 +311,7 @@ struct CarouselComponent: View {
     }
 
     func exit() {
-        model.layoutState.actionCollection[.close](nil)
+        model.layoutState?.actionCollection[.close](nil)
     }
 
     func getGapOffset() -> CGFloat {

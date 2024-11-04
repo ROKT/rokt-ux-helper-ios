@@ -26,7 +26,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     let defaultStyle: [RichTextStyle]?
     let linkStyle: [InLineTextStyle]?
     let openLinks: LinkOpenTarget?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
 
     // extracted data from `dataBinding` that's published externally
     @Published var boundValue = ""
@@ -35,12 +35,12 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     @Published var attributedString = NSAttributedString("")
 
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
-    lazy var currentIndex: Binding<Int> = layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
-    lazy var totalOffer: Int = layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
-    lazy var viewableItems: Binding<Int> = layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+    lazy var currentIndex: Binding<Int> = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+    lazy var totalOffer: Int = layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
+    lazy var viewableItems: Binding<Int> = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
 
     var totalPages: Int {
         return Int(ceil(Double(totalOffer)/Double(viewableItems.wrappedValue)))
@@ -67,7 +67,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         linkStyle: [InLineTextStyle]? = nil,
         openLinks: LinkOpenTarget?,
         stateDataExpansionClosure: ((String?) -> String?)? = nil,
-        layoutState: any LayoutStateRepresenting,
+        layoutState: (any LayoutStateRepresenting)?,
         eventService: EventDiagnosticServicing?
     ) {
         self.value = value
@@ -181,7 +181,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     }
 
     func updateBreakpointLinkIndex(for newSize: CGFloat?) -> Int {
-        let linkIndex = min(layoutState.getGlobalBreakpointIndex(newSize),
+        let linkIndex = min(layoutState?.getGlobalBreakpointIndex(newSize) ?? 0,
                             (linkStyle?.count ?? 1) - 1)
         return linkIndex >= 0 ? linkIndex : 0
     }

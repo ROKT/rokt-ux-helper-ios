@@ -51,26 +51,26 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     let pressedStyle: [BasicTextStyle]?
     let hoveredStyle: [BasicTextStyle]?
     let disabledStyle: [BasicTextStyle]?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
 
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
     private let diagnosticService: DiagnosticServicing?
 
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     var currentIndex: Binding<Int> {
-        layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
 
     var totalOffer: Int {
-        layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
+        layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
 
     var viewableItems: Binding<Int> {
-        layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(
@@ -80,7 +80,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         hoveredStyle: [BasicTextStyle]?,
         disabledStyle: [BasicTextStyle]?,
         stateDataExpansionClosure: ((String?) -> String?)? = nil,
-        layoutState: any LayoutStateRepresenting,
+        layoutState: (any LayoutStateRepresenting)?,
         diagnosticService: DiagnosticServicing?
     ) {
         self.value = value

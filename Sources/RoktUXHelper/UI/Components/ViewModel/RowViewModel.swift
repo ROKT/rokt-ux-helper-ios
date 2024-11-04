@@ -21,9 +21,9 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [RowStyle]?
     let disabledStyle: [RowStyle]?
     let accessibilityGrouped: Bool
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -32,7 +32,7 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [RowStyle]?,
          disabledStyle: [RowStyle]?,
          accessibilityGrouped: Bool,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle

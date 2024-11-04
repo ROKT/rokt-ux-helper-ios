@@ -16,7 +16,7 @@ import SwiftUI
 
 /// A type with methods for loading and updating embedded layouts.
 @available(iOS 15.0, *)
-public protocol LayoutLoader {
+public protocol LayoutLoader: AnyObject {
 
     /// Loads the layout content with the specified view.
     /// - Parameters:
