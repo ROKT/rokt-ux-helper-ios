@@ -9,7 +9,6 @@
 //
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
-
 import RoktUXHelper
 import SwiftUI
 import SafariServices
@@ -37,7 +36,7 @@ class SampleViewController: UIViewController {
             // Handle open URL event
             // Here is a sample how to open different types of URLs
             if let event = uxEvent as? RoktUXEvent.OpenUrl,
-               let url = URL(string: event.url){
+               let url = URL(string: event.url) {
                 switch event.type {
                 case .externally:
                     UIApplication.shared.open(url) { _ in
@@ -50,13 +49,13 @@ class SampleViewController: UIViewController {
                         event.onClose?(event.id)
                     }
                 }
-            } else if uxEvent as? RoktUXEvent.LayoutCompleted != nil {
+            } else if uxEvent is RoktUXEvent.LayoutCompleted {
                 dismiss(animated: true)
             }
             
             // Handle UX events here
             
-        } onPlatformEvent: { platformEvent in
+        } onPlatformEvent: { _ in
             // Send these platform events to Rokt API
         }
 
@@ -78,7 +77,7 @@ extension SampleViewController: ImageLoader {
     func loadImage(urlString: String, completion: @escaping (Result<UIImage?, any Error>) -> Void) {
         guard let url = URL(string: urlString) else { return }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             guard let data = data else { return }
             DispatchQueue.main.async {
                 completion(.success(UIImage(data: data)))

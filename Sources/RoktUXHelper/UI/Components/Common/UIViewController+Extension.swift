@@ -62,7 +62,7 @@ extension UIViewController {
                 DispatchQueue.main.async {
                     if let sheet = modal.sheetPresentationController {
                         sheet.animateChanges {
-                            sheet.detents = [.custom { context in
+                            sheet.detents = [.custom { _ in
                                 return size
                             }]
                         }
@@ -137,8 +137,8 @@ extension UIViewController {
     }
     
     @available(iOS 16.0, *)
-    private func applyInitialDynamicBottomSheetHeight (modal: UIHostingController<AnyView>) {
-        let zeroDetents: [UISheetPresentationController.Detent] = [.custom { context in
+    private func applyInitialDynamicBottomSheetHeight(modal: UIHostingController<AnyView>) {
+        let zeroDetents: [UISheetPresentationController.Detent] = [.custom { _ in
             return CGFloat(0)
         }]
         modal.sheetPresentationController?.detents = zeroDetents
@@ -149,7 +149,7 @@ extension UIViewController {
     -> [UISheetPresentationController.Detent]? {
         switch dimensionType {
         case .fixed(let value):
-            return [.custom { context in
+            return [.custom { _ in
                 return CGFloat(value)
             }]
         case .percentage(let value):

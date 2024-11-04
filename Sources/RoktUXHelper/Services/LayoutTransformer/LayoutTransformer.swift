@@ -209,8 +209,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                  peekThroughSize: carouselModel.peekThroughSize,
                                  eventService: eventService,
                                  slots: layoutPlugin.slots,
-                                 layoutState: layoutState
-        )
+                                 layoutState: layoutState)
     }
     
     func getGroupedDistribution(
@@ -234,6 +233,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
     
     // MARK: Component Models
+
     func getStaticImage(_ imageModel: StaticImageModel<WhenPredicate>) throws -> StaticImageViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return StaticImageViewModel(url: imageModel.url,
@@ -557,14 +557,14 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
-                             slots: layoutPlugin.slots.map{$0.toSlotOfferModel()},
+                             slots: layoutPlugin.slots.map {$0.toSlotOfferModel()},
                              globalBreakPoints: layoutPlugin.breakpoints,
                              layoutState: layoutState)
     }
     
     func getToggleButton(customStateKey: String,
                          styles: LayoutStyle<ToggleButtonStateTriggerElements,
-                         ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
+                                             ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
                          children: [LayoutSchemaViewModel]?) throws -> ToggleButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return ToggleButtonViewModel(children: children,
