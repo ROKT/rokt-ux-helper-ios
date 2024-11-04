@@ -47,7 +47,7 @@ final class TestEventProcessor: XCTestCase {
                 XCTAssertEqual(request.attributes, [.init(name: "key", value: "value \(request.eventType.rawValue)")])
                 let metaData = [
                     EventNameValue(name: BE_CLIENT_TIME_STAMP,
-                                   value: EventDateFormatter.getDateString(date)),
+                                   value: date.toIso8601String()),
                     EventNameValue(name: BE_CAPTURE_METHOD,
                                    value: kClientProvided),
                     EventNameValue(name: "name", 

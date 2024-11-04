@@ -61,7 +61,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(event?.eventType, .SignalImpression)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         XCTAssertNotNil(event?.metadata.first{$0.name == BE_PAGE_SIGNAL_LOAD})
-        XCTAssertNotNil(event?.metadata.first{$0.value == EventDateFormatter.getDateString(startDate)})
+        XCTAssertNotNil(event?.metadata.first{$0.value == startDate.toIso8601String()})
         XCTAssertNotNil(event?.metadata.first{$0.name == BE_PAGE_RENDER_ENGINE})
         XCTAssertNotNil(event?.metadata.first{$0.value == BE_RENDER_ENGINE_LAYOUTS})
         
