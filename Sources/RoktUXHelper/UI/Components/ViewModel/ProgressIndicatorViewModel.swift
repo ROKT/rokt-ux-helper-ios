@@ -30,15 +30,15 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     var currentIndex: Binding<Int> {
         layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
-    
+
     var totalOffer: Int {
         layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
-    
+
     var viewableItems: Binding<Int> {
         layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }

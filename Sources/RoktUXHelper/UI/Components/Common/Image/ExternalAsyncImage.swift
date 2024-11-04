@@ -19,13 +19,13 @@ struct ExternalAsyncImage: View {
     let scale: BackgroundImageScale?
     let altString: String
     @State private var image: UIImage?
-    
+
     init(urlString: String, scale: BackgroundImageScale?, altString: String, loader: ImageLoader) {
         self.imageDownloader = ImageDownloader(urlString: urlString, loader: loader)
         self.scale = scale
         self.altString = altString
     }
-    
+
     var body: some View {
         if let image = image {
             Image(uiImage: image)
@@ -41,6 +41,6 @@ struct ExternalAsyncImage: View {
                     self.image = newImage
                 }
         }
-        
+
     }
 }

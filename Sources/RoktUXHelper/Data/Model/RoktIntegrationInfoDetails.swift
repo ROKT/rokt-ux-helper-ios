@@ -23,16 +23,16 @@ private enum Constants {
 
 public struct RoktIntegrationInfo: Encodable {
     static var shared: RoktIntegrationInfo = .init(integration: .init())
-    
+
     public let integration: RoktIntegrationInfoDetails
-    
+
     /// Method to convert SDK info to a JSON string
     public var jsonString: String {
         guard let jsonData = try? JSONEncoder().encode(self),
               let string = String(data: jsonData, encoding: .utf8) else { return "" }
-        return  string
+        return string
     }
-    
+
     /// Method to convert SDK info to a JSON dictionary
     public var json: [String: Any] {
         (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(self))) as? [String: Any] ?? [:]
@@ -52,7 +52,7 @@ public struct RoktIntegrationInfoDetails: Codable {
     let packageVersion: String?
     let packageName: String?
     let platform: String
-    
+
     init(
         deviceType: String = UIDevice.current.userInterfaceIdiom.string,
         deviceModel: String = UIDevice.modelName,

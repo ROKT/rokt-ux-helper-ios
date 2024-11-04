@@ -15,7 +15,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive {
-    
+
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [GroupedDistributionStyles]?
@@ -42,13 +42,13 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
                    slots: slots,
                    layoutState: layoutState)
     }
-    
+
     func sendViewableImpressionEvents(viewableItems: Int, currentLeadingOffer: Int) {
-        for offer in currentLeadingOffer..<currentLeadingOffer+viewableItems {
+        for offer in currentLeadingOffer..<currentLeadingOffer + viewableItems {
             sendImpressionEvents(currentOffer: offer)
         }
     }
-    
+
     func setupBindings(
         currentProgress: Binding<Int>,
         totalItems: Int,
@@ -60,7 +60,7 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
         layoutState.items[LayoutState.viewableItemsKey] = viewableItems
         layoutState.items[LayoutState.customStateMap] = customStateMap
     }
-    
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         layoutState.getGlobalBreakpointIndex(width)
     }

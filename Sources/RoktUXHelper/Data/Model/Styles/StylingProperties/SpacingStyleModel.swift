@@ -41,7 +41,7 @@ extension SpacingStyleable {
 
         return FrameAlignmentProperty.getFrameAlignment(margin)
     }
-    
+
     func getOffset() -> OffsetProperty {
         guard let offsetString = spacing?.offset
         else {

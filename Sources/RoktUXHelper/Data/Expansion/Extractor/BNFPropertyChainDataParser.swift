@@ -53,7 +53,7 @@ struct BNFPropertyChainDataParser<Sanitiser: DataSanitiser>: PropertyChainDataPa
         if defaultValue == nil {
             defaultValue = getDefaultValueIn(sanitisedFullChainList: sanitisedFullChainList)
         }
-        
+
         // if defaultValue is still unassigned, set the last key in this chain to isMandatory
         if defaultValue == nil {
             parseableChains.indices.last.map { parseableChains[$0].isMandatory = true }

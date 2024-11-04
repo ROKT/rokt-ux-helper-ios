@@ -15,24 +15,24 @@ import DcuiSchema
 @available(iOS 15, *)
 struct RowComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     var style: RowStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex: Int = 0
     @State var frameChangeIndex: Int = 0
-    
+
     var containerStyle: ContainerStylingProperties? { style?.container }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
@@ -74,11 +74,11 @@ struct RowComponent: View {
             return .start
         }
     }
-    
+
     var accessibilityBehavior: AccessibilityChildBehavior {
         model.accessibilityGrouped ? .combine : .contain
     }
-    
+
     var body: some View {
         build()
             .applyLayoutModifier(
@@ -114,7 +114,7 @@ struct RowComponent: View {
             }
             .accessibilityElement(children: accessibilityBehavior)
     }
-    
+
     func build() -> some View {
         return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                       spacing: CGFloat(containerStyle?.gap ?? 0)) {

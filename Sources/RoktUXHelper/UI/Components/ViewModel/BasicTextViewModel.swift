@@ -36,11 +36,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     @Published var breakpointIndex = 0
     var currentStylingProperties: BasicTextStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return hoveredStyle?.count ?? -1 > breakpointIndex ? hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return pressedStyle?.count ?? -1 > breakpointIndex ? pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return disabledStyle?.count ?? -1 > breakpointIndex ? disabledStyle?[breakpointIndex] : nil
         default:
             return defaultStyle?.count ?? -1 > breakpointIndex ? defaultStyle?[breakpointIndex] : nil
@@ -60,15 +60,15 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     var currentIndex: Binding<Int> {
         layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
-    
+
     var totalOffer: Int {
         layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
-    
+
     var viewableItems: Binding<Int> {
         layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
@@ -97,7 +97,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.diagnosticService = diagnosticService
         performStyleStateBinding()
     }
-    
+
     func updateDataBinding(dataBinding: DataBinding<String>) {
         self.dataBinding = dataBinding
         runDataExpansion()
@@ -157,11 +157,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         default: break
         }
     }
-    
+
     func validateFont(textStyle: TextStylingProperties?) {
         if let fontFamily = textStyle?.fontFamily,
             UIFont(name: fontFamily,
-                  size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
+                   size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
             diagnosticService?.sendFontDiagnostics(fontFamily)
         }
     }

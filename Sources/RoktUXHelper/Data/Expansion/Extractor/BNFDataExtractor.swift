@@ -49,7 +49,7 @@ enum DataBindingStateKeys {
 /// Expands a BNF-formatted String using values nested in an `OfferModel` entity
 @available(iOS 13, *)
 class BNFDataExtractor<Validator: DataValidator>: DataExtractor where Validator.T == String {
-    
+
     private let dataValidator: Validator
     private let parser: PropertyChainDataParser
     private let dataReflector: any DataReflector

@@ -23,7 +23,7 @@ struct WhenComponent: View {
 
     @Binding var currentProgress: Int
     let totalOffers: Int
-    
+
     @Binding var customStateMap: CustomStateMap?
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
@@ -31,10 +31,10 @@ struct WhenComponent: View {
     let parentOverride: ComponentParentOverride?
 
     @SwiftUI.Environment(\.colorScheme) var colorScheme: ColorScheme
-    
+
     @State private var visible: Bool?
     @State private var toggleTransition = false
-    
+
     private var shouldApply: Bool {
         model.shouldApply(
             WhenComponentUIState(
@@ -43,15 +43,13 @@ struct WhenComponent: View {
                 position: config.position,
                 width: globalScreenSize.width ?? 0,
                 isDarkMode: colorScheme == .dark,
-                customStateMap: customStateMap
-            )
-        )
+                customStateMap: customStateMap))
     }
-    
+
     private var getOpacity: Double {
         toggleTransition ? 1 : 0
     }
-    
+
     init(
         config: ComponentConfig,
         model: WhenViewModel,
@@ -62,7 +60,7 @@ struct WhenComponent: View {
     ) {
         self.config = config
         self.model = model
-        
+
         _parentWidth = parentWidth
         _parentHeight = parentHeight
         _styleState = styleState
@@ -95,7 +93,7 @@ struct WhenComponent: View {
             transitionIn()
         }
     }
-    
+
     @ViewBuilder func buildComponent() -> some View {
         if let children = model.children {
             ForEach(children, id: \.self) { child in
@@ -108,7 +106,7 @@ struct WhenComponent: View {
             }
         }
     }
-    
+
     private func transitionIn() {
         visible = true
         withAnimation(
@@ -116,7 +114,7 @@ struct WhenComponent: View {
                 toggleTransition = true
             }
     }
-    
+
     private func transitionOut() {
         if #available(iOS 17.0, *) {
             withAnimation(

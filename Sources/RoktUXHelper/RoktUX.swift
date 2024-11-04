@@ -22,9 +22,9 @@ public class RoktUX: UXEventsDelegate {
     public static var integrationInfo: RoktIntegrationInfo { RoktIntegrationInfo.shared }
 
     private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
-    
+
     public init() {}
-    
+
     /**
      Loads and displays the layout based on the given experience response and configuration.
      
@@ -52,7 +52,7 @@ public class RoktUX: UXEventsDelegate {
                                                    startDate: Date(),
                                                    experienceResponse: experienceResponse,
                                                    processor: processor)
-            
+
             if let layoutPlugins = layoutPage.layoutPlugins {
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = layoutLoaders?.first { $0.key == layoutPlugin.targetElementSelector }?
@@ -84,7 +84,7 @@ public class RoktUX: UXEventsDelegate {
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
-    
+
     /**
      Loads and displays the layout based on the given experience response and configuration with additional parameters.
      
@@ -120,10 +120,11 @@ public class RoktUX: UXEventsDelegate {
                                                    startDate: startDate,
                                                    experienceResponse: experienceResponse,
                                                    processor: processor)
-            
+
             if let layoutPlugins = layoutPage.layoutPlugins {
                 for layoutPlugin in layoutPlugins {
-                    let layoutLoader = defaultLayoutLoader ?? layoutLoaders?.first { $0.key == layoutPlugin.targetElementSelector }?
+                    let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
+                        .first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
                     displayLayout(
                         page: layoutPage,
@@ -152,7 +153,7 @@ public class RoktUX: UXEventsDelegate {
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
-    
+
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
@@ -170,7 +171,7 @@ public class RoktUX: UXEventsDelegate {
                 .getPageModel()
                 .unwrap(orThrow: RoktUXError.experienceResponseMapping)
         }
-    
+
         sendPageIntialEvents(
             pageModel: layoutPage,
             startDate: startDate,
@@ -179,7 +180,7 @@ public class RoktUX: UXEventsDelegate {
         )
         return layoutPage
     }
-    
+
     private func displayLayout(
         page: PageModel,
         layoutPlugin: LayoutPlugin,
@@ -195,9 +196,9 @@ public class RoktUX: UXEventsDelegate {
     ) {
         self.onRoktEvent = onRoktUXEvent
         let actionCollection = ActionCollection()
-        
+
         let layoutState = LayoutState(actionCollection: actionCollection, config: config)
-        
+
         let eventService = EventService(
             pageId: page.pageId,
             pageInstanceGuid: page.pageInstanceGuid,
@@ -217,9 +218,9 @@ public class RoktUX: UXEventsDelegate {
         layoutState.items[LayoutState.layoutSettingsKey] = layoutPlugin.settings
 
         eventService.sendSignalLoadStartEvent()
-        
+
         layoutState.setLayoutType(.unknown)
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: layoutPlugin,
                                                   layoutState: layoutState,
                                                   eventService: eventService)
@@ -228,7 +229,7 @@ public class RoktUX: UXEventsDelegate {
                 switch layoutUIModel {
                 case .overlay(let model):
                     layoutState.setLayoutType(.overlayLayout)
-                    
+
                     showOverlay(placementType: .Overlay,
                                 layoutState: layoutState,
                                 eventService: eventService,
@@ -239,9 +240,9 @@ public class RoktUX: UXEventsDelegate {
                     }
                 case .bottomSheet(let model):
                     layoutState.setLayoutType(.bottomSheetLayout)
-                    
+
                     let bottomSheetHeightDimension = model.defaultStyle?.first?.dimension?.height
-                    
+
                     if bottomSheetHeightDimension == nil || bottomSheetHeightDimension == .fit(.wrapContent),
                        #available(iOS 16.0, *) {
                         showOverlay(placementType: .BottomSheet(.dynamic),
@@ -267,18 +268,19 @@ public class RoktUX: UXEventsDelegate {
                     }
                 default:
                     layoutState.setLayoutType(.embeddedLayout)
-                    
+
                     showEmbedded(
                         layoutLoader: layoutLoader,
                         layoutState: layoutState,
                         layoutPlugin: layoutPlugin,
                         layoutUIModel: layoutUIModel,
-                        config: config, 
+                        config: config,
                         eventService: eventService,
                         onLoad: onLoad,
                         onUnload: onUnload,
-                        onEmbeddedSizeChange: onEmbeddedSizeChange)
-                    
+                        onEmbeddedSizeChange: onEmbeddedSizeChange
+                    )
+
                 }
             }
             eventService.sendEventsOnTransformerSuccess()
@@ -294,7 +296,7 @@ public class RoktUX: UXEventsDelegate {
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
     }
-    
+
     private func showEmbedded(
         layoutLoader: LayoutLoader?,
         layoutState: LayoutState,
@@ -304,9 +306,10 @@ public class RoktUX: UXEventsDelegate {
         eventService: EventDiagnosticServicing?,
         onLoad: @escaping (() -> Void),
         onUnload: @escaping (() -> Void),
-        onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void) {
+        onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
+    ) {
         DispatchQueue.main.async {
-            if  let targetElement = layoutPlugin.targetElementSelector {
+            if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
                     layoutLoader.load(onSizeChanged: onSizeChange,
                                       injectedView: {
@@ -321,19 +324,19 @@ public class RoktUX: UXEventsDelegate {
                         .customColorMode(colorMode: config?.colorMode)
                     })
                     layoutState.actionCollection[.close] = closeEmbedded
-                    
+
                     func closeEmbedded(_: Any? = nil) {
                         layoutLoader.closeEmbedded()
                         onUnload()
                     }
-                    
+
                     func onSizeChange(size: CGFloat) {
                         layoutLoader.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
-                                                    callStack: kEmbeddedLayoutDoesntExistMessage
+                                                  callStack: kEmbeddedLayoutDoesntExistMessage
                                                     + targetElement + kLocationDoesNotExist)
                     onUnload()
                     self.onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
@@ -341,7 +344,7 @@ public class RoktUX: UXEventsDelegate {
             }
         }
     }
-    
+
     private func showOverlay<Content: View>(placementType: PlacementType?,
                                             bottomSheetUIModel: BottomSheetViewModel? = nil,
                                             layoutState: LayoutState,
@@ -361,10 +364,10 @@ public class RoktUX: UXEventsDelegate {
             }
         }
     }
-    
+
     private func getTopViewController() -> UIViewController? {
         let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-        
+
         if var topController = keyWindow?.rootViewController {
             while let presentedViewController = topController.presentedViewController {
                 topController = presentedViewController
@@ -373,7 +376,7 @@ public class RoktUX: UXEventsDelegate {
         }
         return nil
     }
-        
+
     private func sendPageIntialEvents(
         pageModel: PageModel,
         startDate: Date,
@@ -408,12 +411,12 @@ public class RoktUX: UXEventsDelegate {
             )
         )
     }
-    
-    private func sendDiagnostics (sessionId: String? = nil,
-                                  code: String?,
-                                  callStack: String?,
-                                  severity: Severity = .error,
-                                  processor: EventProcessing) {
+
+    private func sendDiagnostics(sessionId: String? = nil,
+                                 code: String?,
+                                 callStack: String?,
+                                 severity: Severity = .error,
+                                 processor: EventProcessing) {
         processor.handle(
             event: EventRequest(
                 sessionId: sessionId ?? "",
@@ -428,11 +431,11 @@ public class RoktUX: UXEventsDelegate {
             )
         )
     }
-    
+
     func onOfferEngagement(_ pluginId: String?) {
         onRoktEvent?(RoktUXEvent.OfferEngagement(layoutId: pluginId))
     }
-    
+
     func onFirstPositiveEngagement(
         sessionId: String,
         pluginInstanceGuid: String,
@@ -448,31 +451,31 @@ public class RoktUX: UXEventsDelegate {
             )
         )
     }
-    
+
     func onPositiveEngagement(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.PositiveEngagement(layoutId: layoutId))
     }
-    
+
     func onPlacementInteractive(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.LayoutInteractive(layoutId: layoutId))
     }
-    
+
     func onPlacementReady(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.LayoutReady(layoutId: layoutId))
     }
-    
+
     func onPlacementClosed(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.LayoutClosed(layoutId: layoutId))
     }
-    
+
     func onPlacementCompleted(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.LayoutCompleted(layoutId: layoutId))
     }
-    
+
     func onPlacementFailure(_ layoutId: String?) {
         onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutId))
     }
-    
+
     func openURL(url: String,
                  id: String,
                  type: OpenURLType,

@@ -16,7 +16,7 @@ import DcuiSchema
 class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
 
     let id: UUID = UUID()
-    
+
     let url: StaticImageUrl?
     let alt: String?
     let defaultStyle: [StaticImageStyles]?
@@ -24,7 +24,7 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
     let hoveredStyle: [StaticImageStyles]?
     let disabledStyle: [StaticImageStyles]?
     let layoutState: any LayoutStateRepresenting
-    
+
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
@@ -38,7 +38,7 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
          layoutState: any LayoutStateRepresenting) {
         self.url = url
         self.alt = alt
-        
+
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle

@@ -15,13 +15,13 @@ import RoktUXHelper
 import SwiftUI
 
 class SampleViewModel: ObservableObject {
-    
+
     let roktConfig: RoktUXConfig = RoktUXConfig.Builder().colorMode(.system).build()
     let experienceResponse: String = String.getExperienceResponse(for: "experience")!
-    
+
     @Published var urlToOpen: URL?
     private var cancellable: AnyCancellable?
-    
+
     func handleURL(_ event: RoktUXEvent.OpenUrl) {
         // Here is a sample how to open different types of URLs
         guard let url = URL(string: event.url) else {
@@ -39,7 +39,7 @@ class SampleViewModel: ObservableObject {
 }
 
 extension SampleViewModel: ImageLoader {
-    
+
     func loadImage(
         urlString: String,
         completion: @escaping (Result<UIImage?, any Error>) -> Void

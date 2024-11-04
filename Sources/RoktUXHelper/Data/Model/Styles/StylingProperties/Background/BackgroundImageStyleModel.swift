@@ -30,7 +30,7 @@ enum Position: String, Decodable, Hashable {
     case bottomRight = "bottom-right"
     case bottomLeft = "bottom-left"
     case center
-    
+
     func getAlignment() -> Alignment {
         switch self {
         case .top:
@@ -59,7 +59,7 @@ enum Position: String, Decodable, Hashable {
 enum ScaleStyleModel: String, Decodable, Hashable {
     case `fill`
     case fit
-    
+
     func getScale() -> ContentMode {
         switch self {
         case .fill:

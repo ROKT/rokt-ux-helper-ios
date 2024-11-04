@@ -21,11 +21,11 @@ struct EmbeddedComponent: View {
     let config: RoktUXConfig?
     let onLoad: (() -> Void)?
     let onSizeChange: ((CGFloat) -> Void)?
-    
+
     @State var lastUpdatedHeight: CGFloat = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @StateObject var globalScreenSize = GlobalScreenSize()
 
     var body: some View {
@@ -40,7 +40,7 @@ struct EmbeddedComponent: View {
         .readSize { size in
             availableWidth = size.width
             availableHeight = size.height
-            
+
             notifyHeightChanged(size.height)
             // 0 at the start
             globalScreenSize.width = size.width
@@ -64,7 +64,7 @@ struct EmbeddedComponent: View {
         }
         .environmentObject(globalScreenSize)
     }
-    
+
     func notifyHeightChanged(_ newHeight: CGFloat) {
         if lastUpdatedHeight != newHeight {
             onSizeChange?(newHeight)

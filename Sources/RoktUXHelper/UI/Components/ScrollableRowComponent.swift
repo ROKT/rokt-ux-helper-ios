@@ -26,27 +26,27 @@ struct ScrollableRowComponent: View {
     @State private var availableHeight: CGFloat?
     @State private var contentMaxWidth: CGFloat = .zero
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
-        
+
     var style: RowStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @State var breakpointIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
-    
+
     let parentOverride: ComponentParentOverride?
-    
+
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
             return justifyContent
@@ -66,7 +66,7 @@ struct ScrollableRowComponent: View {
             return .start
         }
     }
-    
+
     var weightProperties: WeightModifier.Properties {
         WeightModifier.Properties(weight: flexStyle?.weight,
                                   parent: .row,
@@ -82,12 +82,12 @@ struct ScrollableRowComponent: View {
                          parentHeight: $parentHeight,
                          styleState: $styleState,
                          parentOverride: parentOverride)
-            .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment  in
+            .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment in
                 contentMaxWidth = newSizeWithMax.maxWidth ?? newSizeWithMax.size.width
                 contentAlignment = newAlignment
             }
         }
         .frame(maxWidth: contentMaxWidth, alignment: contentAlignment)
     }
-    
+
 }

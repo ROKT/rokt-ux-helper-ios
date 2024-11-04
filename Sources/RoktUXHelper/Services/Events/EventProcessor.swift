@@ -15,7 +15,7 @@ import Combine
 @available(iOS 13.0, *)
 protocol EventProcessing {
     var publisher: PassthroughSubject<EventRequest, Never> { get }
-    
+
     func handle(event: EventRequest)
 }
 
@@ -25,7 +25,7 @@ class EventProcessor: EventProcessing {
     private var processedEvents: Set<ProcessedEvent> = .init()
     private var onRoktPlatformEvent: (([String: Any]) -> Void)?
     private(set) var publisher: PassthroughSubject<EventRequest, Never> = .init()
-    
+
     init(
         delay: Double = kEventDelay,
         queue: DispatchQueue = DispatchQueue.background,
@@ -56,7 +56,7 @@ class EventProcessor: EventProcessing {
             })
             .store(in: &cancellables)
     }
-    
+
     func handle(event: EventRequest) {
         publisher.send(event)
     }

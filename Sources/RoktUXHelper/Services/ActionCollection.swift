@@ -25,9 +25,9 @@ enum RoktActionType: String {
 
 protocol ActionCollecting {
     typealias ShareFunction = ((Any?) -> Void)
-    
+
     subscript(actionType: RoktActionType) -> ShareFunction { get set }
-    
+
     func reset()
 }
 
@@ -35,9 +35,9 @@ class ActionCollection: ActionCollecting {
     private let internalQueue = DispatchQueue(label: "com.rokt.actions",
                                               qos: .default,
                                               attributes: .concurrent)
-    
+
     private var callbackMap: [RoktActionType: ShareFunction] = [RoktActionType: ShareFunction]()
-    
+
     subscript(actionType: RoktActionType) -> ShareFunction {
         get {
             internalQueue.sync {
@@ -47,14 +47,14 @@ class ActionCollection: ActionCollecting {
                 return { (_: Any?) in return }
             }
         }
-        
+
         set {
             internalQueue.sync {
                 callbackMap[actionType] = newValue
             }
         }
     }
-    
+
     func reset() {
         internalQueue.sync {
             callbackMap.removeAll()

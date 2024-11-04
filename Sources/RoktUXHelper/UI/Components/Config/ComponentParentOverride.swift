@@ -18,7 +18,7 @@ struct ComponentParentOverride {
     let parentHorizontalAlignment: HorizontalAlignment?
     let parentBackgroundStyle: BackgroundStylingProperties?
     let stretchChildren: Bool?
-    
+
     func updateBackground(_ backgroundStyle: BackgroundStylingProperties?) -> ComponentParentOverride {
         return ComponentParentOverride(parentVerticalAlignment: parentVerticalAlignment,
                                        parentHorizontalAlignment: parentHorizontalAlignment,

@@ -13,18 +13,18 @@ import Foundation
 
 @available(iOS 13.0, *)
 protocol ScreenSizeAdaptive {
-    
+
     associatedtype Item
-    
+
     var defaultStyle: [Item]? { get }
     var layoutState: any LayoutStateRepresenting { get }
-    
+
     func updateBreakpointIndex(for newSize: CGFloat?) -> Int
 }
 
 @available(iOS 13.0, *)
 extension ScreenSizeAdaptive {
-    
+
     func updateBreakpointIndex(for newSize: CGFloat?) -> Int {
         let index = min(
             layoutState.getGlobalBreakpointIndex(newSize),

@@ -15,35 +15,35 @@ import DcuiSchema
 @available(iOS 15, *)
 struct OneByOneComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     var style: OneByOneDistributionStyles? {
         return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex = 0
     @State var frameChangeIndex: Int = 0
-    
+
     var containerStyle: ContainerStylingProperties? { style?.container }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
-    
+
     var transition: DcuiSchema.Transition? { model.transition }
-    
+
     let config: ComponentConfig
     let model: OneByOneViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
-    
+
     @State var currentOffer = 0
     @State private var toggleTransition = false
     @State var customStateMap: CustomStateMap?
-    
+
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
         String(format: kOneByOneAnnouncement,
@@ -73,7 +73,7 @@ struct OneByOneComponent: View {
         self.parentOverride = parentOverride
         self.model = model
     }
-    
+
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
             return justifyContent
@@ -93,7 +93,7 @@ struct OneByOneComponent: View {
             return .start
         }
     }
-    
+
     var body: some View {
         if let children = model.children, !children.isEmpty {
             Group {
@@ -149,11 +149,11 @@ struct OneByOneComponent: View {
             .accessibilityLabel(accessibilityAnnouncement)
         }
     }
-    
+
     func registerActions() {
         model.layoutState.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState.actionCollection[.toggleCustomState] = toggleCustomState
-        
+
         model.setupBindings(
             currentProgess: $currentOffer,
             customStateMap: $customStateMap,
@@ -175,24 +175,25 @@ struct OneByOneComponent: View {
             exit()
         }
     }
-    
+
     func exit() {
         model.layoutState.actionCollection[.close](nil)
     }
-    
+
     func transitionIn() {
         switch transition {
         case .fadeInOut(let settings):
             let duration = Double(settings.duration)/1000/2
             withAnimation(
-                .easeIn(duration: Double(duration))) {
+                .easeIn(duration: Double(duration))
+            ) {
                 toggleTransition = true
             }
         default:
             return
         }
     }
-    
+
     func transitionToNextOffer() {
         switch transition {
         case .fadeInOut(let settings):
@@ -212,12 +213,12 @@ struct OneByOneComponent: View {
             self.currentOffer = currentOffer + 1
         }
     }
-    
+
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: CustomStateMap = customStateMap ?? CustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
     }
-    
+
     func getOpacity() -> Double {
         switch transition {
         case .fadeInOut:

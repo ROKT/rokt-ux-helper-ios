@@ -31,19 +31,19 @@ class EventService: Hashable, EventDiagnosticServicing {
     let pluginConfigJWTToken: String
     let useDiagnosticEvents: Bool
     let processor: EventProcessing
-    
+
     weak var uxEventDelegate: UXEventsDelegate?
     var responseReceivedDate: Date
     var isFirstPositiveEngagementSend = false
     var dismissOption: LayoutDismissOptions?
-    
+
     init(pageId: String?,
          pageInstanceGuid: String,
          sessionId: String,
          pluginInstanceGuid: String,
          pluginId: String?,
          pluginName: String?,
-         startDate: Date, 
+         startDate: Date,
          uxEventDelegate: UXEventsDelegate,
          processor: EventProcessing,
          responseReceivedDate: Date,
@@ -70,12 +70,12 @@ class EventService: Hashable, EventDiagnosticServicing {
     func sendSignalLoadStartEvent() {
         sendEvent(.SignalLoadStart, parentGuid: pluginInstanceGuid, jwtToken: pluginConfigJWTToken)
     }
-    
+
     func sendEventsOnTransformerSuccess() {
         sendPlacementReadyEventCallback()
         sendSignalLoadCompleteEvent()
     }
-    
+
     private func sendPlacementReadyEventCallback() {
         uxEventDelegate?.onPlacementReady(pluginId)
     }
@@ -87,12 +87,12 @@ class EventService: Hashable, EventDiagnosticServicing {
     func sendSignalActivationEvent() {
         sendEvent(.SignalActivation, parentGuid: pluginInstanceGuid, jwtToken: pluginConfigJWTToken)
     }
-    
+
     func sendEventsOnLoad() {
         sendPlacementInteractiveEventCallback()
         sendPluginImpressionEvent()
     }
-    
+
     func sendSlotImpressionEvent(instanceGuid: String, jwtToken: String) {
         sendEvent(.SignalImpression, parentGuid: instanceGuid, jwtToken: jwtToken)
     }
@@ -113,10 +113,9 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendEngagementEventCallback(isPositive: isPositive)
         sendEvent(.SignalGatedResponse,
                   parentGuid: instanceGuid,
-                  jwtToken: jwtToken
-        )
+                  jwtToken: jwtToken)
     }
-    
+
     func sendDismissalEvent() {
         sendDismissalEventCallback()
         switch dismissOption {
@@ -134,7 +133,7 @@ class EventService: Hashable, EventDiagnosticServicing {
             sendDefaultDismissEvent()
         }
     }
-    
+
     func sendEvent(
         _ eventType: EventType,
         parentGuid: String,
@@ -154,7 +153,7 @@ class EventService: Hashable, EventDiagnosticServicing {
             )
         )
     }
-    
+
     func openURL(url: URL, type: OpenURLType, completionHandler: @escaping () -> Void) {
         canOpenUrl(url)
         let id = UUID().uuidString
@@ -169,14 +168,14 @@ class EventService: Hashable, EventDiagnosticServicing {
             }
         })
     }
-    
+
     private func canOpenUrl(_ url: URL) {
         if !UIApplication.shared.canOpenURL(url) {
             sendDiagnostics(message: kUrlErrorCode,
                             callStack: url.absoluteString)
         }
     }
-    
+
     private func sendPlacementInteractiveEventCallback() {
         uxEventDelegate?.onPlacementInteractive(pluginId)
     }
@@ -216,19 +215,19 @@ class EventService: Hashable, EventDiagnosticServicing {
                   extraMetadata: metaData,
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendDismissalEndMessageEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [EventNameValue(name: kInitiator, value: kEndMessage)],
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendDismissalCollapsedEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [EventNameValue(name: kInitiator, value: kCollapsed)],
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendDismissalCloseEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [EventNameValue(name: kInitiator, value: kCloseButton)],
@@ -239,25 +238,25 @@ class EventService: Hashable, EventDiagnosticServicing {
                   extraMetadata: [EventNameValue(name: kInitiator, value: kPartnerTriggered)],
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendDismissalNoMoreOfferEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [EventNameValue(name: kInitiator, value: kNoMoreOfferToShow)],
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendDefaultDismissEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [EventNameValue(name: kInitiator, value: kDismissed)],
                   jwtToken: pluginConfigJWTToken)
     }
-    
+
     private func sendEngagementEventCallback(isPositive: Bool) {
         uxEventDelegate?.onOfferEngagement(pluginId)
-        
+
         if isPositive {
             uxEventDelegate?.onPositiveEngagement(pluginId)
-            
+
             if !isFirstPositiveEngagementSend {
                 uxEventDelegate?.onFirstPositiveEngagement(
                     sessionId: sessionId,
@@ -269,7 +268,7 @@ class EventService: Hashable, EventDiagnosticServicing {
             }
         }
     }
-    
+
     private func sendDismissalEventCallback() {
         switch dismissOption {
         case .noMoreOffer, .endMessage, .collapsed:
@@ -284,7 +283,7 @@ class EventService: Hashable, EventDiagnosticServicing {
 
 class DateHandler {
     static var customDate: Date?
-    
+
     static func currentDate() -> Date {
         return self.customDate ?? Date()
     }

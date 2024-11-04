@@ -23,7 +23,7 @@ public class RoktUXEvent {
             self.layoutId = layoutId
         }
     }
-    
+
     /// Triggered when the user positively engages with the offer for the first time
     public class FirstPositiveEngagement: RoktUXEvent {
         public var sessionId: String
@@ -44,11 +44,11 @@ public class RoktUXEvent {
             self.layoutId = layoutId
         }
     }
-    
+
     /// Triggered when the user positively engages with the offer
     public class PositiveEngagement: RoktUXEvent {
         public let layoutId: String?
-        
+
         /// Initializes a PositiveEngagement event.
         /// - Parameter layoutId: The identifier of the layout.
         init(layoutId: String?) {
@@ -70,7 +70,7 @@ public class RoktUXEvent {
     /// Triggered when a layout is ready to display but has not rendered content yet
     public class LayoutReady: RoktUXEvent {
         public let layoutId: String?
-        
+
         /// Initializes a LayoutReady event.
         /// - Parameter layoutId: The identifier of the layout.
         init(layoutId: String?) {
@@ -110,7 +110,7 @@ public class RoktUXEvent {
             self.layoutId = layoutId
         }
     }
-    
+
     /// Triggered when a link needs to be opened
     public class OpenUrl: RoktUXEvent {
         public let url: String
@@ -118,7 +118,7 @@ public class RoktUXEvent {
         public let type: OpenURLType
         public let onClose: ((String) -> Void)?
         public let onError: ((String, Error?) -> Void)?
-        
+
         /// Initializes an OpenUrl event.
         /// - Parameters:
         ///   - url: The URL to open.

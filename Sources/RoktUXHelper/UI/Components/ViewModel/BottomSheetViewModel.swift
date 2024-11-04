@@ -23,7 +23,7 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          allowBackdropToClose: Bool?,
          defaultStyle: [BottomSheetStyles]?,

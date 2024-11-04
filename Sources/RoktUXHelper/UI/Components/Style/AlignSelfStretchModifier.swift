@@ -25,7 +25,7 @@ struct AlignSelfStretchModifier {
     let parent: ComponentParentType
     let parentHeight: CGFloat?
     let parentWidth: CGFloat?
-    
+
     let parentOverride: ComponentParentOverride?
 
     let wrapperAlignment: Alignment?
@@ -68,7 +68,7 @@ struct AlignSelfStretchModifier {
             strechChildren: parentOverride?.stretchChildren,
             parent: parent
         )
-        
+
     }
 
     private static func getWrapperAlignment(
@@ -95,9 +95,11 @@ struct AlignSelfStretchModifier {
             return .center
         }
     }
-    private static func getFrameMaxWidth(alignSelf: FlexAlignment?,
-                                         strechChildren: Bool? = false,
-                                         parent: ComponentParentType) -> CGFloat? {
+    private static func getFrameMaxWidth(
+        alignSelf: FlexAlignment?,
+        strechChildren: Bool? = false,
+        parent: ComponentParentType
+    ) -> CGFloat? {
         guard alignSelf == .stretch || strechChildren == true else {
             return nil
         }
@@ -108,9 +110,11 @@ struct AlignSelfStretchModifier {
             return nil
         }
     }
-    private static func getFrameMaxHeight(alignSelf: FlexAlignment?,
-                                          strechChildren: Bool? = false,
-                                          parent: ComponentParentType) -> CGFloat? {
+    private static func getFrameMaxHeight(
+        alignSelf: FlexAlignment?,
+        strechChildren: Bool? = false,
+        parent: ComponentParentType
+    ) -> CGFloat? {
         guard alignSelf == .stretch || strechChildren == true else {
             return nil
         }

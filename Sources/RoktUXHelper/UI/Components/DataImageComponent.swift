@@ -16,20 +16,20 @@ import DcuiSchema
 @available(iOS 15, *)
 struct DataImageViewComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     private var style: DataImageStyles? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex = 0
 
@@ -38,16 +38,16 @@ struct DataImageViewComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
-    
+
     let config: ComponentConfig
     let model: DataImageViewModel
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
     @State private var isImageValid = true
-    
+
     let parentOverride: ComponentParentOverride?
 
     let expandsToContainerOnSelfAlign: Bool
@@ -59,7 +59,7 @@ struct DataImageViewComponent: View {
     var horizontalAlignment: HorizontalAlignmentProperty {
         parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty ?? .center
     }
-    
+
     var body: some View {
         if !isImageValid || !hasUrlForColorScheme() {
             EmptyView()
@@ -88,10 +88,10 @@ struct DataImageViewComponent: View {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     }
                 }
-                
+
         }
     }
-    
+
     func build() -> some View {
         AsyncImageView(imageUrl: ThemeUrl(light: model.image?.light ?? "",
                                           dark: model.image?.dark ?? ""),
@@ -100,7 +100,7 @@ struct DataImageViewComponent: View {
                        imageLoader: model.imageLoader,
                        isImageValid: $isImageValid)
     }
-    
+
     func hasUrlForColorScheme() -> Bool {
         return (model.image?.light?.isEmpty == false && colorScheme == .light)
         || (model.image?.dark?.isEmpty == false && colorScheme == .dark)

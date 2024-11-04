@@ -60,7 +60,7 @@ public struct RoktLayoutView: View {
             loadLayout()
         }
     }
-    
+
     private func loadLayout() {
         uxHelper?.loadLayout(experienceResponse: experienceResponse,
                              layoutLoaders: [location: self],
@@ -73,20 +73,18 @@ public struct RoktLayoutView: View {
 
 @available(iOS 15, *)
 extension RoktLayoutView: LayoutLoader {
-    
+
     /// Loads the layout content with the specified view.
     /// Implementation of LayoutLoader.
     /// - Parameters:
     ///   - onSizeChanged: Closure to handle size changes.
     ///   - injectedView: A closure returning the SwiftUI view to embed.
-    public func load<Content: View>(
-        onSizeChanged: @escaping ((CGFloat) -> Void),
-        @ViewBuilder injectedView: @escaping () -> Content
-    ) {
+    public func load<Content: View>(onSizeChanged: @escaping ((CGFloat) -> Void),
+                                    @ViewBuilder injectedView: @escaping () -> Content) {
         self.injectedView = AnyView(injectedView())
         layoutInitialized = true
     }
-    
+
     /// Closes the embedded view.
     public func closeEmbedded() {
         isVisible = false

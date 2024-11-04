@@ -14,7 +14,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
-    
+
     private let src: String
     private let open: LinkOpenTarget
     private let eventService: EventDiagnosticServicing?

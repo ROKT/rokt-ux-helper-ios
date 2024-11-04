@@ -23,7 +23,7 @@ public struct EventRequest: Codable, Hashable {
     public let metadata: [EventNameValue]
     public let pageInstanceGuid: String
     public let jwtToken: String
-    
+
     public enum CodingKeys: String, CodingKey {
         case uuid = "instanceGuid"
         case sessionId
@@ -35,7 +35,7 @@ public struct EventRequest: Codable, Hashable {
         case pageInstanceGuid
         case jwtToken = "token"
     }
-    
+
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         sessionId = try container.decode(String.self, forKey: .sessionId)
@@ -76,7 +76,7 @@ public struct EventRequest: Codable, Hashable {
     public var getParams: [String: Any] {
         (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(self))) as? [String: Any] ?? [:]
     }
-    
+
     public func getLog() -> String {
         let params: [String: Any] = [
             BE_SESSION_ID_KEY: sessionId,
@@ -86,7 +86,7 @@ public struct EventRequest: Codable, Hashable {
             BE_METADATA_KEY: getNameValueDictionary(metadata),
             BE_ATTRIBUTES_KEY: getNameValueDictionary(attributes)
         ]
-        
+
         guard let theJSONData = try? JSONSerialization.data(withJSONObject: params,
                                                             options: []),
               let jsonString = String(data: theJSONData, encoding: .utf8) else {

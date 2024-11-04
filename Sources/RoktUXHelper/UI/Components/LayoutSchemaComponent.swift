@@ -15,7 +15,7 @@ import SwiftUI
 struct LayoutSchemaComponent: View {
     let config: ComponentConfig
     let layout: LayoutSchemaViewModel
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
@@ -41,7 +41,7 @@ struct LayoutSchemaComponent: View {
         self.parentOverride = parentOverride
         self.expandsToContainerOnSelfAlign = expandsToContainerOnSelfAlign
     }
-    
+
     var body: some View {
         switch layout {
         case .richText(let textModel):

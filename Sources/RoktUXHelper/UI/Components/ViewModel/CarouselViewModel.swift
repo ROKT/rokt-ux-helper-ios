@@ -23,7 +23,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [CarouselDistributionStyles]?,
          viewableItems: [UInt8],
@@ -37,17 +37,17 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
         self.peekThroughSize = peekThroughSize
         super.init(eventService: eventService, slots: slots, layoutState: layoutState)
     }
-    
+
     func sendViewableImpressionEvents(viewableItems: Int, currentLeadingOffer: Int) {
-        for offer in currentLeadingOffer..<currentLeadingOffer+viewableItems {
+        for offer in currentLeadingOffer..<currentLeadingOffer + viewableItems {
             sendImpressionEvents(currentOffer: offer)
         }
     }
-    
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         layoutState.getGlobalBreakpointIndex(width)
     }
-    
+
     func setupBindings(
         currentProgress: Binding<Int>,
         totalItems: Int,

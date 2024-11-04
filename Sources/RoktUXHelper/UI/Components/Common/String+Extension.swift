@@ -205,7 +205,7 @@ internal extension StringProtocol {
                 }
 
                 // have to check this again in case new descriptors like fontWeight were added
-                guard let fontWithTraitsDescriptor = updatedFont.fontDescriptor.withSymbolicTraits(traits) 
+                guard let fontWithTraitsDescriptor = updatedFont.fontDescriptor.withSymbolicTraits(traits)
                 else { return }
 
                 updatedFont = UIFont(descriptor: fontWithTraitsDescriptor, size: updatedFont.pointSize)

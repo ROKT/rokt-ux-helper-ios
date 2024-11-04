@@ -24,7 +24,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var imageLoader: ImageLoader? {
         layoutState.imageLoader
     }
-    
+
     let defaultStyle: [CreativeResponseStyles]?
     let pressedStyle: [CreativeResponseStyles]?
     let hoveredStyle: [CreativeResponseStyles]?
@@ -51,7 +51,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func sendSignalResponseEvent() {
         guard let responseJWTToken = responseOptions?.responseJWTToken else { return }
 
@@ -70,7 +70,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
             break
         }
     }
-    
+
     func getOfferUrl() -> URL? {
         guard let urlString = responseOptions?.url,
               responseOptions?.action == .url
@@ -78,14 +78,14 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
         return URL(string: urlString)
     }
-    
+
     func handleLink(url: URL) {
         eventService?.openURL(url: url, type: .init(openLinks, sessionId: (eventService as? EventService)?.sessionId),
                               completionHandler: { [weak self] in
             self?.goToNextOffer()
         })
     }
-    
+
     func goToNextOffer() {
         layoutState.actionCollection[.nextOffer](nil)
     }

@@ -16,14 +16,14 @@ import DcuiSchema
 @available(iOS 15, *)
 struct ToggleButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     var containerStyle: ContainerStylingProperties? { style?.container }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
     var borderStyle: BorderStylingProperties? { style?.border }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
-    
+
     let config: ComponentConfig
     let model: ToggleButtonViewModel
 
@@ -35,21 +35,21 @@ struct ToggleButtonComponent: View {
     @State var isHovered: Bool = false
     @State var isPressed: Bool = false
     @State var isDisabled: Bool = false
-    
+
     @GestureState private var isPressingDown: Bool = false
     var style: ToggleButtonStateTriggerStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex = 0
     @State var frameChangeIndex: Int = 0
@@ -59,7 +59,7 @@ struct ToggleButtonComponent: View {
     var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
     }
-    
+
     var verticalAlignmentOverride: VerticalAlignment? {
         return containerStyle?.justifyContent?.asVerticalAlignment.vertical
     }
@@ -117,7 +117,7 @@ struct ToggleButtonComponent: View {
                 frameChangeIndex: $frameChangeIndex,
                 imageLoader: model.imageLoader
             )
-            
+
             // contentShape extends tappable area outside of children
             .contentShape(Rectangle())
             // alignSelf must apply after the touchable area
@@ -147,8 +147,7 @@ struct ToggleButtonComponent: View {
                     default:
                         break
                     }
-                }
-            )
+                })
             .onChange(of: isPressingDown) { value in
                 if !value {
                     // toggle when long press is released
@@ -172,7 +171,7 @@ struct ToggleButtonComponent: View {
                 }
             }
     }
-    
+
     func createContainer() -> some View {
         return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems), spacing: 0) {
             if let children = model.children {
@@ -192,7 +191,8 @@ struct ToggleButtonComponent: View {
                                     justifyContent: containerStyle?.justifyContent
                                 ).asHorizontalType,
                                 parentBackgroundStyle: passableBackgroundStyle,
-                                stretchChildren: containerStyle?.alignItems == .stretch),
+                                stretchChildren: containerStyle?.alignItems == .stretch
+                            ),
                         expandsToContainerOnSelfAlign: shouldExpandToContainerOnSelfAlign()
                     )
                 }
@@ -212,12 +212,12 @@ struct ToggleButtonComponent: View {
             return false
         }
     }
-    
+
     private func handleToggle() {
         model.layoutState.actionCollection[.toggleCustomState](CustomStateIdentifiable(position: config.position,
                                                                                        key: model.customStateKey))
     }
-    
+
     private func updateStyleState() {
       if isDisabled {
           styleState = .disabled

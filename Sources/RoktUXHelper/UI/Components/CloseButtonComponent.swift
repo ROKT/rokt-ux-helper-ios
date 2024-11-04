@@ -15,25 +15,25 @@ import DcuiSchema
 @available(iOS 15, *)
 struct CloseButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     @State var styleState: StyleState = .default
     @State var isHovered: Bool = false
     @State var isPressed: Bool = false
     @State var isDisabled: Bool = false
-    
+
     var style: CloseButtonStyles? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex: Int = 0
     @State var frameChangeIndex: Int = 0
@@ -47,12 +47,12 @@ struct CloseButtonComponent: View {
 
     let config: ComponentConfig
     let model: CloseButtonViewModel
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @GestureState private var isPressingDown: Bool = false
 
     let parentOverride: ComponentParentOverride?
@@ -147,8 +147,7 @@ struct CloseButtonComponent: View {
                     default:
                         break
                     }
-                }
-            )
+                })
             .onChange(of: isPressingDown) { value in
                 if !value {
                     // handle link when long press is released
@@ -161,7 +160,7 @@ struct CloseButtonComponent: View {
                 updateStyleState()
             })
     }
-    
+
     func build() -> some View {
         createContainer()
             .onChange(of: globalScreenSize.width) { newSize in
@@ -174,7 +173,7 @@ struct CloseButtonComponent: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(kCloseButtonAnnouncement)
     }
-    
+
     func createContainer() -> some View {
         return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems), spacing: 0) {
             if let children = model.children {
@@ -186,24 +185,25 @@ struct CloseButtonComponent: View {
                                           styleState: $styleState,
                                           parentOverride:
                                             ComponentParentOverride(
-                                                parentVerticalAlignment: 
+                                                parentVerticalAlignment:
                                                     rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
-                                                parentHorizontalAlignment: 
+                                                parentHorizontalAlignment:
                                                     rowPrimaryAxisAlignment(justifyContent:
                                                                                 containerStyle?.justifyContent).asHorizontalType,
                                                 parentBackgroundStyle: passableBackgroundStyle,
-                                                stretchChildren: containerStyle?.alignItems == .stretch),
+                                                stretchChildren: containerStyle?.alignItems == .stretch
+                                            ),
                                           expandsToContainerOnSelfAlign: shouldExpandToContainerOnSelfAlign())
                 }
             }
         }
     }
-    
+
     private func handleClose() {
         model.sendCloseEvent()
         model.layoutState.actionCollection[.close](nil)
     }
-    
+
     // if height = fixed or percentage, we need to allow the children to expand. `expandsToContainerOnSelfAlign` will let them use maxHeight=.infinity
     //   since it will only take up its container's finite heigh
     // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
@@ -217,7 +217,7 @@ struct CloseButtonComponent: View {
             return false
         }
     }
-    
+
     private func updateStyleState() {
         if isDisabled {
             styleState = .disabled
