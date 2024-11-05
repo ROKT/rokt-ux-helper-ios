@@ -67,8 +67,7 @@ final class TestStaticLinkComponent: XCTestCase {
     }
     
     func test_tapGesture_shouldTriggerLinkhandler() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
-                                   layoutState: get_layout_state())
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
         
         let sut = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -85,8 +84,7 @@ final class TestStaticLinkComponent: XCTestCase {
     }
     
     func test_longPressGesture_shouldUpdatePressedStyle() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
-                                   layoutState: get_layout_state())
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
         
         let sut = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -111,9 +109,5 @@ final class TestStaticLinkComponent: XCTestCase {
                                              styles: model.styles,
                                              children: transformer.transformChildren(model.children, slot: nil))
         
-    }
-    
-    func get_layout_state() -> LayoutState {
-        LayoutState()
     }
 }

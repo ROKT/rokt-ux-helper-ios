@@ -81,17 +81,17 @@ final class TestGroupedDistributionComponent: XCTestCase {
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-        let view = TestPlaceHolder(layout:
-                                    LayoutSchemaViewModel.groupDistribution(
-                                        try get_model(
-                                            layoutSettings: closeOnCompleteSettings,
-                                            eventHandler: { event in
-                                                if event.eventType == .SignalDismissal {
-                                                    closeActionCalled = true
-                                                }
-                                            }
-                                        )
-                                    )
+        let view = TestPlaceHolder(
+            layout: LayoutSchemaViewModel.groupDistribution(
+                try get_model(
+                    eventHandler: { event in
+                        if event.eventType == .SignalDismissal {
+                            closeActionCalled = true
+                        }
+                    }
+                )
+            ),
+            layoutSettings: closeOnCompleteSettings
         )
         
         let groupedComponent = try view.inspect()
@@ -110,17 +110,16 @@ final class TestGroupedDistributionComponent: XCTestCase {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
         
-        let view = TestPlaceHolder(layout:
-                                    LayoutSchemaViewModel.groupDistribution(
-                                        try get_model(layoutSettings: closeOnCompleteSettings,
-                                                      eventHandler: { event in
-                                                          
-                                                          if event.eventType == .SignalDismissal {
-                                                              closeActionCalled = true
-                                                          }
-                                                      }
-                                                     )
-                                    )
+        let view = TestPlaceHolder(
+            layout: LayoutSchemaViewModel.groupDistribution(
+                try get_model(eventHandler: { event in
+
+                    if event.eventType == .SignalDismissal {
+                        closeActionCalled = true
+                    }
+                })
+            ),
+            layoutSettings: closeOnCompleteSettings
         )
         
         let groupedComponent = try view.inspect()
@@ -135,8 +134,7 @@ final class TestGroupedDistributionComponent: XCTestCase {
         XCTAssertFalse(closeActionCalled)
     }
     
-    func get_model(layoutSettings: LayoutSettings? = nil,
-                   eventHandler: @escaping (EventRequest) -> Void) throws -> GroupedDistributionViewModel {
+    func get_model(eventHandler: @escaping (EventRequest) -> Void) throws -> GroupedDistributionViewModel {
         let eventService = EventService(
             pageId: nil,
             pageInstanceGuid: "",
@@ -151,12 +149,9 @@ final class TestGroupedDistributionComponent: XCTestCase {
             pluginConfigJWTToken: "",
             useDiagnosticEvents: false
         )
-        let layoutState = LayoutState()
-        layoutState.items[LayoutState.layoutSettingsKey] = layoutSettings
         
         let slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots!),
-                                            layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.GroupedDistributionData.groupedDistribution()
         return try transformer.getGroupedDistribution(groupedModel: model!)

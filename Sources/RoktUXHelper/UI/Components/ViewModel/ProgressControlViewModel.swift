@@ -21,7 +21,7 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ProgressControlStyle]?
     let disabledStyle: [ProgressControlStyle]?
     let direction: ProgressionDirection
-    let layoutState: (any LayoutStateRepresenting)?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader
     }

@@ -102,10 +102,10 @@ import SwiftUI
             experienceResponse: experienceResponse,
             layoutLoaders: [location ?? "": self],
             config: config,
-            onRoktUXEvent: { event in onUXEvent?(event) },
-            onRoktPlatformEvent: { platformEvent in onPlatformEvent?(platformEvent) },
-            onEmbeddedSizeChange: { location, size in
-                if location == self.location {
+            onRoktUXEvent: { [weak self] event in onUXEvent?(event) },
+            onRoktPlatformEvent: { [weak self] platformEvent in onPlatformEvent?(platformEvent) },
+            onEmbeddedSizeChange: { [weak self] location, size in
+                if location == self?.location {
                     onEmbeddedSizeChange?(size)
                 }
             }

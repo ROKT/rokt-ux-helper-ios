@@ -54,13 +54,15 @@ final class TestCarouselComponent: XCTestCase {
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-        
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.carousel(
-            try get_model(layoutSettings: closeOnCompleteSettings, eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-                    closeActionCalled = true
-                }
-            }))
+        let view = TestPlaceHolder(
+            layout: LayoutSchemaViewModel.carousel(
+                try get_model(eventHandler: { event in
+                    if event.eventType == .SignalDismissal {
+                        closeActionCalled = true
+                    }
+                })
+            ),
+            layoutSettings: closeOnCompleteSettings
         )
         
         let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
@@ -74,8 +76,7 @@ final class TestCarouselComponent: XCTestCase {
         XCTAssertFalse(closeActionCalled)
     }
     
-    func get_model(layoutSettings: LayoutSettings? = nil,
-                   eventHandler: @escaping (EventRequest) -> Void) throws -> CarouselViewModel {
+    func get_model(eventHandler: @escaping (EventRequest) -> Void) throws -> CarouselViewModel {
         let eventService = EventService(
             pageId: nil,
             pageInstanceGuid: "",
@@ -90,12 +91,9 @@ final class TestCarouselComponent: XCTestCase {
             pluginConfigJWTToken: "",
             useDiagnosticEvents: false
         )
-        let layoutState = LayoutState()
-        layoutState.items[LayoutState.layoutSettingsKey] = layoutSettings
         
         let slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots!),
-                                            layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.CarouselData.carousel()
         return try transformer.getCarousel(carouselModel: model!)

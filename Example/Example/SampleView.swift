@@ -21,29 +21,23 @@ struct SampleView: View {
     @StateObject private var vm: SampleViewModel = .init()
 
     var body: some View {
-        VStack {
-            Button("Done") {
+        RoktLayoutView(
+            experienceResponse: vm.experienceResponse,
+            location: "#target_element", // "targetElementSelector" in experience JSON file
+            config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
+        ) { uxEvent in
+            if uxEvent is RoktUXEvent.LayoutCompleted {
                 dismiss()
+            } else if let uxEvent = (uxEvent as? RoktUXEvent.OpenUrl) {
+                // Handle open URL event
+                vm.handleURL(uxEvent)
             }
-
-            RoktLayoutView(
-                experienceResponse: vm.experienceResponse,
-                location: "#target_element", // "targetElementSelector" in experience JSON file
-                config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
-            ) { uxEvent in
-                if uxEvent is RoktUXEvent.LayoutCompleted {
-                    dismiss()
-                } else if let uxEvent = (uxEvent as? RoktUXEvent.OpenUrl) {
-                    // Handle open URL event
-                    vm.handleURL(uxEvent)
-                }
-                // Handle UX events here
-
-            } onPlatformEvent: { _ in
-                // Send these platform events to Rokt API
-            }.sheet(item: $vm.urlToOpen) {
-                SafariWebView(url: $0)
-            }
+            // Handle UX events here
+            
+        } onPlatformEvent: { _ in
+            // Send these platform events to Rokt API
+        }.sheet(item: $vm.urlToOpen) {
+            SafariWebView(url: $0)
         }
     }
 }

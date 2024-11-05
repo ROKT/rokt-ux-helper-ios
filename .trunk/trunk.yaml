@@ -45,6 +45,5 @@ actions:
   enabled:
     - trunk-announce
     - trunk-fmt-pre-commit
-    - trunk-check-pre-push
     - trunk-check-pre-commit
     - trunk-upgrade-available

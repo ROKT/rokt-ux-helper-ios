@@ -61,16 +61,17 @@ final class TestOneByOneComponent: XCTestCase {
         
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
         
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.oneByOne(
-            try get_model(layoutSettings: closeOnCompleteSettings,
-                          eventHandler: { event in
-                              
-                              if event.eventType == .SignalDismissal {
-                                  closeActionCalled = true
-                              } else if event.eventType == .SignalResponse {
-                                  SignalResponseCalled = true
-                              }
-                          }))
+        let view = TestPlaceHolder(
+            layout: LayoutSchemaViewModel.oneByOne(
+                try get_model(eventHandler: { event in
+                    if event.eventType == .SignalDismissal {
+                        closeActionCalled = true
+                    } else if event.eventType == .SignalResponse {
+                        SignalResponseCalled = true
+                    }
+                })
+            ),
+            layoutSettings: closeOnCompleteSettings
         )
         
         let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
@@ -85,7 +86,6 @@ final class TestOneByOneComponent: XCTestCase {
         oneByOneComponent.goToNextOffer()
         XCTAssertFalse(closeActionCalled)
         XCTAssertFalse(SignalResponseCalled)
-        
     }
     
     func get_model(layoutSettings: LayoutSettings? = nil, 
