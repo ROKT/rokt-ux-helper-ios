@@ -35,10 +35,6 @@ class SampleViewModel: ObservableObject {
         }
         event.onClose?(event.id)
     }
-
-    deinit {
-        print("SmapleViewModel deinit")
-    }
 }
 
 extension SampleViewModel: ImageLoader {

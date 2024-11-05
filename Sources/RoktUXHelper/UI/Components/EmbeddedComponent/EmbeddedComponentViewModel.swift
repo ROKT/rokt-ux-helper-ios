@@ -64,8 +64,4 @@ class EmbeddedComponentViewModel: ObservableObject {
             lastUpdatedHeight = newHeight
         }
     }
-
-    deinit {
-        print("Embedded Component deinit")
-    }
 }

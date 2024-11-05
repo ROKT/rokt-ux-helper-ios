@@ -486,8 +486,4 @@ public class RoktUX: UXEventsDelegate {
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))
     }
-
-    deinit {
-        print("roktux deinit")
-    }
 }

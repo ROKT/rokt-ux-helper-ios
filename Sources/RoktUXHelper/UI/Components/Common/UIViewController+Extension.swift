@@ -46,13 +46,9 @@ extension UIViewController {
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            modal.rootView = AnyView(
-                builder(onSizeChange)
-                    .background(Color.clear)
-            )
-            func onSizeChange(size: CGFloat) {
+            var onSizeChange = { [weak self, weak modal] size in
                 DispatchQueue.main.async {
-                    if let sheet = modal.sheetPresentationController {
+                    if let sheet = modal?.sheetPresentationController {
                         sheet.animateChanges {
                             sheet.detents = [.custom { _ in
                                 return size
@@ -65,6 +61,10 @@ extension UIViewController {
                     }
                 }
             }
+            modal.rootView = AnyView(
+                builder(onSizeChange)
+                    .background(Color.clear)
+            )
 
             applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
             applyInitialDynamicBottomSheetHeight(modal: modal)
