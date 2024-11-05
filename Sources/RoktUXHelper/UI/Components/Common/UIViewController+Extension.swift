@@ -26,14 +26,6 @@ struct ViewControllerHolder {
 }
 
 @available(iOS 15, *)
-extension EnvironmentValues {
-    var viewController: UIViewController? {
-        get { return self[ViewControllerKey.self].value }
-        set { self[ViewControllerKey.self].value = newValue }
-    }
-}
-
-@available(iOS 15, *)
 extension UIViewController {
     func present<Content: View>(placementType: PlacementType?,
                                 bottomSheetUIModel: BottomSheetViewModel?,
@@ -56,7 +48,6 @@ extension UIViewController {
             var isOnLoadCalled = false
             modal.rootView = AnyView(
                 builder(onSizeChange)
-                    .environment(\.viewController, modal)
                     .background(Color.clear)
             )
             func onSizeChange(size: CGFloat) {
@@ -82,7 +73,6 @@ extension UIViewController {
         } else {
             modal.rootView = AnyView(
                 builder(nil)
-                    .environment(\.viewController, modal)
                     .background(Color.clear)
             )
 
@@ -106,10 +96,9 @@ extension UIViewController {
         }
 
         modal.view.isOpaque = false
-        func closeOverlay(_: Any? = nil) {
-            modal.dismiss(animated: true, completion: nil)
+        layoutState.actionCollection[.close] = { [weak self, weak modal] _ in
+            modal?.dismiss(animated: true, completion: nil)
         }
-        layoutState.actionCollection[.close] = closeOverlay
     }
 
     private func applyBottomSheetStyles(modal: UIHostingController<AnyView>,
