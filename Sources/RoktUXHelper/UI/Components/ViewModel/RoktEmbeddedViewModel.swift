@@ -14,7 +14,7 @@ import SwiftUI
 @available(iOS 15, *)
 class RoktEmbeddedViewModel {
     let layouts: [LayoutSchemaViewModel]?
-    let eventService: EventServicing?
+    weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
 
     var imageLoader: ImageLoader? {

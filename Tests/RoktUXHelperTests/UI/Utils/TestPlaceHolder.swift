@@ -17,82 +17,45 @@ import DcuiSchema
 struct TestPlaceHolder: View {
     let layout: LayoutSchemaViewModel
     var layoutState: LayoutState
+    var eventService: EventService?
 
-    init(layout: LayoutSchemaViewModel, layoutSettings: LayoutSettings? = nil) {
+    init(
+        layout: LayoutSchemaViewModel,
+        layoutState: LayoutState = LayoutState(),
+        eventService: EventService? = nil
+    ) {
         self.layout = layout
-        self.layoutState = LayoutState()
-        layoutState.items[LayoutState.layoutSettingsKey] = layoutSettings
-        expandLayoutAndInjectState(layout)
-    }
-
-    private func expandLayoutAndInjectState(_ layout: LayoutSchemaViewModel) {
-        var children: [LayoutSchemaViewModel]?
-        switch layout {
-        case let .basicText(viewModel):
-            viewModel.layoutState = layoutState
-        case let .richText(viewModel):
-            viewModel.layoutState = layoutState
-        case let .staticImage(viewModel):
-            viewModel.layoutState = layoutState
-        case let .dataImage(viewModel):
-            viewModel.layoutState = layoutState
-        case let .progressIndicator(viewModel):
-            viewModel.layoutState = layoutState
-        case let .overlay(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .bottomSheet(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .row(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .column(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .zStack(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .scrollableRow(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .scrollableColumn(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .when(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .oneByOne(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .carousel(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .groupDistribution(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .creativeResponse(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .closeButton(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .staticLink(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .progressControl(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case let .toggleButton(viewModel):
-            viewModel.layoutState = layoutState
-            children = viewModel.children
-        case .empty:
-            break
-        }
-        children?.forEach(expandLayoutAndInjectState(_:))
+        self.layoutState = layoutState
+        self.eventService = eventService
     }
 
     var body: some View {
-        EmbeddedComponent(layout: layout, layoutState: layoutState, eventService: nil, onLoad: nil, onSizeChange: nil)
+        EmbeddedComponent(
+            layout: layout,
+            layoutState: layoutState,
+            eventService: eventService,
+            onLoad: nil,
+            onSizeChange: nil
+        )
+    }
+}
+
+@available(iOS 15.0, *)
+extension TestPlaceHolder {
+
+    static func make(
+        layoutSettings: LayoutSettings? = nil,
+        eventHandler: @escaping ((EventRequest) -> Void) = { _ in },
+        eventDelegate: UXEventsDelegate = MockUXHelper(),
+        layoutMaker: (LayoutState, EventService) throws -> LayoutSchemaViewModel
+    ) throws -> Self {
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.layoutSettingsKey] = layoutSettings
+        let eventService = get_mock_event_processor(uxEventDelegate: eventDelegate, eventHandler: eventHandler)
+        return TestPlaceHolder(
+            layout: try layoutMaker(layoutState, eventService),
+            layoutState: layoutState,
+            eventService: eventService
+        )
     }
 }

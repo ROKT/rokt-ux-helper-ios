@@ -20,13 +20,14 @@ final class TestOneByOneComponent: XCTestCase {
     
     func test_one_by_one() throws {
         var closeActionCalled = false
-        
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.oneByOne(try get_model(eventHandler: { event in
-            
-            if event.eventType == .SignalDismissal {
-                closeActionCalled = true
-            }
-        })))
+        let view = try TestPlaceHolder.make(
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
+        )
         let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -61,17 +62,16 @@ final class TestOneByOneComponent: XCTestCase {
         
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
         
-        let view = TestPlaceHolder(
-            layout: LayoutSchemaViewModel.oneByOne(
-                try get_model(eventHandler: { event in
-                    if event.eventType == .SignalDismissal {
-                        closeActionCalled = true
-                    } else if event.eventType == .SignalResponse {
-                        SignalResponseCalled = true
-                    }
-                })
-            ),
-            layoutSettings: closeOnCompleteSettings
+        let view = try TestPlaceHolder.make(
+            layoutSettings: closeOnCompleteSettings,
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                } else if event.eventType == .SignalResponse {
+                    SignalResponseCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
         )
         
         let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
@@ -87,31 +87,20 @@ final class TestOneByOneComponent: XCTestCase {
         XCTAssertFalse(closeActionCalled)
         XCTAssertFalse(SignalResponseCalled)
     }
-    
-    func get_model(layoutSettings: LayoutSettings? = nil, 
-                   eventHandler: @escaping (EventRequest) -> Void) throws -> OneByOneViewModel {
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: "",
-            sessionId: "",
-            pluginInstanceGuid: "",
-            pluginId: nil,
-            pluginName: nil,
-            startDate: Date(),
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: "",
-            useDiagnosticEvents: false
-        )
-        let layoutState = LayoutState()
-        layoutState.items[LayoutState.layoutSettingsKey] = layoutSettings
-        
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+
+    static func makeOneByOne(
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
         let slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots!),
                                             layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.OneByOneData.oneByOne()
-        return try transformer.getOneByOne(oneByOneModel: model!)
+        return LayoutSchemaViewModel.oneByOne(try transformer.getOneByOne(oneByOneModel: model!))
     }
 }

@@ -24,13 +24,15 @@ final class TestGroupedDistributionComponent: XCTestCase {
     func test_grouped_distribution() throws {
         var closeActionCalled = false
         
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.groupDistribution(try get_model(eventHandler: { event in
-            
-            if event.eventType == .SignalDismissal {
-                closeActionCalled = true
-            }
-        })))
-        
+        let view = try TestPlaceHolder.make(
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeGroupedDistribution(layoutState:eventService:)
+        )
+
         let groupedComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -59,13 +61,15 @@ final class TestGroupedDistributionComponent: XCTestCase {
     func test_goToNextGroup_with_closeOnComplete_default() throws {
         var closeActionCalled = false
         
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.groupDistribution(try get_model(eventHandler: { event in
-            
-            if event.eventType == .SignalDismissal {
-                closeActionCalled = true
-            }
-        })))
-        
+        let view = try TestPlaceHolder.make(
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeGroupedDistribution(layoutState:eventService:)
+        )
+
         let groupedComponent = try view.inspect()
             .view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -81,17 +85,14 @@ final class TestGroupedDistributionComponent: XCTestCase {
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-        let view = TestPlaceHolder(
-            layout: LayoutSchemaViewModel.groupDistribution(
-                try get_model(
-                    eventHandler: { event in
-                        if event.eventType == .SignalDismissal {
-                            closeActionCalled = true
-                        }
-                    }
-                )
-            ),
-            layoutSettings: closeOnCompleteSettings
+        let view = try TestPlaceHolder.make(
+            layoutSettings: closeOnCompleteSettings,
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeGroupedDistribution(layoutState:eventService:)
         )
         
         let groupedComponent = try view.inspect()
@@ -110,16 +111,14 @@ final class TestGroupedDistributionComponent: XCTestCase {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
         
-        let view = TestPlaceHolder(
-            layout: LayoutSchemaViewModel.groupDistribution(
-                try get_model(eventHandler: { event in
-
-                    if event.eventType == .SignalDismissal {
-                        closeActionCalled = true
-                    }
-                })
-            ),
-            layoutSettings: closeOnCompleteSettings
+        let view = try TestPlaceHolder.make(
+            layoutSettings: closeOnCompleteSettings,
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeGroupedDistribution(layoutState:eventService:)
         )
         
         let groupedComponent = try view.inspect()
@@ -133,27 +132,20 @@ final class TestGroupedDistributionComponent: XCTestCase {
         groupedComponent.goToNextGroup()
         XCTAssertFalse(closeActionCalled)
     }
-    
-    func get_model(eventHandler: @escaping (EventRequest) -> Void) throws -> GroupedDistributionViewModel {
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: "",
-            sessionId: "",
-            pluginInstanceGuid: "",
-            pluginId: nil,
-            pluginName: nil,
-            startDate: Date(),
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: "",
-            useDiagnosticEvents: false
-        )
-        
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+
+    static func makeGroupedDistribution(
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
         let slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots!),
+                                            layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.GroupedDistributionData.groupedDistribution()
-        return try transformer.getGroupedDistribution(groupedModel: model!)
+        return LayoutSchemaViewModel.groupDistribution(try transformer.getGroupedDistribution(groupedModel: model!))
     }
 }

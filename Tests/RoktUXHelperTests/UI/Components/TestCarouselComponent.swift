@@ -19,13 +19,15 @@ import DcuiSchema
 final class TestCarouselComponent: XCTestCase {
     func test_carousel() throws {
         var closeActionCalled = false
-        
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.carousel(try get_model(eventHandler: { event in
-            if event.eventType == .SignalDismissal {
-                closeActionCalled = true
-            }
-        })))
-        
+        let view = try TestPlaceHolder.make(
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeCarousel(layoutState:eventService:)
+        )
+
         let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -54,15 +56,14 @@ final class TestCarouselComponent: XCTestCase {
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-        let view = TestPlaceHolder(
-            layout: LayoutSchemaViewModel.carousel(
-                try get_model(eventHandler: { event in
-                    if event.eventType == .SignalDismissal {
-                        closeActionCalled = true
-                    }
-                })
-            ),
-            layoutSettings: closeOnCompleteSettings
+        let view = try TestPlaceHolder.make(
+            layoutSettings: closeOnCompleteSettings,
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeActionCalled = true
+                }
+            },
+            layoutMaker: LayoutSchemaViewModel.makeCarousel(layoutState:eventService:)
         )
         
         let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
@@ -75,27 +76,20 @@ final class TestCarouselComponent: XCTestCase {
         carouselComponent.goToNextOffer()
         XCTAssertFalse(closeActionCalled)
     }
-    
-    func get_model(eventHandler: @escaping (EventRequest) -> Void) throws -> CarouselViewModel {
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: "",
-            sessionId: "",
-            pluginInstanceGuid: "",
-            pluginId: nil,
-            pluginName: nil,
-            startDate: Date(),
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: "",
-            useDiagnosticEvents: false
-        )
-        
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+
+    static func makeCarousel(
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
         let slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots!),
+                                            layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.CarouselData.carousel()
-        return try transformer.getCarousel(carouselModel: model!)
+        return LayoutSchemaViewModel.carousel(try transformer.getCarousel(carouselModel: model!))
     }
 }

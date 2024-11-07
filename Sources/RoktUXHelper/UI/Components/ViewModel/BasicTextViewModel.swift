@@ -52,10 +52,9 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     let hoveredStyle: [BasicTextStyle]?
     let disabledStyle: [BasicTextStyle]?
     weak var layoutState: (any LayoutStateRepresenting)?
-
+    weak var diagnosticService: DiagnosticServicing?
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
-    private let diagnosticService: DiagnosticServicing?
 
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader

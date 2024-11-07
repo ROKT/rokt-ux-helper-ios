@@ -25,7 +25,7 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
     let seenIndicatorStyle: [IndicatorStyles]?
     let startPosition: Int32?
     let accessibilityHidden: Bool?
-    let eventService: EventDiagnosticServicing?
+    weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader

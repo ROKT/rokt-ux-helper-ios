@@ -17,7 +17,7 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     private let src: String
     private let open: LinkOpenTarget
-    private let eventService: EventDiagnosticServicing?
+    private weak var eventService: EventDiagnosticServicing?
     private(set) var children: [LayoutSchemaViewModel]?
     let id: UUID = UUID()
     let defaultStyle: [StaticLinkStyles]?

@@ -29,12 +29,8 @@ class EmbeddedComponentViewModel: ObservableObject {
         self.layout = layout
         self.layoutState = layoutState
         self.eventService = eventService
-        self.onLoadCallback = { [weak self] in
-            onLoad?()
-        }
-        self.onSizeChange = { [weak self] size in
-            onSizeChange?(size)
-        }
+        self.onLoadCallback = onLoad
+        self.onSizeChange = onSizeChange
     }
 
     func onLoad() {

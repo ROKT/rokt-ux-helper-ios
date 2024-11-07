@@ -45,9 +45,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
-        onRoktEvent = { [weak self] event in
-            onRoktUXEvent(event)
-        }
+        onRoktEvent = onRoktUXEvent
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -67,8 +65,8 @@ public class RoktUX: UXEventsDelegate {
                         responseReceivedDate: layoutPage.responseReceivedDate,
                         layoutLoader: layoutLoader,
                         config: config,
-                        onLoad: { [weak self] in },
-                        onUnload: { [weak self] in },
+                        onLoad: {},
+                        onUnload: {},
                         onEmbeddedSizeChange: onEmbeddedSizeChange,
                         onRoktUXEvent: onRoktUXEvent,
                         processor: processor
@@ -116,9 +114,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void
     ) {
-        onRoktEvent = { [weak self] event in
-            onRoktUXEvent(event)
-        }
+        onRoktEvent = onRoktUXEvent
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {

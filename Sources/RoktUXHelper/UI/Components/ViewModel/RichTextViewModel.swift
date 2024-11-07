@@ -20,7 +20,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     private(set) var dataBinding: DataBinding = .value("")
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
-    private let eventService: EventDiagnosticServicing?
+    private weak var eventService: EventDiagnosticServicing?
 
     let id: UUID = UUID()
     let defaultStyle: [RichTextStyle]?

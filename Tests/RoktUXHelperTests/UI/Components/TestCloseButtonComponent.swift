@@ -19,8 +19,8 @@ final class TestCloseButtonComponent: XCTestCase {
     
     func test_creative_response() throws {
         
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.closeButton(try get_model()))
-        
+        let view = try TestPlaceHolder.make(layoutMaker: LayoutSchemaViewModel.makeCloseButton(layoutState:eventService:))
+
         let closeButton = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -40,12 +40,53 @@ final class TestCloseButtonComponent: XCTestCase {
         
         XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close button")
     }
-    
-    func get_model() throws -> CloseButtonViewModel {
-        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let closeButton = ModelTestData.CloseButtonData.closeButton()
-        return try transformer.getCloseButton(styles: closeButton.styles,
-                                              children: transformer.transformChildren(closeButton.children, slot: nil))
+
+    func test_send_close_event() throws {
+        var closeEventCalled = false
+        let eventDelegate = MockUXHelper()
+        let view = try TestPlaceHolder.make(
+            eventHandler: { event in
+                if event.eventType == .SignalDismissal {
+                    closeEventCalled = true
+                }
+            },
+            eventDelegate: eventDelegate,
+            layoutMaker: LayoutSchemaViewModel.makeCloseButton(layoutState:eventService:)
+        )
+
+        let closeButton = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CloseButtonComponent.self)
+            .actualView()
+
+        let sut = closeButton.model
+        sut.sendCloseEvent()
+
+        XCTAssertTrue(closeEventCalled)
+        XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))
+        XCTAssertNotNil(sut.layoutState)
     }
-    
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+    static func makeCloseButton(
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState,
+            eventService: eventService
+        )
+        let closeButton = ModelTestData.CloseButtonData.closeButton()
+        return LayoutSchemaViewModel.closeButton(
+            try transformer.getCloseButton(
+                styles: closeButton.styles,
+                children: transformer.transformChildren(closeButton.children, slot: nil)
+            )
+        )
+    }
 }

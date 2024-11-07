@@ -20,16 +20,15 @@ let mockPluginName = "pluginName"
 let mockPageId = "pageId"
 let mockPageInstanceGuid = "pageInstanceGuid"
 
-func get_mock_layout_plugin(
-    pluginInstanceGuid: String = "",
-    breakpoints: BreakPoint? = nil,
-    settings: LayoutSettings? = nil,
-    layout: LayoutSchemaModel? = nil,
-    slots: [SlotModel] = [],
-    targetElementSelector: String? = "",
-    pluginConfigJWTToken: String = "",
-    pluginId: String? = "",
-    pluginName: String? = "") -> LayoutPlugin {
+func get_mock_layout_plugin(pluginInstanceGuid: String = "",
+                            breakpoints: BreakPoint? = nil,
+                            settings: LayoutSettings? = nil,
+                            layout: LayoutSchemaModel? = nil,
+                            slots: [SlotModel] = [],
+                            targetElementSelector: String? = "",
+                            pluginConfigJWTToken: String = "",
+                            pluginId: String? = "",
+                            pluginName: String? = "") -> LayoutPlugin {
     return LayoutPlugin(pluginInstanceGuid: pluginInstanceGuid,
                         breakpoints: breakpoints,
                         settings: settings,
@@ -58,9 +57,9 @@ func get_mock_uistate(currentProgress: Int = 0,
 @available(iOS 13.0, *)
 func get_mock_event_processor(startDate: Date = Date(),
                               responseReceivedDate: Date = Date(),
-                              uxEventDelegate: UXEventsDelegate,
+                              uxEventDelegate: UXEventsDelegate = MockUXHelper(),
                               useDiagnosticEvents: Bool = false,
-                              eventHandler: @escaping (EventRequest) -> Void) -> EventService {
+                              eventHandler: @escaping (EventRequest) -> Void = { _ in }) -> EventService {
     return EventService(pageId: mockPageId,
                         pageInstanceGuid: mockPageInstanceGuid,
                         sessionId: "session",

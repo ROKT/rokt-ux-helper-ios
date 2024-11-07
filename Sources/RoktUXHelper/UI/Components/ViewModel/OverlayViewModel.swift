@@ -19,7 +19,7 @@ class OverlayViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let allowBackdropToClose: Bool?
     let defaultStyle: [OverlayStyles]?
     let wrapperStyle: [OverlayWrapperStyles]?
-    let eventService: EventServicing?
+    weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader

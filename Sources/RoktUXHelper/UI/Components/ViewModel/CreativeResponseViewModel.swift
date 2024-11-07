@@ -19,7 +19,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let responseKey: BNFNamespace.CreativeResponseKey
     let responseOptions: ResponseOption?
     let openLinks: LinkOpenTarget?
-    let eventService: EventDiagnosticServicing?
+    weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader
