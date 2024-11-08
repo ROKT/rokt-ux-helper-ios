@@ -21,6 +21,7 @@ class RoktLayoutViewModel: ObservableObject, LayoutLoader {
         case empty
     }
     @Published var state: State = .empty
+    @Published var height: CGFloat = 0
     private let experienceResponse: String
     private let location: String
     private let config: RoktUXConfig?
@@ -68,5 +69,7 @@ extension RoktLayoutViewModel: LayoutLoader {
         state = .empty
     }
 
-    public func updateEmbeddedSize(_ size: CGFloat) {}
+    public func updateEmbeddedSize(_ size: CGFloat) {
+        height = size
+    }
 }

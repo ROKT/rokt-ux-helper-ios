@@ -48,6 +48,8 @@ public struct RoktLayoutView: View {
             switch viewModel.state {
             case let .ready(view):
                 view
+                    .frame(height: viewModel.height)
+                    .frame(maxWidth: .infinity)
             case .empty:
                 EmptyView()
             }
