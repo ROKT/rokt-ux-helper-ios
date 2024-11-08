@@ -45,7 +45,6 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
-        onRoktEvent = onRoktUXEvent
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -114,7 +113,6 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void
     ) {
-        onRoktEvent = onRoktUXEvent
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -196,6 +194,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         processor: EventProcessing
     ) {
+        onRoktEvent = onRoktUXEvent
         let actionCollection = ActionCollection()
 
         let layoutState = LayoutState(actionCollection: actionCollection, config: config)
