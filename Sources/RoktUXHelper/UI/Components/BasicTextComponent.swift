@@ -150,7 +150,7 @@ struct BasicTextComponent: View {
                     // run it in background thread for smooth transition
                     DispatchQueue.background.async {
                         // update breakpoint index
-                        let index = min(model.layoutState.getGlobalBreakpointIndex(newSize),
+                        let index = min(model.layoutState?.getGlobalBreakpointIndex(newSize) ?? 0,
                                         (model.defaultStyle?.count ?? 1) - 1)
                         DispatchQueue.main.async {
                             model.breakpointIndex = index >= 0 ? index : 0

@@ -59,7 +59,7 @@ public struct RoktUXConfig {
         /// Builds the `RoktUXConfig` instance with the specified settings.
         /// - Returns: A configured `RoktUXConfig` instance.
         public func build() -> RoktUXConfig {
-            return RoktUXConfig(colorMode: colorMode ?? .system, imageLoader: imageLoader)
+            RoktUXConfig(colorMode: colorMode ?? .system, imageLoader: imageLoader)
         }
     }
 }

@@ -36,7 +36,7 @@ struct OverlayComponent: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        model.layoutState.actionCollection[.close](nil)
+                        model.layoutState?.actionCollection[.close](nil)
                     }
             }
             build()

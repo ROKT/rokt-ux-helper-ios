@@ -18,17 +18,17 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     var children: [LayoutSchemaViewModel]?
     let allowBackdropToClose: Bool?
     let defaultStyle: [BottomSheetStyles]?
-    let eventService: EventServicing?
-    let layoutState: any LayoutStateRepresenting
+    weak var eventService: EventServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
          allowBackdropToClose: Bool?,
          defaultStyle: [BottomSheetStyles]?,
          eventService: EventServicing?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.allowBackdropToClose = allowBackdropToClose
         self.defaultStyle = defaultStyle

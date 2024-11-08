@@ -21,9 +21,9 @@ class DataImageViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAd
     let pressedStyle: [DataImageStyles]?
     let hoveredStyle: [DataImageStyles]?
     let disabledStyle: [DataImageStyles]?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(image: CreativeImage?,
@@ -31,7 +31,7 @@ class DataImageViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAd
          pressedStyle: [DataImageStyles]?,
          hoveredStyle: [DataImageStyles]?,
          disabledStyle: [DataImageStyles]?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.image = image
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle

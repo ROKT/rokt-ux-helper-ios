@@ -194,7 +194,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         processor: EventProcessing
     ) {
-        self.onRoktEvent = onRoktUXEvent
+        onRoktEvent = onRoktUXEvent
         let actionCollection = ActionCollection()
 
         let layoutState = LayoutState(actionCollection: actionCollection, config: config)
@@ -311,28 +311,26 @@ public class RoktUX: UXEventsDelegate {
         DispatchQueue.main.async {
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
+
+                    var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                        layoutLoader?.updateEmbeddedSize(size)
+                        onEmbeddedSizeChange(targetElement, size)
+                    }
+
                     layoutLoader.load(onSizeChanged: onSizeChange,
                                       injectedView: {
                         EmbeddedComponent(
                             layout: layoutUIModel,
                             layoutState: layoutState,
                             eventService: eventService,
-                            config: config,
                             onLoad: onLoad,
                             onSizeChange: onSizeChange
                         )
                         .customColorMode(colorMode: config?.colorMode)
                     })
-                    layoutState.actionCollection[.close] = closeEmbedded
-
-                    func closeEmbedded(_: Any? = nil) {
-                        layoutLoader.closeEmbedded()
+                    layoutState.actionCollection[.close] = { [weak layoutLoader] _ in
+                        layoutLoader?.closeEmbedded()
                         onUnload()
-                    }
-
-                    func onSizeChange(size: CGFloat) {
-                        layoutLoader.updateEmbeddedSize(size)
-                        onEmbeddedSizeChange(targetElement, size)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,

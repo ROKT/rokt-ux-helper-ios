@@ -16,7 +16,6 @@ import SwiftUI
 
 class SampleViewModel: ObservableObject {
 
-    let roktConfig: RoktUXConfig = RoktUXConfig.Builder().colorMode(.system).build()
     let experienceResponse: String = String.getExperienceResponse(for: "experience")!
 
     @Published var urlToOpen: URL?

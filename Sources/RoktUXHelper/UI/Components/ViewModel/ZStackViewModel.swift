@@ -21,9 +21,9 @@ class ZStackViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ZStackStyle]?
     let disabledStyle: [ZStackStyle]?
     let accessibilityGrouped: Bool
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -32,7 +32,7 @@ class ZStackViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [ZStackStyle]?,
          disabledStyle: [ZStackStyle]?,
          accessibilityGrouped: Bool,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle

@@ -12,26 +12,37 @@
 import SwiftUI
 
 @available(iOS 15, *)
-
 struct EmbeddedComponent: View {
-    @SwiftUI.Environment(\.colorScheme) var colorScheme
-    let layout: LayoutSchemaViewModel
-    let layoutState: LayoutState
-    let eventService: EventServicing?
-    let config: RoktUXConfig?
-    let onLoad: (() -> Void)?
-    let onSizeChange: ((CGFloat) -> Void)?
 
-    @State var lastUpdatedHeight: CGFloat = 0
+    @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @StateObject var globalScreenSize = GlobalScreenSize()
+
+    @StateObject private var viewModel: EmbeddedComponentViewModel
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
 
-    @StateObject var globalScreenSize = GlobalScreenSize()
+    init(
+        layout: LayoutSchemaViewModel,
+        layoutState: LayoutState?,
+        eventService: EventServicing?,
+        onLoad: (() -> Void)?,
+        onSizeChange: ((CGFloat) -> Void)?
+    ) {
+        self._viewModel = .init(
+            wrappedValue: .init(
+                layout: layout,
+                layoutState: layoutState,
+                eventService: eventService,
+                onLoad: onLoad,
+                onSizeChange: onSizeChange
+            )
+        )
+    }
 
     var body: some View {
         VStack {
             LayoutSchemaComponent(config: ComponentConfig(parent: .column, position: nil),
-                                  layout: layout,
+                                  layout: viewModel.layout,
                                   parentWidth: $availableWidth,
                                   parentHeight: $availableHeight,
                                   styleState: .constant(.default))
@@ -47,28 +58,18 @@ struct EmbeddedComponent: View {
             globalScreenSize.height = size.height
         }
         .onLoad {
-            eventService?.sendEventsOnLoad()
-            onLoad?()
-            layoutState.actionCollection[.checkBoundingBox](nil)
+            viewModel.onLoad()
         }
         .onFirstTouch {
-            eventService?.sendSignalActivationEvent()
+            viewModel.onFirstTouch()
         }
         .onChange(of: colorScheme) { newColor in
-            DispatchQueue.main.async {
-                AttributedStringTransformer
-                    .convertRichTextHTMLIfExists(uiModel: layout,
-                                                 config: config,
-                                                 colorScheme: newColor)
-            }
+            viewModel.updateColorScheme(newColor)
         }
         .environmentObject(globalScreenSize)
     }
 
     func notifyHeightChanged(_ newHeight: CGFloat) {
-        if lastUpdatedHeight != newHeight {
-            onSizeChange?(newHeight)
-            lastUpdatedHeight = newHeight
-        }
+        viewModel.updateHeight(newHeight)
     }
 }

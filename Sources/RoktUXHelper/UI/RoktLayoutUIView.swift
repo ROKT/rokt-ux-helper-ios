@@ -35,7 +35,7 @@ import SwiftUI
     private var onUXEvent: ((RoktUXEvent) -> Void)?
     private var onPlatformEvent: (([String: Any]) -> Void)?
     private var onEmbeddedSizeChange: ((CGFloat) -> Void)?
-    private var semaphore = DispatchSemaphore(value: 1)
+    private var hasLoadedLayout = false
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -70,18 +70,16 @@ import SwiftUI
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            if let experienceResponse, semaphore.wait(timeout: .now()) == .success {
-                loadLayout(
-                    experienceResponse: experienceResponse,
-                    location: location,
-                    config: config,
-                    onUXEvent: onUXEvent,
-                    onPlatformEvent: onPlatformEvent,
-                    onEmbeddedSizeChange: onEmbeddedSizeChange
-                )
-            }
+        if let experienceResponse, !hasLoadedLayout {
+            hasLoadedLayout = true
+            loadLayout(
+                experienceResponse: experienceResponse,
+                location: location,
+                config: config,
+                onUXEvent: onUXEvent,
+                onPlatformEvent: onPlatformEvent,
+                onEmbeddedSizeChange: onEmbeddedSizeChange
+            )
         }
     }
 
@@ -106,8 +104,8 @@ import SwiftUI
             config: config,
             onRoktUXEvent: { event in onUXEvent?(event) },
             onRoktPlatformEvent: { platformEvent in onPlatformEvent?(platformEvent) },
-            onEmbeddedSizeChange: { location, size in
-                if location == self.location {
+            onEmbeddedSizeChange: { [weak self] location, size in
+                if location == self?.location {
                     onEmbeddedSizeChange?(size)
                 }
             }

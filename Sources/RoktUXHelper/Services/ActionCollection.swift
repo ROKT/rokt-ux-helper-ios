@@ -41,7 +41,7 @@ class ActionCollection: ActionCollecting {
     subscript(actionType: RoktActionType) -> ShareFunction {
         get {
             internalQueue.sync {
-                if let callback = self.callbackMap[actionType] {
+                if let callback = callbackMap[actionType] {
                     return { (param: Any?) in return callback(param) }
                 }
                 return { (_: Any?) in return }

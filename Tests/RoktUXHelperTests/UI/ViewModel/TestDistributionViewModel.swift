@@ -18,23 +18,26 @@ import XCTest
 final class TestDistributionViewModel: XCTestCase {
     
     var events = [EventRequest]()
+    var eventService: EventService!
     var stubUXHelper: MockUXHelper!
-    
+    var layoutState: LayoutState = LayoutState()
     override func setUpWithError() throws {
         events = [EventRequest]()
-        self.stubUXHelper = MockUXHelper()
+        eventService = get_mock_event_processor { [weak self] event in
+            self?.events.append(event)
+        }
+        stubUXHelper = MockUXHelper()
     }
     
     func test_slot_impression_event() throws {
         // Arrange
-        let viewModel = getDistributionViewModel(eventHandler: { event in
-            self.events.append(event)
-        })
+        let viewModel = getDistributionViewModel(eventService: eventService, layoutState: layoutState)
 
         // Act
         viewModel.sendSlotImpressionEvent(currentOffer: 0)
 
         // Assert
+        XCTAssertNotNil(viewModel.layoutState)
         XCTAssertEqual(events.first?.eventType, .SignalImpression)
         XCTAssertEqual(events.first?.parentGuid, "Slot1")
         XCTAssertEqual(events.first?.jwtToken, "JwtToken0")
@@ -42,9 +45,7 @@ final class TestDistributionViewModel: XCTestCase {
     
     func test_creative_impression_event() throws {
         // Arrange
-        let viewModel = getDistributionViewModel(eventHandler: { event in
-            self.events.append(event)
-        })
+        let viewModel = getDistributionViewModel(eventService: eventService, layoutState: layoutState)
 
         // Act
         viewModel.sendCreativeImpressionEvent(currentOffer: 0)
@@ -57,9 +58,7 @@ final class TestDistributionViewModel: XCTestCase {
     
     func test_dismissal_no_more_offer_event() throws {
         // Arrange
-        let viewModel = getDistributionViewModel(eventHandler: { event in
-            self.events.append(event)
-        })
+        let viewModel = getDistributionViewModel(eventService: eventService, layoutState: layoutState)
 
         // Act
         viewModel.sendDismissalNoMoreOfferEvent()
@@ -68,16 +67,14 @@ final class TestDistributionViewModel: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalDismissal)
         XCTAssertEqual(event?.parentGuid, "pluginInstanceGuid")
-        XCTAssertEqual(event?.jwtToken, "pluginConfigJWTToken")
+        XCTAssertEqual(event?.jwtToken, "plugin-config-token")
         XCTAssertNotNil(event?.metadata.first{$0.name == kInitiator})
         XCTAssertNotNil(event?.metadata.first{$0.value == kNoMoreOfferToShow})
     }
     
     func test_dismissal_collapsed_event() throws {
         // Arrange
-        let viewModel = getDistributionViewModel(eventHandler: { event in
-            self.events.append(event)
-        })
+        let viewModel = getDistributionViewModel(eventService: eventService, layoutState: layoutState)
 
         // Act
         viewModel.sendDismissalCollapsedEvent()
@@ -86,33 +83,39 @@ final class TestDistributionViewModel: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalDismissal)
         XCTAssertEqual(event?.parentGuid, "pluginInstanceGuid")
-        XCTAssertEqual(event?.jwtToken, "pluginConfigJWTToken")
+        XCTAssertEqual(event?.jwtToken, "plugin-config-token")
         XCTAssertNotNil(event?.metadata.first{$0.name == kInitiator})
         XCTAssertNotNil(event?.metadata.first{$0.value == kCollapsed})
     }
 
-
-    private func getDistributionViewModel(eventHandler: @escaping (EventRequest) -> Void) -> DistributionViewModel {
-        
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: "pageInstanceGuid",
-            sessionId: "",
-            pluginInstanceGuid: "pluginInstanceGuid",
-            pluginId: nil,
-            pluginName: nil,
-            startDate: Date(),
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: "pluginConfigJWTToken",
-            useDiagnosticEvents: false
+    private func getDistributionViewModel(
+        eventService: EventService,
+        layoutState: LayoutState = LayoutState()
+    ) -> DistributionViewModel {
+        DistributionViewModel(
+            eventService: eventService,
+            slots: [getSlot()],
+            layoutState: layoutState
         )
-        return DistributionViewModel(eventService: eventService, slots: [getSlot()], layoutState: LayoutState())
     }
     
     private func getSlot() -> SlotModel {
-        return SlotModel(instanceGuid: "Slot1",
-                         offer: OfferModel(campaignId: "Campaign1", creative: CreativeModel(referralCreativeId: "referralCreativeId1", instanceGuid: "instanceGuid", copy: [String:String](), images: nil, links: nil, responseOptionsMap: nil, jwtToken: "jwtToken1")), layoutVariant: nil, jwtToken: "JwtToken0")
+        SlotModel(
+            instanceGuid: "Slot1",
+            offer: OfferModel(
+                campaignId: "Campaign1",
+                creative: CreativeModel(
+                    referralCreativeId: "referralCreativeId1",
+                    instanceGuid: "instanceGuid",
+                    copy: [String: String](),
+                    images: nil,
+                    links: nil,
+                    responseOptionsMap: nil,
+                    jwtToken: "jwtToken1"
+                )
+            ),
+            layoutVariant: nil,
+            jwtToken: "JwtToken0"
+        )
     }
 }

@@ -19,10 +19,10 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let responseKey: BNFNamespace.CreativeResponseKey
     let responseOptions: ResponseOption?
     let openLinks: LinkOpenTarget?
-    let layoutState: any LayoutStateRepresenting
-    let eventService: EventDiagnosticServicing?
+    weak var eventService: EventDiagnosticServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     let defaultStyle: [CreativeResponseStyles]?
@@ -34,7 +34,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          responseKey: BNFNamespace.CreativeResponseKey,
          responseOptions: ResponseOption?,
          openLinks: LinkOpenTarget?,
-         layoutState: any LayoutStateRepresenting,
+         layoutState: (any LayoutStateRepresenting)?,
          eventService: EventDiagnosticServicing?,
          defaultStyle: [CreativeResponseStyles]?,
          pressedStyle: [CreativeResponseStyles]?,
@@ -87,6 +87,6 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     }
 
     func goToNextOffer() {
-        layoutState.actionCollection[.nextOffer](nil)
+        layoutState?.actionCollection[.nextOffer](nil)
     }
 }

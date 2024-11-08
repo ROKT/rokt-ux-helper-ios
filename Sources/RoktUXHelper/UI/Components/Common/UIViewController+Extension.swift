@@ -26,14 +26,6 @@ struct ViewControllerHolder {
 }
 
 @available(iOS 15, *)
-extension EnvironmentValues {
-    var viewController: UIViewController? {
-        get { return self[ViewControllerKey.self].value }
-        set { self[ViewControllerKey.self].value = newValue }
-    }
-}
-
-@available(iOS 15, *)
 extension UIViewController {
     func present<Content: View>(placementType: PlacementType?,
                                 bottomSheetUIModel: BottomSheetViewModel?,
@@ -45,6 +37,7 @@ extension UIViewController {
 
         let modal = SwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
                                           eventService: eventService,
+                                          layoutState: layoutState,
                                           onUnload: onUnLoad)
 
         if #available(iOS 16.0, *),
@@ -53,14 +46,9 @@ extension UIViewController {
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            modal.rootView = AnyView(
-                builder(onSizeChange)
-                    .environment(\.viewController, modal)
-                    .background(Color.clear)
-            )
-            func onSizeChange(size: CGFloat) {
+            var onSizeChange = { [weak self, weak modal] size in
                 DispatchQueue.main.async {
-                    if let sheet = modal.sheetPresentationController {
+                    if let sheet = modal?.sheetPresentationController {
                         sheet.animateChanges {
                             sheet.detents = [.custom { _ in
                                 return size
@@ -73,6 +61,10 @@ extension UIViewController {
                     }
                 }
             }
+            modal.rootView = AnyView(
+                builder(onSizeChange)
+                    .background(Color.clear)
+            )
 
             applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
             applyInitialDynamicBottomSheetHeight(modal: modal)
@@ -81,7 +73,6 @@ extension UIViewController {
         } else {
             modal.rootView = AnyView(
                 builder(nil)
-                    .environment(\.viewController, modal)
                     .background(Color.clear)
             )
 
@@ -105,10 +96,9 @@ extension UIViewController {
         }
 
         modal.view.isOpaque = false
-        func closeOverlay(_: Any? = nil) {
-            modal.dismiss(animated: true, completion: nil)
+        layoutState.actionCollection[.close] = { [weak self, weak modal] _ in
+            modal?.dismiss(animated: true, completion: nil)
         }
-        layoutState.actionCollection[.close] = closeOverlay
     }
 
     private func applyBottomSheetStyles(modal: UIHostingController<AnyView>,
@@ -171,16 +161,19 @@ extension UIViewController {
 public final class SwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
     let eventService: EventService?
+    let layoutState: LayoutState?
 
     required init?(coder: NSCoder) {
         self.onUnload = nil
         self.eventService = nil
+        self.layoutState = nil
         super.init(coder: coder, rootView: AnyView(EmptyView()))
     }
 
-    init(rootView: AnyView, eventService: EventService?, onUnload: @escaping (() -> Void)) {
+    init(rootView: AnyView, eventService: EventService?, layoutState: LayoutState, onUnload: @escaping (() -> Void)) {
         self.onUnload = onUnload
         self.eventService = eventService
+        self.layoutState = layoutState
         super.init(rootView: rootView)
     }
 

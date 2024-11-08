@@ -17,20 +17,26 @@ import XCTest
 @available(iOS 15, *)
 final class TestRoktEmbeddedViewModel: XCTestCase {
     var events = [EventRequest]()
+    var eventService: EventService!
     var stubUXHelper: MockUXHelper!
     let startDate = Date()
     
     override func setUpWithError() throws {
         events = [EventRequest]()
+        eventService = get_mock_event_processor { [weak self] event in
+            self?.events.append(event)
+        }
         self.stubUXHelper = MockUXHelper()
     }
     
     func test_plugin_impression_event() throws {
         // Arrange
-        let viewModel = get_model(eventHandler: { event in
-            self.events.append(event)
-        })
-        
+        let layoutState = LayoutState()
+        eventService = get_mock_event_processor(startDate: startDate) { [weak self] event in
+            self?.events.append(event)
+        }
+        let viewModel = get_model(eventService: eventService, layoutState: layoutState)
+
         // Act
         viewModel.sendOnLoadEvents()
         
@@ -41,14 +47,12 @@ final class TestRoktEmbeddedViewModel: XCTestCase {
         XCTAssertNotNil(event?.metadata.first{$0.value == EventDateFormatter.getDateString(startDate)})
         XCTAssertNotNil(event?.metadata.first{$0.name == BE_PAGE_RENDER_ENGINE})
         XCTAssertNotNil(event?.metadata.first{$0.value == BE_RENDER_ENGINE_LAYOUTS})
-        
+        XCTAssertNotNil(viewModel.layoutState)
     }
     
     func test_plugin_activation_event() throws {
         // Arrange
-        let viewModel = get_model(eventHandler: { event in
-            self.events.append(event)
-        })
+        let viewModel = get_model(eventService: eventService)
         // Act
         viewModel.sendSignalActivationEvent()
         
@@ -57,25 +61,12 @@ final class TestRoktEmbeddedViewModel: XCTestCase {
         XCTAssertEqual(event?.eventType, .SignalActivation)
         XCTAssertEqual(event?.parentGuid, mockPluginInstanceGuid)
         XCTAssertEqual(event?.jwtToken, mockPluginConfigJWTToken)
+        XCTAssertNil(viewModel.layoutState)
     }
-    
-    func get_model(eventHandler: @escaping (EventRequest) -> Void) -> RoktEmbeddedViewModel {
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: mockPageInstanceGuid,
-            sessionId: "",
-            pluginInstanceGuid: mockPluginInstanceGuid,
-            pluginId: nil,
-            pluginName: nil,
-            startDate: startDate,
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: mockPluginConfigJWTToken,
-            useDiagnosticEvents: false
-        )
-        return RoktEmbeddedViewModel(layouts: [],
-                                     eventService: eventService,
-                                     layoutState: LayoutState())
+
+    func get_model(eventService: EventService, layoutState: LayoutState = LayoutState()) -> RoktEmbeddedViewModel {
+        RoktEmbeddedViewModel(layouts: [],
+                              eventService: eventService,
+                              layoutState: layoutState)
     }
 }

@@ -25,22 +25,22 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
     let seenIndicatorStyle: [IndicatorStyles]?
     let startPosition: Int32?
     let accessibilityHidden: Bool?
-    let layoutState: any LayoutStateRepresenting
-    let eventService: EventDiagnosticServicing?
+    weak var eventService: EventDiagnosticServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     var currentIndex: Binding<Int> {
-        layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
 
     var totalOffer: Int {
-        layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
+        layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
 
     var viewableItems: Binding<Int> {
-        layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(

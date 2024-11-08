@@ -151,8 +151,8 @@ struct OneByOneComponent: View {
     }
 
     func registerActions() {
-        model.layoutState.actionCollection[.nextOffer] = goToNextOffer
-        model.layoutState.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
+        model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
             currentProgess: $currentOffer,
@@ -164,9 +164,9 @@ struct OneByOneComponent: View {
     func goToNextOffer(_: Any? = nil) {
         if currentOffer + 1 < model.children?.count ?? 0 {
             transitionToNextOffer()
-        } else if model.layoutState.closeOnComplete() {
+        } else if model.layoutState?.closeOnComplete() == true {
             // when on last offer AND closeOnComplete is true
-            if case .embeddedLayout = model.layoutState.layoutType() {
+            if case .embeddedLayout = model.layoutState?.layoutType() {
                 model.sendDismissalCollapsedEvent()
             } else {
                 model.sendDismissalNoMoreOfferEvent()
@@ -177,7 +177,7 @@ struct OneByOneComponent: View {
     }
 
     func exit() {
-        model.layoutState.actionCollection[.close](nil)
+        model.layoutState?.actionCollection[.close](nil)
     }
 
     func transitionIn() {

@@ -201,7 +201,7 @@ struct CloseButtonComponent: View {
 
     private func handleClose() {
         model.sendCloseEvent()
-        model.layoutState.actionCollection[.close](nil)
+        model.layoutState?.actionCollection[.close](nil)
     }
 
     // if height = fixed or percentage, we need to allow the children to expand. `expandsToContainerOnSelfAlign` will let them use maxHeight=.infinity

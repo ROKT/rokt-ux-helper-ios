@@ -16,7 +16,8 @@ import XCTest
 final class TestCreativeResponseViewModel: XCTestCase {
     var events = [EventRequest]()
     var stubUXHelper: MockUXHelper!
-    
+    var eventService: EventService!
+
     override func setUpWithError() throws {
         events = [EventRequest]()
         self.stubUXHelper = MockUXHelper()
@@ -24,9 +25,13 @@ final class TestCreativeResponseViewModel: XCTestCase {
     
     func test_send_signal_impression_event() throws {
         // Arrange
-        let viewModel = get_model(eventHandler: { event in
-            self.events.append(event)
-        })
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(eventService: eventService)
 
         // Act
         viewModel.sendSignalResponseEvent()
@@ -39,11 +44,14 @@ final class TestCreativeResponseViewModel: XCTestCase {
     
     func test_send_signal_gated_impression_event() throws {
         // Arrange
-        let viewModel = get_model(signalType: .signalGatedResponse,
-                                  eventHandler: { event in
-            self.events.append(event)
-        })
-        
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(signalType: .signalGatedResponse, eventService: eventService)
+
         // Act
         viewModel.sendSignalResponseEvent()
         
@@ -55,10 +63,13 @@ final class TestCreativeResponseViewModel: XCTestCase {
     
     func test_get_valid_url() throws {
         // Arrange
-        let viewModel = get_model(url: "https://www.rokt.com",
-                                  eventHandler: { event in
-            self.events.append(event)
-        })
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(url: "https://www.rokt.com", eventService: eventService)
         // Act
         let url = viewModel.getOfferUrl()
         // Assert
@@ -67,10 +78,14 @@ final class TestCreativeResponseViewModel: XCTestCase {
     
     func test_get_inavlid_url_nil() throws {
         // Arrange
-        let viewModel = get_model(signalType: .signalGatedResponse,
-                                  eventHandler: { event in
-            self.events.append(event)
-        })
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(signalType: .signalGatedResponse, eventService: eventService)
+
         // Act
         let url = viewModel.getOfferUrl()
         // Assert
@@ -79,34 +94,40 @@ final class TestCreativeResponseViewModel: XCTestCase {
     
     func test_get_inavlid_url_nil_when_action_is_not_url() throws {
         // Arrange
-        let viewModel = get_model(action: .captureOnly,
-                                  eventHandler: { event in
-            self.events.append(event)
-        })
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(action: .captureOnly, eventService: eventService)
         // Act
         let url = viewModel.getOfferUrl()
         // Assert
         XCTAssertNil(url)
     }
-    
-    func get_model(signalType: SignalType = .signalResponse,
-                   url: String? = nil,
-                   action: Action = .url,
-                   eventHandler: @escaping (EventRequest) -> Void) -> CreativeResponseViewModel {
-        let eventService = EventService(
-            pageId: nil,
-            pageInstanceGuid: "",
-            sessionId: "",
-            pluginInstanceGuid: "",
-            pluginId: nil,
-            pluginName: nil,
-            startDate: Date(),
-            uxEventDelegate: MockUXHelper(),
-            processor: MockEventProcessor(handler: eventHandler),
-            responseReceivedDate: Date(),
-            pluginConfigJWTToken: "",
-            useDiagnosticEvents: false
-        )
+
+    func test_next_offer() {
+        eventService = get_mock_event_processor()
+        let actionCollection = ActionCollection()
+        var nextOfferCalled = false
+        actionCollection[.nextOffer] = { _ in
+            nextOfferCalled = true
+        }
+        let layoutState = LayoutState(actionCollection: actionCollection)
+        let viewModel = get_model(action: .captureOnly, eventService: eventService, layoutState: layoutState)
+        viewModel.goToNextOffer()
+
+        XCTAssertTrue(nextOfferCalled)
+    }
+
+    func get_model(
+        signalType: SignalType = .signalResponse,
+        url: String? = nil,
+        action: Action = .url,
+        eventService: EventService,
+        layoutState: LayoutState = LayoutState()
+    ) -> CreativeResponseViewModel {
         return CreativeResponseViewModel(
             children: [],
             responseKey: .positive,
@@ -122,15 +143,12 @@ final class TestCreativeResponseViewModel: XCTestCase {
                                url: url,
                                responseJWTToken: "response-jwt"),
             openLinks: nil,
-            layoutState: LayoutState(),
+            layoutState: layoutState,
             eventService: eventService,
             defaultStyle: nil,
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil
         )
-        
     }
 }
-
-

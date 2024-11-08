@@ -13,18 +13,17 @@ import Foundation
 
 @available(iOS 13.0, *)
 class DistributionViewModel: Hashable {
-    let eventService: EventServicing?
     let slots: [SlotModel]
-
-    var layoutState: any LayoutStateRepresenting
+    weak var eventService: EventServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var config: RoktUXConfig? {
-        layoutState.config
+        layoutState?.config
     }
 
     init(
         eventService: EventServicing?,
         slots: [SlotModel],
-        layoutState: any LayoutStateRepresenting
+        layoutState: (any LayoutStateRepresenting)?
     ) {
         self.eventService = eventService
         self.slots = slots

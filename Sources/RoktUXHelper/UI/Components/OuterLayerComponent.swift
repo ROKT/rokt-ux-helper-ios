@@ -46,7 +46,7 @@ struct OuterLayerComponent: View {
     init(
         layouts: [LayoutSchemaViewModel]?,
         style: StylingPropertiesModel?,
-        layoutState: any LayoutStateRepresenting,
+        layoutState: (any LayoutStateRepresenting)?,
         eventService: EventServicing?,
         parent: ComponentParentType = .root,
         parentWidth: Binding<CGFloat?>,

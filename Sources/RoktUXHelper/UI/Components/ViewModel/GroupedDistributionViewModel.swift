@@ -32,7 +32,7 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
         transition: DcuiSchema.Transition,
         eventService: EventServicing?,
         slots: [SlotModel],
-        layoutState: any LayoutStateRepresenting
+        layoutState: (any LayoutStateRepresenting)?
     ) {
         self.children = children
         self.defaultStyle = defaultStyle
@@ -55,13 +55,13 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
         viewableItems: Binding<Int>,
         customStateMap: Binding<CustomStateMap?>
     ) {
-        layoutState.items[LayoutState.currentProgressKey] = currentProgress
-        layoutState.items[LayoutState.totalItemsKey] = totalItems
-        layoutState.items[LayoutState.viewableItemsKey] = viewableItems
-        layoutState.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.currentProgressKey] = currentProgress
+        layoutState?.items[LayoutState.totalItemsKey] = totalItems
+        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
+        layoutState?.items[LayoutState.customStateMap] = customStateMap
     }
 
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
-        layoutState.getGlobalBreakpointIndex(width)
+        layoutState?.getGlobalBreakpointIndex(width) ?? 0
     }
 }
