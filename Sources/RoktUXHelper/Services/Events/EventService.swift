@@ -291,12 +291,15 @@ class DateHandler {
 
 class EventDateFormatter {
 
-    static let dateFormatter = DateFormatter()
-
-    static func getDateString(_ date: Date) -> String {
+    static let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: kBaseLocale)
         dateFormatter.dateFormat = kEventTimeStamp
         dateFormatter.timeZone = TimeZone(abbreviation: kUTCTimeStamp)
-        return dateFormatter.string(from: date)
+        return dateFormatter
+    }()
+
+    static func getDateString(_ date: Date) -> String {
+        dateFormatter.string(from: date)
     }
 }
