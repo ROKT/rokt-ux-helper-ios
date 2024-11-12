@@ -21,18 +21,18 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [RowStyle]?
     let disabledStyle: [RowStyle]?
     let accessibilityGrouped: Bool
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [RowStyle]?,
          pressedStyle: [RowStyle]?,
          hoveredStyle: [RowStyle]?,
          disabledStyle: [RowStyle]?,
          accessibilityGrouped: Bool,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
@@ -40,5 +40,5 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.disabledStyle = disabledStyle
         self.accessibilityGrouped = accessibilityGrouped
         self.layoutState = layoutState
-    }    
+    }
 }

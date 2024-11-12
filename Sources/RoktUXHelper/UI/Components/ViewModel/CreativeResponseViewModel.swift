@@ -19,12 +19,12 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let responseKey: BNFNamespace.CreativeResponseKey
     let responseOptions: ResponseOption?
     let openLinks: LinkOpenTarget?
-    let layoutState: any LayoutStateRepresenting
-    let eventService: EventDiagnosticServicing?
+    weak var eventService: EventDiagnosticServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     let defaultStyle: [CreativeResponseStyles]?
     let pressedStyle: [CreativeResponseStyles]?
     let hoveredStyle: [CreativeResponseStyles]?
@@ -34,7 +34,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          responseKey: BNFNamespace.CreativeResponseKey,
          responseOptions: ResponseOption?,
          openLinks: LinkOpenTarget?,
-         layoutState: any LayoutStateRepresenting,
+         layoutState: (any LayoutStateRepresenting)?,
          eventService: EventDiagnosticServicing?,
          defaultStyle: [CreativeResponseStyles]?,
          pressedStyle: [CreativeResponseStyles]?,
@@ -51,7 +51,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func sendSignalResponseEvent() {
         guard let responseJWTToken = responseOptions?.responseJWTToken else { return }
 
@@ -70,7 +70,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
             break
         }
     }
-    
+
     func getOfferUrl() -> URL? {
         guard let urlString = responseOptions?.url,
               responseOptions?.action == .url
@@ -78,15 +78,15 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
         return URL(string: urlString)
     }
-    
+
     func handleLink(url: URL) {
         eventService?.openURL(url: url, type: .init(openLinks, sessionId: (eventService as? EventService)?.sessionId),
                               completionHandler: { [weak self] in
             self?.goToNextOffer()
         })
     }
-    
+
     func goToNextOffer() {
-        layoutState.actionCollection[.nextOffer](nil)
+        layoutState?.actionCollection[.nextOffer](nil)
     }
 }

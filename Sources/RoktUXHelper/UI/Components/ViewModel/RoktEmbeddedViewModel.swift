@@ -14,20 +14,20 @@ import SwiftUI
 @available(iOS 15, *)
 class RoktEmbeddedViewModel {
     let layouts: [LayoutSchemaViewModel]?
-    let eventService: EventServicing?
-    let layoutState: any LayoutStateRepresenting
-    
+    weak var eventService: EventServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
+
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     var config: RoktUXConfig? {
-        layoutState.config
+        layoutState?.config
     }
-    
-    init(layouts: [LayoutSchemaViewModel]?, 
+
+    init(layouts: [LayoutSchemaViewModel]?,
          eventService: EventServicing?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.layouts = layouts
         self.eventService = eventService
         self.layoutState = layoutState
@@ -36,18 +36,20 @@ class RoktEmbeddedViewModel {
     func sendOnLoadEvents() {
         eventService?.sendEventsOnLoad()
     }
-    
+
     func sendSignalActivationEvent() {
         eventService?.sendSignalActivationEvent()
     }
-    
+
     func updateAttributedStrings(_ newColor: ColorScheme) {
-        DispatchQueue.main.async {
-            if let layouts = self.layouts {
+        DispatchQueue.main.async { [weak self] in
+            if let layouts = self?.layouts {
                 layouts.forEach { layout in
-                    AttributedStringTransformer.convertRichTextHTMLIfExists(uiModel: layout,
-                                                                            config: self.config,
-                                                                            colorScheme: newColor)
+                    AttributedStringTransformer.convertRichTextHTMLIfExists(
+                        uiModel: layout,
+                        config: self?.config,
+                        colorScheme: newColor
+                    )
                 }
             }
         }

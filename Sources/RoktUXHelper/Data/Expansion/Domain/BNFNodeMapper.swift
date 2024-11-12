@@ -103,14 +103,14 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
             let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
                                                                           creativeParent: creativeParent,
                                                                           dataSource: dataSource)
-            
+
             var transformedText = fullText
-            
+
             placeholdersToResolved.forEach {
                 let keyWithDelimiters = BNFSeparator.startDelimiter.rawValue + $0 + BNFSeparator.endDelimiter.rawValue
                 transformedText = transformedText.replacingOccurrences(of: keyWithDelimiters, with: $1)
             }
-            
+
             return transformedText
         } catch {
             return ""

@@ -17,7 +17,7 @@ struct SlotModel: Decodable {
     // contains BNF placeholder Strings
     // has properties or nested entities with properties that provide the actual value of BNF placeholder Strings
     let offer: OfferModel?
-    
+
     let layoutVariant: LayoutVariantModel?
 
     let jwtToken: String
@@ -28,7 +28,7 @@ struct SlotModel: Decodable {
         case layoutVariant
         case jwtToken = "token"
     }
-    
+
     func toSlotOfferModel() -> SlotOfferModel {
         return SlotOfferModel(offer: offer)
     }

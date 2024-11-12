@@ -1,0 +1,15 @@
+{
+  "originHash" : "0631035f5f949be8144f9bde806917cb1150fd32e5860b6e32024f5982a4ab45",
+  "pins" : [
+    {
+      "identity" : "dcui-swift-schema",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ROKT/dcui-swift-schema.git",
+      "state" : {
+        "revision" : "9f3d65f75034ad4739e4850653d11df587037f21",
+        "version" : "2.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

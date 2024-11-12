@@ -13,9 +13,10 @@ import SwiftUI
 
 class TextComponentBNFHelper {
     // shared method for RichText and BasicText components to replace STATE placeholders
-    static func replaceStates(_ originalString: String,
-                              currentOffer: String,
-                              totalOffers: String
+    static func replaceStates(
+        _ originalString: String,
+        currentOffer: String,
+        totalOffers: String
     ) -> String {
         let placeholdersToResolved = statePlaceholdersToResolvedValues(
             originalString, currentOffer: currentOffer, totalOffers: totalOffers)
@@ -29,11 +30,12 @@ class TextComponentBNFHelper {
 
         return transformedText
     }
-    
+
     // replace STATE placeholders in attributed string
-    static func replaceStates(_ originalString: NSAttributedString,
-                              currentOffer: String,
-                              totalOffers: String
+    static func replaceStates(
+        _ originalString: NSAttributedString,
+        currentOffer: String,
+        totalOffers: String
     ) -> NSAttributedString {
         let placeholdersToResolved = statePlaceholdersToResolvedValues(
             originalString.description, currentOffer: currentOffer, totalOffers: totalOffers)
@@ -45,43 +47,42 @@ class TextComponentBNFHelper {
             let keyWithDelimiters = BNFSeparator.startDelimiter.rawValue + $0 + BNFSeparator.endDelimiter.rawValue
 
             let range = origString.range(of: keyWithDelimiters)
-                
+
             transformedText.replaceCharacters(in: range, with: $1)
         }
 
         return transformedText as NSAttributedString
     }
-    
+
     private static func statePlaceholdersToResolvedValues(
         _ originalString: String,
         currentOffer: String,
         totalOffers: String
     ) -> [String: String] {
         var placeHoldersToResolvedValues: [String: String] = [:]
-        
+
         let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
         let range = NSRange(originalString.startIndex..<originalString.endIndex, in: originalString)
-        
+
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
         let bnfMatches = regexCheck.matches(in: originalString, options: [], range: range)
-        
+
         for match in bnfMatches {
             guard let swiftRange = Range(match.range, in: originalString) else { continue }
-            
+
             let chainOfValues = String(originalString[swiftRange])
             let resolvedValue = resolveStateChain(
                 propertyChain: chainOfValues,
                 currentOfferString: currentOffer,
-                totalOffersString: totalOffers
-            )
-            
+                totalOffersString: totalOffers)
+
             // e.g. [STATE.IndicatorPosition: "1", STATE.TotalOffers: "4"]
             placeHoldersToResolvedValues[chainOfValues] = resolvedValue
         }
-        
+
         return placeHoldersToResolvedValues
     }
-    
+
     private static func resolveStateChain(
         propertyChain: String,
         currentOfferString: String,
@@ -89,10 +90,10 @@ class TextComponentBNFHelper {
     ) -> String {
         let validator = BNFPlaceholderValidator()
         guard validator.isValid(data: propertyChain) else { return propertyChain }
-        
+
         let parser = BNFPropertyChainDataParser()
         let parsedChain = parser.parse(propertyChain: propertyChain)
-        
+
         for keyAndNamespace in parsedChain.parseableChains {
             guard case .state = keyAndNamespace.namespace,
                   DataBindingStateKeys.isValidKey(keyAndNamespace.key)
@@ -106,7 +107,7 @@ class TextComponentBNFHelper {
                 return currentOfferString
             }
         }
-        
+
         // fallback if STATE placeholder unable to be resolved
         return parsedChain.defaultValue ?? ""
     }

@@ -23,7 +23,7 @@ struct AlignSelfModifier: ViewModifier {
     let parent: ComponentParentType
     let parentHeight: CGFloat?
     let parentWidth: CGFloat?
-    
+
     let parentRowAlignment: VerticalAlignment?
     let parentColumnAlignment: HorizontalAlignment?
 
@@ -70,7 +70,7 @@ struct AlignSelfModifier: ViewModifier {
         )
         self.frameMaxWidth = AlignSelfModifier.getFrameMaxWidth(
             alignSelf: alignSelf,
-            parent: parent, 
+            parent: parent,
             parentWidth: parentWidth
         )
         self.frameMaxHeight = AlignSelfModifier.getFrameMaxHeight(
@@ -117,7 +117,7 @@ struct AlignSelfModifier: ViewModifier {
             return .center
         }
     }
-    
+
     private static func getFrameMaxWidth(alignSelf: FlexAlignment?,
                                          parent: ComponentParentType,
                                          parentWidth: CGFloat?) -> CGFloat? {
@@ -128,7 +128,7 @@ struct AlignSelfModifier: ViewModifier {
             return nil
         }
     }
-    
+
     private static func getFrameMaxHeight(alignSelf: FlexAlignment?,
                                           parent: ComponentParentType,
                                           parentHeight: CGFloat?,

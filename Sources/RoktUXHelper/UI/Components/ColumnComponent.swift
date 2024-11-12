@@ -15,20 +15,20 @@ import DcuiSchema
 @available(iOS 15, *)
 struct ColumnComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     var style: ColumnStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex: Int = 0
     @State var frameChangeIndex: Int = 0
@@ -48,7 +48,7 @@ struct ColumnComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     let parentOverride: ComponentParentOverride?
 
     var passableBackgroundStyle: BackgroundStylingProperties? {
@@ -74,7 +74,7 @@ struct ColumnComponent: View {
             return .start
         }
     }
-    
+
     var accessibilityBehavior: AccessibilityChildBehavior {
         model.accessibilityGrouped ? .combine : .contain
     }
@@ -135,7 +135,8 @@ struct ColumnComponent: View {
                                                     columnPerpendicularAxisAlignment(alignItems:
                                                                                         containerStyle?.alignItems),
                                                 parentBackgroundStyle: passableBackgroundStyle,
-                                                stretchChildren: containerStyle?.alignItems == .stretch))
+                                                stretchChildren: containerStyle?.alignItems == .stretch
+                                            ))
                 }
             }
         }

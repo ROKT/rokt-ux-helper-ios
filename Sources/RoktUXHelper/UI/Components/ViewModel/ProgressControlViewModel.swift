@@ -21,9 +21,9 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ProgressControlStyle]?
     let disabledStyle: [ProgressControlStyle]?
     let direction: ProgressionDirection
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -32,7 +32,7 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [ProgressControlStyle]?,
          disabledStyle: [ProgressControlStyle]?,
          direction: ProgressionDirection,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle

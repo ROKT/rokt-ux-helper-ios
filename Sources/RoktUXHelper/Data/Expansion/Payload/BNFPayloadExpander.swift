@@ -80,7 +80,7 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
                 offer: dataSource,
                 offerIndex: dataSourceIndex,
                 useOfferIndex: usesDataSourceIndex
-            )      
+            )
         case .scrollableRow(let row):
             updateChildren(
                 parent: row,
@@ -104,7 +104,7 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
                 offer: dataSource,
                 offerIndex: dataSourceIndex,
                 useOfferIndex: usesDataSourceIndex
-            )       
+            )
         case .zStack(let zStack):
             updateChildren(
                 parent: zStack,
@@ -128,7 +128,7 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
                 offer: dataSource,
                 offerIndex: dataSourceIndex,
                 useOfferIndex: true
-            )   
+            )
         case .groupDistribution(let groupedDistribution):
             updateChildren(
                 parent: groupedDistribution,

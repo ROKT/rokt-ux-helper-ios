@@ -62,10 +62,10 @@ extension TextStylingProperties {
         default: return Font(weightedUIFont)
         }
     }
-    
+
     var styledUIFont: UIFont? {
         guard let fontStyle else { return weightedUIFont }
-        
+
         switch fontStyle {
         case .italic: return weightedUIFont.setItalic()
         default: return weightedUIFont

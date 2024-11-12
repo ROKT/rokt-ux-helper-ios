@@ -16,17 +16,17 @@ import DcuiSchema
 class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
 
     let id: UUID = UUID()
-    
+
     let url: StaticImageUrl?
     let alt: String?
     let defaultStyle: [StaticImageStyles]?
     let pressedStyle: [StaticImageStyles]?
     let hoveredStyle: [StaticImageStyles]?
     let disabledStyle: [StaticImageStyles]?
-    let layoutState: any LayoutStateRepresenting
-    
+    weak var layoutState: (any LayoutStateRepresenting)?
+
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(url: StaticImageUrl?,
@@ -35,10 +35,10 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
          pressedStyle: [StaticImageStyles]?,
          hoveredStyle: [StaticImageStyles]?,
          disabledStyle: [StaticImageStyles]?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.url = url
         self.alt = alt
-        
+
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle

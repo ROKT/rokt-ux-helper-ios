@@ -19,12 +19,12 @@ struct BottomSheetComponent: View {
     var style: BottomSheetStyles? {
         model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
-    
+
     @State var breakpointIndex = 0
-    
+
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @StateObject var globalScreenSize = GlobalScreenSize()
     var body: some View {
         OuterLayerComponent(layouts: model.children,
@@ -34,7 +34,7 @@ struct BottomSheetComponent: View {
                                 dimension: updateButtomSheetHeight(dimension: style?.dimension),
                                 flexChild: style?.flexChild,
                                 spacing: style?.spacing,
-                                border: style?.border), 
+                                border: style?.border),
                             layoutState: model.layoutState,
                             eventService: model.eventService,
                             parentWidth: $availableWidth,
@@ -44,7 +44,7 @@ struct BottomSheetComponent: View {
         .readSize(spacing: style?.spacing) { size in
             availableWidth = size.width
             availableHeight = size.height
-            
+
             // 0 at the start
             globalScreenSize.width = size.width
             globalScreenSize.height = size.height
@@ -57,7 +57,7 @@ struct BottomSheetComponent: View {
             }
         }
     }
-    
+
     // BottomSheet height already applied to the viewController level
     // if height value is percentage, instead of applying percentage, need to use fit-height
     // to occupy whole area instead of applying percentage twice
@@ -70,7 +70,7 @@ struct BottomSheetComponent: View {
                                               width: dimension.width,
                                               minHeight: dimension.minHeight,
                                               maxHeight: dimension.maxHeight,
-                                              height: .fit(.fitHeight), 
+                                              height: .fit(.fitHeight),
                                               rotateZ: dimension.rotateZ)
         default:
             return dimension

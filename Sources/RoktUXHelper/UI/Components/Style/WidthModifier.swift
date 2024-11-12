@@ -17,17 +17,17 @@ struct WidthModifier {
     enum Constant {
         static let defaultAlignment = HorizontalAlignment.leading
     }
-    
+
     let widthProperty: DimensionWidthValue?
     let minimum: Float?
     let maximum: Float?
-    
+
     let alignment: Alignment?
     let defaultWidth: WidthFitProperty
     let alignmentAsHorizontalType: HorizontalAlignment
-    
+
     let parentWidth: CGFloat?
-    
+
     init(
         widthProperty: DimensionWidthValue?,
         minimum: Float?, maximum: Float?,
@@ -43,7 +43,7 @@ struct WidthModifier {
         self.parentWidth = parentWidth
         self.alignmentAsHorizontalType = alignment?.asHorizontalType ?? Constant.defaultAlignment
     }
-    
+
     var fixedWidth: CGFloat? {
         if case .fixed(let value) = widthProperty {
             return CGFloat(value)
@@ -51,9 +51,9 @@ struct WidthModifier {
             return nil
         }
     }
-    
+
     var isFixedWidth: Bool { fixedWidth != nil }
-    
+
     var isPercentageWidth: Bool {
         if case .percentage = widthProperty {
             return true
@@ -61,7 +61,7 @@ struct WidthModifier {
             return false
         }
     }
-    
+
     var maxWidth: CGFloat? {
         if let mWidth = maximum {
             return CGFloat(mWidth)
@@ -74,7 +74,7 @@ struct WidthModifier {
         }
         return nil
     }
-    
+
     var minWidth: CGFloat? {
         if let mWidth = minimum {
             return CGFloat(mWidth)
@@ -84,7 +84,7 @@ struct WidthModifier {
             return nil
         }
     }
-    
+
     // We maintain a hierarchy of modifiers. In order of priority
     // 1. if the value type is fixed, ignore min/max, ignore fit
     // 2. if the value type is percentage, respect min/max, ignore fit
@@ -129,7 +129,7 @@ struct WidthModifier {
             }
         }
     }
-    
+
     var frameMaxWidth: CGFloat? {
         if let widthProperty {
             if isFixedWidth {

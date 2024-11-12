@@ -36,11 +36,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     @Published var breakpointIndex = 0
     var currentStylingProperties: BasicTextStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return hoveredStyle?.count ?? -1 > breakpointIndex ? hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return pressedStyle?.count ?? -1 > breakpointIndex ? pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return disabledStyle?.count ?? -1 > breakpointIndex ? disabledStyle?[breakpointIndex] : nil
         default:
             return defaultStyle?.count ?? -1 > breakpointIndex ? defaultStyle?[breakpointIndex] : nil
@@ -51,26 +51,25 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     let pressedStyle: [BasicTextStyle]?
     let hoveredStyle: [BasicTextStyle]?
     let disabledStyle: [BasicTextStyle]?
-    let layoutState: any LayoutStateRepresenting
-
+    weak var layoutState: (any LayoutStateRepresenting)?
+    weak var diagnosticService: DiagnosticServicing?
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
-    private let diagnosticService: DiagnosticServicing?
 
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     var currentIndex: Binding<Int> {
-        layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
-    
+
     var totalOffer: Int {
-        layoutState.items[LayoutState.totalItemsKey] as? Int ?? 1
+        layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
-    
+
     var viewableItems: Binding<Int> {
-        layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(
@@ -80,7 +79,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         hoveredStyle: [BasicTextStyle]?,
         disabledStyle: [BasicTextStyle]?,
         stateDataExpansionClosure: ((String?) -> String?)? = nil,
-        layoutState: any LayoutStateRepresenting,
+        layoutState: (any LayoutStateRepresenting)?,
         diagnosticService: DiagnosticServicing?
     ) {
         self.value = value
@@ -97,7 +96,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.diagnosticService = diagnosticService
         performStyleStateBinding()
     }
-    
+
     func updateDataBinding(dataBinding: DataBinding<String>) {
         self.dataBinding = dataBinding
         runDataExpansion()
@@ -157,11 +156,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         default: break
         }
     }
-    
+
     func validateFont(textStyle: TextStylingProperties?) {
         if let fontFamily = textStyle?.fontFamily,
             UIFont(name: fontFamily,
-                  size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
+                   size: CGFloat(textStyle?.fontSize ?? 17)) == nil {
             diagnosticService?.sendFontDiagnostics(fontFamily)
         }
     }

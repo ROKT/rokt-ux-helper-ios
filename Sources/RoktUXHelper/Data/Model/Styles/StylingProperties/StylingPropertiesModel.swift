@@ -42,7 +42,7 @@ class StylingPropertiesModel: Decodable, Hashable {
         spacing = try values.decodeIfPresent(SpacingStylingProperties.self, forKey: .spacing)
         border = try values.decodeIfPresent(BorderStylingProperties.self, forKey: .border)
     }
-    
+
     init(container: ContainerStylingProperties?,
          background: BackgroundStylingProperties?,
          dimension: DimensionStylingProperties?,

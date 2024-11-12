@@ -18,11 +18,11 @@ enum Severity: String, Codable {
 }
 
 protocol DiagnosticServicing: AnyObject {
-    
+
     var pluginInstanceGuid: String { get }
     var pluginConfigJWTToken: String { get }
     var useDiagnosticEvents: Bool { get }
-    
+
     func sendEvent(
         _ eventType: EventType,
         parentGuid: String,
@@ -30,18 +30,18 @@ protocol DiagnosticServicing: AnyObject {
         attributes: [String: String],
         jwtToken: String
     )
-    
+
     func sendDiagnostics(
         message: String,
         callStack: String,
         severity: Severity
     )
-    
+
     func sendFontDiagnostics(_ fontFamily: String)
 }
 
 extension DiagnosticServicing {
-    
+
     func sendDiagnostics(
         message: String,
         callStack: String,
@@ -60,7 +60,7 @@ extension DiagnosticServicing {
             jwtToken: pluginConfigJWTToken
         )
     }
-    
+
     func sendFontDiagnostics(_ fontFamily: String) {
         sendDiagnostics(message: kViewErrorCode,
                         callStack: kUIFontErrorMessage + fontFamily)

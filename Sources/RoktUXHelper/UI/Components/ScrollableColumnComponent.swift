@@ -15,7 +15,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct ScrollableColumnComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let config: ComponentConfig
     let model: ColumnViewModel
 
@@ -24,27 +24,28 @@ struct ScrollableColumnComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @State private var contentSize: CGFloat = .zero
+    @State private var contentHeight: CGFloat? = nil
+    @State private var contentMaxHeight: CGFloat? = nil
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
-        
+
     var style: ColumnStyle? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @State var breakpointIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
-    
+
     let parentOverride: ComponentParentOverride?
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -66,7 +67,7 @@ struct ScrollableColumnComponent: View {
             return .start
         }
     }
-    
+
     var weightProperties: WeightModifier.Properties {
         WeightModifier.Properties(weight: flexStyle?.weight,
                                   parent: .column,
@@ -82,11 +83,16 @@ struct ScrollableColumnComponent: View {
                             parentHeight: $parentHeight,
                             styleState: $styleState,
                             parentOverride: parentOverride)
-            .readSize(weightProperties: weightProperties) { newSize, alignment in
-                contentSize = newSize.height
-                contentAlignment = alignment
+            .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment in
+                if let newMaxHeight = newSizeWithMax.maxHeight {
+                    contentMaxHeight = newMaxHeight
+                } else {
+                    contentHeight = newSizeWithMax.size.height
+                }
+                contentAlignment = newAlignment
             }
         }
-        .frame(height: contentSize, alignment: contentAlignment)
+        .ifLet(contentMaxHeight) { $0.frame(maxHeight: $1, alignment: contentAlignment) }
+        .ifLet(contentHeight) { $0.frame(height: $1, alignment: contentAlignment) }
     }
 }

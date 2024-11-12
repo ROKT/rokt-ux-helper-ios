@@ -14,21 +14,21 @@ import DcuiSchema
 
 @available(iOS 13, *)
 struct StyleTransformer {
-    
+
     static func updatedStyles<T: Codable>(
         _ styles: [BasicStateStylingBlock<T>]?
     ) throws -> [BasicStateStylingBlock<T>] {
         var updatedStyles: [BasicStateStylingBlock<T>] = []
-        guard let styles, styles.count > 0 else { return updatedStyles }
-        
+        guard let styles, !styles.isEmpty else { return updatedStyles }
+
         var lastDefault: T?
         var lastPressed: T?
         var lastHovered: T?
         var lastDisabled: T?
-        
+
         try styles.forEach { style in
             let defaultStyle = style.default
-            
+
             if let lastDefaultValue = lastDefault {
                 lastDefault = try updatedStyle(lastDefaultValue, newStyle: defaultStyle)
             } else {
@@ -49,112 +49,112 @@ struct StyleTransformer {
             } else {
                 lastDisabled = style.disabled
             }
-            
+
             updatedStyles.append(
                 BasicStateStylingBlock(default: lastDefault ?? defaultStyle,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
         }
-        
+
         return updatedStyles
     }
-    
+
     static func updatedStyles<T: Codable>(_ styles: [StatelessStylingBlock<T>]?) throws -> [StatelessStylingBlock<T>] {
         var updatedStyles: [StatelessStylingBlock<T>] = []
-        guard let styles, styles.count > 0 else { return updatedStyles }
-        
+        guard let styles, !styles.isEmpty else { return updatedStyles }
+
         var lastDefault: T?
-        
+
         try styles.forEach { style in
             let defaultStyle = style.default
-            
+
             if let lastDefaultValue = lastDefault {
                 lastDefault = try updatedStyle(lastDefaultValue, newStyle: defaultStyle)
             } else {
                 lastDefault = defaultStyle
             }
-            
+
             updatedStyles.append(
                 StatelessStylingBlock(default: lastDefault ?? defaultStyle))
         }
-        
+
         return updatedStyles
     }
-    
+
     static func updatedIndicatorStyles(
         _ styles: [BasicStateStylingBlock<IndicatorStyles>]?,
         newStyles: [BasicStateStylingBlock<IndicatorStyles>]?
     ) throws -> [BasicStateStylingBlock<IndicatorStyles>] {
         var resultStyles: [BasicStateStylingBlock<IndicatorStyles>] = []
-        
+
         let prefilledStyle = try updatedStyles(styles)
         let prefilledNewStyle = try updatedStyles(newStyles)
-        
+
         var styleIndex = 0
         var newStyleIndex = 0
-        
+
         var lastDefaultIndicator: BasicStateStylingBlock<IndicatorStyles>?
         var lastNewIndicator: BasicStateStylingBlock<IndicatorStyles>?
-        
+
         var lastDefault: IndicatorStyles?
         var lastPressed: IndicatorStyles?
         var lastHovered: IndicatorStyles?
         var lastDisabled: IndicatorStyles?
-        
+
         while styleIndex < prefilledStyle.count || newStyleIndex < prefilledNewStyle.count {
-            
+
             if prefilledStyle.count > styleIndex {
                 lastDefaultIndicator = prefilledStyle[styleIndex]
             }
-            
+
             if prefilledNewStyle.count > newStyleIndex {
                 lastNewIndicator = prefilledNewStyle[newStyleIndex]
             }
-            
+
             if let lastDefaultValue = lastDefault {
                 lastDefault = try updatedStyle(lastDefaultValue, newStyle: lastDefaultIndicator?.default)
             } else {
                 lastDefault = lastDefaultIndicator?.default
             }
             lastDefault = try updatedStyle(lastDefault, newStyle: lastNewIndicator?.default)
-            
+
             if let lastPressedValue = lastPressed, let pressedStyle = lastDefaultIndicator?.pressed {
                 lastPressed = try updatedStyle(lastPressedValue, newStyle: pressedStyle)
             } else {
                 lastPressed = lastDefaultIndicator?.pressed
             }
             lastPressed = try updatedStyle(lastPressed, newStyle: lastNewIndicator?.pressed)
-            
+
             if let lastHoveredValue = lastHovered, let hoveredStyle = lastDefaultIndicator?.hovered {
                 lastHovered = try updatedStyle(lastHoveredValue, newStyle: hoveredStyle)
             } else {
                 lastHovered = lastDefaultIndicator?.hovered
             }
             lastHovered = try updatedStyle(lastHovered, newStyle: lastNewIndicator?.hovered)
-            
+
             if let lastDisabledValue = lastDisabled, let disabledStyle = lastDefaultIndicator?.disabled {
                 lastDisabled = try updatedStyle(lastDisabledValue, newStyle: disabledStyle)
             } else {
                 lastDisabled = lastDefaultIndicator?.disabled
             }
             lastDisabled = try updatedStyle(lastDisabled, newStyle: lastNewIndicator?.disabled)
-            
+
             guard let lastDefault else { break }
             resultStyles.append(
                 BasicStateStylingBlock(default: lastDefault,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
-            
+
             styleIndex += 1
             newStyleIndex += 1
-            
+
         }
-        
+
         return resultStyles
     }
-    
+
     static func updatedStyle<T: Codable>(_ defaultStyle: T?,
                                          newStyle: T?) throws -> T? {
         if let defaultStyle = defaultStyle as? StylingPropertiesModel {
@@ -220,7 +220,7 @@ struct StyleTransformer {
         }
         return nil
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: StylingPropertiesModel?,
                                 newStyle: StylingPropertiesModel?) throws -> StylingPropertiesModel {
         return StylingPropertiesModel(container: try updatedContainer(defaultStyle?.container,
@@ -228,15 +228,15 @@ struct StyleTransformer {
                                       background: try updatedBackground(defaultStyle?.background,
                                                                         newStyle: newStyle?.background),
                                       dimension: updatedDimension(defaultStyle?.dimension,
-                                                                   newStyle: newStyle?.dimension),
+                                                                  newStyle: newStyle?.dimension),
                                       flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                   newStyle: newStyle?.flexChild),
+                                                                  newStyle: newStyle?.flexChild),
                                       spacing: updatedSpacing(defaultStyle?.spacing,
                                                               newStyle: newStyle?.spacing),
                                       border: try updatedBorder(defaultStyle?.border,
                                                                 newStyle: newStyle?.border))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: RowStyle?,
                                 newStyle: RowStyle?) throws -> RowStyle {
         return RowStyle(container: try updatedContainer(defaultStyle?.container,
@@ -246,13 +246,13 @@ struct StyleTransformer {
                         border: try updatedBorder(defaultStyle?.border,
                                                   newStyle: newStyle?.border),
                         dimension: updatedDimension(defaultStyle?.dimension,
-                                                     newStyle: newStyle?.dimension),
+                                                    newStyle: newStyle?.dimension),
                         flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                     newStyle: newStyle?.flexChild),
+                                                    newStyle: newStyle?.flexChild),
                         spacing: updatedSpacing(defaultStyle?.spacing,
                                                 newStyle: newStyle?.spacing))
     }
-        
+
     static func getUpdatedStyle(_ defaultStyle: ScrollableRowStyle?,
                                 newStyle: ScrollableRowStyle?) throws -> ScrollableRowStyle {
         return ScrollableRowStyle(container: try updatedContainer(defaultStyle?.container,
@@ -262,13 +262,13 @@ struct StyleTransformer {
                                   border: try updatedBorder(defaultStyle?.border,
                                                             newStyle: newStyle?.border),
                                   dimension: updatedDimension(defaultStyle?.dimension,
-                                                               newStyle: newStyle?.dimension),
+                                                              newStyle: newStyle?.dimension),
                                   flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                               newStyle: newStyle?.flexChild),
+                                                              newStyle: newStyle?.flexChild),
                                   spacing: updatedSpacing(defaultStyle?.spacing,
                                                           newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: ColumnStyle?,
                                 newStyle: ColumnStyle?) throws -> ColumnStyle {
         return ColumnStyle(container: try updatedContainer(defaultStyle?.container,
@@ -278,13 +278,13 @@ struct StyleTransformer {
                            border: try updatedBorder(defaultStyle?.border,
                                                      newStyle: newStyle?.border),
                            dimension: updatedDimension(defaultStyle?.dimension,
-                                                        newStyle: newStyle?.dimension),
+                                                       newStyle: newStyle?.dimension),
                            flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                        newStyle: newStyle?.flexChild),
+                                                       newStyle: newStyle?.flexChild),
                            spacing: updatedSpacing(defaultStyle?.spacing,
                                                    newStyle: newStyle?.spacing))
     }
-        
+
     static func getUpdatedStyle(_ defaultStyle: ScrollableColumnStyle?,
                                 newStyle: ScrollableColumnStyle?) throws -> ScrollableColumnStyle {
         return ScrollableColumnStyle(container: try updatedContainer(defaultStyle?.container,
@@ -294,13 +294,13 @@ struct StyleTransformer {
                                      border: try updatedBorder(defaultStyle?.border,
                                                                newStyle: newStyle?.border),
                                      dimension: updatedDimension(defaultStyle?.dimension,
-                                                                  newStyle: newStyle?.dimension),
+                                                                 newStyle: newStyle?.dimension),
                                      flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                  newStyle: newStyle?.flexChild),
+                                                                 newStyle: newStyle?.flexChild),
                                      spacing: updatedSpacing(defaultStyle?.spacing,
                                                              newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: ZStackStyle?,
                                 newStyle: ZStackStyle?) throws -> ZStackStyle {
         return ZStackStyle(container: try updatedZStackContainer(defaultStyle?.container,
@@ -310,13 +310,13 @@ struct StyleTransformer {
                            border: try updatedBorder(defaultStyle?.border,
                                                      newStyle: newStyle?.border),
                            dimension: updatedDimension(defaultStyle?.dimension,
-                                                        newStyle: newStyle?.dimension),
+                                                       newStyle: newStyle?.dimension),
                            flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                        newStyle: newStyle?.flexChild),
+                                                       newStyle: newStyle?.flexChild),
                            spacing: updatedSpacing(defaultStyle?.spacing,
                                                    newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: OneByOneDistributionStyles?,
                                 newStyle: OneByOneDistributionStyles?) throws -> OneByOneDistributionStyles {
         return OneByOneDistributionStyles(container: try updatedContainer(defaultStyle?.container,
@@ -326,13 +326,13 @@ struct StyleTransformer {
                                           border: try updatedBorder(defaultStyle?.border,
                                                                     newStyle: newStyle?.border),
                                           dimension: updatedDimension(defaultStyle?.dimension,
-                                                                       newStyle: newStyle?.dimension),
+                                                                      newStyle: newStyle?.dimension),
                                           flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                       newStyle: newStyle?.flexChild),
+                                                                      newStyle: newStyle?.flexChild),
                                           spacing: updatedSpacing(defaultStyle?.spacing,
                                                                   newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: CarouselDistributionStyles?,
                                 newStyle: CarouselDistributionStyles?) throws -> CarouselDistributionStyles? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -343,39 +343,39 @@ struct StyleTransformer {
                                           border: try updatedBorder(defaultStyle?.border,
                                                                     newStyle: newStyle?.border),
                                           dimension: updatedDimension(defaultStyle?.dimension,
-                                                                       newStyle: newStyle?.dimension),
+                                                                      newStyle: newStyle?.dimension),
                                           flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                       newStyle: newStyle?.flexChild),
+                                                                      newStyle: newStyle?.flexChild),
                                           spacing: updatedSpacing(defaultStyle?.spacing,
                                                                   newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: BasicTextStyle?,
                                 newStyle: BasicTextStyle?) throws -> BasicTextStyle {
         return BasicTextStyle(dimension: updatedDimension(defaultStyle?.dimension,
-                                                           newStyle: newStyle?.dimension),
+                                                          newStyle: newStyle?.dimension),
                               flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                           newStyle: newStyle?.flexChild),
+                                                          newStyle: newStyle?.flexChild),
                               spacing: updatedSpacing(defaultStyle?.spacing,
                                                       newStyle: newStyle?.spacing),
                               background: try updatedBackground(defaultStyle?.background,
                                                                 newStyle: newStyle?.background),
                               text: try updatedText(defaultStyle?.text, newStyle: newStyle?.text))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: RichTextStyle?,
                                 newStyle: RichTextStyle?) throws -> RichTextStyle {
         return RichTextStyle(dimension: updatedDimension(defaultStyle?.dimension,
-                                                          newStyle: newStyle?.dimension),
+                                                         newStyle: newStyle?.dimension),
                              flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                          newStyle: newStyle?.flexChild),
+                                                         newStyle: newStyle?.flexChild),
                              spacing: updatedSpacing(defaultStyle?.spacing,
                                                      newStyle: newStyle?.spacing),
                              background: try updatedBackground(defaultStyle?.background,
                                                                newStyle: newStyle?.background),
                              text: try updatedText(defaultStyle?.text, newStyle: newStyle?.text))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: StaticImageStyles?,
                                 newStyle: StaticImageStyles?) throws -> StaticImageStyles {
         return StaticImageStyles(background: try updatedBackground(defaultStyle?.background,
@@ -383,13 +383,13 @@ struct StyleTransformer {
                                  border: try updatedBorder(defaultStyle?.border,
                                                            newStyle: newStyle?.border),
                                  dimension: updatedDimension(defaultStyle?.dimension,
-                                                              newStyle: newStyle?.dimension),
+                                                             newStyle: newStyle?.dimension),
                                  flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                              newStyle: newStyle?.flexChild),
+                                                             newStyle: newStyle?.flexChild),
                                  spacing: updatedSpacing(defaultStyle?.spacing,
                                                          newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: DataImageStyles?,
                                 newStyle: DataImageStyles?) throws -> DataImageStyles {
         return DataImageStyles(background: try updatedBackground(defaultStyle?.background,
@@ -397,13 +397,13 @@ struct StyleTransformer {
                                border: try updatedBorder(defaultStyle?.border,
                                                          newStyle: newStyle?.border),
                                dimension: updatedDimension(defaultStyle?.dimension,
-                                                            newStyle: newStyle?.dimension),
+                                                           newStyle: newStyle?.dimension),
                                flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                            newStyle: newStyle?.flexChild),
+                                                           newStyle: newStyle?.flexChild),
                                spacing: updatedSpacing(defaultStyle?.spacing,
                                                        newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: CloseButtonStyles?,
                                 newStyle: CloseButtonStyles?) throws -> CloseButtonStyles {
         return CloseButtonStyles(container: try updatedContainer(defaultStyle?.container,
@@ -413,13 +413,13 @@ struct StyleTransformer {
                                  border: try updatedBorder(defaultStyle?.border,
                                                            newStyle: newStyle?.border),
                                  dimension: updatedDimension(defaultStyle?.dimension,
-                                                              newStyle: newStyle?.dimension),
+                                                             newStyle: newStyle?.dimension),
                                  flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                              newStyle: newStyle?.flexChild),
+                                                             newStyle: newStyle?.flexChild),
                                  spacing: updatedSpacing(defaultStyle?.spacing,
                                                          newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: IndicatorStyles?,
                                 newStyle: IndicatorStyles?) throws -> IndicatorStyles {
         return IndicatorStyles(container: try updatedContainer(defaultStyle?.container,
@@ -429,14 +429,14 @@ struct StyleTransformer {
                                border: try updatedBorder(defaultStyle?.border,
                                                          newStyle: newStyle?.border),
                                dimension: updatedDimension(defaultStyle?.dimension,
-                                                            newStyle: newStyle?.dimension),
+                                                           newStyle: newStyle?.dimension),
                                flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                            newStyle: newStyle?.flexChild),
+                                                           newStyle: newStyle?.flexChild),
                                spacing: updatedSpacing(defaultStyle?.spacing,
                                                        newStyle: newStyle?.spacing),
                                text: try updatedText(defaultStyle?.text, newStyle: newStyle?.text))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: ProgressIndicatorStyles?,
                                 newStyle: ProgressIndicatorStyles?) throws -> ProgressIndicatorStyles {
         return ProgressIndicatorStyles(container: try updatedContainer(defaultStyle?.container,
@@ -446,18 +446,18 @@ struct StyleTransformer {
                                        border: try updatedBorder(defaultStyle?.border,
                                                                  newStyle: newStyle?.border),
                                        dimension: updatedDimension(defaultStyle?.dimension,
-                                                                    newStyle: newStyle?.dimension),
+                                                                   newStyle: newStyle?.dimension),
                                        flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                    newStyle: newStyle?.flexChild),
+                                                                   newStyle: newStyle?.flexChild),
                                        spacing: updatedSpacing(defaultStyle?.spacing,
                                                                newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: InLineTextStyle,
                                 newStyle: InLineTextStyle?) throws -> InLineTextStyle {
         return InLineTextStyle(text: try updatedInLineText(defaultStyle.text, newStyle: newStyle?.text))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: StaticLinkStyles?,
                                 newStyle: StaticLinkStyles?) throws -> StaticLinkStyles {
         return StaticLinkStyles(container: try updatedContainer(defaultStyle?.container,
@@ -467,13 +467,13 @@ struct StyleTransformer {
                                 border: try updatedBorder(defaultStyle?.border,
                                                           newStyle: newStyle?.border),
                                 dimension: updatedDimension(defaultStyle?.dimension,
-                                                             newStyle: newStyle?.dimension),
+                                                            newStyle: newStyle?.dimension),
                                 flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                             newStyle: newStyle?.flexChild),
+                                                            newStyle: newStyle?.flexChild),
                                 spacing: updatedSpacing(defaultStyle?.spacing,
                                                         newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: CreativeResponseStyles?,
                                 newStyle: CreativeResponseStyles?) throws -> CreativeResponseStyles {
         return CreativeResponseStyles(container: try updatedContainer(defaultStyle?.container,
@@ -483,13 +483,13 @@ struct StyleTransformer {
                                       border: try updatedBorder(defaultStyle?.border,
                                                                 newStyle: newStyle?.border),
                                       dimension: updatedDimension(defaultStyle?.dimension,
-                                                                   newStyle: newStyle?.dimension),
+                                                                  newStyle: newStyle?.dimension),
                                       flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                   newStyle: newStyle?.flexChild),
+                                                                  newStyle: newStyle?.flexChild),
                                       spacing: updatedSpacing(defaultStyle?.spacing,
                                                               newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: ProgressControlStyle?,
                                 newStyle: ProgressControlStyle?) throws -> ProgressControlStyle {
         return ProgressControlStyle(container: try updatedContainer(defaultStyle?.container,
@@ -499,13 +499,13 @@ struct StyleTransformer {
                                     border: try updatedBorder(defaultStyle?.border,
                                                               newStyle: newStyle?.border),
                                     dimension: updatedDimension(defaultStyle?.dimension,
-                                                                 newStyle: newStyle?.dimension),
+                                                                newStyle: newStyle?.dimension),
                                     flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                 newStyle: newStyle?.flexChild),
+                                                                newStyle: newStyle?.flexChild),
                                     spacing: updatedSpacing(defaultStyle?.spacing,
                                                             newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: GroupedDistributionStyles?,
                                 newStyle: GroupedDistributionStyles?) throws -> GroupedDistributionStyles {
         return GroupedDistributionStyles(container: try updatedContainer(defaultStyle?.container,
@@ -515,13 +515,13 @@ struct StyleTransformer {
                                          border: try updatedBorder(defaultStyle?.border,
                                                                    newStyle: newStyle?.border),
                                          dimension: updatedDimension(defaultStyle?.dimension,
-                                                                      newStyle: newStyle?.dimension),
+                                                                     newStyle: newStyle?.dimension),
                                          flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                      newStyle: newStyle?.flexChild),
+                                                                     newStyle: newStyle?.flexChild),
                                          spacing: updatedSpacing(defaultStyle?.spacing,
                                                                  newStyle: newStyle?.spacing))
     }
-    
+
     static func getUpdatedStyle(_ defaultStyle: ToggleButtonStateTriggerStyle?,
                                 newStyle: ToggleButtonStateTriggerStyle?) throws -> ToggleButtonStateTriggerStyle {
         return ToggleButtonStateTriggerStyle(container: try updatedContainer(defaultStyle?.container,
@@ -531,14 +531,15 @@ struct StyleTransformer {
                                              border: try updatedBorder(defaultStyle?.border,
                                                                        newStyle: newStyle?.border),
                                              dimension: updatedDimension(defaultStyle?.dimension,
-                                                                          newStyle: newStyle?.dimension),
+                                                                         newStyle: newStyle?.dimension),
                                              flexChild: updatedFlexChild(defaultStyle?.flexChild,
-                                                                          newStyle: newStyle?.flexChild),
+                                                                         newStyle: newStyle?.flexChild),
                                              spacing: updatedSpacing(defaultStyle?.spacing,
                                                                      newStyle: newStyle?.spacing))
     }
-    
+
     // MARK: Styling properties
+
     static func updatedContainer(_ defaultStyle: ContainerStylingProperties?,
                                  newStyle: ContainerStylingProperties?) throws -> ContainerStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -546,11 +547,10 @@ struct StyleTransformer {
                                           alignItems: newStyle?.alignItems ?? defaultStyle?.alignItems,
                                           shadow: try updatedShadow(defaultStyle?.shadow, newStyle: newStyle?.shadow),
                                           overflow: newStyle?.overflow ?? defaultStyle?.overflow,
-                                          gap: newStyle?.gap ?? defaultStyle?.gap, 
-                                          blur: newStyle?.blur ?? defaultStyle?.blur
-        )
+                                          gap: newStyle?.gap ?? defaultStyle?.gap,
+                                          blur: newStyle?.blur ?? defaultStyle?.blur)
     }
-    
+
     static func updatedZStackContainer(_ defaultStyle: ZStackContainerStylingProperties?,
                                        newStyle: ZStackContainerStylingProperties?) throws -> ZStackContainerStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -558,10 +558,9 @@ struct StyleTransformer {
                                                 alignItems: newStyle?.alignItems ?? defaultStyle?.alignItems,
                                                 shadow: try updatedShadow(defaultStyle?.shadow, newStyle: newStyle?.shadow),
                                                 overflow: newStyle?.overflow ?? defaultStyle?.overflow,
-                                                blur: newStyle?.blur ?? defaultStyle?.blur
-        )
+                                                blur: newStyle?.blur ?? defaultStyle?.blur)
     }
-    
+
     static func updatedBackground(_ defaultStyle: BackgroundStylingProperties?,
                                   newStyle: BackgroundStylingProperties?) throws -> BackgroundStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -570,7 +569,7 @@ struct StyleTransformer {
                                            backgroundImage: updatedBackgroundImage(defaultStyle?.backgroundImage,
                                                                                    newStyle: newStyle?.backgroundImage))
     }
-    
+
     static func updatedDimension(_ defaultStyle: DimensionStylingProperties?,
                                  newStyle: DimensionStylingProperties?) -> DimensionStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -579,10 +578,10 @@ struct StyleTransformer {
                                           width: newStyle?.width ?? defaultStyle?.width,
                                           minHeight: newStyle?.minHeight ?? defaultStyle?.minHeight,
                                           maxHeight: newStyle?.maxHeight ?? defaultStyle?.maxHeight,
-                                          height: newStyle?.height ?? defaultStyle?.height, 
+                                          height: newStyle?.height ?? defaultStyle?.height,
                                           rotateZ: newStyle?.rotateZ ?? defaultStyle?.rotateZ)
     }
-    
+
     static func updatedFlexChild(_ defaultStyle: FlexChildStylingProperties?,
                                  newStyle: FlexChildStylingProperties?) -> FlexChildStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -590,7 +589,7 @@ struct StyleTransformer {
                                           order: newStyle?.order ?? defaultStyle?.order,
                                           alignSelf: newStyle?.alignSelf ?? defaultStyle?.alignSelf)
     }
-    
+
     static func updatedSpacing(_ defaultStyle: SpacingStylingProperties?,
                                newStyle: SpacingStylingProperties?) -> SpacingStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -598,7 +597,7 @@ struct StyleTransformer {
                                         margin: newStyle?.margin ?? defaultStyle?.margin,
                                         offset: newStyle?.offset ?? defaultStyle?.offset)
     }
-    
+
     static func updatedBorder(_ defaultStyle: BorderStylingProperties?,
                               newStyle: BorderStylingProperties?) throws -> BorderStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -608,7 +607,7 @@ struct StyleTransformer {
                                        borderWidth: newStyle?.borderWidth ?? defaultStyle?.borderWidth,
                                        borderStyle: newStyle?.borderStyle ?? defaultStyle?.borderStyle)
     }
-    
+
     static func updatedText(_ defaultStyle: TextStylingProperties?,
                             newStyle: TextStylingProperties?) throws -> TextStylingProperties? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
@@ -625,7 +624,7 @@ struct StyleTransformer {
                                      textDecoration: newStyle?.textDecoration ?? defaultStyle?.textDecoration,
                                      lineLimit: newStyle?.lineLimit ?? defaultStyle?.lineLimit)
     }
-    
+
     static func updatedInLineText(_ defaultStyle: InlineTextStylingProperties,
                                   newStyle: InlineTextStylingProperties?) throws -> InlineTextStylingProperties {
         return InlineTextStylingProperties(textColor: try updatedColor(defaultStyle.textColor, newStyle: newStyle?.textColor),
@@ -638,8 +637,9 @@ struct StyleTransformer {
                                            letterSpacing: newStyle?.letterSpacing ?? defaultStyle.letterSpacing,
                                            textDecoration: newStyle?.textDecoration ?? defaultStyle.textDecoration)
     }
-    
+
     // MARK: Styles
+
     static func updatedShadow(_ defaultStyle: Shadow?,
                               newStyle: Shadow?) throws -> Shadow? {
         guard let defaultStyle else { return nil }
@@ -649,22 +649,22 @@ struct StyleTransformer {
                       spreadRadius: newStyle?.spreadRadius ?? defaultStyle.spreadRadius,
                       color: try updatedShadowColor(defaultStyle.color, newStyle: newStyle?.color))
     }
-    
+
     static func updatedShadowColor(_ defaultStyle: ThemeColor,
                                    newStyle: ThemeColor?) throws -> ThemeColor {
         let lightColor = newStyle?.light ?? defaultStyle.light
         let darkColor = newStyle?.dark ?? defaultStyle.dark
         if !LayoutValidator.isValidColor(lightColor) {
-            throw(LayoutTransformerError.InvalidColor(color: lightColor))
+            throw (LayoutTransformerError.InvalidColor(color: lightColor))
         }
         if let darkColor,
            !LayoutValidator.isValidColor(darkColor) {
-            throw(LayoutTransformerError.InvalidColor(color: darkColor))
+            throw (LayoutTransformerError.InvalidColor(color: darkColor))
         }
         return ThemeColor(light: newStyle?.light ?? defaultStyle.light,
                           dark: newStyle?.dark ?? defaultStyle.dark)
     }
-    
+
     static func updatedColor(_ defaultStyle: ThemeColor?,
                              newStyle: ThemeColor?) throws -> ThemeColor? {
         guard defaultStyle != nil || newStyle != nil ||
@@ -672,16 +672,16 @@ struct StyleTransformer {
         let lightColor = (newStyle?.light ?? defaultStyle?.light) ?? ""
         let darkColor = newStyle?.dark ?? defaultStyle?.dark
         guard LayoutValidator.isValidColor(lightColor) else {
-            throw(LayoutTransformerError.InvalidColor(color: lightColor))
+            throw (LayoutTransformerError.InvalidColor(color: lightColor))
         }
         if let darkColor,
            !LayoutValidator.isValidColor(darkColor) {
-            throw(LayoutTransformerError.InvalidColor(color: darkColor))
+            throw (LayoutTransformerError.InvalidColor(color: darkColor))
         }
         return ThemeColor(light: (newStyle?.light ?? defaultStyle?.light) ?? "",
                           dark: newStyle?.dark ?? defaultStyle?.dark)
     }
-    
+
     static func updatedBackgroundImage(_ defaultStyle: BackgroundImage?,
                                        newStyle: BackgroundImage?) -> BackgroundImage? {
         guard defaultStyle != nil || newStyle != nil,
@@ -690,15 +690,16 @@ struct StyleTransformer {
                                position: newStyle?.position ?? defaultStyle?.position,
                                scale: newStyle?.scale ?? defaultStyle?.scale)
     }
-    
+
     static func updatedUrl(_ defaultStyle: ThemeUrl?,
                            newStyle: ThemeUrl?) -> ThemeUrl? {
         guard defaultStyle != nil || newStyle != nil else { return nil }
         return ThemeUrl(light: (newStyle?.light ?? defaultStyle?.light) ?? "",
                         dark: newStyle?.dark ?? defaultStyle?.dark)
     }
-    
+
     // MARK: Convertors
+
     static func convertToRowStyles(_ style: ScrollableRowStyle?) -> RowStyle? {
         guard let style else { return nil }
         return RowStyle(container: style.container,
@@ -707,8 +708,8 @@ struct StyleTransformer {
                         dimension: style.dimension,
                         flexChild: style.flexChild,
                         spacing: style.spacing)
-    }   
-    
+    }
+
     static func convertToColumnStyles(_ style: ScrollableColumnStyle?) -> ColumnStyle? {
         guard let style else { return nil }
         return ColumnStyle(container: style.container,

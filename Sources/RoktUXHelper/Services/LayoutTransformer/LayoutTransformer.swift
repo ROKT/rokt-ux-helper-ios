@@ -19,7 +19,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     let extractor: Extractor
     let layoutState: LayoutState
     let eventService: EventDiagnosticServicing?
-    
+
     init(
         layoutPlugin: LayoutPlugin,
         expander: Expander = BNFPayloadExpander(),
@@ -33,12 +33,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func transform() throws -> LayoutSchemaViewModel? {
         guard let layout = layoutPlugin.layout else { return nil}
-        
+
         let transformedUIModels = try transform(layout)
-        
+
         for (slotIndex, slot) in layoutPlugin.slots.enumerated() {
             expander.expand(
                 layoutVariant: transformedUIModels,
@@ -48,12 +48,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                 usesDataSourceIndex: nil
             )
         }
-        
+
         AttributedStringTransformer.convertRichTextHTMLIfExists(uiModel: transformedUIModels, config: layoutState.config)
-        
+
         return transformedUIModels
     }
-    
+
     func transform<T: Codable>(_ layout: T, slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
         if let layout = layout as? LayoutSchemaModel {
             return try transform(layout, slot: slot)
@@ -63,7 +63,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             return .empty
         }
     }
-    
+
     func transform(_ layout: LayoutSchemaModel, slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
         switch layout {
         case .row(let rowModel):
@@ -80,7 +80,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         case .staticImage(let imageModel): return .staticImage(try getStaticImage(imageModel))
         case .richText(let richTextModel):
             return .richText(try getRichText(richTextModel))
-            
+
         case .dataImage(let imageModel): return .dataImage(try getDataImage(imageModel, slot: slot))
         case .progressIndicator(let progressIndicatorModel):
             return .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel))
@@ -138,7 +138,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                                                                  slot: slot)))
         }
     }
-    
+
     func transform(
         _ layout: AccessibilityGroupedLayoutChildren,
         slot: SlotOfferModel? = nil
@@ -162,23 +162,23 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             )
         }
     }
-    
+
     func transformChildren<T: Codable>(_ layouts: [T]?, slot: SlotOfferModel?) throws -> [LayoutSchemaViewModel]? {
         guard let layouts else { return nil }
-        
+
         var children: [LayoutSchemaViewModel] = []
-        
+
         try layouts.forEach { layout in
             children.append(try transform(layout, slot: slot))
         }
-        
+
         return children
     }
-    
+
     // attach inner layout into outer layout and transform to UI Model
     func getOneByOne(oneByOneModel: OneByOneDistributionModel<WhenPredicate>) throws -> OneByOneViewModel {
         var children: [LayoutSchemaViewModel] = []
-        
+
         try layoutPlugin.slots.forEach { slot in
             if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
                 children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
@@ -192,10 +192,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                  slots: layoutPlugin.slots,
                                  layoutState: layoutState)
     }
-    
+
     func getCarousel(carouselModel: CarouselDistributionModel<WhenPredicate>) throws -> CarouselViewModel {
         var children: [LayoutSchemaViewModel] = []
-        
+
         try layoutPlugin.slots.forEach { slot in
             if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
                 children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
@@ -208,15 +208,14 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                  peekThroughSize: carouselModel.peekThroughSize,
                                  eventService: eventService,
                                  slots: layoutPlugin.slots,
-                                 layoutState: layoutState
-        )
+                                 layoutState: layoutState)
     }
-    
+
     func getGroupedDistribution(
         groupedModel: GroupedDistributionModel<WhenPredicate>
     ) throws -> GroupedDistributionViewModel {
         var children: [LayoutSchemaViewModel] = []
-        
+
         try layoutPlugin.slots.forEach { slot in
             if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
                 children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
@@ -231,8 +230,9 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                             slots: layoutPlugin.slots,
                                             layoutState: layoutState)
     }
-    
+
     // MARK: Component Models
+
     func getStaticImage(_ imageModel: StaticImageModel<WhenPredicate>) throws -> StaticImageViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return StaticImageViewModel(url: imageModel.url,
@@ -243,7 +243,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState)
     }
-    
+
     func getStaticLink(src: String,
                        open: LinkOpenTarget,
                        styles: LayoutStyle<StaticLinkElements,
@@ -260,8 +260,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                    layoutState: layoutState,
                                    eventService: eventService)
     }
-    
-    func getCloseButton(styles: LayoutStyle<CloseButtonElements, 
+
+    func getCloseButton(styles: LayoutStyle<CloseButtonElements,
                                             ConditionalStyleTransition<CloseButtonTransitions, WhenPredicate>>?,
                         children: [LayoutSchemaViewModel]?) throws -> CloseButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
@@ -273,9 +273,9 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                     layoutState: layoutState,
                                     eventService: eventService)
     }
-    
-    func getProgressControl(styles: LayoutStyle<ProgressControlElements, 
-                                    ConditionalStyleTransition<ProgressControlTransitions, WhenPredicate>>?,
+
+    func getProgressControl(styles: LayoutStyle<ProgressControlElements,
+                                                ConditionalStyleTransition<ProgressControlTransitions, WhenPredicate>>?,
                             direction: ProgressionDirection,
                             children: [LayoutSchemaViewModel]?) throws -> ProgressControlViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
@@ -287,7 +287,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                         direction: direction,
                                         layoutState: layoutState)
     }
-    
+
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, slot: SlotOfferModel?) throws -> DataImageViewModel {
         let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey]
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
@@ -298,7 +298,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                   disabledStyle: updateStyles.compactMap {$0.disabled},
                                   layoutState: layoutState)
     }
-    
+
     func getBasicText(_ basicTextModel: BasicTextModel<WhenPredicate>) throws -> BasicTextViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(basicTextModel.styles?.elements?.own)
         return BasicTextViewModel(value: basicTextModel.value,
@@ -309,7 +309,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                   layoutState: layoutState,
                                   diagnosticService: eventService)
     }
-    
+
     func getRichText(_ richTextModel: RichTextModel<WhenPredicate>) throws -> RichTextViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(richTextModel.styles?.elements?.own)
         let updateLinkStyles = try StyleTransformer.updatedStyles(richTextModel.styles?.elements?.link)
@@ -320,7 +320,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                  layoutState: layoutState,
                                  eventService: eventService)
     }
-    
+
     func getColumn(_ styles: LayoutStyle<ColumnElements, ConditionalStyleTransition<ColumnTransitions, WhenPredicate>>?,
                    children: [LayoutSchemaViewModel]?,
                    accessibilityGrouped: Bool = false) throws -> ColumnViewModel {
@@ -333,9 +333,9 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                accessibilityGrouped: accessibilityGrouped,
                                layoutState: layoutState)
     }
-    
-    func getScrollableColumn(_ styles: LayoutStyle<ScrollableColumnElements, 
-                                       ConditionalStyleTransition<ScrollableColumnTransitions, WhenPredicate>>?,
+
+    func getScrollableColumn(_ styles: LayoutStyle<ScrollableColumnElements,
+                                                   ConditionalStyleTransition<ScrollableColumnTransitions, WhenPredicate>>?,
                              children: [LayoutSchemaViewModel]?,
                              accessibilityGrouped: Bool = false) throws -> ColumnViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
@@ -355,12 +355,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                accessibilityGrouped: accessibilityGrouped,
                                layoutState: layoutState)
     }
-    
+
     func getRow(_ styles: LayoutStyle<RowElements, ConditionalStyleTransition<RowTransitions, WhenPredicate>>?,
                 children: [LayoutSchemaViewModel]?,
                 accessibilityGrouped: Bool = false) throws -> RowViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
-        
+
         return RowViewModel(children: children,
                             defaultStyle: updateStyles.compactMap {$0.default},
                             pressedStyle: updateStyles.compactMap {$0.pressed},
@@ -369,13 +369,13 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                             accessibilityGrouped: accessibilityGrouped,
                             layoutState: layoutState)
     }
-    
-    func getScrollableRow(_ styles: LayoutStyle<ScrollableRowElements, 
+
+    func getScrollableRow(_ styles: LayoutStyle<ScrollableRowElements,
                                                 ConditionalStyleTransition<ScrollableRowTransitions, WhenPredicate>>?,
                           children: [LayoutSchemaViewModel]?,
                           accessibilityGrouped: Bool = false) throws -> RowViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
-        
+
         return RowViewModel(children: children,
                             defaultStyle: updateStyles.compactMap {
             StyleTransformer.convertToRowStyles($0.default)
@@ -392,7 +392,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                             accessibilityGrouped: accessibilityGrouped,
                             layoutState: layoutState)
     }
-    
+
     func getZStack(_ styles: LayoutStyle<ZStackElements, ConditionalStyleTransition<ZStackTransitions, WhenPredicate>>?,
                    children: [LayoutSchemaViewModel]?,
                    accessibilityGrouped: Bool = false) throws -> ZStackViewModel {
@@ -405,7 +405,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                accessibilityGrouped: accessibilityGrouped,
                                layoutState: layoutState)
     }
-    
+
     func getAccessibilityGrouped(child: AccessibilityGroupedLayoutChildren,
                                  slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
         switch child {
@@ -423,8 +423,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                          accessibilityGrouped: true))
         }
     }
-    
-    func getOverlay(_ styles: LayoutStyle<OverlayElements, 
+
+    func getOverlay(_ styles: LayoutStyle<OverlayElements,
                                           ConditionalStyleTransition<OverlayTransitions, WhenPredicate>>?,
                     allowBackdropToClose: Bool?,
                     children: [LayoutSchemaViewModel]?) throws -> OverlayViewModel {
@@ -437,8 +437,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                 eventService: eventService,
                                 layoutState: layoutState)
     }
-    
-    func getBottomSheet(_ styles: LayoutStyle<BottomSheetElements, 
+
+    func getBottomSheet(_ styles: LayoutStyle<BottomSheetElements,
                                               ConditionalStyleTransition<BottomSheetTransitions, WhenPredicate>>?,
                         allowBackdropToClose: Bool?,
                         children: [LayoutSchemaViewModel]?) throws -> BottomSheetViewModel {
@@ -449,7 +449,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                     eventService: eventService,
                                     layoutState: layoutState)
     }
-    
+
     func getCreativeResponse(responseKey: String,
                              openLinks: LinkOpenTarget?,
                              styles: LayoutStyle<CreativeResponseElements,
@@ -465,14 +465,14 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         else {
             return .empty
         }
-        
+
         return .creativeResponse(try getCreativeResponseUIModel(responseKey: responseKey,
                                                                 openLinks: openLinks,
                                                                 styles: styles,
                                                                 children: children,
                                                                 slot: slot))
     }
-    
+
     func getCreativeResponseUIModel(responseKey: String,
                                     openLinks: LinkOpenTarget?,
                                     styles: LayoutStyle<CreativeResponseElements,
@@ -481,12 +481,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                     slot: SlotOfferModel?) throws -> CreativeResponseViewModel {
         var responseOption: ResponseOption?
         var creativeResponseKey = BNFNamespace.CreativeResponseKey.positive
-        
+
         if responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {
             responseOption = slot?.offer?.creative.responseOptionsMap?.positive
             creativeResponseKey = .positive
         }
-        
+
         if responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue {
             responseOption = slot?.offer?.creative.responseOptionsMap?.negative
             creativeResponseKey = .negative
@@ -503,7 +503,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                          hoveredStyle: updateStyles.compactMap {$0.hovered},
                                          disabledStyle: updateStyles.compactMap {$0.disabled})
     }
-    
+
     func getProgressIndicator(
         _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>
     ) throws -> LayoutSchemaViewModel {
@@ -514,17 +514,17 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                 responseKey: nil,
                 from: nil
             )
-            
+
             guard case .state(let stateValue) = indicatorData,
                   DataBindingStateKeys.isValidKey(stateValue)
             else { return .empty }
-            
+
             return .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel))
         } catch {
             return .empty
         }
     }
-    
+
     func getProgressIndicatorUIModel(
         _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>
     ) throws -> ProgressIndicatorViewModel {
@@ -549,21 +549,21 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             eventService: eventService
         )
     }
-    
+
     func getWhenNode(children: [LayoutSchemaViewModel]?,
                      predicates: [WhenPredicate],
                      transition: WhenTransition?) -> WhenViewModel {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
-                             slots: layoutPlugin.slots.map{$0.toSlotOfferModel()},
+                             slots: layoutPlugin.slots.map {$0.toSlotOfferModel()},
                              globalBreakPoints: layoutPlugin.breakpoints,
                              layoutState: layoutState)
     }
-    
+
     func getToggleButton(customStateKey: String,
                          styles: LayoutStyle<ToggleButtonStateTriggerElements,
-                         ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
+                                             ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
                          children: [LayoutSchemaViewModel]?) throws -> ToggleButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return ToggleButtonViewModel(children: children,

@@ -16,12 +16,12 @@ import DcuiSchema
 @available(iOS 15, *)
 struct AsyncImageView: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let imageUrl: ThemeUrl?
     let scale: BackgroundImageScale?
     var alt: String?
     var imageLoader: ImageLoader?
-    
+
     private var altString: String {
         alt ?? ""
     }
@@ -68,12 +68,12 @@ struct AsyncImageView: View {
                                    loader: imageLoader)
             } else {
                 AsyncImage(url: URL(string: imgURL)) { phase in
-                    if let image = phase.image {  // valid
+                    if let image = phase.image { // valid
                         image.scaleIfNeeded(scale: scale)
-                    } else if phase.error != nil {  // error
+                    } else if phase.error != nil { // error
                         let _ = setImageAsInvalid() // swiftlint:disable:this redundant_discardable_let
                         EmptyView()
-                    } else {  // placeholder
+                    } else { // placeholder
                         EmptyView()
                     }
                 }
@@ -84,7 +84,7 @@ struct AsyncImageView: View {
             EmptyView()
         }
     }
-    
+
     func setImageAsInvalid() {
         isImageValid = false
     }

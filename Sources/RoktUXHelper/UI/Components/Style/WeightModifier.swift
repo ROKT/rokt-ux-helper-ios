@@ -20,14 +20,14 @@ struct WeightModifier {
         let verticalAlignment: Alignment
         let horizontalAlignment: Alignment
     }
-    
+
     enum Constant {
         static let defaultVerticalAlignment = VerticalAlignment.top
         static let defaultHorizontalAlignment = HorizontalAlignment.leading
     }
 
     let props: Properties
-    
+
     var weight: Float? {
         props.weight
     }
@@ -40,7 +40,7 @@ struct WeightModifier {
     var horizontalAlignment: Alignment {
         props.horizontalAlignment
     }
-    
+
     var alignment: Alignment {
         switch parent {
         case .row:
@@ -63,7 +63,7 @@ struct WeightModifier {
             return nil
         }
     }
-    
+
     var frameMaxWidth: CGFloat? {
         guard let weight, weight != 0 else {
             return nil

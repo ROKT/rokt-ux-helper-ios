@@ -20,13 +20,13 @@ struct ResizableBottomSheetComponent: View {
     var style: BottomSheetStyles? {
         model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
-    
+
     @State var breakpointIndex = 0
     @State var lastUpdatedHeight: CGFloat = 0
-    
+
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     @StateObject var globalScreenSize = GlobalScreenSize()
     var body: some View {
         ScrollView {
@@ -48,7 +48,7 @@ struct ResizableBottomSheetComponent: View {
             .readSize(spacing: style?.spacing) { size in
                 availableWidth = size.width
                 availableHeight = size.height
-                
+
                 // 0 at the start
                 globalScreenSize.width = size.width
                 globalScreenSize.height = size.height
@@ -64,7 +64,7 @@ struct ResizableBottomSheetComponent: View {
         .bounceBasedOnSize()
         .background(backgroundStyle: style?.background, imageLoader: model.imageLoader)
     }
-    
+
     func onBottomSheetSizeChange(newHeight: CGFloat) {
         var adjustedHeight = newHeight
         if let padding = style?.spacing?.padding {
@@ -79,7 +79,7 @@ struct ResizableBottomSheetComponent: View {
 
         onSizeChange?(adjustedHeight)
     }
-    
+
     // BottomSheet height has to be wrapContent
     private func updateBottomSheetHeight(dimension: DimensionStylingProperties?) -> DimensionStylingProperties? {
         guard let dimension, dimension.height != nil else { return dimension }
@@ -89,8 +89,8 @@ struct ResizableBottomSheetComponent: View {
                                               width: dimension.width,
                                               minHeight: dimension.minHeight,
                                               maxHeight: dimension.maxHeight,
-                                              height: .fit(.wrapContent), 
+                                              height: .fit(.wrapContent),
                                               rotateZ: dimension.rotateZ)
-        
+
     }
 }

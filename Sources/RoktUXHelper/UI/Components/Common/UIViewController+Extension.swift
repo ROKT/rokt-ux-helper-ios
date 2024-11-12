@@ -26,14 +26,6 @@ struct ViewControllerHolder {
 }
 
 @available(iOS 15, *)
-extension EnvironmentValues {
-    var viewController: UIViewController? {
-        get { return self[ViewControllerKey.self].value }
-        set { self[ViewControllerKey.self].value = newValue }
-    }
-}
-
-@available(iOS 15, *)
 extension UIViewController {
     func present<Content: View>(placementType: PlacementType?,
                                 bottomSheetUIModel: BottomSheetViewModel?,
@@ -42,27 +34,23 @@ extension UIViewController {
                                 onLoad: @escaping (() -> Void),
                                 onUnLoad: @escaping (() -> Void),
                                 @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content) {
-        
+
         let modal = SwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
                                           eventService: eventService,
+                                          layoutState: layoutState,
                                           onUnload: onUnLoad)
-        
+
         if #available(iOS 16.0, *),
            let type = placementType,
            type == .BottomSheet(.dynamic),
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            modal.rootView = AnyView(
-                builder(onSizeChange)
-                    .environment(\.viewController, modal)
-                    .background(Color.clear)
-            )
-            func onSizeChange(size: CGFloat) {
+            var onSizeChange = { [weak self, weak modal] size in
                 DispatchQueue.main.async {
-                    if let sheet = modal.sheetPresentationController {
+                    if let sheet = modal?.sheetPresentationController {
                         sheet.animateChanges {
-                            sheet.detents = [.custom { context in
+                            sheet.detents = [.custom { _ in
                                 return size
                             }]
                         }
@@ -73,18 +61,21 @@ extension UIViewController {
                     }
                 }
             }
-            
+            modal.rootView = AnyView(
+                builder(onSizeChange)
+                    .background(Color.clear)
+            )
+
             applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
             applyInitialDynamicBottomSheetHeight(modal: modal)
             self.present(modal, animated: true)
-            
+
         } else {
             modal.rootView = AnyView(
                 builder(nil)
-                    .environment(\.viewController, modal)
                     .background(Color.clear)
             )
-            
+
             if let type = placementType,
                case .BottomSheet = type,
                let bottomSheetUIModel = bottomSheetUIModel {
@@ -98,19 +89,18 @@ extension UIViewController {
                 modal.modalPresentationStyle = .overFullScreen
                 modal.view.backgroundColor = .clear
             }
-            
+
             self.present(modal, animated: true, completion: {
                 onLoad()
             })
         }
-        
+
         modal.view.isOpaque = false
-        func closeOverlay(_: Any? = nil) {
-            modal.dismiss(animated: true, completion: nil)
+        layoutState.actionCollection[.close] = { [weak self, weak modal] _ in
+            modal?.dismiss(animated: true, completion: nil)
         }
-        layoutState.actionCollection[.close] = closeOverlay
     }
-    
+
     private func applyBottomSheetStyles(modal: UIHostingController<AnyView>,
                                         bottomSheetUIModel: BottomSheetViewModel) {
         modal.modalPresentationStyle = .pageSheet
@@ -124,7 +114,7 @@ extension UIViewController {
             modal.sheetPresentationController?.preferredCornerRadius = CGFloat(borderRadius)
         }
     }
-    
+
     @available(iOS 16.0, *)
     private func applyFixedBottomSheetHeight(modal: UIHostingController<AnyView>,
                                              bottomSheetUIModel: BottomSheetViewModel) {
@@ -135,21 +125,21 @@ extension UIViewController {
             modal.sheetPresentationController?.detents = customDetents
         }
     }
-    
+
     @available(iOS 16.0, *)
-    private func applyInitialDynamicBottomSheetHeight (modal: UIHostingController<AnyView>) {
-        let zeroDetents: [UISheetPresentationController.Detent] = [.custom { context in
+    private func applyInitialDynamicBottomSheetHeight(modal: UIHostingController<AnyView>) {
+        let zeroDetents: [UISheetPresentationController.Detent] = [.custom { _ in
             return CGFloat(0)
         }]
         modal.sheetPresentationController?.detents = zeroDetents
     }
-    
+
     @available(iOS 16.0, *)
     private func getFixedBottomSheetDetents(dimensionType: DimensionHeightValue)
     -> [UISheetPresentationController.Detent]? {
         switch dimensionType {
         case .fixed(let value):
-            return [.custom { context in
+            return [.custom { _ in
                 return CGFloat(value)
             }]
         case .percentage(let value):
@@ -164,26 +154,29 @@ extension UIViewController {
             }
         }
     }
-    
+
 }
 
 @available(iOS 15.0, *)
 public final class SwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
     let eventService: EventService?
+    let layoutState: LayoutState?
 
     required init?(coder: NSCoder) {
         self.onUnload = nil
         self.eventService = nil
+        self.layoutState = nil
         super.init(coder: coder, rootView: AnyView(EmptyView()))
     }
-    
-    init(rootView: AnyView, eventService: EventService?, onUnload: @escaping (() -> Void)) {
+
+    init(rootView: AnyView, eventService: EventService?, layoutState: LayoutState, onUnload: @escaping (() -> Void)) {
         self.onUnload = onUnload
         self.eventService = eventService
+        self.layoutState = layoutState
         super.init(rootView: rootView)
     }
-    
+
     public override func viewDidDisappear(_ animated: Bool) {
         // The viewcontroller is dismissed by touching outside of swipe down
         if eventService?.dismissOption == nil {
@@ -191,7 +184,7 @@ public final class SwiftUIViewController: UIHostingController<AnyView> {
         }
         onUnload?()
     }
-    
+
     func closeModal() {
         if let eventService {
             eventService.dismissOption = .partnerTriggered

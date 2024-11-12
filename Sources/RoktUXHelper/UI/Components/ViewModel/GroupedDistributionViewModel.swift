@@ -15,7 +15,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive {
-    
+
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [GroupedDistributionStyles]?
@@ -32,7 +32,7 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
         transition: DcuiSchema.Transition,
         eventService: EventServicing?,
         slots: [SlotModel],
-        layoutState: any LayoutStateRepresenting
+        layoutState: (any LayoutStateRepresenting)?
     ) {
         self.children = children
         self.defaultStyle = defaultStyle
@@ -42,26 +42,26 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
                    slots: slots,
                    layoutState: layoutState)
     }
-    
+
     func sendViewableImpressionEvents(viewableItems: Int, currentLeadingOffer: Int) {
-        for offer in currentLeadingOffer..<currentLeadingOffer+viewableItems {
+        for offer in currentLeadingOffer..<currentLeadingOffer + viewableItems {
             sendImpressionEvents(currentOffer: offer)
         }
     }
-    
+
     func setupBindings(
         currentProgress: Binding<Int>,
         totalItems: Int,
         viewableItems: Binding<Int>,
         customStateMap: Binding<CustomStateMap?>
     ) {
-        layoutState.items[LayoutState.currentProgressKey] = currentProgress
-        layoutState.items[LayoutState.totalItemsKey] = totalItems
-        layoutState.items[LayoutState.viewableItemsKey] = viewableItems
-        layoutState.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.currentProgressKey] = currentProgress
+        layoutState?.items[LayoutState.totalItemsKey] = totalItems
+        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
+        layoutState?.items[LayoutState.customStateMap] = customStateMap
     }
-    
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
-        layoutState.getGlobalBreakpointIndex(width)
+        layoutState?.getGlobalBreakpointIndex(width) ?? 0
     }
 }

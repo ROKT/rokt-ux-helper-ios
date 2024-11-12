@@ -18,7 +18,7 @@ import DcuiSchema
 public enum OpenURLType {
     case `internally`(sessionId: String?)
     case externally
-    
+
     init(_ linkOpenTarget: LinkOpenTarget?, sessionId: String? = nil) {
         switch linkOpenTarget {
         case .externally,

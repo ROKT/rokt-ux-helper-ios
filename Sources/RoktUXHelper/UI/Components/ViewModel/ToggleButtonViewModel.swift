@@ -21,9 +21,9 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let pressedStyle: [ToggleButtonStateTriggerStyle]?
     let hoveredStyle: [ToggleButtonStateTriggerStyle]?
     let disabledStyle: [ToggleButtonStateTriggerStyle]?
-    let layoutState: any LayoutStateRepresenting
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(children: [LayoutSchemaViewModel]?,
@@ -32,7 +32,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          pressedStyle: [ToggleButtonStateTriggerStyle]?,
          hoveredStyle: [ToggleButtonStateTriggerStyle]?,
          disabledStyle: [ToggleButtonStateTriggerStyle]?,
-         layoutState: any LayoutStateRepresenting) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.customStateKey = customStateKey
         self.defaultStyle = defaultStyle

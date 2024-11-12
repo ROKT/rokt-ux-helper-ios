@@ -20,18 +20,18 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let pressedStyle: [CloseButtonStyles]?
     let hoveredStyle: [CloseButtonStyles]?
     let disabledStyle: [CloseButtonStyles]?
-    let layoutState: any LayoutStateRepresenting
-    let eventService: EventServicing?
+    weak var eventService: EventServicing?
+    weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [CloseButtonStyles]?,
          pressedStyle: [CloseButtonStyles]?,
          hoveredStyle: [CloseButtonStyles]?,
          disabledStyle: [CloseButtonStyles]?,
-         layoutState: any LayoutStateRepresenting,
+         layoutState: (any LayoutStateRepresenting)?,
          eventService: EventServicing?) {
         self.children = children
         self.defaultStyle = defaultStyle
@@ -41,7 +41,7 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func sendCloseEvent() {
         eventService?.dismissOption = .closeButton
         eventService?.sendDismissalEvent()

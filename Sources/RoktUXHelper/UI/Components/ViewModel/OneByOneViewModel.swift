@@ -15,13 +15,13 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive {
-    
+
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [OneByOneDistributionStyles]?
     let transition: DcuiSchema.Transition?
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
 
     init(
@@ -30,7 +30,7 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
         transition: DcuiSchema.Transition?,
         eventService: EventServicing?,
         slots: [SlotModel],
-        layoutState: any LayoutStateRepresenting
+        layoutState: (any LayoutStateRepresenting)
     ) {
         self.children = children
         self.defaultStyle = defaultStyle
@@ -41,14 +41,14 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
             layoutState: layoutState
         )
     }
-    
+
     func setupBindings(
         currentProgess: Binding<Int>,
         customStateMap: Binding<CustomStateMap?>,
         totalItems: Int
     ) {
-        layoutState.items[LayoutState.currentProgressKey] = currentProgess
-        layoutState.items[LayoutState.customStateMap] = customStateMap
-        layoutState.items[LayoutState.totalItemsKey] = totalItems
+        layoutState?.items[LayoutState.currentProgressKey] = currentProgess
+        layoutState?.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.totalItemsKey] = totalItems
     }
 }

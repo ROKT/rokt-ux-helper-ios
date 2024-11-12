@@ -13,7 +13,7 @@ import SwiftUI
 
 @available(iOS 15, *)
 class AttributedStringTransformer {
-    
+
     static func convertRichTextHTMLIfExists(
         uiModel: LayoutSchemaViewModel,
         config: RoktUXConfig?,
@@ -25,13 +25,13 @@ class AttributedStringTransformer {
         case .bottomSheet(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .row(let parentModel):
-            convertRichTextHTMLInChildren(parent: parentModel, config: config)   
+            convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .scrollableRow(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .column(let parentModel):
-            convertRichTextHTMLInChildren(parent: parentModel, config: config)       
+            convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .scrollableColumn(let parentModel):
-            convertRichTextHTMLInChildren(parent: parentModel, config: config)       
+            convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .zStack(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .oneByOne(let parentModel):
@@ -54,10 +54,10 @@ class AttributedStringTransformer {
             break
         }
     }
-    
+
     static func convertRichTextHTMLInChildren(parent: DomainMappableParent, config: RoktUXConfig?) {
         guard let children = parent.children, !children.isEmpty else { return }
-        
+
         children.forEach { convertRichTextHTMLIfExists(uiModel: $0, config: config) }
     }
 }

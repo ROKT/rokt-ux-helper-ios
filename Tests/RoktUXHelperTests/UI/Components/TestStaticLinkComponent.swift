@@ -24,8 +24,12 @@ final class TestStaticLinkComponent: XCTestCase {
     }
     
     func test_static_link() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
-        
+
+        let view = try TestPlaceHolder.make(
+            eventDelegate: stubComponent,
+            layoutMaker: LayoutSchemaViewModel.makeStaticLink(layoutState:eventService:)
+        )
+
         let staticLink = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -34,7 +38,7 @@ final class TestStaticLinkComponent: XCTestCase {
             .actualView()
             .inspect()
             .hStack()
-        
+
         // test custom modifier class
         let paddingModifier = try staticLink.modifier(PaddingModifier.self)
         XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 13, right: 14, bottom: 15, left: 16))
@@ -45,8 +49,11 @@ final class TestStaticLinkComponent: XCTestCase {
     }
     
     func test_staticLink_computedProperties_usesModelProperties() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()))
-        
+        let view = try TestPlaceHolder.make(
+            eventDelegate: stubComponent,
+            layoutMaker: LayoutSchemaViewModel.makeStaticLink(layoutState:eventService:)
+        )
+
         let sut = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -64,12 +71,15 @@ final class TestStaticLinkComponent: XCTestCase {
         
         XCTAssertEqual(sut.verticalAlignment, .top)
         XCTAssertEqual(sut.horizontalAlignment, .center)
+        XCTAssertNotNil(model.layoutState)
     }
     
     func test_tapGesture_shouldTriggerLinkhandler() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
-                                   layoutState: get_layout_state())
-        
+        let view = try TestPlaceHolder.make(
+            eventDelegate: stubComponent,
+            layoutMaker: LayoutSchemaViewModel.makeStaticLink(layoutState:eventService:)
+        )
+
         let sut = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -85,9 +95,11 @@ final class TestStaticLinkComponent: XCTestCase {
     }
     
     func test_longPressGesture_shouldUpdatePressedStyle() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticLink(try get_model()),
-                                   layoutState: get_layout_state())
-        
+        let view = try TestPlaceHolder.make(
+            eventDelegate: stubComponent,
+            layoutMaker: LayoutSchemaViewModel.makeStaticLink(layoutState:eventService:)
+        )
+
         let sut = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -101,19 +113,26 @@ final class TestStaticLinkComponent: XCTestCase {
         
         XCTAssertEqual(sut.style, model.pressedStyle?[0])
     }
-    
-    func get_model() throws -> StaticLinkViewModel {
-        let eventService = get_mock_event_processor(uxEventDelegate: stubComponent, eventHandler: { _ in })
-        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(), eventService: eventService)
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+
+    static func makeStaticLink(
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState, 
+            eventService: eventService
+        )
         let model = ModelTestData.StaticLinkData.staticLink()
-        return try transformer.getStaticLink(src: model.src,
-                                             open: model.open,
-                                             styles: model.styles,
-                                             children: transformer.transformChildren(model.children, slot: nil))
-        
-    }
-    
-    func get_layout_state() -> LayoutState {
-        LayoutState()
+        return LayoutSchemaViewModel.staticLink(
+            try transformer.getStaticLink(src: model.src,
+                                          open: model.open,
+                                          styles: model.styles,
+                                          children: transformer.transformChildren(model.children, slot: nil))
+        )
     }
 }

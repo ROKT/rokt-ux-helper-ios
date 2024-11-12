@@ -14,7 +14,7 @@ import Foundation
 public struct EventsPayload: Codable {
     public let integration: RoktIntegrationInfoDetails
     public let events: [EventRequest]
-    
+
     init(events: [EventRequest]) {
         self.integration = RoktIntegrationInfo.shared.integration
         self.events = events

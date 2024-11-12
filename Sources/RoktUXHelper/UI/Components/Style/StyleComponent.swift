@@ -33,7 +33,7 @@ internal extension View {
         var minHeight: CGFloat?
         var maxHeight: CGFloat?
         var alignment: Alignment = horizontalAxisAlignment
-        
+
         // update with width values
         let width = WidthModifier(widthProperty: dimension?.width,
                                   minimum: dimension?.minWidth,
@@ -57,18 +57,18 @@ internal extension View {
                 alignment.horizontal = width.alignmentAsHorizontalType
             }
         }
-        
+
         // update with percentage width values
         let percentageWidth = PercentageWidthModifier(width: parentWidth,
                                                       percentage: dimension?.width,
-                                                      horizontalAxisAlignment: horizontalAxisAlignment, 
+                                                      horizontalAxisAlignment: horizontalAxisAlignment,
                                                       margin: margin)
         if let frameWidth = percentageWidth.frameWidth {
             minWidth = frameWidth
             maxWidth = frameWidth
             alignment.horizontal = percentageWidth.alignmentAsHorizontalType
         }
-        
+
         // update with height values
         let height = HeightModifier(heightProperty: dimension?.height,
                                     minimum: dimension?.minHeight,
@@ -96,14 +96,14 @@ internal extension View {
         // update with percentage height
         let percentageHeight = PercentageHeightModifier(height: parentHeight,
                                                         percentage: dimension?.height,
-                                                        verticalAxisAlignment: verticalAxisAlignment, 
+                                                        verticalAxisAlignment: verticalAxisAlignment,
                                                         margin: margin)
         if let frameHeight = percentageHeight.frameHeight {
             minHeight = frameHeight
             maxHeight = frameHeight
             alignment.vertical = percentageHeight.alignmentAsVerticalType
         }
-        
+
         // update with weight
         let weightProperties = WeightModifier.Properties(weight: weight,
                                                          parent: parent,
@@ -119,7 +119,7 @@ internal extension View {
             maxHeight = frameMaxHeight
             alignment.vertical = weight.alignment.asVerticalType ?? WeightModifier.Constant.defaultVerticalAlignment
         }
-        
+
         // update with align self stretch
         let alignSelfStretch = AlignSelfStretchModifier(alignSelf: alignSelf,
                                                         parent: parent,
@@ -136,14 +136,14 @@ internal extension View {
             alignment.vertical = alignSelfStretch.wrapperAlignment?.asVerticalType ??
             AlignSelfStretchModifier.Constant.defaultVerticalAlignment
         }
-        
+
         return modifier(FrameModifier(minWidth: minWidth,
                                       maxWidth: maxWidth,
                                       minHeight: minHeight,
                                       maxHeight: maxHeight,
                                       alignment: alignment))
     }
-    
+
     func alignSelf(
         alignSelf: FlexAlignment?,
         parent: ComponentParentType,
@@ -165,65 +165,65 @@ internal extension View {
             parentColumnAlignment: parentHorizontalAlignment,
             rowAlignmentOverride: rowAlignmentOverride,
             columnAlignmentOverride: columnAlignmentOverride,
-            expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign, 
+            expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign,
             applyAlignself: applyAlignSelf
         ))
     }
-    
+
     func overflow(overflow: Overflow?) -> some View {
         modifier(OverflowModifier(overFlow: overflow))
     }
-    
+
     func background(backgroundStyle: BackgroundStylingProperties?, imageLoader: ImageLoader?) -> some View {
         modifier(BackgroundModifier(backgroundStyle: backgroundStyle, imageLoader: imageLoader))
     }
-    
+
     func backgroundColor(hex: String?) -> some View {
         modifier(BackgroundColorModifier(backgroundColor: hex))
     }
-    
+
     func backgroundImage(backgroundImage: BackgroundImage?, imageLoader: ImageLoader?) -> some View {
         modifier(BackgroundImageModifier(backgroundImage: backgroundImage, imageLoader: imageLoader))
     }
-    
+
     func foregroundColor(hex: String?) -> some View {
         modifier(ForegroundModifier(color: hex))
-    }    
-    
+    }
+
     func rotate(rotateZ: Float?) -> some View {
         modifier(RotateModifier(rotateZ: rotateZ))
     }
-    
+
     func padding(frame: FrameAlignmentProperty?) -> some View {
         modifier(PaddingModifier(padding: frame))
     }
-    
+
     func offset(offset: OffsetProperty?) -> some View {
         modifier(OffsetModifier(offset: offset))
-    } 
-    
+    }
+
     func blur(blur: Float?) -> some View {
         modifier(BlurModifier(blur: blur))
     }
-    
+
     func bounceBasedOnSize() -> some View {
         modifier(ScrollBounceBasedOnSize())
     }
-    
+
     func equalStretch(containerType: ComponentParentType,
                       isContainer: Bool,
                       stretchChildren: Bool?,
                       breakpointIndex: Binding<Int>) -> some View {
         modifier(EqualStretchModifier(containerType: containerType,
                                       isContainer: isContainer,
-                                      stretchChildren: stretchChildren, 
+                                      stretchChildren: stretchChildren,
                                       breakpointIndex: breakpointIndex))
     }
 
     func margin(spacing: SpacingStylingProperties?, applyMargin: Bool) -> some View {
         modifier(MarginModifier(spacing: spacing, applyMargin: applyMargin))
     }
-    
+
     func border(
         borderRadius: Float?,
         borderColor: ThemeColor?,
@@ -235,7 +235,7 @@ internal extension View {
                                 borderWidth: FrameAlignmentProperty.getFrameAlignment(borderWidth),
                                 borderStyle: borderStyle))
     }
-    
+
     func shadow(
         backgroundColor: ThemeColor?,
         borderRadius: Float?,
@@ -252,22 +252,22 @@ internal extension View {
             shadowOffsetY: yOffset,
             shadowColor: shadowColor,
             blurRadius: blurRadius,
-            isContainer: isContainer)
-        )
+            isContainer: isContainer
+        ))
     }
-    
+
     func customColorMode(colorMode: RoktUXConfig.ColorMode?) -> some View {
         modifier(ColorModeModifier(colorMode: colorMode))
     }
-    
+
     func onLoad(perform action: (() -> Void)? = nil) -> some View {
         modifier(ViewDidLoadModifier(perform: action))
     }
-    
+
     func onFirstTouch(perform action: (() -> Void)? = nil) -> some View {
         modifier(FirstTouchModifier(perform: action))
     }
-    
+
     // return type must be `Alignment` since Width/Height uses the axis-independent type in `frame`
     func rowPrimaryAxisAlignment(justifyContent: FlexJustification?) -> Alignment {
         guard let justifyContent else { return .leading }
@@ -299,7 +299,7 @@ internal extension View {
 
         return horizontalAlignment
     }
-    
+
     func scaledFont(textStyle: TextStylingProperties?) -> some View {
         return self.modifier(ScaledFont(textStyle: textStyle))
     }
@@ -343,7 +343,7 @@ struct PercentageWidthModifier {
         self.alignmentAsHorizontalType = horizontalAxisAlignment.asHorizontalType ?? HorizontalAlignment.leading
         self.margin = margin
     }
-    
+
     var frameWidth: CGFloat? {
         guard let width,
               let percentage,
@@ -352,7 +352,7 @@ struct PercentageWidthModifier {
             return nil
         }
 
-        return (width * CGFloat(value / 100)) - (margin?.horizontalSpacing ?? 0)
+        return (width * CGFloat(value/100)) - (margin?.horizontalSpacing ?? 0)
     }
 }
 
@@ -372,7 +372,7 @@ struct PercentageHeightModifier {
         self.alignmentAsVerticalType = verticalAxisAlignment.asVerticalType ?? VerticalAlignment.top
         self.margin = margin
     }
-    
+
     var frameHeight: CGFloat? {
         guard let height,
               let percentage,
@@ -380,14 +380,14 @@ struct PercentageHeightModifier {
         else {
             return nil
         }
-        return height * CGFloat(value / 100) - (margin?.verticalSpacing ?? 0)
+        return height * CGFloat(value/100) - (margin?.verticalSpacing ?? 0)
     }
 }
 
 @available(iOS 15, *)
 struct ForegroundModifier: ViewModifier {
     let color: String?
-    
+
     var foregroundColor: Color? {
         guard let color else { return nil }
         return Color(hex: color)
@@ -410,7 +410,7 @@ struct RotateModifier: ViewModifier {
 @available(iOS 15, *)
 struct ColorModeModifier: ViewModifier {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let colorMode: RoktUXConfig.ColorMode?
 
     var configColorScheme: ColorScheme {
@@ -488,11 +488,11 @@ struct EqualStretchModifier: ViewModifier {
     let isContainer: Bool
     let stretchChildren: Bool?
     @Binding var frameChangeIndex: Int
-    
+
     @State var horizontalFixSize: Bool
     @State var verticalFixSize: Bool
     @State var show: Bool = true
-    
+
     init(containerType: ComponentParentType,
          isContainer: Bool,
          stretchChildren: Bool?,
@@ -504,21 +504,21 @@ struct EqualStretchModifier: ViewModifier {
         self.horizontalFixSize = containerType != .row
         self.verticalFixSize = containerType == .row
     }
-    
+
     var horizontal: Bool {
         if isContainer && stretchChildren == true && containerType != .row {
             return true
         }
         return false
-    }  
-    
+    }
+
     var vertical: Bool {
         if isContainer && stretchChildren == true && containerType == .row {
             return true
         }
         return false
     }
-    
+
     func body(content: Content) -> some View {
         // Only apply this listeners if it is container and has stretch modifier
         if isContainer && stretchChildren == true {
@@ -556,12 +556,12 @@ struct EqualStretchModifier: ViewModifier {
 @available(iOS 15, *)
 struct BorderModifier: ViewModifier {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let borderRadius: Float?
     let borderColor: ThemeColor?
     let borderWidth: FrameAlignmentProperty
     let borderStyle: BorderStyle?
-    
+
     func body(content: Content) -> some View {
         content
             .cornerRadius(CGFloat(borderRadius ?? 0))
@@ -576,13 +576,13 @@ struct BorderModifier: ViewModifier {
                         Color(hex: borderColor?.getAdaptiveColor(colorScheme)),
                         style: getStrokeStyle(borderWidth: borderWidth.defaultWidth(), borderStyle: borderStyle)
                     )
-                
+
             }
     }
-    
+
     func getStrokeStyle(borderWidth: CGFloat, borderStyle: BorderStyle?) -> StrokeStyle {
         guard let borderStyle else { return StrokeStyle(lineWidth: CGFloat(borderWidth))}
-        
+
         switch borderStyle {
         case .dashed:
             return StrokeStyle(
@@ -622,14 +622,14 @@ struct MultiDimensionBorder: Shape {
 
 @available(iOS 15, *)
 struct ViewDidLoadModifier: ViewModifier {
-    
+
     @State private var loaded = false
     private let action: (() -> Void)?
-    
+
     init(perform action: (() -> Void)? = nil) {
         self.action = action
     }
-    
+
     func body(content: Content) -> some View {
         content.onAppear {
             if !loaded {
@@ -642,14 +642,14 @@ struct ViewDidLoadModifier: ViewModifier {
 
 @available(iOS 15, *)
 struct FirstTouchModifier: ViewModifier {
-    
+
     @State private var loaded = false
     private let action: (() -> Void)?
-    
+
     init(perform action: (() -> Void)? = nil) {
         self.action = action
     }
-    
+
     func body(content: Content) -> some View {
         content.simultaneousGesture(
             TapGesture().onEnded({

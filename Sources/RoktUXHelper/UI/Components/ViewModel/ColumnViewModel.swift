@@ -21,12 +21,12 @@ class ColumnViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ColumnStyle]?
     let disabledStyle: [ColumnStyle]?
     let accessibilityGrouped: Bool
-    let layoutState: any LayoutStateRepresenting
-    
+    weak var layoutState: (any LayoutStateRepresenting)?
+
     var imageLoader: ImageLoader? {
-        layoutState.imageLoader
+        layoutState?.imageLoader
     }
-    
+
     init(children: [LayoutSchemaViewModel]?,
          defaultStyle: [ColumnStyle]?,
          pressedStyle: [ColumnStyle]?,

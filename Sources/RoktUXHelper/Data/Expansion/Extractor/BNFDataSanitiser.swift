@@ -28,7 +28,7 @@ struct BNFDataSanitiser: DataSanitiser {
 
     func sanitiseNamespace(data: String, namespace: BNFNamespace) -> String {
         var inputData = data
-        
+
         if data.contains(namespace.withNamespaceSeparator) {
             inputData = inputData.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         }

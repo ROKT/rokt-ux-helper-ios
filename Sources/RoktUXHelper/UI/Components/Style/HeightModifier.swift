@@ -41,7 +41,7 @@ struct HeightModifier {
         self.alignment = alignment
         self.defaultHeight = defaultHeight
         self.parentHeight = parentHeight
-        
+
         self.alignmentAsVerticalType = alignment?.asVerticalType ?? Constant.defaultAlignment
     }
 
@@ -91,7 +91,7 @@ struct HeightModifier {
             return nil
         }
     }
-    
+
     // We maintain a hierarchy of modifiers. In order of priority
     // 1. if the value type is fixed, ignore min/max, ignore fit
     // 2. if the value type is percentage, respect min/max, ignore fit

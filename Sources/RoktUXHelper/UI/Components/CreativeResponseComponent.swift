@@ -15,15 +15,15 @@ import DcuiSchema
 @available(iOS 15, *)
 struct CreativeResponseComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
-    
+
     let config: ComponentConfig
     let model: CreativeResponseViewModel
-    
+
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    
+
     init(
         config: ComponentConfig,
         model: CreativeResponseViewModel,
@@ -38,27 +38,27 @@ struct CreativeResponseComponent: View {
 
         self.parentOverride = parentOverride
     }
-    
+
     @State var styleState: StyleState = .default
     @State var isHovered: Bool = false
     @State var isPressed: Bool = false
     @State var isDisabled: Bool = false
-    
+
     @GestureState private var isPressingDown: Bool = false
-    
+
     var style: CreativeResponseStyles? {
         switch styleState {
-        case .hovered: 
+        case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed: 
+        case .pressed:
             return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled: 
+        case .disabled:
             return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
         default:
             return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
         }
     }
-    
+
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex = 0
     @State var frameChangeIndex: Int = 0
@@ -162,8 +162,7 @@ struct CreativeResponseComponent: View {
                     default:
                         break
                     }
-                }
-            )
+                })
             .onChange(of: isPressingDown) { value in
                 if !value {
                     // handle link when long press is released
@@ -176,7 +175,7 @@ struct CreativeResponseComponent: View {
                 updateStyleState()
             })
     }
-    
+
     func build() -> some View {
         createContainer()
             .onChange(of: globalScreenSize.width) { newSize in
@@ -187,7 +186,7 @@ struct CreativeResponseComponent: View {
                 }
             }
     }
-    
+
     func createContainer() -> some View {
         return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems), spacing: 0) {
             if let children = model.children {
@@ -206,7 +205,8 @@ struct CreativeResponseComponent: View {
                                                     justifyContent: containerStyle?.justifyContent
                                                 ).asHorizontalType,
                                                 parentBackgroundStyle: passableBackgroundStyle,
-                                                stretchChildren: containerStyle?.alignItems == .stretch),
+                                                stretchChildren: containerStyle?.alignItems == .stretch
+                                            ),
                                           expandsToContainerOnSelfAlign: shouldExpandToContainerOnSelfAlign())
                 }
             }
@@ -226,10 +226,10 @@ struct CreativeResponseComponent: View {
             return false
         }
     }
-    
+
     private func handleLink() {
         model.sendSignalResponseEvent()
-        
+
         if let url = model.getOfferUrl() {
             model.handleLink(url: url)
         } else {

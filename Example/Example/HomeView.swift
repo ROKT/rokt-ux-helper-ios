@@ -16,7 +16,7 @@ struct HomeView: View {
 
     @State private var isShowingSwiftUIView = false
     @State private var isShowingUIKitView = false
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -27,14 +27,14 @@ struct HomeView: View {
                         .scaledToFit()
                         .frame(width: 200, alignment: .center)
                         .padding(.top, 100)
-                    
+
                     Text("Seize the Transaction Moment")
                         .font(.defaultFont(.header3))
                         .foregroundColor(.titleColor)
                         .multilineTextAlignment(.center)
                         .padding()
                     Spacer()
-                    
+
                     Button(action: {
                         isShowingSwiftUIView = true
                     }) {
@@ -42,7 +42,7 @@ struct HomeView: View {
                     }
                     .padding(.top)
                     .buttonStyle(ButtonDefaultOutlined())
-                    
+
                     Button(action: {
                         isShowingUIKitView = true
                     }) {
@@ -50,7 +50,7 @@ struct HomeView: View {
                     }
                     .padding(.top)
                     .buttonStyle(ButtonDefaultOutlined())
-                    
+
                     Spacer()
                     Text("® Rokt 2024 — All rights reserved")
                         .font(.defaultFont(.subtitle2))
@@ -61,7 +61,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            
+
         }
         .background(Color.white)
         .navigationViewStyle(StackNavigationViewStyle())

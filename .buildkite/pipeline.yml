@@ -3,8 +3,8 @@ env:
   ENG_BK_AGENT: eng-default
 
 steps:
-  - label: ':lint-roller: Lint'
-    key: 'lint'
+  - label: ":lint-roller: Lint"
+    key: "lint"
     commands:
       - .buildkite/bin/lint.sh
     artifact_paths:
@@ -13,10 +13,10 @@ steps:
       queue: ${MAC_BK_AGENT}
     timeout_in_minutes: 25
 
-  - label: ':hammer: Unit tests'
-    key: 'unit-tests'
+  - label: ":hammer: Unit tests"
+    key: "unit-tests"
     depends_on:
-      - 'lint'
+      - "lint"
     commands:
       - . ~/.zshrc
       - rbenv local 3.2.2
