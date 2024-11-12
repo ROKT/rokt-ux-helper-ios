@@ -50,7 +50,7 @@ class TestEventRequest: XCTestCase {
         XCTAssertNotNil(eventRequest.metadata)
         XCTAssertNotNil(eventRequest.metadata[0])
         XCTAssertEqual(eventRequest.metadata[0].name, BE_CLIENT_TIME_STAMP)
-        XCTAssertEqual(eventRequest.metadata[0].value, eventTime.toIso8601String())
+        XCTAssertEqual(eventRequest.metadata[0].value, EventDateFormatter.getDateString(eventTime))
         XCTAssertNotNil(eventRequest.metadata[0].value)
     }
 

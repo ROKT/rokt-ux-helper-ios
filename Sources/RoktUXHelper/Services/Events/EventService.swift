@@ -183,13 +183,13 @@ class EventService: Hashable, EventDiagnosticServicing {
     private func sendPluginImpressionEvent() {
         var metaData = [
             EventNameValue(name: BE_PAGE_SIGNAL_LOAD,
-                           value: startDate.toIso8601String()),
+                           value: EventDateFormatter.getDateString(startDate)),
             EventNameValue(name: BE_PAGE_RENDER_ENGINE,
                            value: BE_RENDER_ENGINE_LAYOUTS),
             EventNameValue(name: BE_PAGE_SIGNAL_COMPLETE,
-                           value: responseReceivedDate.toIso8601String()),
+                           value: EventDateFormatter.getDateString(responseReceivedDate)),
             EventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
-                           value: DateHandler.currentDate().toIso8601String()),
+                           value: EventDateFormatter.getDateString(DateHandler.currentDate())),
             EventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
                            value: pageInstanceGuid)
         ]
@@ -290,6 +290,9 @@ class DateHandler {
 }
 
 class EventDateFormatter {
+    private static let kEventTimeStamp = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    private static let kUTCTimeStamp = "UTC"
+    private static let kBaseLocale = "en"
 
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()

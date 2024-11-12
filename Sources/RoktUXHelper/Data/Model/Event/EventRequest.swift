@@ -63,11 +63,11 @@ public struct EventRequest: Codable, Hashable {
         self.sessionId = sessionId
         self.eventType = eventType
         self.parentGuid = parentGuid
-        self.eventTime = eventTime.toIso8601String()
+        self.eventTime = EventDateFormatter.getDateString(eventTime)
         self.attributes = EventRequest.convertDictionaryToNameValue(attributes)
         self.pageInstanceGuid = pageInstanceGuid
         self.metadata = [EventNameValue(name: BE_CLIENT_TIME_STAMP,
-                                        value: eventTime.toIso8601String()),
+                                        value: EventDateFormatter.getDateString(eventTime)),
                          EventNameValue(name: BE_CAPTURE_METHOD,
                                         value: kClientProvided)] + extraMetadata
         self.jwtToken = jwtToken
