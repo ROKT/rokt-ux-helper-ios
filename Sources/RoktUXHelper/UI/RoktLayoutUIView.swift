@@ -29,6 +29,13 @@ import SwiftUI
     private var onPlatformEvent: (([String: Any]) -> Void)?
     private var onEmbeddedSizeChange: ((CGFloat) -> Void)?
     private var hasLoadedLayout = false
+    private lazy var heightConstraint: NSLayoutConstraint = .init(item: self,
+                                                                  attribute: .height,
+                                                                  relatedBy: .equal,
+                                                                  toItem: nil,
+                                                                  attribute: .notAnAttribute,
+                                                                  multiplier: 1,
+                                                                  constant: 0)
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -110,7 +117,8 @@ import SwiftUI
             embeddedView.topAnchor.constraint(equalTo: topAnchor),
             embeddedView.leadingAnchor.constraint(equalTo: leadingAnchor),
             embeddedView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            embeddedView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            embeddedView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            heightConstraint
         ])
     }
 }
@@ -140,7 +148,7 @@ extension RoktLayoutUIView: LayoutLoader {
     /// - Parameter size: The new height for the embedded view.
     public func updateEmbeddedSize(_ size: CGFloat) {
         if roktEmbeddedSwiftUIView != nil {
-            layoutIfNeeded()
+            heightConstraint.constant = size
         }
     }
 
