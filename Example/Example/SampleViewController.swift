@@ -64,10 +64,11 @@ class SampleViewController: UIViewController {
         roktView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            roktView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
+            roktView.topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor),
             roktView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             roktView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            roktView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor)
+            roktView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor),
+            roktView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
 }

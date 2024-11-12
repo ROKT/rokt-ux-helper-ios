@@ -20,14 +20,7 @@ import SwiftUI
 /// and optional configuration parameters such as RoktUXConfig, ImageLoader, and event handlers.
 @available(iOS 15, *)
 @objc public class RoktLayoutUIView: UIView {
-    var roktEmbeddedSwiftUIView: UIView?
-
-    var topConstaint: NSLayoutConstraint?
-    var leadingConstaint: NSLayoutConstraint?
-    var trailingConstaint: NSLayoutConstraint?
-    var heightConstaint: NSLayoutConstraint?
-    // The default is -1 as 0 is a valid state. -1 means embedded view is not loaded correctly
-    private var latestHeight: CGFloat = -1
+    private(set) var roktEmbeddedSwiftUIView: UIView?
     private var uxHelper: RoktUX?
     private var experienceResponse: String?
     private var location: String?
@@ -36,6 +29,13 @@ import SwiftUI
     private var onPlatformEvent: (([String: Any]) -> Void)?
     private var onEmbeddedSizeChange: ((CGFloat) -> Void)?
     private var hasLoadedLayout = false
+    private lazy var heightConstraint: NSLayoutConstraint = .init(item: self,
+                                                                  attribute: .height,
+                                                                  relatedBy: .equal,
+                                                                  toItem: nil,
+                                                                  attribute: .notAnAttribute,
+                                                                  multiplier: 1,
+                                                                  constant: 0)
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -112,52 +112,14 @@ import SwiftUI
         )
     }
 
-    private func decideTranslatesAutoresizingMask() {
-        // translateAutoresizingMaskIntoConstraints only when view doesn't have any constraints.
-        if !self.constraints.isEmpty {
-            self.translatesAutoresizingMaskIntoConstraints = false
-        } else {
-            self.translatesAutoresizingMaskIntoConstraints = true
-        }
-    }
-
-    private func cleanupEmbeddedView() {
-        subviews.forEach({ $0.removeFromSuperview() })
-        removeEmbeddedLayoutConstraint(topConstaint)
-        removeEmbeddedLayoutConstraint(leadingConstaint)
-        removeEmbeddedLayoutConstraint(trailingConstaint)
-        removeEmbeddedLayoutConstraint(heightConstaint)
-    }
-
     private func addEmbeddedLayoutConstraints(embeddedView: UIView) {
-        topConstaint = NSLayoutConstraint(item: self, attribute: .top,
-                                          relatedBy: .equal, toItem: embeddedView,
-                                          attribute: .top, multiplier: 1, constant: 0)
-        leadingConstaint = NSLayoutConstraint(item: self, attribute: .leading,
-                                              relatedBy: .equal, toItem: embeddedView,
-                                              attribute: .leading, multiplier: 1, constant: 0)
-        trailingConstaint = NSLayoutConstraint(item: self, attribute: .trailing,
-                                               relatedBy: .equal, toItem: embeddedView,
-                                               attribute: .trailing, multiplier: 1, constant: 0)
-        heightConstaint = NSLayoutConstraint(item: self, attribute: .height,
-                                             relatedBy: .equal, toItem: nil,
-                                             attribute: .notAnAttribute, multiplier: 1, constant: 0)
-        addEmbeddedLayoutConstraint(topConstaint)
-        addEmbeddedLayoutConstraint(leadingConstaint)
-        addEmbeddedLayoutConstraint(trailingConstaint)
-        addEmbeddedLayoutConstraint(heightConstaint)
-    }
-
-    private func addEmbeddedLayoutConstraint(_ layoutConstraint: NSLayoutConstraint?) {
-        if let layoutConstraint {
-            self.addConstraint(layoutConstraint)
-        }
-    }
-
-    private func removeEmbeddedLayoutConstraint(_ layoutConstraint: NSLayoutConstraint?) {
-        if let layoutConstraint {
-            self.removeConstraint(layoutConstraint)
-        }
+        NSLayoutConstraint.activate([
+            embeddedView.topAnchor.constraint(equalTo: topAnchor),
+            embeddedView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            embeddedView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            embeddedView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            heightConstraint
+        ])
     }
 }
 
@@ -170,23 +132,15 @@ extension RoktLayoutUIView: LayoutLoader {
     ///   - injectedView: A closure returning the SwiftUI view to embed.
     public func load<Content>(onSizeChanged: @escaping ((CGFloat) -> Void),
                               injectedView: @escaping () -> Content) where Content: View {
-        cleanupEmbeddedView()
-
+        roktEmbeddedSwiftUIView?.removeFromSuperview()
         let vc = ResizableHostingController(rootView: AnyView(injectedView()))
-        let swiftuiView = vc.view!
-        self.roktEmbeddedSwiftUIView = swiftuiView
+        guard let swiftUIView = vc.view else { return }
 
+        self.roktEmbeddedSwiftUIView = swiftUIView
         parentViewControllers?.addChild(vc)
-        swiftuiView.translatesAutoresizingMaskIntoConstraints = false
-
-        decideTranslatesAutoresizingMask()
-
-        addSubview(swiftuiView)
-
-        self.frame = CGRect(x: self.frame.minX, y: self.frame.minY, width: self.frame.width, height: 0)
-
-        addEmbeddedLayoutConstraints(embeddedView: swiftuiView)
-
+        swiftUIView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(swiftUIView)
+        addEmbeddedLayoutConstraints(embeddedView: swiftUIView)
         vc.didMove(toParent: parentViewControllers)
     }
 
@@ -194,13 +148,7 @@ extension RoktLayoutUIView: LayoutLoader {
     /// - Parameter size: The new height for the embedded view.
     public func updateEmbeddedSize(_ size: CGFloat) {
         if roktEmbeddedSwiftUIView != nil {
-            for cons in self.constraints where cons.firstAttribute == NSLayoutConstraint.Attribute.height {
-                cons.constant = size
-                cons.isActive = true
-            }
-            self.frame = CGRect(x: self.frame.minX, y: self.frame.minY, width: self.frame.width, height: size)
-            roktEmbeddedSwiftUIView?.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: size)
-            latestHeight = size
+            heightConstraint.constant = size
         }
     }
 
