@@ -174,6 +174,23 @@ struct LayoutSchemaComponent: View {
                                   parentWidth: $parentWidth,
                                   parentHeight: $parentHeight,
                                   parentOverride: parentOverride)
+        case .catalogStackedCollection(let model):
+            CatalogStackedCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
+        case .catalogResponseButton(let model):
+            CatalogResponseButtonComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
         default:
             EmptyView()
         }

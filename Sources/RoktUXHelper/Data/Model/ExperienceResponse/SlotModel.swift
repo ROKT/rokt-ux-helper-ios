@@ -32,4 +32,12 @@ struct SlotModel: Decodable {
     func toSlotOfferModel() -> SlotOfferModel {
         return SlotOfferModel(offer: offer)
     }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.instanceGuid = try container.decodeIfPresent(String.self, forKey: .instanceGuid)
+        self.offer = try container.decodeIfPresent(OfferModel.self, forKey: .offer)
+        self.layoutVariant = try container.decodeIfPresent(LayoutVariantModel.self, forKey: .layoutVariant)
+        self.jwtToken = try container.decode(String.self, forKey: .jwtToken)
+    }
 }
