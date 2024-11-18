@@ -110,9 +110,8 @@ struct CatalogStackedCollectionComponent: View {
     }
 
     private func build() -> some View {
-        // `alignment` = children edge alignment in the horizontal direction
-        DynamicStackView(
-            axis: model.template == .column ? .vertical(columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems)) : .horizontal(rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems)),
+        VStack(
+            alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
             ForEach(model.children, id: \.self) { child in
@@ -133,36 +132,6 @@ struct CatalogStackedCollectionComponent: View {
                         stretchChildren: containerStyle?.alignItems == .stretch
                     )
                 )
-            }
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-struct DynamicStackView<V: View>: View {
-    enum Axis {
-        case vertical(HorizontalAlignment)
-        case horizontal(VerticalAlignment)
-    }
-    let axis: Axis
-    let spacing: CGFloat
-    var content: () -> V
-
-    var body: some View {
-        switch axis {
-        case .vertical(let horizontalAlignment):
-            VStack(
-                alignment: horizontalAlignment,
-                spacing: spacing
-            ) {
-                content()
-            }
-        case .horizontal(let verticalAlignment):
-            HStack(
-                alignment: verticalAlignment,
-                spacing: spacing
-            ) {
-                content()
             }
         }
     }

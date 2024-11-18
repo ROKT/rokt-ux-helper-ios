@@ -14,16 +14,11 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
-    enum Template {
-        case column
-        case row
-    }
 
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]
     let defaultStyle: [CatalogStackedCollectionStyles]?
     let accessibilityGrouped: Bool
-    let template: Template
     weak var layoutState: (any LayoutStateRepresenting)?
 
     var imageLoader: ImageLoader? {
@@ -34,13 +29,11 @@ class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdapt
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogStackedCollectionStyles]?,
         accessibilityGrouped: Bool,
-        layoutState: any LayoutStateRepresenting,
-        template: Template
+        layoutState: any LayoutStateRepresenting
     ) {
         self.children = children ?? []
         self.defaultStyle = defaultStyle
         self.accessibilityGrouped = accessibilityGrouped
         self.layoutState = layoutState
-        self.template = template
     }
 }

@@ -12,11 +12,6 @@
 import Foundation
 import DcuiSchema
 
-/**
- - consumer item id
- - bnf data
- */
-
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()

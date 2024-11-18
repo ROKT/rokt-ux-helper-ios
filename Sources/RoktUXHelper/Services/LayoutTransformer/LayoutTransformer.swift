@@ -148,8 +148,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             return .catalogResponseButton(
                 try getCatalogResponseButtonModel(
                     style: model.styles,
-                    children: transformChildren(model.children, slot: slot),
-                    slot: slot
+                    children: transformChildren(model.children, slot: slot)
                 )
             )
         }
@@ -180,15 +179,9 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func transformChildren<T: Codable>(_ layouts: [T]?, slot: SlotOfferModel?) throws -> [LayoutSchemaViewModel]? {
-        guard let layouts else { return nil }
-
-        var children: [LayoutSchemaViewModel] = []
-
-        try layouts.forEach { layout in
-            children.append(try transform(layout, slot: slot))
+        try layouts?.map {
+            try transform($0, slot: slot)
         }
-
-        return children
     }
 
     // attach inner layout into outer layout and transform to UI Model
@@ -521,7 +514,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getCatalogStackedCollectionModel(
-        model: CatalogStackedCollectionModel<LayoutSchemaModel, WhenPredicate>,
+        model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
         slot: SlotOfferModel?,
         accessibilityGrouped: Bool = false
     ) throws -> CatalogStackedCollectionViewModel {
@@ -529,19 +522,17 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         switch model.template {
         case .column(let model):
             return CatalogStackedCollectionViewModel(
-                children: try transformChildren(model.children, slot: slot),
+                children: [.column(try getColumn(model.styles, children: transformChildren(model.children, slot: slot)))],
                 defaultStyle: updateStyles.compactMap {$0.default},
                 accessibilityGrouped: accessibilityGrouped,
-                layoutState: layoutState,
-                template: .column
+                layoutState: layoutState
             )
         case .row(let model):
             return CatalogStackedCollectionViewModel(
-                children: try transformChildren(model.children, slot: slot),
+                children: [.row(try getRow(model.styles, children: transformChildren(model.children, slot: slot)))],
                 defaultStyle: updateStyles.compactMap {$0.default},
                 accessibilityGrouped: accessibilityGrouped,
-                layoutState: layoutState,
-                template: .row
+                layoutState: layoutState
             )
         default:
             throw RoktUXError.experienceResponseMapping
@@ -550,8 +541,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
 
     func getCatalogResponseButtonModel(
         style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
-        children: [LayoutSchemaViewModel]?,
-        slot: SlotOfferModel?
+        children: [LayoutSchemaViewModel]?
     ) throws -> CatalogResponseButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
         return CatalogResponseButtonViewModel(
