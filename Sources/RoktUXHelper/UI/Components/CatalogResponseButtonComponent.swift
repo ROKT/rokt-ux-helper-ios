@@ -214,7 +214,7 @@ struct CatalogResponseButtonComponent: View {
     }
 
     // if height = fixed or percentage, we need to allow the children to expand. `expandsToContainerOnSelfAlign` will let them use maxHeight=.infinity
-    //   since it will only take up its container's finite heigh
+    //   since it will only take up its container's finite height
     // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
     private func shouldExpandToContainerOnSelfAlign() -> Bool {
         guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
@@ -228,7 +228,7 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        print("Catalog response button tapped")
+        print("Catalog response button tapped") // TODO: remove
     }
 
     private func updateStyleState() {
