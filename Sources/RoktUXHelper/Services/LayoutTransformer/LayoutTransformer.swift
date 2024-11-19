@@ -513,7 +513,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                          disabledStyle: updateStyles.compactMap {$0.disabled})
     }
 
-    func getCatalogStackedCollectionModel(
+    private func getCatalogStackedCollectionModel(
         model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
         slot: SlotOfferModel?,
         accessibilityGrouped: Bool = false
@@ -539,7 +539,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         }
     }
 
-    func getCatalogResponseButtonModel(
+    private func getCatalogResponseButtonModel(
         style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
         children: [LayoutSchemaViewModel]?
     ) throws -> CatalogResponseButtonViewModel {
