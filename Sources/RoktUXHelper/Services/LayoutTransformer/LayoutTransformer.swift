@@ -299,7 +299,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, slot: SlotOfferModel?) throws -> DataImageViewModel {
-        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey] // should have only 1 catalogItem at this node
+        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey]
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return DataImageViewModel(image: creativeImage,
                                   defaultStyle: updateStyles.compactMap {$0.default},
@@ -521,8 +521,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     ) throws -> CatalogStackedCollectionViewModel {
         guard let slotOffer = slot?.offer else { throw RoktUXError.experienceResponseMapping }
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        let children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
-            let updatedSlot = SlotOfferModel(
+        var children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
+            var updatedSlot = SlotOfferModel(
                 offer: .init(
                     campaignId: slotOffer.campaignId,
                     creative: slotOffer.creative,
