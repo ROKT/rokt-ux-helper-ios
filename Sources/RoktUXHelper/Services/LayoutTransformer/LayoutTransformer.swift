@@ -299,7 +299,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, slot: SlotOfferModel?) throws -> DataImageViewModel {
-        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey]
+        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey] // should have only 1 catalogItem at this node
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return DataImageViewModel(image: creativeImage,
                                   defaultStyle: updateStyles.compactMap {$0.default},

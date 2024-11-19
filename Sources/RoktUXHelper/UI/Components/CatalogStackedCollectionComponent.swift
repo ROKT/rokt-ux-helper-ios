@@ -109,14 +109,20 @@ struct CatalogStackedCollectionComponent: View {
             .accessibilityElement(children: accessibilityBehavior)
     }
 
+    var axis: DynamicStackView<ForEach<[LayoutSchemaViewModel], LayoutSchemaViewModel, LayoutSchemaComponent>>.Axis {
+        model.isRow ?
+            .vertical(columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems)) :
+            .horizontal(rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems))
+    }
+
     private func build() -> some View {
-        VStack(
-            alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
+        DynamicStackView(
+            axis: axis,
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
             ForEach(model.children, id: \.self) { child in
                 LayoutSchemaComponent(
-                    config: config.updateParent(.column),
+                    config: config.updateParent(model.isRow ? .column : .row),
                     layout: child,
                     parentWidth: $availableWidth,
                     parentHeight: $availableHeight,
