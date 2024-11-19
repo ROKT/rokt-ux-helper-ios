@@ -298,7 +298,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, slot: SlotOfferModel?) throws -> DataImageViewModel {
-        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey]
+        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey]
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return DataImageViewModel(image: creativeImage,
                                   defaultStyle: updateStyles.compactMap {$0.default},
@@ -518,25 +518,31 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         slot: SlotOfferModel?,
         accessibilityGrouped: Bool = false
     ) throws -> CatalogStackedCollectionViewModel {
+        guard let slotOffer = slot?.offer else { throw RoktUXError.experienceResponseMapping }
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        switch model.template {
-        case .column(let model):
-            return CatalogStackedCollectionViewModel(
-                children: [.column(try getColumn(model.styles, children: transformChildren(model.children, slot: slot)))],
-                defaultStyle: updateStyles.compactMap {$0.default},
-                accessibilityGrouped: accessibilityGrouped,
-                layoutState: layoutState
+        var children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
+            var updatedSlot = SlotOfferModel(
+                offer: .init(
+                    campaignId: slotOffer.campaignId,
+                    creative: slotOffer.creative,
+                    catalogItems: [catalogItem]
+                )
             )
-        case .row(let model):
-            return CatalogStackedCollectionViewModel(
-                children: [.row(try getRow(model.styles, children: transformChildren(model.children, slot: slot)))],
-                defaultStyle: updateStyles.compactMap {$0.default},
-                accessibilityGrouped: accessibilityGrouped,
-                layoutState: layoutState
-            )
-        default:
-            throw RoktUXError.experienceResponseMapping
+            switch model.template {
+            case .column(let model):
+                return .column(try getColumn(model.styles, children: transformChildren(model.children, slot: updatedSlot)))
+            case .row(let model):
+                return .row(try getRow(model.styles, children: transformChildren(model.children, slot: updatedSlot)))
+            default:
+                throw RoktUXError.experienceResponseMapping
+            }
         }
+        return CatalogStackedCollectionViewModel(
+            children: children,
+            defaultStyle: updateStyles.compactMap {$0.default},
+            accessibilityGrouped: accessibilityGrouped,
+            layoutState: layoutState
+        )
     }
 
     private func getCatalogResponseButtonModel(

@@ -14,6 +14,7 @@ import Foundation
 struct OfferModel: Codable {
     let campaignId: String?
     let creative: CreativeModel
+    let catalogItems: [CatalogItem]?
 }
 
 struct CreativeModel: Codable {

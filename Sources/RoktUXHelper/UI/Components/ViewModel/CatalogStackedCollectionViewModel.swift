@@ -25,6 +25,16 @@ class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdapt
         layoutState?.imageLoader
     }
 
+    var isRow: Bool {
+        children.allSatisfy {
+            if case let .row(model) = $0 {
+                type(of: model) is RowViewModel
+            } else {
+                false
+            }
+        }
+    }
+
     init(
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogStackedCollectionStyles]?,
