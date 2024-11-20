@@ -137,6 +137,20 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                                      styles: buttonModel.styles,
                                                      children: transformChildren(buttonModel.children,
                                                                                  slot: slot)))
+        case .catalogStackedCollection(let model):
+            return .catalogStackedCollection(
+                try getCatalogStackedCollectionModel(
+                    model: model,
+                    slot: slot
+                )
+            )
+        case .catalogResponseButton(let model):
+            return .catalogResponseButton(
+                try getCatalogResponseButtonModel(
+                    style: model.styles,
+                    children: transformChildren(model.children, slot: slot)
+                )
+            )
         }
     }
 
@@ -165,15 +179,9 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func transformChildren<T: Codable>(_ layouts: [T]?, slot: SlotOfferModel?) throws -> [LayoutSchemaViewModel]? {
-        guard let layouts else { return nil }
-
-        var children: [LayoutSchemaViewModel] = []
-
-        try layouts.forEach { layout in
-            children.append(try transform(layout, slot: slot))
+        try layouts?.map {
+            try transform($0, slot: slot)
         }
-
-        return children
     }
 
     // attach inner layout into outer layout and transform to UI Model
@@ -503,6 +511,48 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                          pressedStyle: updateStyles.compactMap {$0.pressed},
                                          hoveredStyle: updateStyles.compactMap {$0.hovered},
                                          disabledStyle: updateStyles.compactMap {$0.disabled})
+    }
+
+    private func getCatalogStackedCollectionModel(
+        model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
+        slot: SlotOfferModel?,
+        accessibilityGrouped: Bool = false
+    ) throws -> CatalogStackedCollectionViewModel {
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        switch model.template {
+        case .column(let model):
+            return CatalogStackedCollectionViewModel(
+                children: [.column(try getColumn(model.styles, children: transformChildren(model.children, slot: slot)))],
+                defaultStyle: updateStyles.compactMap {$0.default},
+                accessibilityGrouped: accessibilityGrouped,
+                layoutState: layoutState
+            )
+        case .row(let model):
+            return CatalogStackedCollectionViewModel(
+                children: [.row(try getRow(model.styles, children: transformChildren(model.children, slot: slot)))],
+                defaultStyle: updateStyles.compactMap {$0.default},
+                accessibilityGrouped: accessibilityGrouped,
+                layoutState: layoutState
+            )
+        default:
+            throw RoktUXError.experienceResponseMapping
+        }
+    }
+
+    private func getCatalogResponseButtonModel(
+        style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
+        children: [LayoutSchemaViewModel]?
+    ) throws -> CatalogResponseButtonViewModel {
+        let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
+        return CatalogResponseButtonViewModel(
+            children: children,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: updateStyles.compactMap { $0.default },
+            pressedStyle: updateStyles.compactMap { $0.pressed },
+            hoveredStyle: updateStyles.compactMap { $0.hovered },
+            disabledStyle: updateStyles.compactMap { $0.disabled }
+        )
     }
 
     func getProgressIndicator(
