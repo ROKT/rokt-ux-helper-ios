@@ -41,7 +41,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
         XCTAssertEqual(padding, EdgeInsets(top: 29.0, leading: 5.0, bottom: 29.0, trailing: 5.0))
     }
 
-    func test_send_close_event() throws {
+    func test_send_ux_event() throws {
         var closeEventCalled = false
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
