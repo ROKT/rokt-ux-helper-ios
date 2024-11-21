@@ -69,18 +69,13 @@ final class TestDataImageComponent: XCTestCase {
     }
     
     func get_slot() -> SlotModel {
-        return SlotModel(instanceGuid: "",
-                         offer: OfferModel(campaignId: "", creative:
-                                            CreativeModel(referralCreativeId: "",
-                                                          instanceGuid: "",
-                                                          copy: [:],
-                                                          images: ["creativeImage" : CreativeImage(light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
-                                                                                                   dark: nil, alt: "", title: nil)],
-                                                          links: nil,
-                                                          responseOptionsMap: nil, 
-                                                          jwtToken: "creative-token")),
-                         layoutVariant: nil,
-                         jwtToken: "slot-token")
+        SlotModel(instanceGuid: "",
+                  offer: .mock(
+                    images: ["creativeImage" : CreativeImage(light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
+                                                             dark: nil, alt: "", title: nil)],
+                    token: "creative-token"
+                  ),
+                  layoutVariant: nil,
+                  jwtToken: "slot-token")
     }
-    
 }
