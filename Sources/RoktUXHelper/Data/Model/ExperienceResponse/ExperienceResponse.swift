@@ -28,7 +28,7 @@ public class ExperienceResponse: PlacementResponse, PluginResponse {
         try super.init(from: decoder)
     }
 
-    func getPageModel() -> PageModel? {
+    public func getPageModel() -> PageModel? {
         guard let outerLayer = getOuterLayoutSchema(plugins: plugins),
               outerLayer.layout != nil && getAllInnerlayoutSchema(plugins: plugins) != nil
         else { return nil }
