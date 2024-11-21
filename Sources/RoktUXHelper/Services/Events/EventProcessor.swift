@@ -12,6 +12,8 @@
 import Foundation
 import Combine
 
+private let defaultEventBufferDuration: Double = 0.025
+
 @available(iOS 13.0, *)
 protocol EventProcessing {
     var publisher: PassthroughSubject<EventRequest, Never> { get }
@@ -27,7 +29,7 @@ class EventProcessor: EventProcessing {
     private(set) var publisher: PassthroughSubject<EventRequest, Never> = .init()
 
     init(
-        delay: Double = kEventDelay,
+        delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
         integrationType: HelperIntegrationType = .s2s,
         onRoktPlatformEvent: (([String: Any]) -> Void)?

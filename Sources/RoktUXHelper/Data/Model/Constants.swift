@@ -69,10 +69,6 @@ let kErrorCode = "code"
 let kErrorStackTrace = "stackTrace"
 let kErrorSeverity = "severity"
 
-// MARK: - Event Queue
-
-let kEventDelay: Double = 0.25
-
 // MARK: Queue
 
 let kSharedDataItemsQueueLabel = "com.rokt.shareddata.items.queue"
