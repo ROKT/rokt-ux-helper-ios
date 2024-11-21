@@ -27,4 +27,36 @@ struct CatalogItem: Codable {
     let negativeResponseText: String?
     let providerData: String?
     let token: String?
+    
+    init(images: [String : CreativeImage]? = nil,
+         catalogItemId: String? = nil,
+         cartItemId: String? = nil,
+         instanceGuid: String? = nil,
+         title: String? = nil,
+         description: String? = nil,
+         price: Decimal? = nil,
+         originalPrice: Decimal? = nil,
+         originalPriceFormatted: String? = nil,
+         currency: String? = nil,
+         linkedProductId: String? = nil,
+         positiveResponseText: String? = nil,
+         negativeResponseText: String? = nil,
+         providerData: String? = nil,
+         token: String? = nil) {
+        self.images = images
+        self.catalogItemId = catalogItemId
+        self.cartItemId = cartItemId
+        self.instanceGuid = instanceGuid
+        self.title = title
+        self.description = description
+        self.price = price
+        self.originalPrice = originalPrice
+        self.originalPriceFormatted = originalPriceFormatted
+        self.currency = currency
+        self.linkedProductId = linkedProductId
+        self.positiveResponseText = positiveResponseText
+        self.negativeResponseText = negativeResponseText
+        self.providerData = providerData
+        self.token = token
+    }
 }

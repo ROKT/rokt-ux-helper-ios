@@ -521,8 +521,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     ) throws -> CatalogStackedCollectionViewModel {
         guard let slotOffer = slot?.offer else { throw RoktUXError.experienceResponseMapping }
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        var children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
-            var updatedSlot = SlotOfferModel(
+        let children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
+            let updatedSlot = SlotOfferModel(
                 offer: .init(
                     campaignId: slotOffer.campaignId,
                     creative: slotOffer.creative,
@@ -546,7 +546,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         )
     }
 
-    private func getCatalogResponseButtonModel(
+    func getCatalogResponseButtonModel(
         slot: SlotOfferModel?,
         style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
         children: [LayoutSchemaViewModel]?

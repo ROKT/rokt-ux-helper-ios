@@ -328,4 +328,8 @@ class MockUXHelper: UXEventsDelegate {
                  onError: @escaping (String, Error?) -> Void) {
         self.roktEvents.append(.OpenUrl)
     }
+    
+    func onCartItemInstantPurchase(_ layoutId: String?, catalogItem: RoktUXHelper.CatalogItem) {
+        self.roktEvents.append(.CartItemInstantPurchase)
+    }
 }
