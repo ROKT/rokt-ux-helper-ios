@@ -228,7 +228,8 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        print("Catalog response button tapped") // TODO: remove
+        model.cartItemInstantPurchase()
+        model.layoutState?.actionCollection[.close](nil)
     }
 
     private func updateStyleState() {
