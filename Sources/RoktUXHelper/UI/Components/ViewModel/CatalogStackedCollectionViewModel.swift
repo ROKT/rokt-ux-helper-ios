@@ -24,7 +24,6 @@ class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdapt
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader
     }
-
     init(
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogStackedCollectionStyles]?,

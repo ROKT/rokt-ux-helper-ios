@@ -358,18 +358,9 @@ final class TestLayoutTransformer: XCTestCase {
     
     func get_slot(responseOptionList: ResponseOptionList?,
                   layoutVariant: CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? = nil) -> SlotModel {
-        return SlotModel(
+        SlotModel(
             instanceGuid: "",
-            offer: OfferModel(
-                campaignId: "",
-                creative: CreativeModel(referralCreativeId: "",
-                                        instanceGuid: "",
-                                        copy: [:],
-                                        images: nil,
-                                        links: [:],
-                                        responseOptionsMap: responseOptionList,
-                                        jwtToken: "creative-token")
-            ),
+            offer: .mock(responseOptionList: responseOptionList, token: "creative-token"),
             layoutVariant: layoutVariant == nil ? nil : LayoutVariantModel(
                 layoutVariantSchema: .creativeResponse(layoutVariant!), moduleName: ""
             ),

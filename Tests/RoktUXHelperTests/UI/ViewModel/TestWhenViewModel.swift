@@ -803,7 +803,15 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     private func get_slot_offer(copy: [String: String]) -> SlotOfferModel {
-        return SlotOfferModel(offer: OfferModel(campaignId: "Campaign1", creative: CreativeModel(referralCreativeId: "referralCreativeId1", instanceGuid: "instanceGuid", copy: copy, images: nil, links: nil, responseOptionsMap: nil, jwtToken: "jwtToken1")))
+        SlotOfferModel(
+            offer: .mock(
+                campaignId: "campaign1",
+                referralCreativeId: "referralCreativeId1",
+                instanceGuid: "instanceGuid",
+                copy: copy,
+                token: "jwtToken1"
+            )
+        )
     }
     
     func get_shared_data_with_breakpoints() -> BreakPoint {
