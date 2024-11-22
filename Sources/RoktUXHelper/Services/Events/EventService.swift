@@ -170,6 +170,9 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
     
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        sendEvent(.SignalCartItemInstantPurchaseInitiated,
+                  parentGuid: catalogItem.instanceGuid ?? "",
+                  jwtToken: catalogItem.token ?? "")
         uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
     }
 
