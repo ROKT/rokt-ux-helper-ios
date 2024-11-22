@@ -12,10 +12,10 @@
 import Foundation
 import DcuiSchema
 
-struct PageModel {
-    let pageId: String?
-    let sessionId: String
-    let pageInstanceGuid: String
+public struct PageModel {
+    public let pageId: String?
+    public let sessionId: String
+    public let pageInstanceGuid: String
     let layoutPlugins: [LayoutPlugin]?
     var startDate: Date = Date()
     var responseReceivedDate: Date = Date()
