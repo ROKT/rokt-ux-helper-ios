@@ -21,7 +21,7 @@ public struct EventNameValue: Codable, Hashable, Equatable {
         self.value = value
     }
 
-    func getDictionaty() -> [String: String] {
+    public func getDictionary() -> [String: String] {
         var dictionary = [String: String]()
         dictionary[BE_NAME] = self.name
         dictionary[BE_VALUE] = self.value

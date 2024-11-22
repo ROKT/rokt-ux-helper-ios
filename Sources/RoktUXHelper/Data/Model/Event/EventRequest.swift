@@ -96,7 +96,7 @@ public struct RoktEventRequest: Codable, Hashable {
     }
 
     private func getNameValueDictionary(_ nameValues: [EventNameValue]) -> [[String: Any]] {
-        return nameValues.map { $0.getDictionaty()}
+        return nameValues.map { $0.getDictionary()}
     }
 
     private static func convertDictionaryToNameValue(_ from: [String: String]) -> [EventNameValue] {
