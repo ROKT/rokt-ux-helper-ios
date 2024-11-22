@@ -19,8 +19,8 @@ public struct RoktEventRequest: Codable, Hashable {
     public let eventType: EventType
     public let parentGuid: String
     public let eventTime: String
-    public let eventData: [EventNameValue]
-    public let metadata: [EventNameValue]
+    public let eventData: [RoktEventNameValue]
+    public let metadata: [RoktEventNameValue]
     public let pageInstanceGuid: String
     public let jwtToken: String
 
@@ -42,8 +42,8 @@ public struct RoktEventRequest: Codable, Hashable {
         eventType = try container.decode(EventType.self, forKey: .eventType)
         parentGuid = try container.decode(String.self, forKey: .parentGuid)
         eventTime = try container.decode(String.self, forKey: .eventTime)
-        eventData = try container.decode([EventNameValue].self, forKey: .eventData)
-        metadata = try container.decode([EventNameValue].self, forKey: .metadata)
+        eventData = try container.decode([RoktEventNameValue].self, forKey: .eventData)
+        metadata = try container.decode([RoktEventNameValue].self, forKey: .metadata)
         pageInstanceGuid = try container.decode(String.self, forKey: .pageInstanceGuid)
         jwtToken = try container.decode(String.self, forKey: .jwtToken)
         uuid = try container.decode(String.self, forKey: .uuid)
@@ -54,7 +54,7 @@ public struct RoktEventRequest: Codable, Hashable {
         eventType: EventType,
         parentGuid: String,
         eventTime: Date = Date(),
-        extraMetadata: [EventNameValue] = [EventNameValue](),
+        extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [String: String](),
         pageInstanceGuid: String = "",
         jwtToken: String
@@ -66,9 +66,9 @@ public struct RoktEventRequest: Codable, Hashable {
         self.eventTime = EventDateFormatter.getDateString(eventTime)
         self.eventData = RoktEventRequest.convertDictionaryToNameValue(eventData)
         self.pageInstanceGuid = pageInstanceGuid
-        self.metadata = [EventNameValue(name: BE_CLIENT_TIME_STAMP,
+        self.metadata = [RoktEventNameValue(name: BE_CLIENT_TIME_STAMP,
                                         value: EventDateFormatter.getDateString(eventTime)),
-                         EventNameValue(name: BE_CAPTURE_METHOD,
+                         RoktEventNameValue(name: BE_CAPTURE_METHOD,
                                         value: kClientProvided)] + extraMetadata
         self.jwtToken = jwtToken
     }
@@ -95,11 +95,11 @@ public struct RoktEventRequest: Codable, Hashable {
         return "RoktEventLog: \(jsonString)"
     }
 
-    private func getNameValueDictionary(_ nameValues: [EventNameValue]) -> [[String: Any]] {
+    private func getNameValueDictionary(_ nameValues: [RoktEventNameValue]) -> [[String: Any]] {
         return nameValues.map { $0.getDictionary()}
     }
 
-    private static func convertDictionaryToNameValue(_ from: [String: String]) -> [EventNameValue] {
-        return from.map { EventNameValue(name: $0.key, value: $0.value)}
+    private static func convertDictionaryToNameValue(_ from: [String: String]) -> [RoktEventNameValue] {
+        return from.map { RoktEventNameValue(name: $0.key, value: $0.value)}
     }
 }

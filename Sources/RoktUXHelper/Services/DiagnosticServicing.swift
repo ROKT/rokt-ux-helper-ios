@@ -26,7 +26,7 @@ protocol DiagnosticServicing: AnyObject {
     func sendEvent(
         _ eventType: EventType,
         parentGuid: String,
-        extraMetadata: [EventNameValue],
+        extraMetadata: [RoktEventNameValue],
         eventData: [String: String],
         jwtToken: String
     )

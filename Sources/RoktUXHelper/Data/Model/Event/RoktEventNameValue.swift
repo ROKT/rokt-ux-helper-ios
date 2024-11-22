@@ -12,7 +12,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
-public struct EventNameValue: Codable, Hashable, Equatable {
+public struct RoktEventNameValue: Codable, Hashable, Equatable {
     public let name: String
     public let value: String
 

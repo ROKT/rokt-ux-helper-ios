@@ -16,7 +16,7 @@ struct ProcessedEvent: Hashable, Equatable {
     let parentGuid: String
     let eventType: EventType
     let pageInstanceGuid: String
-    let eventData: [EventNameValue]
+    let eventData: [RoktEventNameValue]
 }
 
 extension ProcessedEvent {

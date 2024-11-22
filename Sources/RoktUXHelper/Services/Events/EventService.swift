@@ -137,7 +137,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     func sendEvent(
         _ eventType: EventType,
         parentGuid: String,
-        extraMetadata: [EventNameValue] = [EventNameValue](),
+        extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [:],
         jwtToken: String
     ) {
@@ -182,31 +182,31 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     private func sendPluginImpressionEvent() {
         var metaData = [
-            EventNameValue(name: BE_PAGE_SIGNAL_LOAD,
+            RoktEventNameValue(name: BE_PAGE_SIGNAL_LOAD,
                            value: EventDateFormatter.getDateString(startDate)),
-            EventNameValue(name: BE_PAGE_RENDER_ENGINE,
+            RoktEventNameValue(name: BE_PAGE_RENDER_ENGINE,
                            value: BE_RENDER_ENGINE_LAYOUTS),
-            EventNameValue(name: BE_PAGE_SIGNAL_COMPLETE,
+            RoktEventNameValue(name: BE_PAGE_SIGNAL_COMPLETE,
                            value: EventDateFormatter.getDateString(responseReceivedDate)),
-            EventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
+            RoktEventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
                            value: EventDateFormatter.getDateString(DateHandler.currentDate())),
-            EventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
+            RoktEventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
                            value: pageInstanceGuid)
         ]
         pageId.map {
             metaData.append(
-                EventNameValue(name: BE_VIEW_NAME_KEY, value: $0)
+                RoktEventNameValue(name: BE_VIEW_NAME_KEY, value: $0)
             )
         }
         pluginId.map {
             metaData.append(
-                EventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
+                RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
                                value: $0)
             )
         }
         pluginName.map {
             metaData.append(
-                EventNameValue(name: BE_TIMINGS_PLUGIN_NAME_KEY,
+                RoktEventNameValue(name: BE_TIMINGS_PLUGIN_NAME_KEY,
                                value: $0)
             )
         }
@@ -218,36 +218,36 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     private func sendDismissalEndMessageEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kEndMessage)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kEndMessage)],
                   jwtToken: pluginConfigJWTToken)
     }
 
     private func sendDismissalCollapsedEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kCollapsed)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kCollapsed)],
                   jwtToken: pluginConfigJWTToken)
     }
 
     private func sendDismissalCloseEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kCloseButton)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kCloseButton)],
                   jwtToken: pluginConfigJWTToken)
     }
     private func sendDismissalPartnerTriggeredEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kPartnerTriggered)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kPartnerTriggered)],
                   jwtToken: pluginConfigJWTToken)
     }
 
     private func sendDismissalNoMoreOfferEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kNoMoreOfferToShow)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kNoMoreOfferToShow)],
                   jwtToken: pluginConfigJWTToken)
     }
 
     private func sendDefaultDismissEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
-                  extraMetadata: [EventNameValue(name: kInitiator, value: kDismissed)],
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kDismissed)],
                   jwtToken: pluginConfigJWTToken)
     }
 

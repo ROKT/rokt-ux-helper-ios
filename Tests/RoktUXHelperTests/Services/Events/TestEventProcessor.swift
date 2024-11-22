@@ -46,12 +46,12 @@ final class TestEventProcessor: XCTestCase {
                 }
                 XCTAssertEqual(request.eventData, [.init(name: "key", value: "value \(request.eventType.rawValue)")])
                 let metaData = [
-                    EventNameValue(name: BE_CLIENT_TIME_STAMP,
-                                   value: EventDateFormatter.getDateString(date)),
-                    EventNameValue(name: BE_CAPTURE_METHOD,
-                                   value: kClientProvided),
-                    EventNameValue(name: "name", 
-                                   value: "meta \(request.eventType.rawValue)")
+                    RoktEventNameValue(name: BE_CLIENT_TIME_STAMP,
+                                       value: EventDateFormatter.getDateString(date)),
+                    RoktEventNameValue(name: BE_CAPTURE_METHOD,
+                                       value: kClientProvided),
+                    RoktEventNameValue(name: "name",
+                                       value: "meta \(request.eventType.rawValue)")
                 ]
                 XCTAssertEqual(request.metadata, metaData)
             }
@@ -181,7 +181,7 @@ final class TestEventProcessor: XCTestCase {
     private func mockEvent(
         eventType: EventType,
         date: Date,
-        extraMetadata: [EventNameValue] = [],
+        extraMetadata: [RoktEventNameValue] = [],
         eventData: [String: String] = [:]
     ) -> RoktEventRequest {
         .init(
