@@ -16,17 +16,17 @@ struct ProcessedEvent: Hashable, Equatable {
     let parentGuid: String
     let eventType: EventType
     let pageInstanceGuid: String
-    let attributes: [EventNameValue]
+    let eventData: [RoktEventNameValue]
 }
 
 extension ProcessedEvent {
-    init(_ event: EventRequest) {
+    init(_ event: RoktEventRequest) {
         self = .init(
             sessionId: event.sessionId,
             parentGuid: event.parentGuid,
             eventType: event.eventType,
             pageInstanceGuid: event.pageInstanceGuid,
-            attributes: event.attributes
+            eventData: event.eventData
         )
     }
 }

@@ -17,12 +17,12 @@ import XCTest
 @available(iOS 13, *)
 final class TestDistributionViewModel: XCTestCase {
     
-    var events = [EventRequest]()
+    var events = [RoktEventRequest]()
     var eventService: EventService!
     var stubUXHelper: MockUXHelper!
     var layoutState: LayoutState = LayoutState()
     override func setUpWithError() throws {
-        events = [EventRequest]()
+        events = [RoktEventRequest]()
         eventService = get_mock_event_processor { [weak self] event in
             self?.events.append(event)
         }
