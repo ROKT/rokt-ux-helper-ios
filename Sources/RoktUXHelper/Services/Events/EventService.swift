@@ -201,13 +201,13 @@ class EventService: Hashable, EventDiagnosticServicing {
         pluginId.map {
             metaData.append(
                 RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
-                               value: $0)
+                                   value: $0)
             )
         }
         pluginName.map {
             metaData.append(
                 RoktEventNameValue(name: BE_TIMINGS_PLUGIN_NAME_KEY,
-                               value: $0)
+                                   value: $0)
             )
         }
         sendEvent(.SignalImpression,
