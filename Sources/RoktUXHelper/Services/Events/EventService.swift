@@ -183,15 +183,15 @@ class EventService: Hashable, EventDiagnosticServicing {
     private func sendPluginImpressionEvent() {
         var metaData = [
             RoktEventNameValue(name: BE_PAGE_SIGNAL_LOAD,
-                           value: EventDateFormatter.getDateString(startDate)),
+                               value: EventDateFormatter.getDateString(startDate)),
             RoktEventNameValue(name: BE_PAGE_RENDER_ENGINE,
-                           value: BE_RENDER_ENGINE_LAYOUTS),
+                               value: BE_RENDER_ENGINE_LAYOUTS),
             RoktEventNameValue(name: BE_PAGE_SIGNAL_COMPLETE,
-                           value: EventDateFormatter.getDateString(responseReceivedDate)),
+                               value: EventDateFormatter.getDateString(responseReceivedDate)),
             RoktEventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
-                           value: EventDateFormatter.getDateString(DateHandler.currentDate())),
+                               value: EventDateFormatter.getDateString(DateHandler.currentDate())),
             RoktEventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
-                           value: pageInstanceGuid)
+                               value: pageInstanceGuid)
         ]
         pageId.map {
             metaData.append(
