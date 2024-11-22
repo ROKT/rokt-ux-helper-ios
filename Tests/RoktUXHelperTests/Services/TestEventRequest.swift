@@ -83,7 +83,7 @@ class TestEventRequest: XCTestCase {
         XCTAssertEqual(params[BE_PARENT_GUID_KEY] as! String, "parentGuid")
         XCTAssertEqual(params[BE_PAGE_INSTANCE_GUID_KEY] as! String, "page")
         XCTAssertEqual(params[BE_EVENT_TYPE_KEY] as! String, EventType.SignalImpression.rawValue)
-        XCTAssertNotNil(params[BE_ATTRIBUTES_KEY])
+        XCTAssertNotNil(params[BE_EVENT_DATA_KEY])
         XCTAssertNotNil(params[BE_INSTANCE_GUID])
         XCTAssertNotNil(params[BE_METADATA_KEY])
     }

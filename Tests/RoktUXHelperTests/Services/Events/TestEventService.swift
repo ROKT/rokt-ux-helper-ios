@@ -220,9 +220,9 @@ final class TestEventService: XCTestCase {
                                                       eventHandler: { event in
             switch event.eventType {
             case .SignalSdkDiagnostic:
-                XCTAssertEqual(event.attributes.first(where: {$0.name == "code" })?.value, "error message")
-                XCTAssertEqual(event.attributes.first(where: { $0.name == "stackTrace" })?.value, "stack")
-                XCTAssertEqual(event.attributes.first(where: { $0.name == "severity" })?.value, "ERROR")
+                XCTAssertEqual(event.eventData.first(where: {$0.name == "code" })?.value, "error message")
+                XCTAssertEqual(event.eventData.first(where: { $0.name == "stackTrace" })?.value, "stack")
+                XCTAssertEqual(event.eventData.first(where: { $0.name == "severity" })?.value, "ERROR")
                 expectation.fulfill()
             default:
                 XCTFail("Should not be here")
@@ -240,9 +240,9 @@ final class TestEventService: XCTestCase {
                                                       eventHandler: { event in
             switch event.eventType {
             case .SignalSdkDiagnostic:
-                XCTAssertEqual(event.attributes.first(where: {$0.name == "code" })?.value, "[VIEW]")
-                XCTAssertEqual(event.attributes.first(where: { $0.name == "stackTrace" })?.value, "Font family not found: Arial")
-                XCTAssertEqual(event.attributes.first(where: { $0.name == "severity" })?.value, "ERROR")
+                XCTAssertEqual(event.eventData.first(where: {$0.name == "code" })?.value, "[VIEW]")
+                XCTAssertEqual(event.eventData.first(where: { $0.name == "stackTrace" })?.value, "Font family not found: Arial")
+                XCTAssertEqual(event.eventData.first(where: { $0.name == "severity" })?.value, "ERROR")
                 expectation.fulfill()
             default:
                 XCTFail("Should not be here")

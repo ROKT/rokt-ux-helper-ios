@@ -26,7 +26,7 @@ extension ProcessedEvent {
             parentGuid: event.parentGuid,
             eventType: event.eventType,
             pageInstanceGuid: event.pageInstanceGuid,
-            attributes: event.attributes
+            attributes: event.eventData
         )
     }
 }

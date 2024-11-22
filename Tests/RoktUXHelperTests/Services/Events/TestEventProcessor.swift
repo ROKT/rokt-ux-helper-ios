@@ -44,7 +44,7 @@ final class TestEventProcessor: XCTestCase {
                     XCTFail("fail with unwrapping EventRequest")
                     return
                 }
-                XCTAssertEqual(request.attributes, [.init(name: "key", value: "value \(request.eventType.rawValue)")])
+                XCTAssertEqual(request.eventData, [.init(name: "key", value: "value \(request.eventType.rawValue)")])
                 let metaData = [
                     EventNameValue(name: BE_CLIENT_TIME_STAMP,
                                    value: EventDateFormatter.getDateString(date)),
@@ -64,7 +64,7 @@ final class TestEventProcessor: XCTestCase {
                     eventType: $0,
                     date: date,
                     extraMetadata: [.init(name: "name", value: "meta \($0.rawValue)")],
-                    attributes: ["key": "value \($0.rawValue)"]
+                    eventData: ["key": "value \($0.rawValue)"]
                 )
             )
         }
@@ -98,7 +98,7 @@ final class TestEventProcessor: XCTestCase {
                     eventType: $0,
                     date: date,
                     extraMetadata: [.init(name: "name", value: "meta \($0.rawValue)")],
-                    attributes: ["key": "value \($0.rawValue)"]
+                    eventData: ["key": "value \($0.rawValue)"]
                 )
             )
         }
@@ -152,9 +152,9 @@ final class TestEventProcessor: XCTestCase {
         sut.handle(event: mockEvent(eventType: .SignalViewed, date: date))
         sut.handle(event: mockEvent(eventType: .SignalViewed, date: date + 10))
         
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, attributes: ["key": "value"]))
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, attributes: ["key": "value"]))
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, attributes: ["key2": "value2"]))
+        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key": "value"]))
+        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key": "value"]))
+        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key2": "value2"]))
         
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: date, extraMetadata: [.init(name: "name", value: "value")]))
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: date, extraMetadata: [.init(name: "name2", value: "value2")]))
@@ -164,7 +164,7 @@ final class TestEventProcessor: XCTestCase {
         XCTAssertEqual(receivedPayload?[0].eventType, .SignalViewed)
         XCTAssertEqual(receivedPayload?[1].eventType, .SignalActivation)
         XCTAssertEqual(receivedPayload?[2].eventType, .SignalActivation)
-        XCTAssertEqual(receivedPayload?[2].attributes, [.init(name: "key2", value: "value2")])
+        XCTAssertEqual(receivedPayload?[2].eventData, [.init(name: "key2", value: "value2")])
         
         XCTAssertEqual(receivedPayload?[3].eventType, .SignalResponse)
     }
@@ -182,7 +182,7 @@ final class TestEventProcessor: XCTestCase {
         eventType: EventType,
         date: Date,
         extraMetadata: [EventNameValue] = [],
-        attributes: [String: String] = [:]
+        eventData: [String: String] = [:]
     ) -> EventRequest {
         .init(
             sessionId: "sessionId",
@@ -190,7 +190,7 @@ final class TestEventProcessor: XCTestCase {
             parentGuid: "parentGuid",
             eventTime: date,
             extraMetadata: extraMetadata,
-            attributes: attributes,
+            eventData: eventData,
             pageInstanceGuid: "pageInstanceGuid",
             jwtToken: "token"
         )

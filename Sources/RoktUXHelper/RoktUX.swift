@@ -420,7 +420,7 @@ public class RoktUX: UXEventsDelegate {
                 sessionId: sessionId ?? "",
                 eventType: .SignalSdkDiagnostic,
                 parentGuid: "",
-                attributes: [
+                eventData: [
                     kErrorCode: code ?? "",
                     kErrorStackTrace: callStack ?? "",
                     kErrorSeverity: severity.rawValue

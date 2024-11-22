@@ -18,7 +18,7 @@ let BE_HEADER_PAGE_INSTANCE_GUID_KEY = "rokt-page-instance-guid"
 
 // MARK: - API keys
 
-let BE_ATTRIBUTES_KEY = "attributes"
+let BE_EVENT_DATA_KEY = "eventData"
 let BE_VIEW_NAME_KEY = "pageIdentifier"
 let BE_SESSION_ID_KEY = "sessionId"
 let BE_PAGE_INSTANCE_GUID_KEY = "pageInstanceGuid"

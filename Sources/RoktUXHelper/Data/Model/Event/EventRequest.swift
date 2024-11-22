@@ -19,7 +19,7 @@ public struct EventRequest: Codable, Hashable {
     public let eventType: EventType
     public let parentGuid: String
     public let eventTime: String
-    public let attributes: [EventNameValue]
+    public let eventData: [EventNameValue]
     public let metadata: [EventNameValue]
     public let pageInstanceGuid: String
     public let jwtToken: String
@@ -30,7 +30,7 @@ public struct EventRequest: Codable, Hashable {
         case eventType
         case parentGuid
         case eventTime
-        case attributes
+        case eventData
         case metadata
         case pageInstanceGuid
         case jwtToken = "token"
@@ -42,7 +42,7 @@ public struct EventRequest: Codable, Hashable {
         eventType = try container.decode(EventType.self, forKey: .eventType)
         parentGuid = try container.decode(String.self, forKey: .parentGuid)
         eventTime = try container.decode(String.self, forKey: .eventTime)
-        attributes = try container.decode([EventNameValue].self, forKey: .attributes)
+        eventData = try container.decode([EventNameValue].self, forKey: .eventData)
         metadata = try container.decode([EventNameValue].self, forKey: .metadata)
         pageInstanceGuid = try container.decode(String.self, forKey: .pageInstanceGuid)
         jwtToken = try container.decode(String.self, forKey: .jwtToken)
@@ -55,7 +55,7 @@ public struct EventRequest: Codable, Hashable {
         parentGuid: String,
         eventTime: Date = Date(),
         extraMetadata: [EventNameValue] = [EventNameValue](),
-        attributes: [String: String] = [String: String](),
+        eventData: [String: String] = [String: String](),
         pageInstanceGuid: String = "",
         jwtToken: String
     ) {
@@ -64,7 +64,7 @@ public struct EventRequest: Codable, Hashable {
         self.eventType = eventType
         self.parentGuid = parentGuid
         self.eventTime = EventDateFormatter.getDateString(eventTime)
-        self.attributes = EventRequest.convertDictionaryToNameValue(attributes)
+        self.eventData = EventRequest.convertDictionaryToNameValue(eventData)
         self.pageInstanceGuid = pageInstanceGuid
         self.metadata = [EventNameValue(name: BE_CLIENT_TIME_STAMP,
                                         value: EventDateFormatter.getDateString(eventTime)),
@@ -84,7 +84,7 @@ public struct EventRequest: Codable, Hashable {
             BE_PAGE_INSTANCE_GUID_KEY: pageInstanceGuid,
             BE_EVENT_TYPE_KEY: eventType.rawValue,
             BE_METADATA_KEY: getNameValueDictionary(metadata),
-            BE_ATTRIBUTES_KEY: getNameValueDictionary(attributes)
+            BE_EVENT_DATA_KEY: getNameValueDictionary(eventData)
         ]
 
         guard let theJSONData = try? JSONSerialization.data(withJSONObject: params,

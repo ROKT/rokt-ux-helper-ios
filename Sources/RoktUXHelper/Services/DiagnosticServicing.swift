@@ -27,7 +27,7 @@ protocol DiagnosticServicing: AnyObject {
         _ eventType: EventType,
         parentGuid: String,
         extraMetadata: [EventNameValue],
-        attributes: [String: String],
+        eventData: [String: String],
         jwtToken: String
     )
 
@@ -52,7 +52,7 @@ extension DiagnosticServicing {
             .SignalSdkDiagnostic,
             parentGuid: pluginInstanceGuid,
             extraMetadata: [],
-            attributes: [
+            eventData: [
                 kErrorCode: message,
                 kErrorStackTrace: callStack,
                 kErrorSeverity: severity.rawValue

@@ -138,7 +138,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         _ eventType: EventType,
         parentGuid: String,
         extraMetadata: [EventNameValue] = [EventNameValue](),
-        attributes: [String: String] = [:],
+        eventData: [String: String] = [:],
         jwtToken: String
     ) {
         processor.handle(
@@ -147,7 +147,7 @@ class EventService: Hashable, EventDiagnosticServicing {
                 eventType: eventType,
                 parentGuid: parentGuid,
                 extraMetadata: extraMetadata,
-                attributes: attributes,
+                eventData: eventData,
                 pageInstanceGuid: pageInstanceGuid,
                 jwtToken: jwtToken
             )
