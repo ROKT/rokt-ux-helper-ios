@@ -481,4 +481,19 @@ public class RoktUX: UXEventsDelegate {
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))
     }
+    
+    func onCartItemInstantPurchase(_ layoutId: String?, catalogItem: CatalogItem) {
+        onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice))
+    }
 }

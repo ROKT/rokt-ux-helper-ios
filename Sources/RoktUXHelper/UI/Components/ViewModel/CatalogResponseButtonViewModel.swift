@@ -15,6 +15,7 @@ import DcuiSchema
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
+    let catalogItem: CatalogItem?
     var children: [LayoutSchemaViewModel]?
     weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
@@ -27,13 +28,15 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let hoveredStyle: [CatalogResponseButtonStyles]?
     let disabledStyle: [CatalogResponseButtonStyles]?
 
-    init(children: [LayoutSchemaViewModel]?,
+    init(catalogItem: CatalogItem?,
+         children: [LayoutSchemaViewModel]?,
          layoutState: (any LayoutStateRepresenting)?,
          eventService: EventDiagnosticServicing?,
          defaultStyle: [CatalogResponseButtonStyles]?,
          pressedStyle: [CatalogResponseButtonStyles]?,
          hoveredStyle: [CatalogResponseButtonStyles]?,
          disabledStyle: [CatalogResponseButtonStyles]?) {
+        self.catalogItem = catalogItem
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
@@ -41,5 +44,17 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
+    }
+    
+    func cartItemInstantPurchase() {
+        if let catalogItem {
+            eventService?.cartItemInstantPurchase(catalogItem: catalogItem)
+        }
+        sendCloseEvent()
+    }
+    
+    private func sendCloseEvent() {
+        eventService?.dismissOption = .defaultDismiss
+        eventService?.sendDismissalEvent()
     }
 }

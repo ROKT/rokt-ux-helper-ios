@@ -271,6 +271,13 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
+    
+    enum CatalogResponseButtonData {
+        static func catalogResponseButton() -> CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_response")
+            return try! JSONDecoder().decode(CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
 
     @available(iOS 13, *)
     enum PageModelData {

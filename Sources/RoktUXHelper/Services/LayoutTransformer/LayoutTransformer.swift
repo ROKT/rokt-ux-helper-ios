@@ -147,6 +147,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         case .catalogResponseButton(let model):
             return .catalogResponseButton(
                 try getCatalogResponseButtonModel(
+                    slot: slot,
                     style: model.styles,
                     children: transformChildren(model.children, slot: slot)
                 )
@@ -520,8 +521,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     ) throws -> CatalogStackedCollectionViewModel {
         guard let slotOffer = slot?.offer else { throw RoktUXError.experienceResponseMapping }
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        var children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
-            var updatedSlot = SlotOfferModel(
+        let children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
+            let updatedSlot = SlotOfferModel(
                 offer: .init(
                     campaignId: slotOffer.campaignId,
                     creative: slotOffer.creative,
@@ -545,12 +546,14 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         )
     }
 
-    private func getCatalogResponseButtonModel(
+    func getCatalogResponseButtonModel(
+        slot: SlotOfferModel?,
         style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
         children: [LayoutSchemaViewModel]?
     ) throws -> CatalogResponseButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
         return CatalogResponseButtonViewModel(
+            catalogItem: slot?.offer?.catalogItems?.first,
             children: children,
             layoutState: layoutState,
             eventService: eventService,

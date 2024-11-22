@@ -30,4 +30,6 @@ protocol UXEventsDelegate: AnyObject {
                  type: OpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void)
+    
+    func onCartItemInstantPurchase(_ layoutId: String?, catalogItem: CatalogItem)
 }

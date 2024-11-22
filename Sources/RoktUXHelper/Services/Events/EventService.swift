@@ -168,6 +168,10 @@ class EventService: Hashable, EventDiagnosticServicing {
             }
         })
     }
+    
+    func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
+    }
 
     private func canOpenUrl(_ url: URL) {
         if !UIApplication.shared.canOpenURL(url) {
