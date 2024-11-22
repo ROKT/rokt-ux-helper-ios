@@ -59,7 +59,7 @@ func get_mock_event_processor(startDate: Date = Date(),
                               responseReceivedDate: Date = Date(),
                               uxEventDelegate: UXEventsDelegate = MockUXHelper(),
                               useDiagnosticEvents: Bool = false,
-                              eventHandler: @escaping (EventRequest) -> Void = { _ in }) -> EventService {
+                              eventHandler: @escaping (RoktEventRequest) -> Void = { _ in }) -> EventService {
     return EventService(pageId: mockPageId,
                         pageInstanceGuid: mockPageInstanceGuid,
                         sessionId: "session",

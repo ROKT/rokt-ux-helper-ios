@@ -26,8 +26,8 @@ protocol DiagnosticServicing: AnyObject {
     func sendEvent(
         _ eventType: EventType,
         parentGuid: String,
-        extraMetadata: [EventNameValue],
-        attributes: [String: String],
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
         jwtToken: String
     )
 
@@ -52,7 +52,7 @@ extension DiagnosticServicing {
             .SignalSdkDiagnostic,
             parentGuid: pluginInstanceGuid,
             extraMetadata: [],
-            attributes: [
+            eventData: [
                 kErrorCode: message,
                 kErrorStackTrace: callStack,
                 kErrorSeverity: severity.rawValue

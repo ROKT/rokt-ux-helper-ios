@@ -45,7 +45,7 @@ extension TestPlaceHolder {
 
     static func make(
         layoutSettings: LayoutSettings? = nil,
-        eventHandler: @escaping ((EventRequest) -> Void) = { _ in },
+        eventHandler: @escaping ((RoktEventRequest) -> Void) = { _ in },
         eventDelegate: UXEventsDelegate = MockUXHelper(),
         layoutMaker: (LayoutState, EventService) throws -> LayoutSchemaViewModel
     ) throws -> Self {
