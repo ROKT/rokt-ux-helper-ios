@@ -13,7 +13,7 @@
 
 import Foundation
 
-public struct EventRequest: Codable, Hashable {
+public struct RoktEventRequest: Codable, Hashable {
     public let uuid: String
     public let sessionId: String
     public let eventType: EventType
@@ -64,7 +64,7 @@ public struct EventRequest: Codable, Hashable {
         self.eventType = eventType
         self.parentGuid = parentGuid
         self.eventTime = EventDateFormatter.getDateString(eventTime)
-        self.eventData = EventRequest.convertDictionaryToNameValue(eventData)
+        self.eventData = RoktEventRequest.convertDictionaryToNameValue(eventData)
         self.pageInstanceGuid = pageInstanceGuid
         self.metadata = [EventNameValue(name: BE_CLIENT_TIME_STAMP,
                                         value: EventDateFormatter.getDateString(eventTime)),

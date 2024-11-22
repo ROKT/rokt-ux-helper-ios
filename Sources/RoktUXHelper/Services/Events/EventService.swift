@@ -142,7 +142,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         jwtToken: String
     ) {
         processor.handle(
-            event: EventRequest(
+            event: RoktEventRequest(
                 sessionId: sessionId,
                 eventType: eventType,
                 parentGuid: parentGuid,

@@ -16,14 +16,14 @@ import XCTest
 
 @available(iOS 13, *)
 final class TestEventService: XCTestCase {
-    var events = [EventRequest]()
+    var events = [RoktEventRequest]()
     var errors = [String]()
     let startDate = Date()
     let responseReceivedDate = Date()
     var stubUXHelper: MockUXHelper!
 
     override func setUpWithError() throws {
-        events = [EventRequest]()
+        events = [RoktEventRequest]()
         self.stubUXHelper = MockUXHelper()
     }
 

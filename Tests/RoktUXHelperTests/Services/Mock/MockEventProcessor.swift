@@ -15,14 +15,14 @@ import Combine
 
 @available(iOS 13.0, *)
 class MockEventProcessor: EventProcessing {
-    var publisher: PassthroughSubject<EventRequest, Never> = .init()
-    var handler: ((EventRequest) -> Void)?
+    var publisher: PassthroughSubject<RoktEventRequest, Never> = .init()
+    var handler: ((RoktEventRequest) -> Void)?
     
-    init(handler: ((EventRequest) -> Void)? = nil) {
+    init(handler: ((RoktEventRequest) -> Void)? = nil) {
         self.handler = handler
     }
     
-    func handle(event: EventRequest) {
+    func handle(event: RoktEventRequest) {
         handler?(event)
     }
 }

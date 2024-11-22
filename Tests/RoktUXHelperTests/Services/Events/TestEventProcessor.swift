@@ -108,7 +108,7 @@ final class TestEventProcessor: XCTestCase {
     
     func testEventDelayProcessing() {
         var expectation = expectation(description: "wait")
-        var receivedPayload: [EventRequest]?
+        var receivedPayload: [RoktEventRequest]?
         let sut = EventProcessor(delay: 0.5) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
@@ -138,7 +138,7 @@ final class TestEventProcessor: XCTestCase {
     
     func testEventRemoveDuplicates() {
         let expectation = expectation(description: "test duplicates")
-        var receivedPayload: [EventRequest]?
+        var receivedPayload: [RoktEventRequest]?
         let sut = EventProcessor() { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
@@ -183,7 +183,7 @@ final class TestEventProcessor: XCTestCase {
         date: Date,
         extraMetadata: [EventNameValue] = [],
         eventData: [String: String] = [:]
-    ) -> EventRequest {
+    ) -> RoktEventRequest {
         .init(
             sessionId: "sessionId",
             eventType: eventType,
