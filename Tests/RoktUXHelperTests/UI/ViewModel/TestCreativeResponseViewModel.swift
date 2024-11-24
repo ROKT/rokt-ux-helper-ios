@@ -14,12 +14,12 @@ import XCTest
 
 @available(iOS 15, *)
 final class TestCreativeResponseViewModel: XCTestCase {
-    var events = [EventRequest]()
+    var events = [RoktEventRequest]()
     var stubUXHelper: MockUXHelper!
     var eventService: EventService!
 
     override func setUpWithError() throws {
-        events = [EventRequest]()
+        events = [RoktEventRequest]()
         self.stubUXHelper = MockUXHelper()
     }
     

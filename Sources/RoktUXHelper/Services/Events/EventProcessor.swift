@@ -12,11 +12,13 @@
 import Foundation
 import Combine
 
+private let defaultEventBufferDuration: Double = 0.025
+
 @available(iOS 13.0, *)
 protocol EventProcessing {
-    var publisher: PassthroughSubject<EventRequest, Never> { get }
+    var publisher: PassthroughSubject<RoktEventRequest, Never> { get }
 
-    func handle(event: EventRequest)
+    func handle(event: RoktEventRequest)
 }
 
 @available(iOS 13.0, *)
@@ -24,10 +26,10 @@ class EventProcessor: EventProcessing {
     private var cancellables: Set<AnyCancellable> = .init()
     private var processedEvents: Set<ProcessedEvent> = .init()
     private var onRoktPlatformEvent: (([String: Any]) -> Void)?
-    private(set) var publisher: PassthroughSubject<EventRequest, Never> = .init()
+    private(set) var publisher: PassthroughSubject<RoktEventRequest, Never> = .init()
 
     init(
-        delay: Double = kEventDelay,
+        delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
         integrationType: HelperIntegrationType = .s2s,
         onRoktPlatformEvent: (([String: Any]) -> Void)?
@@ -57,7 +59,7 @@ class EventProcessor: EventProcessing {
             .store(in: &cancellables)
     }
 
-    func handle(event: EventRequest) {
+    func handle(event: RoktEventRequest) {
         publisher.send(event)
     }
 }

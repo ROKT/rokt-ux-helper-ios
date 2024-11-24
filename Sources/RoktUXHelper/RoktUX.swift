@@ -382,7 +382,7 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         processor.handle(
-            event: EventRequest(
+            event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
                 eventType: EventType.SignalInitialize,
                 parentGuid: pageModel.pageInstanceGuid,
@@ -391,7 +391,7 @@ public class RoktUX: UXEventsDelegate {
             )
         )
         processor.handle(
-            event: EventRequest(
+            event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
                 eventType: EventType.SignalLoadStart,
                 parentGuid: pageModel.pageInstanceGuid,
@@ -400,7 +400,7 @@ public class RoktUX: UXEventsDelegate {
             )
         )
         processor.handle(
-            event: EventRequest(
+            event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
                 eventType: EventType.SignalLoadComplete,
                 parentGuid: pageModel.pageInstanceGuid,
@@ -416,11 +416,11 @@ public class RoktUX: UXEventsDelegate {
                                  severity: Severity = .error,
                                  processor: EventProcessing) {
         processor.handle(
-            event: EventRequest(
+            event: RoktEventRequest(
                 sessionId: sessionId ?? "",
                 eventType: .SignalSdkDiagnostic,
                 parentGuid: "",
-                attributes: [
+                eventData: [
                     kErrorCode: code ?? "",
                     kErrorStackTrace: callStack ?? "",
                     kErrorSeverity: severity.rawValue

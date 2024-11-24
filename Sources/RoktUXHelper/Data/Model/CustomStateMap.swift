@@ -11,8 +11,6 @@
 
 import Foundation
 
-typealias CustomStateMap = [CustomStateIdentifiable: Int]
-
 extension CustomStateMap {
     mutating func toggleValueFor(_ customStateId: Any?) -> CustomStateMap {
         guard let customStateId = customStateId as? CustomStateIdentifiable else {
@@ -24,7 +22,9 @@ extension CustomStateMap {
     }
 }
 
-struct CustomStateIdentifiable: Hashable {
+public typealias CustomStateMap = [CustomStateIdentifiable: Int]
+
+public struct CustomStateIdentifiable: Hashable {
     let position: Int?
     let key: String
 }
