@@ -51,6 +51,22 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
         else { return }
 
         switch layoutVariant {
+        case .catalogStackedCollection(let model):
+            updateChildren(
+                parent: model,
+                creativeParent: creativeParent,
+                offer: dataSource,
+                offerIndex: dataSourceIndex,
+                useOfferIndex: usesDataSourceIndex
+            )
+        case .catalogResponseButton(let model):
+            updateChildren(
+                parent: model,
+                creativeParent: creativeParent,
+                offer: dataSource,
+                offerIndex: dataSourceIndex,
+                useOfferIndex: usesDataSourceIndex
+            )
         case .overlay(let overlay):
             updateChildren(
                 parent: overlay,
@@ -169,7 +185,12 @@ struct BNFPayloadExpander<Mapper: DomainMapper>: PayloadExpander where Mapper.T 
                 offerIndex: dataSourceIndex,
                 useOfferIndex: usesDataSourceIndex
             )
-        default:
+        case .staticImage,
+                .dataImage,
+                .closeButton,
+                .staticLink,
+                .progressControl,
+                .empty:
             break
         }
     }

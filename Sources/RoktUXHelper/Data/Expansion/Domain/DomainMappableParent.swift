@@ -28,6 +28,12 @@ extension DomainMappableParent {
 }
 
 @available(iOS 15, *)
+extension CatalogStackedCollectionViewModel: DomainMappableParent {}
+
+@available(iOS 15, *)
+extension CatalogResponseButtonViewModel: DomainMappableParent {}
+
+@available(iOS 15, *)
 extension OverlayViewModel: DomainMappableParent {}
 
 @available(iOS 15, *)

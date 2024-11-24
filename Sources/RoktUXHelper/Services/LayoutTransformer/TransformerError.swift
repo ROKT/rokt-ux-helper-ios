@@ -12,4 +12,7 @@
 import Foundation
 enum LayoutTransformerError: Error, Equatable {
     case InvalidColor(color: String)
+    case InvalidNode
+    case UnsupportedNode
+    case InvalidBNF
 }

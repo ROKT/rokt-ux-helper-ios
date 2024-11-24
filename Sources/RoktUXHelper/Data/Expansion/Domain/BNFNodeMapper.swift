@@ -32,7 +32,7 @@ protocol DomainMapper {
 class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
     let extractor: DE
 
-    init(extractor: DE = BNFDataExtractor()) {
+    init(extractor: DE = BNFCreativeDataExtractor()) {
         self.extractor = extractor
     }
 
@@ -49,8 +49,8 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
         dataSource: OfferModel
     ) -> DomainMappable? {
         switch consumer {
-        // assumption is that the `value` property will be the mappable value
-        // this is where we decide that only creative.responseOptions is allowed for buttons
+            // assumption is that the `value` property will be the mappable value
+            // this is where we decide that only creative.responseOptions is allowed for buttons
         case .richText(let textModel):
             let originalText = textModel.value ?? ""
 
@@ -94,6 +94,7 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
         }
     }
 
+    // could call this at layout transformer to update value for nodes
     private func resolveDataExpansion(
         _ fullText: String,
         creativeParent: CreativeResponseViewModel? = nil,
@@ -123,6 +124,10 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
         creativeParent: CreativeResponseViewModel?,
         dataSource: OfferModel
     ) throws -> [String: String] {
+        /**
+         imagine a multiple BNF text
+         "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%
+         */
         // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
 
@@ -145,6 +150,295 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
                 propertyChain: chainOfValues,
                 responseKey: creativeParent?.responseKey.rawValue,
                 from: dataSource
+            )
+
+            guard case .value(let resolvedValue) = resolvedDataBinding else { continue }
+
+            // [DATA.creativeCopy.someValue1: "some-value1", DATA.creativeCopy.someValue2: "some-value2"]
+            placeHolderToResolvedValue[chainOfValues] = resolvedValue
+        }
+
+        return placeHolderToResolvedValue
+    }
+}
+
+enum BNFCreativeContext {
+    case marketing(OfferModel)
+    case positiveResponse(OfferModel)
+    case negativeResponse(OfferModel)
+}
+
+@available(iOS 15, *)
+protocol DomainMapperWithContext<U> {
+
+    associatedtype U
+
+    @discardableResult
+    func map(
+        consumer: LayoutSchemaViewModel,
+        context: U
+    ) -> DomainMappable?
+}
+
+@available(iOS 15, *)
+struct BNFCreativeNodeMapper<DE: DataExtractor>: DomainMapperWithContext where DE.U == OfferModel {
+    let extractor: DE
+
+    init(extractor: DE = BNFCreativeDataExtractor()) {
+        self.extractor = extractor
+    }
+
+    /// Given a node `consumer` with a BNF-formatted property. Extract the value from `dataSource` and mutate `consumer`
+    /// - Parameters:
+    ///   - consumer: Entity with a BNF-formatted property
+    ///   - parent: Top-level parent of the consumer
+    ///   - dataSource: Entity of values
+    /// - Returns: Updated `consumer` DATA MODEL whose BNF-formatted property was parsed and replaced with values from `dataSource`
+    @discardableResult
+    func map(
+        consumer: LayoutSchemaViewModel,
+        context: BNFCreativeContext
+    ) -> DomainMappable? {
+        switch consumer {
+        // assumption is that the `value` property will be the mappable value
+        // this is where we decide that only creative.responseOptions is allowed for buttons
+        case .richText(let textModel):
+            let originalText = textModel.value ?? ""
+
+            let transformedText = resolveDataExpansion(
+                originalText,
+                context: context
+            )
+
+            textModel.updateDataBinding(dataBinding: .value(transformedText))
+
+            return textModel
+        case .basicText(let textModel):
+            let originalText = textModel.value ?? ""
+
+            let transformedText = resolveDataExpansion(
+                originalText,
+                context: context
+            )
+
+            textModel.updateDataBinding(dataBinding: .value(transformedText))
+
+            return textModel
+        case .progressIndicator(let indicatorModel):
+            do {
+                let updatedText = try extractor.extractDataRepresentedBy(
+                    String.self,
+                    propertyChain: indicatorModel.indicator,
+                    responseKey: nil,
+                    from: nil
+                )
+                indicatorModel.updateDataBinding(dataBinding: updatedText)
+
+                return indicatorModel
+            } catch {
+                return nil
+            }
+        default:
+            return consumer
+        }
+    }
+
+    // could call this at layout transformer to update value for nodes
+    private func resolveDataExpansion(
+        _ fullText: String,
+        context: BNFCreativeContext
+    ) -> String {
+        do {
+            var responseKey: BNFNamespace.CreativeResponseKey?
+            var offerModel: OfferModel
+            if case let .positiveResponse(offer) = context {
+                responseKey = .positive
+                offerModel = offer
+            } else if case let .negativeResponse(offer) = context {
+                responseKey = .negative
+                offerModel = offer
+            } else if case let .marketing(offer) = context {
+                offerModel = offer
+            } else {
+                throw LayoutTransformerError.InvalidBNF
+            }
+            let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
+                                                                          responseKey: responseKey,
+                                                                          dataSource: offerModel)
+
+            var transformedText = fullText
+
+            placeholdersToResolved.forEach {
+                let keyWithDelimiters = BNFSeparator.startDelimiter.rawValue + $0 + BNFSeparator.endDelimiter.rawValue
+                transformedText = transformedText.replacingOccurrences(of: keyWithDelimiters, with: $1)
+            }
+
+            return transformedText
+        } catch {
+            return ""
+        }
+    }
+
+    // return type is a hashmap of placeholders to their resolved values
+    private func placeholdersToResolvedValues(
+        _ fullText: String,
+        responseKey: BNFNamespace.CreativeResponseKey?,
+        dataSource: OfferModel
+    ) throws -> [String: String] {
+        /**
+         imagine a multiple BNF text
+         "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%
+         */
+        // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
+        var placeHolderToResolvedValue: [String: String] = [:]
+
+        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let fullTextRange = NSRange(fullText.startIndex..<fullText.endIndex, in: fullText)
+
+        guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
+
+        // [DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2]
+        let bnfMatches = regexCheck.matches(in: fullText, options: [], range: fullTextRange)
+
+        for match in bnfMatches {
+            guard let swiftRange = Range(match.range, in: fullText) else { continue }
+
+            // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
+            let chainOfValues = String(fullText[swiftRange])
+
+            let resolvedDataBinding = try extractor.extractDataRepresentedBy(
+                String.self,
+                propertyChain: chainOfValues,
+                responseKey: responseKey?.rawValue,
+                from: dataSource
+            )
+
+            guard case .value(let resolvedValue) = resolvedDataBinding else { continue }
+
+            // [DATA.creativeCopy.someValue1: "some-value1", DATA.creativeCopy.someValue2: "some-value2"]
+            placeHolderToResolvedValue[chainOfValues] = resolvedValue
+        }
+
+        return placeHolderToResolvedValue
+    }
+}
+
+@available(iOS 15, *)
+struct BNFCatalogNodeMapper<DE: DataExtractor>: DomainMapperWithContext where DE.U == CatalogItem {
+    let extractor: DE
+
+    init(extractor: DE = BNFCatalogItemExtractor()) {
+        self.extractor = extractor
+    }
+
+    /// Given a node `consumer` with a BNF-formatted property. Extract the value from `dataSource` and mutate `consumer`
+    /// - Parameters:
+    ///   - consumer: Entity with a BNF-formatted property
+    ///   - parent: Top-level parent of the consumer
+    ///   - dataSource: Entity of values
+    /// - Returns: Updated `consumer` DATA MODEL whose BNF-formatted property was parsed and replaced with values from `dataSource`
+    @discardableResult
+    func map(
+        consumer: LayoutSchemaViewModel,
+        context: CatalogItem
+    ) -> DomainMappable? {
+        switch consumer {
+            // assumption is that the `value` property will be the mappable value
+            // this is where we decide that only creative.responseOptions is allowed for buttons
+        case .richText(let textModel):
+            let originalText = textModel.value ?? ""
+
+            let transformedText = resolveDataExpansion(
+                originalText,
+                data: context
+            )
+
+            textModel.updateDataBinding(dataBinding: .value(transformedText))
+
+            return textModel
+        case .basicText(let textModel):
+            let originalText = textModel.value ?? ""
+
+            let transformedText = resolveDataExpansion(
+                originalText,
+                data: context
+            )
+
+            textModel.updateDataBinding(dataBinding: .value(transformedText))
+
+            return textModel
+        case .progressIndicator(let indicatorModel):
+            do {
+                let updatedText = try extractor.extractDataRepresentedBy(
+                    String.self,
+                    propertyChain: indicatorModel.indicator,
+                    responseKey: nil,
+                    from: nil
+                )
+                indicatorModel.updateDataBinding(dataBinding: updatedText)
+
+                return indicatorModel
+            } catch {
+                return nil
+            }
+        default:
+            return consumer
+        }
+    }
+
+    // could call this at layout transformer to update value for nodes
+    private func resolveDataExpansion(
+        _ fullText: String,
+        data: CatalogItem
+    ) -> String {
+        do {
+            let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
+                                                                          data: data)
+
+            var transformedText = fullText
+
+            placeholdersToResolved.forEach {
+                let keyWithDelimiters = BNFSeparator.startDelimiter.rawValue + $0 + BNFSeparator.endDelimiter.rawValue
+                transformedText = transformedText.replacingOccurrences(of: keyWithDelimiters, with: $1)
+            }
+
+            return transformedText
+        } catch {
+            return ""
+        }
+    }
+
+    // return type is a hashmap of placeholders to their resolved values
+    private func placeholdersToResolvedValues(
+        _ fullText: String,
+        data: CatalogItem
+    ) throws -> [String: String] {
+        /**
+         imagine a multiple BNF text
+         "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%
+         */
+        // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
+        var placeHolderToResolvedValue: [String: String] = [:]
+
+        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let fullTextRange = NSRange(fullText.startIndex..<fullText.endIndex, in: fullText)
+
+        guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
+
+        // [DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2]
+        let bnfMatches = regexCheck.matches(in: fullText, options: [], range: fullTextRange)
+
+        for match in bnfMatches {
+            guard let swiftRange = Range(match.range, in: fullText) else { continue }
+
+            // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
+            let chainOfValues = String(fullText[swiftRange])
+
+            let resolvedDataBinding = try extractor.extractDataRepresentedBy(
+                String.self,
+                propertyChain: chainOfValues,
+                responseKey: nil,
+                from: data
             )
 
             guard case .value(let resolvedValue) = resolvedDataBinding else { continue }

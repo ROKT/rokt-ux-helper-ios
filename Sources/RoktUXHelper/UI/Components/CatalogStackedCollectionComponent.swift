@@ -69,10 +69,6 @@ struct CatalogStackedCollectionComponent: View {
         }
     }
 
-    var accessibilityBehavior: AccessibilityChildBehavior {
-        model.accessibilityGrouped ? .combine : .contain
-    }
-
     var body: some View {
         build()
             .applyLayoutModifier(
@@ -106,7 +102,6 @@ struct CatalogStackedCollectionComponent: View {
                     frameChangeIndex += 1
                 }
             }
-            .accessibilityElement(children: accessibilityBehavior)
     }
 
     private func build() -> some View {
@@ -114,24 +109,26 @@ struct CatalogStackedCollectionComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            ForEach(model.children, id: \.self) { child in
-                LayoutSchemaComponent(
-                    config: config.updateParent(.column),
-                    layout: child,
-                    parentWidth: $availableWidth,
-                    parentHeight: $availableHeight,
-                    styleState: $styleState,
-                    parentOverride: ComponentParentOverride(
-                        parentVerticalAlignment: columnPrimaryAxisAlignment(
-                            justifyContent: containerStyle?.justifyContent
-                        ).asVerticalType,
-                        parentHorizontalAlignment: columnPerpendicularAxisAlignment(
-                            alignItems: containerStyle?.alignItems
-                        ),
-                        parentBackgroundStyle: passableBackgroundStyle,
-                        stretchChildren: containerStyle?.alignItems == .stretch
+            model.children.map {
+                ForEach($0, id: \.self) { child in
+                    LayoutSchemaComponent(
+                        config: config.updateParent(.column),
+                        layout: child,
+                        parentWidth: $availableWidth,
+                        parentHeight: $availableHeight,
+                        styleState: $styleState,
+                        parentOverride: ComponentParentOverride(
+                            parentVerticalAlignment: columnPrimaryAxisAlignment(
+                                justifyContent: containerStyle?.justifyContent
+                            ).asVerticalType,
+                            parentHorizontalAlignment: columnPerpendicularAxisAlignment(
+                                alignItems: containerStyle?.alignItems
+                            ),
+                            parentBackgroundStyle: passableBackgroundStyle,
+                            stretchChildren: containerStyle?.alignItems == .stretch
+                        )
                     )
-                )
+                }
             }
         }
     }

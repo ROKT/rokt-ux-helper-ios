@@ -16,9 +16,8 @@ import DcuiSchema
 class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     let id: UUID = UUID()
-    var children: [LayoutSchemaViewModel]
+    var children: [LayoutSchemaViewModel]?
     let defaultStyle: [CatalogStackedCollectionStyles]?
-    let accessibilityGrouped: Bool
     weak var layoutState: (any LayoutStateRepresenting)?
 
     var imageLoader: ImageLoader? {
@@ -27,12 +26,10 @@ class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdapt
     init(
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogStackedCollectionStyles]?,
-        accessibilityGrouped: Bool,
         layoutState: any LayoutStateRepresenting
     ) {
         self.children = children ?? []
         self.defaultStyle = defaultStyle
-        self.accessibilityGrouped = accessibilityGrouped
         self.layoutState = layoutState
     }
 }
