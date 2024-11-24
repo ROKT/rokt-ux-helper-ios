@@ -13,14 +13,14 @@
 
 import Foundation
 
-public struct EventRequest: Codable, Hashable {
+public struct RoktEventRequest: Codable, Hashable {
     public let uuid: String
     public let sessionId: String
     public let eventType: EventType
     public let parentGuid: String
     public let eventTime: String
-    public let attributes: [EventNameValue]
-    public let metadata: [EventNameValue]
+    public let eventData: [RoktEventNameValue]
+    public let metadata: [RoktEventNameValue]
     public let pageInstanceGuid: String
     public let jwtToken: String
 
@@ -30,7 +30,7 @@ public struct EventRequest: Codable, Hashable {
         case eventType
         case parentGuid
         case eventTime
-        case attributes
+        case eventData
         case metadata
         case pageInstanceGuid
         case jwtToken = "token"
@@ -42,8 +42,8 @@ public struct EventRequest: Codable, Hashable {
         eventType = try container.decode(EventType.self, forKey: .eventType)
         parentGuid = try container.decode(String.self, forKey: .parentGuid)
         eventTime = try container.decode(String.self, forKey: .eventTime)
-        attributes = try container.decode([EventNameValue].self, forKey: .attributes)
-        metadata = try container.decode([EventNameValue].self, forKey: .metadata)
+        eventData = try container.decode([RoktEventNameValue].self, forKey: .eventData)
+        metadata = try container.decode([RoktEventNameValue].self, forKey: .metadata)
         pageInstanceGuid = try container.decode(String.self, forKey: .pageInstanceGuid)
         jwtToken = try container.decode(String.self, forKey: .jwtToken)
         uuid = try container.decode(String.self, forKey: .uuid)
@@ -54,8 +54,8 @@ public struct EventRequest: Codable, Hashable {
         eventType: EventType,
         parentGuid: String,
         eventTime: Date = Date(),
-        extraMetadata: [EventNameValue] = [EventNameValue](),
-        attributes: [String: String] = [String: String](),
+        extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
+        eventData: [String: String] = [String: String](),
         pageInstanceGuid: String = "",
         jwtToken: String
     ) {
@@ -64,11 +64,11 @@ public struct EventRequest: Codable, Hashable {
         self.eventType = eventType
         self.parentGuid = parentGuid
         self.eventTime = EventDateFormatter.getDateString(eventTime)
-        self.attributes = EventRequest.convertDictionaryToNameValue(attributes)
+        self.eventData = RoktEventRequest.convertDictionaryToNameValue(eventData)
         self.pageInstanceGuid = pageInstanceGuid
-        self.metadata = [EventNameValue(name: BE_CLIENT_TIME_STAMP,
+        self.metadata = [RoktEventNameValue(name: BE_CLIENT_TIME_STAMP,
                                         value: EventDateFormatter.getDateString(eventTime)),
-                         EventNameValue(name: BE_CAPTURE_METHOD,
+                         RoktEventNameValue(name: BE_CAPTURE_METHOD,
                                         value: kClientProvided)] + extraMetadata
         self.jwtToken = jwtToken
     }
@@ -84,7 +84,7 @@ public struct EventRequest: Codable, Hashable {
             BE_PAGE_INSTANCE_GUID_KEY: pageInstanceGuid,
             BE_EVENT_TYPE_KEY: eventType.rawValue,
             BE_METADATA_KEY: getNameValueDictionary(metadata),
-            BE_ATTRIBUTES_KEY: getNameValueDictionary(attributes)
+            BE_EVENT_DATA_KEY: getNameValueDictionary(eventData)
         ]
 
         guard let theJSONData = try? JSONSerialization.data(withJSONObject: params,
@@ -95,11 +95,11 @@ public struct EventRequest: Codable, Hashable {
         return "RoktEventLog: \(jsonString)"
     }
 
-    private func getNameValueDictionary(_ nameValues: [EventNameValue]) -> [[String: Any]] {
-        return nameValues.map { $0.getDictionaty()}
+    private func getNameValueDictionary(_ nameValues: [RoktEventNameValue]) -> [[String: Any]] {
+        return nameValues.map { $0.getDictionary()}
     }
 
-    private static func convertDictionaryToNameValue(_ from: [String: String]) -> [EventNameValue] {
-        return from.map { EventNameValue(name: $0.key, value: $0.value)}
+    private static func convertDictionaryToNameValue(_ from: [String: String]) -> [RoktEventNameValue] {
+        return from.map { RoktEventNameValue(name: $0.key, value: $0.value)}
     }
 }

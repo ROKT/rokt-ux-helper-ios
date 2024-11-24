@@ -12,7 +12,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
-public struct EventNameValue: Codable, Hashable, Equatable {
+public struct RoktEventNameValue: Codable, Hashable, Equatable {
     public let name: String
     public let value: String
 
@@ -21,7 +21,7 @@ public struct EventNameValue: Codable, Hashable, Equatable {
         self.value = value
     }
 
-    func getDictionaty() -> [String: String] {
+    public func getDictionary() -> [String: String] {
         var dictionary = [String: String]()
         dictionary[BE_NAME] = self.name
         dictionary[BE_VALUE] = self.value

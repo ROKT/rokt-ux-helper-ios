@@ -16,13 +16,13 @@ import XCTest
 
 @available(iOS 15, *)
 final class TestRoktEmbeddedViewModel: XCTestCase {
-    var events = [EventRequest]()
+    var events = [RoktEventRequest]()
     var eventService: EventService!
     var stubUXHelper: MockUXHelper!
     let startDate = Date()
     
     override func setUpWithError() throws {
-        events = [EventRequest]()
+        events = [RoktEventRequest]()
         eventService = get_mock_event_processor { [weak self] event in
             self?.events.append(event)
         }
