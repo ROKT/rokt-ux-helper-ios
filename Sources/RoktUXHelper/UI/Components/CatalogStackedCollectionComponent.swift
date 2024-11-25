@@ -69,10 +69,6 @@ struct CatalogStackedCollectionComponent: View {
         }
     }
 
-    var accessibilityBehavior: AccessibilityChildBehavior {
-        model.accessibilityGrouped ? .combine : .contain
-    }
-
     var body: some View {
         build()
             .applyLayoutModifier(
@@ -106,7 +102,6 @@ struct CatalogStackedCollectionComponent: View {
                     frameChangeIndex += 1
                 }
             }
-            .accessibilityElement(children: accessibilityBehavior)
     }
 
     private func build() -> some View {

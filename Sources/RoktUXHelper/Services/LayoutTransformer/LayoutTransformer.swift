@@ -13,22 +13,43 @@ import Foundation
 import DcuiSchema
 
 @available(iOS 15, *)
-struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> where Expander.T == OfferModel {
+struct LayoutTransformer<
+    CreativeMapper: BNFMapper,
+    AddToCartMapper: BNFMapper,
+    Extractor: DataExtractor
+>
+where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
+
+    enum Context {
+        case outer([OfferModel?])
+        case inner(Inner)
+
+        enum Inner {
+            case positive(OfferModel)
+            case negative(OfferModel)
+            case generic(OfferModel?)
+            case addToCart(CatalogItem)
+        }
+    }
+
     let layoutPlugin: LayoutPlugin
-    let expander: Expander
-    let extractor: Extractor
     let layoutState: LayoutState
     let eventService: EventDiagnosticServicing?
+    let creativeMapper: CreativeMapper
+    let addToCartMapper: AddToCartMapper
+    let extractor: Extractor
 
     init(
         layoutPlugin: LayoutPlugin,
-        expander: Expander = BNFPayloadExpander(),
-        extractor: Extractor = BNFDataExtractor(),
+        creativeMapper: CreativeMapper = BNFCreativeMapping(),
+        addToCartMapper: AddToCartMapper = BNFCatalogMapping(),
+        extractor: Extractor = BNFCreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
         eventService: EventDiagnosticServicing? = nil
     ) {
         self.layoutPlugin = layoutPlugin
-        self.expander = expander
+        self.creativeMapper = creativeMapper
+        self.addToCartMapper = addToCartMapper
         self.extractor = extractor
         self.layoutState = layoutState
         self.eventService = eventService
@@ -37,162 +58,199 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     func transform() throws -> LayoutSchemaViewModel? {
         guard let layout = layoutPlugin.layout else { return nil}
 
-        let transformedUIModels = try transform(layout)
-
-        for (slotIndex, slot) in layoutPlugin.slots.enumerated() {
-            expander.expand(
-                layoutVariant: transformedUIModels,
-                parent: nil,
-                creativeParent: nil,
-                using: slot.offer,
-                dataSourceIndex: slotIndex,
-                usesDataSourceIndex: nil
-            )
-        }
+        let transformedUIModels = try transform(
+            layout,
+            context: .outer(layoutPlugin.slots.map(\.offer))
+        )
 
         AttributedStringTransformer.convertRichTextHTMLIfExists(uiModel: transformedUIModels, config: layoutState.config)
 
         return transformedUIModels
     }
 
-    func transform<T: Codable>(_ layout: T, slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
+    func transform<T: Codable>(_ layout: T, context: Context) throws -> LayoutSchemaViewModel {
         if let layout = layout as? LayoutSchemaModel {
-            return try transform(layout, slot: slot)
+            return try transform(layout, context: context)
         } else if let layout = layout as? AccessibilityGroupedLayoutChildren {
-            return try transform(layout, slot: slot)
+            return try transform(layout, context: context)
         } else {
             return .empty
         }
     }
 
-    func transform(_ layout: LayoutSchemaModel, slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
+    func transform(_ layout: LayoutSchemaModel, context: Context) throws -> LayoutSchemaViewModel {
         switch layout {
         case .row(let rowModel):
-            return .row(try getRow(rowModel.styles, children: transformChildren(rowModel.children, slot: slot)))
+                .row(
+                    try getRow(
+                        rowModel.styles, children: transformChildren(rowModel.children, context: context)
+                    )
+                )
         case .column(let columnModel):
-            return .column(try getColumn(
-                columnModel.styles,
-                children: transformChildren(columnModel.children, slot: slot)
-            ))
+                .column(
+                    try getColumn(
+                        columnModel.styles,
+                        children: transformChildren(columnModel.children, context: context)
+                    )
+                )
         case .zStack(let zStackModel):
-            return .zStack(try getZStack(zStackModel.styles,
-                                         children: transformChildren(zStackModel.children, slot: slot)))
-        case .basicText(let basicTextModel): return .basicText(try getBasicText(basicTextModel))
-        case .staticImage(let imageModel): return .staticImage(try getStaticImage(imageModel))
+                .zStack(
+                    try getZStack(
+                        zStackModel.styles,
+                        children: transformChildren(zStackModel.children, context: context)
+                    )
+                )
+        case .basicText(let basicTextModel):
+                .basicText(try getBasicText(basicTextModel, context: context))
+        case .staticImage(let imageModel):
+                .staticImage(try getStaticImage(imageModel))
         case .richText(let richTextModel):
-            return .richText(try getRichText(richTextModel))
-
-        case .dataImage(let imageModel): return .dataImage(try getDataImage(imageModel, slot: slot))
+                .richText(try getRichText(richTextModel, context: context))
+        case .dataImage(let imageModel):
+                .dataImage(try getDataImage(imageModel, context: context))
         case .progressIndicator(let progressIndicatorModel):
-            return .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel))
+                .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel, context: context))
         case .creativeResponse(let model):
-            return try getCreativeResponse(responseKey: model.responseKey,
-                                           openLinks: model.openLinks,
-                                           styles: model.styles,
-                                           children: transformChildren(model.children, slot: slot),
-                                           slot: slot)
+            try getCreativeResponse(
+                model: model,
+                context: context
+            )
         case .oneByOneDistribution(let oneByOneModel):
-            return .oneByOne(try getOneByOne(oneByOneModel: oneByOneModel))
+                .oneByOne(try getOneByOne(oneByOneModel: oneByOneModel, context: context))
         case .overlay(let overlayModel):
-            return .overlay(try getOverlay(overlayModel.styles,
-                                           allowBackdropToClose: overlayModel.allowBackdropToClose,
-                                           children: transformChildren(overlayModel.children, slot: slot)))
+                .overlay(
+                    try getOverlay(
+                        overlayModel.styles,
+                        allowBackdropToClose: overlayModel.allowBackdropToClose,
+                        children: transformChildren(overlayModel.children, context: context)
+                    )
+                )
         case .bottomSheet(let bottomSheetModel):
-            return .bottomSheet(try getBottomSheet(bottomSheetModel.styles,
-                                                   allowBackdropToClose: bottomSheetModel.allowBackdropToClose,
-                                                   children: transformChildren(bottomSheetModel.children, slot: slot)))
+                .bottomSheet(
+                    try getBottomSheet(
+                        bottomSheetModel.styles,
+                        allowBackdropToClose: bottomSheetModel.allowBackdropToClose,
+                        children: transformChildren(bottomSheetModel.children, context: context)
+                    )
+                )
         case .when(let whenModel):
-            return .when(getWhenNode(children: try transformChildren(whenModel.children, slot: slot),
-                                     predicates: whenModel.predicates,
-                                     transition: whenModel.transition))
+                .when(
+                    getWhenNode(
+                        children: try transformChildren(whenModel.children, context: context),
+                        predicates: whenModel.predicates,
+                        transition: whenModel.transition
+                    )
+                )
         case .staticLink(let staticLinkModel):
-            return .staticLink(try getStaticLink(src: staticLinkModel.src,
-                                                 open: staticLinkModel.open,
-                                                 styles: staticLinkModel.styles,
-                                                 children: transformChildren(staticLinkModel.children, slot: slot)))
+                .staticLink(
+                    try getStaticLink(
+                        src: staticLinkModel.src,
+                        open: staticLinkModel.open,
+                        styles: staticLinkModel.styles,
+                        children: transformChildren(staticLinkModel.children, context: context)
+                    )
+                )
         case .closeButton(let closeButtonModel):
-            return .closeButton(try getCloseButton(styles: closeButtonModel.styles,
-                                                   children: transformChildren(closeButtonModel.children, slot: slot)))
+                .closeButton(
+                    try getCloseButton(
+                        styles: closeButtonModel.styles,
+                        children: transformChildren(closeButtonModel.children, context: context)
+                    )
+                )
         case .carouselDistribution(let carouselModel):
-            return .carousel(try getCarousel(carouselModel: carouselModel))
+                .carousel(try getCarousel(carouselModel: carouselModel, context: context))
         case .groupedDistribution(let groupedModel):
-            return .groupDistribution(try getGroupedDistribution(groupedModel: groupedModel))
+                .groupDistribution(try getGroupedDistribution(groupedModel: groupedModel, context: context))
         case .progressControl(let progressControlModel):
-            return .progressControl(try getProgressControl(styles: progressControlModel.styles,
-                                                           direction: progressControlModel.direction,
-                                                           children: transformChildren(progressControlModel.children,
-                                                                                       slot: slot)))
+                .progressControl(
+                    try getProgressControl(
+                        styles: progressControlModel.styles,
+                        direction: progressControlModel.direction,
+                        children: transformChildren(progressControlModel.children,
+                                                    context: context)
+                    )
+                )
         case .accessibilityGrouped(let accessibilityGroupedModel):
-            return try getAccessibilityGrouped(child: accessibilityGroupedModel.child,
-                                               slot: slot)
+            try getAccessibilityGrouped(
+                child: accessibilityGroupedModel.child,
+                context: context
+            )
         case .scrollableColumn(let columnModel):
-            return .scrollableColumn(try getScrollableColumn(columnModel.styles,
-                                                             children:
-                                                                transformChildren(columnModel.children, slot: slot)))
+                .scrollableColumn(
+                    try getScrollableColumn(
+                        columnModel.styles,
+                        children:
+                            transformChildren(columnModel.children, context: context)
+                    )
+                )
         case .scrollableRow(let rowModel):
-            return .scrollableRow(try getScrollableRow(rowModel.styles,
-                                                       children: transformChildren(rowModel.children, slot: slot)))
+                .scrollableRow(
+                    try getScrollableRow(
+                        rowModel.styles,
+                        children: transformChildren(rowModel.children, context: context)
+                    )
+                )
         case .toggleButtonStateTrigger(let buttonModel):
-            return .toggleButton(try getToggleButton(customStateKey: buttonModel.customStateKey,
-                                                     styles: buttonModel.styles,
-                                                     children: transformChildren(buttonModel.children,
-                                                                                 slot: slot)))
+                .toggleButton(
+                    try getToggleButton(
+                        customStateKey: buttonModel.customStateKey,
+                        styles: buttonModel.styles,
+                        children: transformChildren(buttonModel.children,
+                                                    context: context)
+                    )
+                )
         case .catalogStackedCollection(let model):
-            return .catalogStackedCollection(
-                try getCatalogStackedCollectionModel(
-                    model: model,
-                    slot: slot
+                .catalogStackedCollection(
+                    try getCatalogStackedCollectionModel(
+                        model: model,
+                        context: context
+                    )
                 )
-            )
         case .catalogResponseButton(let model):
-            return .catalogResponseButton(
-                try getCatalogResponseButtonModel(
-                    slot: slot,
-                    style: model.styles,
-                    children: transformChildren(model.children, slot: slot)
+                .catalogResponseButton(
+                    try getCatalogResponseButtonModel(
+                        style: model.styles,
+                        children: transformChildren(model.children, context: context)
+                    )
                 )
-            )
         }
     }
 
     func transform(
         _ layout: AccessibilityGroupedLayoutChildren,
-        slot: SlotOfferModel? = nil
+        context: Context
     ) throws -> LayoutSchemaViewModel {
         switch layout {
         case .row(let rowModel):
-            .row(try getRow(rowModel.styles, children: transformChildren(rowModel.children, slot: slot)))
+                .row(try getRow(rowModel.styles, children: transformChildren(rowModel.children, context: context)))
         case .column(let columnModel):
             .column(
                 try getColumn(
                     columnModel.styles,
-                    children: transformChildren(columnModel.children, slot: slot)
+                    children: transformChildren(columnModel.children, context: context)
                 )
             )
         case .zStack(let zStackModel):
             .zStack(
                 try getZStack(
                     zStackModel.styles,
-                    children: transformChildren(zStackModel.children, slot: slot)
+                    children: transformChildren(zStackModel.children, context: context)
                 )
             )
         }
     }
 
-    func transformChildren<T: Codable>(_ layouts: [T]?, slot: SlotOfferModel?) throws -> [LayoutSchemaViewModel]? {
+    private func transformChildren<T: Codable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
         try layouts?.map {
-            try transform($0, slot: slot)
+            try transform($0, context: context)
         }
     }
 
     // attach inner layout into outer layout and transform to UI Model
-    func getOneByOne(oneByOneModel: OneByOneDistributionModel<WhenPredicate>) throws -> OneByOneViewModel {
-        var children: [LayoutSchemaViewModel] = []
-
-        try layoutPlugin.slots.forEach { slot in
-            if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
-                children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
-            }
+    func getOneByOne(oneByOneModel: OneByOneDistributionModel<WhenPredicate>, context: Context) throws -> OneByOneViewModel {
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
+            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic($0.offer)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(oneByOneModel.styles?.elements?.own)
         return OneByOneViewModel(children: children,
@@ -203,13 +261,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                  layoutState: layoutState)
     }
 
-    func getCarousel(carouselModel: CarouselDistributionModel<WhenPredicate>) throws -> CarouselViewModel {
-        var children: [LayoutSchemaViewModel] = []
-
-        try layoutPlugin.slots.forEach { slot in
-            if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
-                children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
-            }
+    func getCarousel(carouselModel: CarouselDistributionModel<WhenPredicate>, context: Context) throws -> CarouselViewModel {
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
+            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic($0.offer)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(carouselModel.styles?.elements?.own)
         return CarouselViewModel(children: children,
@@ -222,14 +277,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getGroupedDistribution(
-        groupedModel: GroupedDistributionModel<WhenPredicate>
+        groupedModel: GroupedDistributionModel<WhenPredicate>,
+        context: Context
     ) throws -> GroupedDistributionViewModel {
-        var children: [LayoutSchemaViewModel] = []
-
-        try layoutPlugin.slots.forEach { slot in
-            if let innerLayout = slot.layoutVariant?.layoutVariantSchema {
-                children.append(try transform(innerLayout, slot: slot.toSlotOfferModel()))
-            }
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
+            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic($0.offer)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(groupedModel.styles?.elements?.own)
         return GroupedDistributionViewModel(children: children,
@@ -298,8 +351,18 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                         layoutState: layoutState)
     }
 
-    func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, slot: SlotOfferModel?) throws -> DataImageViewModel {
-        let creativeImage = slot?.offer?.creative.images?[imageModel.imageKey] ?? slot?.offer?.catalogItems?.first?.images?[imageModel.imageKey] // should have only 1 catalogItem at this node
+    func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, context: Context) throws -> DataImageViewModel {
+        var creativeImage: CreativeImage?
+        switch context {
+        case .inner(.generic(.some(let offer))),
+                .inner(.negative(let offer)),
+                .inner(.positive(let offer)):
+            creativeImage = offer.creative.images?[imageModel.imageKey]
+        case let .inner(.addToCart(catalogItem)):
+            creativeImage = catalogItem.images?[imageModel.imageKey]
+        default:
+            throw LayoutTransformerError.InvalidMapping()
+        }
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return DataImageViewModel(image: creativeImage,
                                   defaultStyle: updateStyles.compactMap {$0.default},
@@ -309,26 +372,38 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                   layoutState: layoutState)
     }
 
-    func getBasicText(_ basicTextModel: BasicTextModel<WhenPredicate>) throws -> BasicTextViewModel {
+    func getBasicText(_ basicTextModel: BasicTextModel<WhenPredicate>, context: Context) throws -> BasicTextViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(basicTextModel.styles?.elements?.own)
-        return BasicTextViewModel(value: basicTextModel.value,
-                                  defaultStyle: updateStyles.compactMap {$0.default},
-                                  pressedStyle: updateStyles.compactMap {$0.pressed},
-                                  hoveredStyle: updateStyles.compactMap {$0.hovered},
-                                  disabledStyle: updateStyles.compactMap {$0.disabled},
-                                  layoutState: layoutState,
-                                  diagnosticService: eventService)
+        let vm = BasicTextViewModel(value: basicTextModel.value,
+                                    defaultStyle: updateStyles.compactMap {$0.default},
+                                    pressedStyle: updateStyles.compactMap {$0.pressed},
+                                    hoveredStyle: updateStyles.compactMap {$0.hovered},
+                                    disabledStyle: updateStyles.compactMap {$0.disabled},
+                                    layoutState: layoutState,
+                                    diagnosticService: eventService)
+        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+            creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
+        }
+        return vm
     }
 
-    func getRichText(_ richTextModel: RichTextModel<WhenPredicate>) throws -> RichTextViewModel {
+    func getRichText(_ richTextModel: RichTextModel<WhenPredicate>, context: Context) throws -> RichTextViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(richTextModel.styles?.elements?.own)
         let updateLinkStyles = try StyleTransformer.updatedStyles(richTextModel.styles?.elements?.link)
-        return RichTextViewModel(value: richTextModel.value,
-                                 defaultStyle: updateStyles.compactMap {$0.default},
-                                 linkStyle: updateLinkStyles.compactMap {$0.default},
-                                 openLinks: richTextModel.openLinks,
-                                 layoutState: layoutState,
-                                 eventService: eventService)
+        let vm = RichTextViewModel(value: richTextModel.value,
+                                   defaultStyle: updateStyles.compactMap {$0.default},
+                                   linkStyle: updateLinkStyles.compactMap {$0.default},
+                                   openLinks: richTextModel.openLinks,
+                                   layoutState: layoutState,
+                                   eventService: eventService)
+        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+            creativeMapper.map(consumer: .richText(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
+        }
+        return vm
     }
 
     func getColumn(_ styles: LayoutStyle<ColumnElements, ConditionalStyleTransition<ColumnTransitions, WhenPredicate>>?,
@@ -417,19 +492,19 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     }
 
     func getAccessibilityGrouped(child: AccessibilityGroupedLayoutChildren,
-                                 slot: SlotOfferModel? = nil) throws -> LayoutSchemaViewModel {
+                                 context: Context) throws -> LayoutSchemaViewModel {
         switch child {
         case .column(let columnModel):
             return .column(try getColumn(columnModel.styles,
-                                         children: transformChildren(columnModel.children, slot: slot),
+                                         children: transformChildren(columnModel.children, context: context),
                                          accessibilityGrouped: true))
         case .row(let rowModel):
             return .row(try getRow(rowModel.styles,
-                                   children: transformChildren(rowModel.children, slot: slot),
+                                   children: transformChildren(rowModel.children, context: context),
                                    accessibilityGrouped: true))
         case .zStack(let zStackModel):
             return .zStack(try getZStack(zStackModel.styles,
-                                         children: transformChildren(zStackModel.children, slot: slot),
+                                         children: transformChildren(zStackModel.children, context: context),
                                          accessibilityGrouped: true))
         }
     }
@@ -460,45 +535,45 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                     layoutState: layoutState)
     }
 
-    func getCreativeResponse(responseKey: String,
-                             openLinks: LinkOpenTarget?,
-                             styles: LayoutStyle<CreativeResponseElements,
-                                                 ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
-                             children: [LayoutSchemaViewModel]?,
-                             slot: SlotOfferModel?) throws -> LayoutSchemaViewModel {
-        guard let responseOptionsMap = slot?.offer?.creative.responseOptionsMap,
-              (responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue
-               && responseOptionsMap.positive != nil)
-                ||
-                (responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue
-                 && responseOptionsMap.negative != nil)
-        else {
+    func getCreativeResponse(model: CreativeResponseModel<LayoutSchemaModel, WhenPredicate>,
+                             context: Context) throws -> LayoutSchemaViewModel {
+        guard case let .inner(.generic(offer)) = context, let offer else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+        var updatedContext: Context
+        if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {
+            updatedContext = .inner(.positive(offer))
+        } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue {
+            updatedContext = .inner(.negative(offer))
+        } else {
             return .empty
         }
-
-        return .creativeResponse(try getCreativeResponseUIModel(responseKey: responseKey,
-                                                                openLinks: openLinks,
-                                                                styles: styles,
+        let children = try transformChildren(model.children, context: updatedContext)
+        return .creativeResponse(try getCreativeResponseUIModel(responseKey: model.responseKey,
+                                                                openLinks: model.openLinks,
+                                                                styles: model.styles,
                                                                 children: children,
-                                                                slot: slot))
+                                                                offer: offer))
     }
 
-    func getCreativeResponseUIModel(responseKey: String,
-                                    openLinks: LinkOpenTarget?,
-                                    styles: LayoutStyle<CreativeResponseElements,
-                                                        ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
-                                    children: [LayoutSchemaViewModel]?,
-                                    slot: SlotOfferModel?) throws -> CreativeResponseViewModel {
+    func getCreativeResponseUIModel(
+        responseKey: String,
+        openLinks: LinkOpenTarget?,
+        styles: LayoutStyle<CreativeResponseElements,
+        ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
+        children: [LayoutSchemaViewModel]?,
+        offer: OfferModel
+    ) throws -> CreativeResponseViewModel {
         var responseOption: ResponseOption?
         var creativeResponseKey = BNFNamespace.CreativeResponseKey.positive
 
         if responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {
-            responseOption = slot?.offer?.creative.responseOptionsMap?.positive
+            responseOption = offer.creative.responseOptionsMap?.positive
             creativeResponseKey = .positive
         }
 
         if responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue {
-            responseOption = slot?.offer?.creative.responseOptionsMap?.negative
+            responseOption = offer.creative.responseOptionsMap?.negative
             creativeResponseKey = .negative
         }
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
@@ -516,24 +591,36 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
 
     private func getCatalogStackedCollectionModel(
         model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
-        slot: SlotOfferModel?,
+        context: Context,
         accessibilityGrouped: Bool = false
     ) throws -> CatalogStackedCollectionViewModel {
-        guard let slotOffer = slot?.offer else { throw RoktUXError.experienceResponseMapping }
+        guard case let .inner(.generic(.some(offer))) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        var children: [LayoutSchemaViewModel]? = try slotOffer.catalogItems?.map { catalogItem in
-            var updatedSlot = SlotOfferModel(
-                offer: .init(
-                    campaignId: slotOffer.campaignId,
-                    creative: slotOffer.creative,
-                    catalogItems: [catalogItem]
-                )
-            )
+        let children: [LayoutSchemaViewModel]? = try offer.catalogItems?.map { catalogItem in
             switch model.template {
             case .column(let model):
-                return .column(try getColumn(model.styles, children: transformChildren(model.children, slot: updatedSlot)))
+                return .column(
+                    try getColumn(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
             case .row(let model):
-                return .row(try getRow(model.styles, children: transformChildren(model.children, slot: updatedSlot)))
+                return .row(
+                    try getRow(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
             default:
                 throw RoktUXError.experienceResponseMapping
             }
@@ -541,7 +628,6 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         return CatalogStackedCollectionViewModel(
             children: children,
             defaultStyle: updateStyles.compactMap {$0.default},
-            accessibilityGrouped: accessibilityGrouped,
             layoutState: layoutState
         )
     }
@@ -564,40 +650,22 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         )
     }
 
-    func getProgressIndicator(
-        _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>
-    ) throws -> LayoutSchemaViewModel {
-        do {
-            let indicatorData = try extractor.extractDataRepresentedBy(
-                String.self,
-                propertyChain: progressIndicatorModel.indicator,
-                responseKey: nil,
-                from: nil
-            )
-
-            guard case .state(let stateValue) = indicatorData,
-                  DataBindingStateKeys.isValidKey(stateValue)
-            else { return .empty }
-
-            return .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel))
-        } catch {
-            return .empty
-        }
-    }
-
     func getProgressIndicatorUIModel(
-        _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>
+        _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>,
+        context: Context
     ) throws -> ProgressIndicatorViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(progressIndicatorModel.styles?.elements?.own)
         let indicatorStyle = try StyleTransformer.updatedStyles(progressIndicatorModel.styles?.elements?.indicator)
-        let seenIndicatorStyle =
-        try StyleTransformer.updatedIndicatorStyles(indicatorStyle,
-                                                    newStyles: progressIndicatorModel.styles?.elements?.seenIndicator)
+        let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
+            indicatorStyle,
+            newStyles: progressIndicatorModel.styles?.elements?.seenIndicator
+        )
         // active falls back to seen (which then falls back to indicator)
-        let activeIndicatorStyle =
-        try StyleTransformer.updatedIndicatorStyles(seenIndicatorStyle,
-                                                    newStyles: progressIndicatorModel.styles?.elements?.activeIndicator)
-        return ProgressIndicatorViewModel(
+        let activeIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
+            seenIndicatorStyle,
+            newStyles: progressIndicatorModel.styles?.elements?.activeIndicator
+        )
+        let vm = ProgressIndicatorViewModel(
             indicator: progressIndicatorModel.indicator,
             defaultStyle: updateStyles.compactMap {$0.default},
             indicatorStyle: indicatorStyle.compactMap {$0.default},
@@ -608,6 +676,12 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             layoutState: layoutState,
             eventService: eventService
         )
+        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+            creativeMapper.map(consumer: .progressIndicator(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .progressIndicator(vm), context: catalogItem)
+        }
+        return vm
     }
 
     func getWhenNode(children: [LayoutSchemaViewModel]?,
@@ -616,7 +690,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
-                             slots: layoutPlugin.slots.map {$0.toSlotOfferModel()},
+                             offers: layoutPlugin.slots.map(\.offer),
                              globalBreakPoints: layoutPlugin.breakpoints,
                              layoutState: layoutState)
     }
@@ -633,5 +707,20 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                      hoveredStyle: updateStyles.compactMap {$0.hovered},
                                      disabledStyle: updateStyles.compactMap {$0.disabled},
                                      layoutState: layoutState)
+    }
+}
+
+@available(iOS 15, *)
+private extension LayoutTransformer.Context.Inner {
+    var mapToBNFCreativeContext: BNFCreativeContext? {
+        switch self {
+        case .positive(let offerModel):
+                .positiveResponse(offerModel)
+        case .negative(let offerModel):
+                .negativeResponse(offerModel)
+        case .generic(.some(let offerModel)):
+                .generic(offerModel)
+        default: nil
+        }
     }
 }

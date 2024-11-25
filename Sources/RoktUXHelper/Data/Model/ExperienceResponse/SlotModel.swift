@@ -28,8 +28,4 @@ struct SlotModel: Decodable {
         case layoutVariant
         case jwtToken = "token"
     }
-
-    func toSlotOfferModel() -> SlotOfferModel {
-        return SlotOfferModel(offer: offer)
-    }
 }

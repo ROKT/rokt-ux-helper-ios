@@ -1,8 +1,6 @@
 //
-//  BNFNodeMapper.swift
+//  BNFCatalogMapping.swift
 //  RoktUXHelper
-//
-//  Copyright 2020 Rokt Pte Ltd
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
 //  Version 2.0 (the "License");
@@ -14,95 +12,52 @@
 import Foundation
 
 @available(iOS 15, *)
-protocol DomainMapper {
-    associatedtype T: DomainMappingSource
+struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem {
 
-    @discardableResult
-    func map(
-        consumer: LayoutSchemaViewModel,
-        creativeParent: CreativeResponseViewModel?,
-        dataSource: T
-    ) -> DomainMappable?
-}
-
-/// Maps properties of `Node`s using values in `dataSource`.
-/// The mappable property of each `node` is known here (eg. `TextNode`'s value)
-/// Bridge that knows the `LayoutSchemaModel` data type
-@available(iOS 15, *)
-class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
     let extractor: DE
 
-    init(extractor: DE = BNFCreativeDataExtractor()) {
+    init(extractor: DE = BNFCatalogItemExtractor()) {
         self.extractor = extractor
     }
 
-    /// Given a node `consumer` with a BNF-formatted property. Extract the value from `dataSource` and mutate `consumer`
-    /// - Parameters:
-    ///   - consumer: Entity with a BNF-formatted property
-    ///   - parent: Top-level parent of the consumer
-    ///   - dataSource: Entity of values
-    /// - Returns: Updated `consumer` DATA MODEL whose BNF-formatted property was parsed and replaced with values from `dataSource`
-    @discardableResult
-    func map(
-        consumer: LayoutSchemaViewModel,
-        creativeParent: CreativeResponseViewModel?,
-        dataSource: OfferModel
-    ) -> DomainMappable? {
+    func map(consumer: LayoutSchemaViewModel, context: CatalogItem) {
         switch consumer {
-        // assumption is that the `value` property will be the mappable value
-        // this is where we decide that only creative.responseOptions is allowed for buttons
+            // assumption is that the `value` property will be the mappable value
+            // this is where we decide that only creative.responseOptions is allowed for buttons
         case .richText(let textModel):
             let originalText = textModel.value ?? ""
 
             let transformedText = resolveDataExpansion(
                 originalText,
-                creativeParent: creativeParent,
-                dataSource: dataSource
+                context: context
             )
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
-
-            return textModel
         case .basicText(let textModel):
             let originalText = textModel.value ?? ""
 
             let transformedText = resolveDataExpansion(
                 originalText,
-                creativeParent: creativeParent,
-                dataSource: dataSource
+                context: context
             )
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
-
-            return textModel
         case .progressIndicator(let indicatorModel):
-            do {
-                let updatedText = try extractor.extractDataRepresentedBy(
-                    String.self,
-                    propertyChain: indicatorModel.indicator,
-                    responseKey: creativeParent?.responseKey.rawValue,
-                    from: dataSource
-                )
-                indicatorModel.updateDataBinding(dataBinding: updatedText)
-
-                return indicatorModel
-            } catch {
-                return nil
-            }
+            guard let updatedText = try? extractor.extractDataRepresentedBy(
+                String.self,
+                propertyChain: indicatorModel.indicator,
+                responseKey: nil,
+                from: nil
+            ) else { return }
+            indicatorModel.updateDataBinding(dataBinding: updatedText)
         default:
-            return consumer
+            break
         }
     }
 
-    private func resolveDataExpansion(
-        _ fullText: String,
-        creativeParent: CreativeResponseViewModel? = nil,
-        dataSource: OfferModel
-    ) -> String {
+    private func resolveDataExpansion(_ fullText: String, context: CatalogItem) -> String {
         do {
-            let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
-                                                                          creativeParent: creativeParent,
-                                                                          dataSource: dataSource)
+            let placeholdersToResolved = try placeholdersToResolvedValues(fullText, data: context)
 
             var transformedText = fullText
 
@@ -120,8 +75,7 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
     // return type is a hashmap of placeholders to their resolved values
     private func placeholdersToResolvedValues(
         _ fullText: String,
-        creativeParent: CreativeResponseViewModel?,
-        dataSource: OfferModel
+        data: CatalogItem
     ) throws -> [String: String] {
         // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
@@ -140,11 +94,11 @@ class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
             // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
-            let resolvedDataBinding = try extractor.extractDataRepresentedBy(
+            let resolvedDataBinding = try BNFCatalogItemExtractor().extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,
-                responseKey: creativeParent?.responseKey.rawValue,
-                from: dataSource
+                responseKey: nil,
+                from: data
             )
 
             guard case .value(let resolvedValue) = resolvedDataBinding else { continue }
