@@ -170,9 +170,21 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
     
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
-        sendEvent(.SignalCartItemInstantPurchaseInitiated,
-                  parentGuid: catalogItem.instanceGuid ?? "",
-                  jwtToken: catalogItem.token ?? "")
+        sendEvent(
+            .SignalCartItemInstantPurchaseInitiated,
+            parentGuid: catalogItem.instanceGuid ?? "",
+            eventData: [
+                kCartItemId: catalogItem.cartItemId ?? "",
+                kCatalogItemId: catalogItem.catalogItemId ?? "",
+                kCurrency: catalogItem.currency ?? "",
+                kDescription: catalogItem.description ?? "",
+                kLinkedProductId: catalogItem.linkedProductId ?? "",
+                kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
+                kQuantity: "1",
+                kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
+                ],
+            jwtToken: catalogItem.token ?? ""
+        )
         uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
     }
 
