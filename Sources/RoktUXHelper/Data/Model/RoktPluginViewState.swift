@@ -36,6 +36,14 @@ import Foundation
         self.isPluginDismissed = isPluginDismissed
         self.customStateMap = customStateMap
     }
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let rhs = object as? RoktPluginViewState else { return false }
+
+        return (self.pluginId == rhs.pluginId &&
+                self.offerIndex == rhs.offerIndex &&
+                self.isPluginDismissed == rhs.isPluginDismissed &&
+                self.customStateMap == rhs.customStateMap)
+    }
 }
 
 @objc public class RoktPluginViewStateUpdates: NSObject {
