@@ -1,5 +1,5 @@
 //
-//  BNFNodeMapper.swift
+//  BNFMapper.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd

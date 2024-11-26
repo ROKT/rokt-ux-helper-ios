@@ -55,7 +55,7 @@ final class BNFCatalogDataExtractorTests: XCTestCase {
 
     func test_extractDataRepresentedBy_usingValidCreativeLinkPropertyChain_returnsNestedString() {
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalogItem.priceFormatted", responseKey: nil, from: catalogItem),
+            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalogItem.originalPriceFormatted", responseKey: nil, from: catalogItem),
             .value("$14.99")
         )
     }

@@ -114,10 +114,6 @@ struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel
         responseKey: BNFNamespace.CreativeResponseKey?,
         dataSource: OfferModel
     ) throws -> [String: String] {
-        /**
-         imagine a multiple BNF text
-         "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%
-         */
         // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
 

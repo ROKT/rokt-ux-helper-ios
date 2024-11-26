@@ -1,5 +1,5 @@
 //
-//  BNFCreativeDataExtractor.swift
+//  BNFCatalogDataExtractor.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,7 +11,6 @@
 
 import Foundation
 
-/// Expands a BNF-formatted String using values nested in an `OfferModel` entity
 @available(iOS 13, *)
 struct BNFCatalogDataExtractor<Validator: DataValidator>: DataExtractor where Validator.T == String {
 
@@ -29,9 +28,6 @@ struct BNFCatalogDataExtractor<Validator: DataValidator>: DataExtractor where Va
         self.dataReflector = dataReflector
     }
 
-    // maps `propertyChain` to a value inside `Offer`, if possible
-    // note that you can chain statements like A? | B? | Default?
-    // if A does not exist, check B, else use default
     func extractDataRepresentedBy<U>(
         _ type: U.Type,
         propertyChain: String,

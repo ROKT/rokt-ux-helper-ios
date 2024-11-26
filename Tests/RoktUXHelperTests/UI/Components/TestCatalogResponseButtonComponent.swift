@@ -88,22 +88,16 @@ extension LayoutSchemaViewModel {
         )
         let catalogResponseButton = ModelTestData.CatalogResponseButtonData.catalogResponseButton()
         
-        var slots = ModelTestData.PageModelData.withBNF().layoutPlugins?.first?.slots
-        if let slot = slots?.first, let offer = slot.offer {
-            let updateSlot = SlotModel(
-                instanceGuid: slot.instanceGuid,
-                offer: .init(campaignId: offer.campaignId, creative: offer.creative, catalogItems: [CatalogItem()]),
-                layoutVariant: slot.layoutVariant,
-                jwtToken: slot.jwtToken)
-            slots = [updateSlot]
+        guard let catalogItem = ModelTestData.CatalogPageModelData.withBNF().layoutPlugins?.first?.slots.first?.offer?.catalogItems?.first else {
+            XCTFail("Couldn't get catalog item")
+            throw LayoutTransformerError.InvalidMapping()
         }
         return LayoutSchemaViewModel.catalogResponseButton(
             try transformer.getCatalogResponseButtonModel(
-                slot: slots?.first?.toSlotOfferModel(),
                 style: catalogResponseButton.styles,
-                children: transformer.transformChildren(catalogResponseButton.children, slot: nil)
+                children: transformer.transformChildren(catalogResponseButton.children, context: .inner(.addToCart(catalogItem))),
+                context: .inner(.addToCart(catalogItem))
             )
-            
         )
     }
 }
