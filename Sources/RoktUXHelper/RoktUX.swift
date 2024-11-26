@@ -91,6 +91,7 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
+       - layoutPluginViewStates: Plugin view states ([RoktPluginViewState]) to be restored.
        - defaultLayoutLoader: Default loader for the layout.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
        - config: Configuration for the RoktUX.
