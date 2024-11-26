@@ -24,7 +24,7 @@ extension CustomStateMap {
 
 public typealias CustomStateMap = [CustomStateIdentifiable: Int]
 
-public struct CustomStateIdentifiable: Hashable {
+public struct CustomStateIdentifiable: Hashable, Encodable, Decodable {
     let position: Int?
     let key: String
 }

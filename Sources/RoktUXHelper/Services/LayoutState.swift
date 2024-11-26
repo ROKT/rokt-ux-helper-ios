@@ -53,9 +53,30 @@ class LayoutState: LayoutStateRepresenting {
         config?.imageLoader
     }
 
-    init(actionCollection: ActionCollecting = ActionCollection(), config: RoktUXConfig? = nil) {
+    public let initialPluginViewState: RoktPluginViewState?
+    private let pluginId: String?
+    private let onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)?
+
+    init(actionCollection: ActionCollecting = ActionCollection(),
+         config: RoktUXConfig? = nil,
+         pluginId: String? = nil,
+         initialPluginViewState: RoktPluginViewState? = nil,
+         onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)? = nil) {
         self.actionCollection = actionCollection
         self.config = config
+        self.pluginId = pluginId
+        self.initialPluginViewState = initialPluginViewState
+        self.onPluginViewStateChange = onPluginViewStateChange
+    }
+    
+    func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {
+        guard let pluginId else { return }
+        let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
+        let customStateMap: Binding<CustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<CustomStateMap?>
+        onPluginViewStateChange?(RoktPluginViewStateUpdates(pluginId: pluginId,
+                                                            offerIndex: offerIndex ?? currentProgress?.wrappedValue,
+                                                            isPluginDismissed: dismiss,
+                                                            customStateMap: customStateMap?.wrappedValue))
     }
 
     func setLayoutType(_ type: PlacementLayoutCode) {

@@ -16,14 +16,14 @@ public struct PageModel {
     public let pageId: String?
     public let sessionId: String
     public let pageInstanceGuid: String
-    let layoutPlugins: [LayoutPlugin]?
+    public let layoutPlugins: [LayoutPlugin]?
     var startDate: Date = Date()
     var responseReceivedDate: Date = Date()
     let token: String
     let options: [SDKOption]?
 }
 
-struct LayoutPlugin {
+public struct LayoutPlugin {
     let pluginInstanceGuid: String
     let breakpoints: BreakPoint?
     let settings: LayoutSettings?
@@ -31,7 +31,7 @@ struct LayoutPlugin {
     let slots: [SlotModel]
     let targetElementSelector: String?
     let pluginConfigJWTToken: String
-    let pluginId: String?
+    public let pluginId: String?
     let pluginName: String?
 }
 
