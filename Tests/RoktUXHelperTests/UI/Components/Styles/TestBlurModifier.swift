@@ -42,7 +42,7 @@ final class TestBlurModifier: XCTestCase {
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithOffset()
-        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, slot: nil))
+        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, context: .outer([])))
     }
 
 }

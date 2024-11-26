@@ -210,7 +210,8 @@ where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
                 .catalogResponseButton(
                     try getCatalogResponseButtonModel(
                         style: model.styles,
-                        children: transformChildren(model.children, context: context)
+                        children: transformChildren(model.children, context: context),
+                        context: context
                     )
                 )
         }
@@ -240,7 +241,7 @@ where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
         }
     }
 
-    private func transformChildren<T: Codable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
+    func transformChildren<T: Codable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
         try layouts?.map {
             try transform($0, context: context)
         }
@@ -541,9 +542,9 @@ where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
             throw LayoutTransformerError.InvalidMapping()
         }
         var updatedContext: Context
-        if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {
+        if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue, offer.creative.responseOptionsMap?.positive.isEmpty.not == true {
             updatedContext = .inner(.positive(offer))
-        } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue {
+        } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue, offer.creative.responseOptionsMap?.negative.isEmpty.not == true {
             updatedContext = .inner(.negative(offer))
         } else {
             return .empty
@@ -633,13 +634,17 @@ where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
     }
 
     func getCatalogResponseButtonModel(
-        slot: SlotOfferModel?,
         style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
-        children: [LayoutSchemaViewModel]?
+        children: [LayoutSchemaViewModel]?,
+        context: Context
     ) throws -> CatalogResponseButtonViewModel {
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
         let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
         return CatalogResponseButtonViewModel(
-            catalogItem: slot?.offer?.catalogItems?.first,
+            catalogItem: catalogItem,
             children: children,
             layoutState: layoutState,
             eventService: eventService,

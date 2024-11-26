@@ -14,9 +14,9 @@ import Foundation
 @available(iOS 15, *)
 struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem {
 
-    let extractor: DE
+    private let extractor: DE
 
-    init(extractor: DE = BNFCatalogItemExtractor()) {
+    init(extractor: DE = BNFCatalogDataExtractor()) {
         self.extractor = extractor
     }
 
@@ -94,7 +94,7 @@ struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem
             // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
-            let resolvedDataBinding = try BNFCatalogItemExtractor().extractDataRepresentedBy(
+            let resolvedDataBinding = try extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,
                 responseKey: nil,

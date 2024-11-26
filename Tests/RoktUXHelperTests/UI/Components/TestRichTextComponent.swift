@@ -205,7 +205,7 @@ final class TestRichTextComponent: XCTestCase {
     
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML())
+        let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
         richText.transformValueToAttributedString(.light)
         
         return richText
@@ -213,7 +213,7 @@ final class TestRichTextComponent: XCTestCase {
     
     func get_state_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let richText = try transformer.getRichText(ModelTestData.TextData.richTextState())
+        let richText = try transformer.getRichText(ModelTestData.TextData.richTextState(), context: .outer([]))
         richText.transformValueToAttributedString(.light)
         
         return richText

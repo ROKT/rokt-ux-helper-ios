@@ -53,7 +53,7 @@ final class TestToggleButtonComponent: XCTestCase {
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
         return try transformer.getToggleButton(customStateKey: model.customStateKey,
                                                styles: model.styles,
-                                               children: transformer.transformChildren(model.children, slot: nil))
+                                               children: transformer.transformChildren(model.children, context: .outer([])))
     }
     
 }

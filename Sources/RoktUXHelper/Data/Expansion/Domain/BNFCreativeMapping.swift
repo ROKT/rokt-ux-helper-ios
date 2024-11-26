@@ -19,6 +19,9 @@ enum BNFCreativeContext {
     case negativeResponse(OfferModel)
 }
 
+/// Maps properties of `Node`s using values in `context`.
+/// The mappable property of each `node` is known here (eg. `TextNode`'s value)
+/// Bridge that knows the `LayoutSchemaModel` data type
 @available(iOS 15, *)
 struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel {
     let extractor: DE
@@ -132,7 +135,7 @@ struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel
             // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
-            let resolvedDataBinding = try BNFCreativeDataExtractor().extractDataRepresentedBy(
+            let resolvedDataBinding = try extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,
                 responseKey: responseKey?.rawValue,

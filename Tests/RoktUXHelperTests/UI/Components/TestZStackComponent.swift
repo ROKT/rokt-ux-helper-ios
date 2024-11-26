@@ -60,8 +60,7 @@ final class TestZStackComponent: XCTestCase {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let zstack = ModelTestData.ZStackData.zStackWithStyles()
         return try transformer.getZStack(zstack.styles,
-                                         children: transformer.transformChildren(zstack.children, slot: nil))
-        
+                                         children: transformer.transformChildren(zstack.children, context: .outer([])))
+
     }
-    
 }

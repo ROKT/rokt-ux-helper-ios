@@ -65,7 +65,7 @@ final class TestDataImageComponent: XCTestCase {
     
     func get_model() throws -> DataImageViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: [get_slot()]))
-        return try transformer.getDataImage(ModelTestData.DataImageData.dataImage(), slot: get_slot().toSlotOfferModel())
+        return try transformer.getDataImage(ModelTestData.DataImageData.dataImage(), context: .inner(.generic(get_slot().offer!)))
     }
     
     func get_slot() -> SlotModel {

@@ -288,6 +288,15 @@ class ModelTestData: NSObject {
         }
     }
 
+    @available(iOS 13, *)
+    enum CatalogPageModelData {
+        static func withBNF() -> PageModel {
+            let data = toData(jsonFilename: "add_to_cart_page_model")
+            let experienceResponse = try! JSONDecoder().decode(S2SExperienceResponse.self, from: data)
+            return experienceResponse.getPageModel()!
+        }
+    }
+
     static func toData(jsonFilename: String) -> Data {
         let bundle = Bundle.module
         let url = bundle.url(forResource: jsonFilename, withExtension: "json")!
