@@ -34,6 +34,8 @@ public enum EventType: String, Codable, CaseIterable {
     case SignalActivation
     /// Triggered when the content displays to user.
     case SignalViewed
+    /// Triggered when the user clicks catalog response button.
+    case SignalCartItemInstantPurchaseInitiated
     /// Not applicable
     case CaptureAttributes
 }
