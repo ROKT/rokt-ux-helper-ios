@@ -91,6 +91,7 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
+       - layoutPluginViewStates: Plugin view states ([RoktPluginViewState]) to be restored.
        - defaultLayoutLoader: Default loader for the layout.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
        - config: Configuration for the RoktUX.
@@ -100,10 +101,12 @@ public class RoktUX: UXEventsDelegate {
        - onRoktUXEvent: Closure to handle RoktUX events.
        - onRoktPlatformEvent: Closure to handle platform events. Platform events are an essential part of integration and it has to be sent to Rokt via your backend.
             For ease of use, platformEvent is defined as [String: Any]
+       - onPluginViewStateChange: Closure to handle changes to the RoktPluginViewState.
      */
     public func loadLayout(
         startDate: Date = Date(),
         experienceResponse: String,
+        layoutPluginViewStates: [RoktPluginViewState]? = nil,
         defaultLayoutLoader: LayoutLoader? = nil,
         layoutLoaders: [String: LayoutLoader?]? = nil,
         config: RoktUXConfig? = nil,
@@ -111,7 +114,8 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
-        onRoktPlatformEvent: @escaping ([String: Any]) -> Void
+        onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
+        onPluginViewStateChange: @escaping (RoktPluginViewStateUpdates) -> Void
     ) {
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
@@ -126,9 +130,12 @@ public class RoktUX: UXEventsDelegate {
                     let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                         .first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
+                    let layoutPluginViewState = layoutPluginViewStates?
+                        .first { viewState in viewState.pluginId == layoutPlugin.pluginId }
                     displayLayout(
                         page: layoutPage,
                         layoutPlugin: layoutPlugin,
+                        layoutPluginViewState: layoutPluginViewState,
                         startDate: startDate,
                         responseReceivedDate: layoutPage.responseReceivedDate,
                         layoutLoader: layoutLoader,
@@ -137,6 +144,7 @@ public class RoktUX: UXEventsDelegate {
                         onUnload: onUnload,
                         onEmbeddedSizeChange: onEmbeddedSizeChange,
                         onRoktUXEvent: onRoktUXEvent,
+                        onPluginViewStateChange: onPluginViewStateChange,
                         processor: processor
                     )
                 }
@@ -184,6 +192,7 @@ public class RoktUX: UXEventsDelegate {
     private func displayLayout(
         page: PageModel,
         layoutPlugin: LayoutPlugin,
+        layoutPluginViewState: RoktPluginViewState? = nil,
         startDate: Date,
         responseReceivedDate: Date,
         layoutLoader: LayoutLoader?,
@@ -192,12 +201,17 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
+        onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)? = nil,
         processor: EventProcessing
     ) {
         onRoktEvent = onRoktUXEvent
         let actionCollection = ActionCollection()
 
-        let layoutState = LayoutState(actionCollection: actionCollection, config: config)
+        let layoutState = LayoutState(actionCollection: actionCollection,
+                                      config: config,
+                                      pluginId: layoutPlugin.pluginId,
+                                      initialPluginViewState: layoutPluginViewState,
+                                      onPluginViewStateChange: onPluginViewStateChange)
 
         let eventService = EventService(
             pageId: page.pageId,
@@ -316,6 +330,13 @@ public class RoktUX: UXEventsDelegate {
                         layoutLoader?.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
                     }
+                    
+                    if let isPluginDismissed = layoutState.initialPluginViewState?.isPluginDismissed,
+                       isPluginDismissed {
+                        layoutLoader.closeEmbedded()
+                        onUnload()
+                        return
+                    }
 
                     layoutLoader.load(onSizeChanged: onSizeChange,
                                       injectedView: {
@@ -331,6 +352,7 @@ public class RoktUX: UXEventsDelegate {
                     layoutState.actionCollection[.close] = { [weak layoutLoader] _ in
                         layoutLoader?.closeEmbedded()
                         onUnload()
+                        layoutState.capturePluginViewState(offerIndex: nil, dismiss: true)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
