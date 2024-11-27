@@ -364,12 +364,8 @@ struct GroupedDistributionComponent: View {
     }
     
     func setRecalculatedCurrentGroup() {
-        if currentLeadingOffer + viewableItems > totalOffers - 1 {
-            // if projected to go above totalOffers, update to last page
-            currentGroup = totalPages - 1
-        } else if currentLeadingOffer >= 0,
-                  currentGroup <= totalPages - 1 {
-            currentGroup = Int(floor(Double(currentLeadingOffer/viewableItems)))
+        if currentLeadingOffer >= 0 {
+            self.currentGroup = Int(floor(Double(currentLeadingOffer+1/viewableItems)))
         }
     }
 }
