@@ -12,18 +12,16 @@
 import Foundation
 
 @available(iOS 15, *)
-struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem {
+struct BNFCatalogMapping<Extractor: DataExtractor>: BNFMapper where Extractor.MappingSource == CatalogItem {
 
-    private let extractor: DE
+    private let extractor: Extractor
 
-    init(extractor: DE = BNFCatalogDataExtractor()) {
+    init(extractor: Extractor = BNFCatalogDataExtractor()) {
         self.extractor = extractor
     }
 
     func map(consumer: LayoutSchemaViewModel, context: CatalogItem) {
         switch consumer {
-            // assumption is that the `value` property will be the mappable value
-            // this is where we decide that only creative.responseOptions is allowed for buttons
         case .richText(let textModel):
             let originalText = textModel.value ?? ""
 
@@ -77,7 +75,7 @@ struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem
         _ fullText: String,
         data: CatalogItem
     ) throws -> [String: String] {
-        // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
+        // given fullText = "Hello %^DATA.catalogItem.someValue1^ AND %^DATA.catalogItem.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
 
         let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
@@ -85,13 +83,13 @@ struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
 
-        // [DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2]
+        // [DATA.catalogItem.someValue1, DATA.catalogItem.someValue2]
         let bnfMatches = regexCheck.matches(in: fullText, options: [], range: fullTextRange)
 
         for match in bnfMatches {
             guard let swiftRange = Range(match.range, in: fullText) else { continue }
 
-            // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
+            // DATA.catalogItem.someValue1, DATA.catalogItem.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
             let resolvedDataBinding = try extractor.extractDataRepresentedBy(
@@ -103,7 +101,7 @@ struct BNFCatalogMapping<DE: DataExtractor>: BNFMapper where DE.U == CatalogItem
 
             guard case .value(let resolvedValue) = resolvedDataBinding else { continue }
 
-            // [DATA.creativeCopy.someValue1: "some-value1", DATA.creativeCopy.someValue2: "some-value2"]
+            // [DATA.catalogItem.someValue1: "some-value1", DATA.catalogItem.someValue2: "some-value2"]
             placeHolderToResolvedValue[chainOfValues] = resolvedValue
         }
 

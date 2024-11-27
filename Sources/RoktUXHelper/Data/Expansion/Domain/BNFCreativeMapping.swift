@@ -17,16 +17,33 @@ enum BNFCreativeContext {
     case generic(OfferModel)
     case positiveResponse(OfferModel)
     case negativeResponse(OfferModel)
+
+    var creativeResponse: BNFNamespace.CreativeResponseKey? {
+        switch self {
+        case .generic: nil
+        case .positiveResponse: .positive
+        case .negativeResponse: .negative
+        }
+    }
+
+    var offerModel: OfferModel {
+        switch self {
+        case .generic(let offerModel),
+                .positiveResponse(let offerModel),
+                .negativeResponse(let offerModel):
+            offerModel
+        }
+    }
 }
 
 /// Maps properties of `Node`s using values in `context`.
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
 @available(iOS 15, *)
-struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel {
-    let extractor: DE
+struct BNFCreativeMapping<Extractor: DataExtractor>: BNFMapper where Extractor.MappingSource == OfferModel {
+    let extractor: Extractor
 
-    init(extractor: DE = BNFCreativeDataExtractor()) {
+    init(extractor: Extractor = BNFCreativeDataExtractor()) {
         self.extractor = extractor
     }
 
@@ -53,23 +70,11 @@ struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
         case .progressIndicator(let indicatorModel):
-            let offer: OfferModel
-            var responseKey: BNFNamespace.CreativeResponseKey?
-            switch context {
-            case .generic(let offerModel):
-                offer = offerModel
-            case .positiveResponse(let offerModel):
-                offer = offerModel
-                responseKey = .positive
-            case .negativeResponse(let offerModel):
-                offer = offerModel
-                responseKey = .negative
-            }
             guard let updatedText = try? extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: indicatorModel.indicator,
-                responseKey: responseKey?.rawValue,
-                from: offer
+                responseKey: context.creativeResponse?.rawValue,
+                from: context.offerModel
             ) else { return }
             indicatorModel.updateDataBinding(dataBinding: updatedText)
         default:
@@ -79,21 +84,9 @@ struct BNFCreativeMapping<DE: DataExtractor>: BNFMapper where DE.U == OfferModel
 
     private func resolveDataExpansion(_ fullText: String, context: BNFCreativeContext) -> String {
         do {
-            var responseKey: BNFNamespace.CreativeResponseKey?
-            var offerModel: OfferModel
-            switch context {
-            case .generic(let offer):
-                offerModel = offer
-            case .positiveResponse(let offer):
-                responseKey = .positive
-                offerModel = offer
-            case .negativeResponse(let offer):
-                responseKey = .negative
-                offerModel = offer
-            }
             let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
-                                                                          responseKey: responseKey,
-                                                                          dataSource: offerModel)
+                                                                          responseKey: context.creativeResponse,
+                                                                          dataSource: context.offerModel)
 
             var transformedText = fullText
 

@@ -29,10 +29,10 @@ protocol DomainMapper {
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
 @available(iOS 15, *)
-class BNFNodeMapper<DE: DataExtractor>: DomainMapper where DE.U == OfferModel {
-    let extractor: DE
+class BNFNodeMapper<Extractor: DataExtractor>: DomainMapper where Extractor.MappingSource == OfferModel {
+    let extractor: Extractor
 
-    init(extractor: DE = BNFCreativeDataExtractor()) {
+    init(extractor: Extractor = BNFCreativeDataExtractor()) {
         self.extractor = extractor
     }
 

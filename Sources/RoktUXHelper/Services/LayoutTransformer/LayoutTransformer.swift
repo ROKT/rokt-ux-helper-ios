@@ -18,7 +18,7 @@ struct LayoutTransformer<
     AddToCartMapper: BNFMapper,
     Extractor: DataExtractor
 >
-where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
+where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == CatalogItem {
 
     enum Context {
         case outer([OfferModel?])
@@ -542,9 +542,11 @@ where CreativeMapper.U == BNFCreativeContext, AddToCartMapper.U == CatalogItem {
             throw LayoutTransformerError.InvalidMapping()
         }
         var updatedContext: Context
-        if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue, offer.creative.responseOptionsMap?.positive.isEmpty.not == true {
+        if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue,
+           offer.creative.responseOptionsMap?.positive != nil {
             updatedContext = .inner(.positive(offer))
-        } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue, offer.creative.responseOptionsMap?.negative.isEmpty.not == true {
+        } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue,
+                  offer.creative.responseOptionsMap?.negative != nil {
             updatedContext = .inner(.negative(offer))
         } else {
             return .empty

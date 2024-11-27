@@ -237,15 +237,6 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.InitialWrongValue | STATE.IndicatorPosition^%")
     }
     
-//    func test_progressIndicator_withInvalidDataExpansion_shouldReturnEmpty() throws {
-//        let model = ModelTestData.ProgressIndicatorData.invalidDataExpansion()
-//        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-//        
-//        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
-//
-//        XCTAssertEqual(uiModel, .empty)
-//    }
-    
     //MARK: Onebyone
     func test_transform_onebyone() throws {
         // Arrange

@@ -14,13 +14,13 @@
 import Foundation
 
 protocol DataExtractor {
-    associatedtype U: DomainMappingSource
+    associatedtype MappingSource: DomainMappingSource
 
     func extractDataRepresentedBy<T>(
         _ type: T.Type,
         propertyChain: String,
         responseKey: String?,
-        from data: U?
+        from data: MappingSource?
     ) throws -> DataBinding<T>
 }
 

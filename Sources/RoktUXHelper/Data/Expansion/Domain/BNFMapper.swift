@@ -15,6 +15,6 @@ import Foundation
 
 @available(iOS 15, *)
 protocol BNFMapper {
-    associatedtype U
-    func map(consumer: LayoutSchemaViewModel, context: U)
+    associatedtype Context
+    func map(consumer: LayoutSchemaViewModel, context: Context)
 }
