@@ -102,9 +102,9 @@ extension UIViewController {
         }
 
         modal.view.isOpaque = false
-        layoutState.actionCollection[.close] = { [weak self, weak modal] _ in
+        layoutState.actionCollection[.close] = { [weak self, weak modal, weak layoutState] _ in
             modal?.dismiss(animated: true, completion: nil)
-            layoutState.capturePluginViewState(offerIndex: nil, dismiss: true)
+            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
         }
     }
 

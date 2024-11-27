@@ -130,7 +130,7 @@ public class RoktUX: UXEventsDelegate {
                     let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                         .first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
-                    let layoutPluginViewState = try? layoutPluginViewStates?
+                    let layoutPluginViewState = layoutPluginViewStates?
                         .first { viewState in viewState.pluginId == layoutPlugin.pluginId }
                     displayLayout(
                         page: layoutPage,
