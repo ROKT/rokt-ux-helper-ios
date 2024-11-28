@@ -24,8 +24,8 @@ struct ScrollableColumnComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @State private var contentHeight: CGFloat? = nil
-    @State private var contentMaxHeight: CGFloat? = nil
+    @State private var contentHeight: CGFloat?
+    @State private var contentMaxHeight: CGFloat?
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
 
     var style: ColumnStyle? {
