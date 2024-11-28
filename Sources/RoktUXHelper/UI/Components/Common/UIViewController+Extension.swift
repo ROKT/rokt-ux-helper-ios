@@ -160,7 +160,7 @@ extension UIViewController {
 @available(iOS 15.0, *)
 public final class SwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
-    let eventService: EventService?
+    weak var eventService: EventService?
     let layoutState: LayoutState?
 
     required init?(coder: NSCoder) {
@@ -185,7 +185,8 @@ public final class SwiftUIViewController: UIHostingController<AnyView> {
         onUnload?()
     }
 
-    func closeModal() {
+    public func closeModal() {
+        
         if let eventService {
             eventService.dismissOption = .partnerTriggered
             eventService.sendDismissalEvent()

@@ -22,6 +22,7 @@ public class RoktUX: UXEventsDelegate {
     public static var integrationInfo: RoktIntegrationInfo { RoktIntegrationInfo.shared }
 
     private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
+    private var eventService: EventService?
 
     public init() {}
 
@@ -199,7 +200,7 @@ public class RoktUX: UXEventsDelegate {
 
         let layoutState = LayoutState(actionCollection: actionCollection, config: config)
 
-        let eventService = EventService(
+        eventService = EventService(
             pageId: page.pageId,
             pageInstanceGuid: page.pageInstanceGuid,
             sessionId: page.sessionId,
@@ -217,7 +218,7 @@ public class RoktUX: UXEventsDelegate {
         layoutState.items[LayoutState.breakPointsSharedKey] = layoutPlugin.breakpoints
         layoutState.items[LayoutState.layoutSettingsKey] = layoutPlugin.settings
 
-        eventService.sendSignalLoadStartEvent()
+        eventService?.sendSignalLoadStartEvent()
 
         layoutState.setLayoutType(.unknown)
 
@@ -283,15 +284,15 @@ public class RoktUX: UXEventsDelegate {
 
                 }
             }
-            eventService.sendEventsOnTransformerSuccess()
+            eventService?.sendEventsOnTransformerSuccess()
         } catch LayoutTransformerError.InvalidColor(color: let color) {
             // invalid color error
-            eventService.sendDiagnostics(message: kValidationErrorCode,
+            eventService?.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kColorInvalid + color)
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
-            eventService.sendDiagnostics(message: kValidationErrorCode,
+            eventService?.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kLayoutInvalid)
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
