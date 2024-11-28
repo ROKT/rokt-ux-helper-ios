@@ -14,24 +14,27 @@
 import Foundation
 
 enum BNFCreativeContext {
-    case generic(OfferModel)
+    case outer
+    case generic(OfferModel?)
     case positiveResponse(OfferModel)
     case negativeResponse(OfferModel)
 
     var creativeResponse: BNFNamespace.CreativeResponseKey? {
         switch self {
-        case .generic: nil
+        case .generic, .outer: nil
         case .positiveResponse: .positive
         case .negativeResponse: .negative
         }
     }
 
-    var offerModel: OfferModel {
+    var offerModel: OfferModel? {
         switch self {
-        case .generic(let offerModel),
+        case .generic(.some(let offerModel)),
                 .positiveResponse(let offerModel),
                 .negativeResponse(let offerModel):
             offerModel
+        case .outer,
+                .generic(.none): nil
         }
     }
 }
@@ -84,9 +87,10 @@ struct BNFCreativeMapping<Extractor: DataExtractor>: BNFMapper where Extractor.M
 
     private func resolveDataExpansion(_ fullText: String, context: BNFCreativeContext) -> String {
         do {
+            guard let offerModel = context.offerModel else { throw LayoutTransformerError.InvalidBNFMapping() }
             let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
                                                                           responseKey: context.creativeResponse,
-                                                                          dataSource: context.offerModel)
+                                                                          dataSource: offerModel)
 
             var transformedText = fullText
 

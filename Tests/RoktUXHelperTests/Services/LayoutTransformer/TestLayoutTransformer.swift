@@ -227,8 +227,26 @@ final class TestLayoutTransformer: XCTestCase {
         
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
+        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+            XCTFail("Failed to get indicator state")
+            return
+        }
+        XCTAssertEqual(stateLabel, "IndicatorPosition")
     }
-    
+
+    func test_progressIndicator_outerLayer_withSingleDataExpansion_parsesUnexpandedData() throws {
+        let model = ModelTestData.ProgressIndicatorData.progressIndicator()
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .outer([]))
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
+        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+            XCTFail("Failed to get indicator state")
+            return
+        }
+        XCTAssertEqual(stateLabel, "IndicatorPosition")
+    }
+
     func test_progressIndicator_withValidChainOfDataExpansion_parsesUnexpandedData() throws {
         let model = ModelTestData.ProgressIndicatorData.chainOfvaluesDataExpansion()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
@@ -236,7 +254,16 @@ final class TestLayoutTransformer: XCTestCase {
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.InitialWrongValue | STATE.IndicatorPosition^%")
     }
-    
+
+    func test_progressIndicator_withInvalidDataExpansion_shouldReturnEmpty() throws {
+        let model = ModelTestData.ProgressIndicatorData.invalidDataExpansion()
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
+
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.SomeValueThatDoesNotWork^%")
+    }
+
     //MARK: Onebyone
     func test_transform_onebyone() throws {
         // Arrange

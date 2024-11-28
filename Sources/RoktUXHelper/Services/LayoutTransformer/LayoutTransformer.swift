@@ -382,7 +382,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState,
                                     diagnosticService: eventService)
-        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
             creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
@@ -399,7 +399,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
                                    openLinks: richTextModel.openLinks,
                                    layoutState: layoutState,
                                    eventService: eventService)
-        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
             creativeMapper.map(consumer: .richText(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
@@ -683,7 +683,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
             layoutState: layoutState,
             eventService: eventService
         )
-        if case .inner(let inner) = context, let bnfContext = inner.mapToBNFCreativeContext {
+        if let bnfContext = context.mapToBNFCreativeContext {
             creativeMapper.map(consumer: .progressIndicator(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .progressIndicator(vm), context: catalogItem)
@@ -718,16 +718,21 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
 }
 
 @available(iOS 15, *)
-private extension LayoutTransformer.Context.Inner {
+private extension LayoutTransformer.Context {
     var mapToBNFCreativeContext: BNFCreativeContext? {
         switch self {
-        case .positive(let offerModel):
-                .positiveResponse(offerModel)
-        case .negative(let offerModel):
-                .negativeResponse(offerModel)
-        case .generic(.some(let offerModel)):
-                .generic(offerModel)
-        default: nil
+        case .outer:
+                .outer
+        case .inner(let inner):
+            switch inner {
+            case .positive(let offerModel):
+                    .positiveResponse(offerModel)
+            case .negative(let offerModel):
+                    .negativeResponse(offerModel)
+            case .generic(let offerModel):
+                    .generic(offerModel)
+            default: nil
+            }
         }
     }
 }
