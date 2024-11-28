@@ -44,7 +44,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .model
-        let nsAttrString  = model.attributedString
+        let nsAttrString = model.attributedString
         
         XCTAssertEqual(nsAttrString.string, "ORDER Number: Uk171359906")
         
@@ -123,7 +123,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .model
-        let nsAttrString  = model.attributedString
+        let nsAttrString = model.attributedString
         //before state replacement
         XCTAssertEqual(nsAttrString.string, "%^STATE.IndicatorPosition^% ORDER Number:")
         
@@ -155,7 +155,11 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertEqual(rawText.horizontalAlignment, .start)
         // after state replacement
         XCTAssertEqual(rawText.model.stateReplacedAttributedString.string, "1 ORDER Number:")
-        let colors = rawText.model.stateReplacedAttributedString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor
+        let colors = rawText.model.stateReplacedAttributedString.attribute(
+            .foregroundColor,
+            at: 0,
+            effectiveRange: nil
+        ) as? UIColor
         XCTAssertEqual(colors?.isEqualIgnoringSpaceContext(UIColor(hexString: "#AABBCC")), true)
         XCTAssertNil(rawText.lineLimit)
         
@@ -192,7 +196,7 @@ final class TestRichTextComponent: XCTestCase {
                 .view(RichTextComponent.self)
                 .actualView()
                 .model
-            let nsAttrString  = model.attributedString
+            let nsAttrString = model.attributedString
 
             XCTAssertEqual(nsAttrString.string, "ORDER Number: Uk171359906")
             
@@ -232,12 +236,17 @@ final class TestRichTextComponent: XCTestCase {
 
 extension UIColor {
     func isEqualIgnoringSpaceContext(_ otherColor: UIColor) -> Bool {
-        guard let selfAsCGColor = self.cgColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil) else {
+        guard let selfAsCGColor = self.cgColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil)
+            else {
             XCTFail("Could not convert to cgColor \(self)")
             return false
         }
         
-        guard let otherAsCGColor = otherColor.cgColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil) else {
+        guard let otherAsCGColor = otherColor.cgColor.converted(
+            to: CGColorSpaceCreateDeviceRGB(),
+            intent: .defaultIntent,
+            options: nil
+        ) else {
             XCTFail("Could not convert to cgColor \(otherColor)")
             return false
         }

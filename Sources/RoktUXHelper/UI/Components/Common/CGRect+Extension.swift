@@ -17,6 +17,6 @@ extension CGRect {
         let geometrySpace = geoProxy.frame(in: .global)
         guard intersects(geometrySpace) else { return 0 }
         let intersection = intersection(geometrySpace)
-        return (intersection.width * intersection.height) / (geometrySpace.width * geometrySpace.height)
+        return (intersection.width * intersection.height)/(geometrySpace.width * geometrySpace.height)
     }
 }

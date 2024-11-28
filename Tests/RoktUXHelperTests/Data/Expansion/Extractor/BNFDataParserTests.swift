@@ -57,8 +57,10 @@ final class BNFDataParserTests: XCTestCase {
     func test_parse_withoutDefaultValueInPropertyChain_returnsNilDefaultValueInBNFPlaceholder() {
         XCTAssertEqual(
             sut.parse(propertyChain: "%^DATA.creativeCopy.owner.pet.name^%"),
-            BNFPlaceholder(parseableChains: [BNFKeyAndNamespace(key: "owner.pet.name", namespace: .dataCreativeCopy, isMandatory: true)],
-                           defaultValue: nil)
+            BNFPlaceholder(
+                parseableChains: [BNFKeyAndNamespace(key: "owner.pet.name", namespace: .dataCreativeCopy, isMandatory: true)],
+                defaultValue: nil
+            )
         )
     }
 }

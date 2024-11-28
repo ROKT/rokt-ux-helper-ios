@@ -20,4 +20,3 @@ struct TestOverlayPlaceholder: View {
         OverlayComponent(model: layout)
     }
 }
-

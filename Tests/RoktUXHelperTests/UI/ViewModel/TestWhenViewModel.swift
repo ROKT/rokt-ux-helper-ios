@@ -18,10 +18,10 @@ import DcuiSchema
 final class TestWhenViewModel: XCTestCase {
     
     func get_when_view_model(children: [LayoutSchemaViewModel]? = [],
-                          predicates: [WhenPredicate]? = [],
-                          transition: WhenTransition? = nil,
-                          copy: [String: String] = [String: String](),
-                          breakPoint: BreakPoint? = nil) -> WhenViewModel {
+                             predicates: [WhenPredicate]? = [],
+                             transition: WhenTransition? = nil,
+                             copy: [String: String] = [String: String](),
+                             breakPoint: BreakPoint? = nil) -> WhenViewModel {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
@@ -127,6 +127,7 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: position
+
     func test_should_apply_position_is_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
@@ -357,6 +358,7 @@ final class TestWhenViewModel: XCTestCase {
     }
 
     // MARK: - Dark Mode
+
     func test_shouldNOTApply_whenConditionEqualsIsAndValueEqualsTrue_andDarkModeIsFalse_shouldNotApply() {
         let predicate = WhenPredicate.darkMode(DarkModePredicate(condition: .is, value: true))
         let whenVM = get_when_view_model(predicates: [predicate])
@@ -394,6 +396,7 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: - StaticBoolean
+
     func test_shouldNotApply_whenConditionEqualsIsTrue_valueEqualsFalse() {
         let predicate = WhenPredicate.staticBoolean(StaticBooleanPredicate(condition: .isTrue, value: false))
         let whenVM = get_when_view_model(predicates: [predicate])
@@ -431,10 +434,11 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: - CreativeCopy
+
     func test_shouldApply_whenCreativeCopy_exists() {
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
         let whenVM = get_when_view_model(predicates: [predicate],
-                                copy: [ "creative.title" : "Awesome offer"])
+                                         copy: [ "creative.title": "Awesome offer"])
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -452,7 +456,7 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_whenCreativeCopy_notExists_differentValue() {
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
-        let whenVM = get_when_view_model(predicates: [predicate], copy: ["creative.copy" : "Awesome offer"])
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["creative.copy": "Awesome offer"])
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -461,7 +465,7 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_whenCreativeCopy_notExists_emptyValue() {
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
-        let whenVM = get_when_view_model(predicates: [predicate], copy: ["creative.title" : ""])
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["creative.title": ""])
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -471,7 +475,7 @@ final class TestWhenViewModel: XCTestCase {
     func test_shouldNotApply_whenCreativeCopy_multiple() {
         let predicate1 = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
         let predicate2 = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.copy"))
-        let whenVM = get_when_view_model(predicates: [predicate1, predicate2], copy: ["creative.title" : "Awesome offer"])
+        let whenVM = get_when_view_model(predicates: [predicate1, predicate2], copy: ["creative.title": "Awesome offer"])
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -481,7 +485,9 @@ final class TestWhenViewModel: XCTestCase {
     func test_shouldApply_whenCreativeCopy_multiple() {
         let predicate1 = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
         let predicate2 = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.copy"))
-        let whenVM = get_when_view_model(predicates: [predicate1, predicate2], copy: ["creative.title" : "Awesome offer", "creative.copy": "For you"])
+        let whenVM = get_when_view_model(
+            predicates: [predicate1, predicate2],
+            copy: ["creative.title": "Awesome offer", "creative.copy": "For you"])
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -489,6 +495,7 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: - StaticString
+
     func test_shouldApply_whenConditionEqualsIs_inputEqualsTest_valueEqualsTest() {
         let predicate = WhenPredicate.staticString(StaticStringPredicate(input: "test", condition: .is, value: "test"))
         let whenVM = get_when_view_model(predicates: [predicate])
@@ -526,6 +533,7 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: - CustomState
+
     func test_shouldNotApply_customStateMapNil() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
             key: "state", condition: .is, value: 1))
@@ -692,7 +700,9 @@ final class TestWhenViewModel: XCTestCase {
         let predicate4 = WhenPredicate.darkMode(
             DarkModePredicate(condition: .is, value: true))
 
-        let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4], breakPoint: get_shared_data_with_breakpoints())
+        let whenVM = get_when_view_model(
+            predicates: [predicate1, predicate2, predicate3, predicate4],
+            breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0, width: 1, isDarkMode: true))
 
@@ -713,7 +723,9 @@ final class TestWhenViewModel: XCTestCase {
         let predicate4 = WhenPredicate.darkMode(
             DarkModePredicate(condition: .isNot, value: true))
 
-        let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4],breakPoint:  get_shared_data_with_breakpoints())
+        let whenVM = get_when_view_model(
+            predicates: [predicate1, predicate2, predicate3, predicate4],
+            breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0, width: 1))
         
@@ -736,7 +748,7 @@ final class TestWhenViewModel: XCTestCase {
             CustomStatePredicate(key: "state", condition: .is, value: 21))
 
         let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4, predicate5],
-                                   breakPoint: get_shared_data_with_breakpoints())
+                                         breakPoint: get_shared_data_with_breakpoints())
         // Act
         let customStateId = CustomStateIdentifiable(position: 0, key: "state")
         let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
@@ -762,7 +774,7 @@ final class TestWhenViewModel: XCTestCase {
             CustomStatePredicate(key: "state", condition: .is, value: 21))
         
         let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4, predicate5],
-                                      breakPoint: get_shared_data_with_breakpoints())
+                                         breakPoint: get_shared_data_with_breakpoints())
         // Act
         let customStateId = CustomStateIdentifiable(position: 0, key: "state")
         let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
@@ -776,6 +788,7 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: Empty
+
     // Test empty
     func test_shouldApply_whenPredicatesEmpty() {
         // Arrange
@@ -788,10 +801,11 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     // MARK: - Transitions
+
     func test_shouldExtractDuration_whenTransition_fadeInOut() {
         // Arrange
-        let whenTransition =  WhenTransition(inTransition: [.fadeIn(FadeInTransitionSettings(duration: 200))],
-                                             outTransition: [.fadeOut(FadeOutTransitionSettings(duration: 300))])
+        let whenTransition = WhenTransition(inTransition: [.fadeIn(FadeInTransitionSettings(duration: 200))],
+                                            outTransition: [.fadeOut(FadeOutTransitionSettings(duration: 300))])
         let whenVM = get_when_view_model(transition: whenTransition)
         // Act
         let fadeInDuration = whenVM.fadeInDuration
@@ -803,10 +817,19 @@ final class TestWhenViewModel: XCTestCase {
     }
     
     private func get_slot_offer(copy: [String: String]) -> SlotOfferModel {
-        return SlotOfferModel(offer: OfferModel(campaignId: "Campaign1", creative: CreativeModel(referralCreativeId: "referralCreativeId1", instanceGuid: "instanceGuid", copy: copy, images: nil, links: nil, responseOptionsMap: nil, jwtToken: "jwtToken1")))
+        return SlotOfferModel(offer: OfferModel(
+            campaignId: "Campaign1",
+            creative: CreativeModel(
+                referralCreativeId: "referralCreativeId1",
+                instanceGuid: "instanceGuid",
+                copy: copy,
+                images: nil,
+                links: nil,
+                responseOptionsMap: nil,
+                jwtToken: "jwtToken1")))
     }
     
     func get_shared_data_with_breakpoints() -> BreakPoint {
-        return ["mobile": 1,"tablet": 500, "desktop": 1000] as BreakPoint
+        return ["mobile": 1, "tablet": 500, "desktop": 1000] as BreakPoint
     }
 }

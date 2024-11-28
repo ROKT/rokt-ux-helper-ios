@@ -25,7 +25,6 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
             return
         }
         
-        
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(zStackUIModel))
         
         let sut = try view.inspect().view(TestPlaceHolder.self)

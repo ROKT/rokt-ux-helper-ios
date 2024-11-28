@@ -28,6 +28,7 @@ final class TestEventService: XCTestCase {
     }
 
     // MARK: Events
+
     func test_sendEventsOnTransformerSuccess_readyEventsAndLoadCompleteSignals_shouldSend() throws {
         // Arrange
         let eventService = get_mock_event_processor(uxEventDelegate: stubUXHelper, eventHandler: { event in
@@ -217,7 +218,7 @@ final class TestEventService: XCTestCase {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     uxEventDelegate: stubUXHelper,
                                                     useDiagnosticEvents: true,
-                                                      eventHandler: { event in
+                                                    eventHandler: { event in
             switch event.eventType {
             case .SignalSdkDiagnostic:
                 XCTAssertEqual(event.eventData.first(where: {$0.name == "code" })?.value, "error message")
@@ -237,7 +238,7 @@ final class TestEventService: XCTestCase {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     uxEventDelegate: stubUXHelper,
                                                     useDiagnosticEvents: true,
-                                                      eventHandler: { event in
+                                                    eventHandler: { event in
             switch event.eventType {
             case .SignalSdkDiagnostic:
                 XCTAssertEqual(event.eventData.first(where: {$0.name == "code" })?.value, "[VIEW]")
@@ -257,7 +258,7 @@ final class TestEventService: XCTestCase {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     uxEventDelegate: stubUXHelper,
                                                     useDiagnosticEvents: false,
-                                                      eventHandler: { event in
+                                                    eventHandler: { event in
             switch event.eventType {
             default:
                 expectation.fulfill()

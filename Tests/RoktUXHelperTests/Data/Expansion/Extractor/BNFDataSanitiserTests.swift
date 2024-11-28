@@ -38,8 +38,14 @@ final class BNFDataSanitiserTests: XCTestCase {
     }
 
     func test_sanitiseNamespace_withNamespace_returnsSanitisedString() {
-        XCTAssertEqual(sut.sanitiseNamespace(data: "DATA.creativeCopy.creative.copy", namespace: .dataCreativeCopy), "creative.copy")
-        XCTAssertEqual(sut.sanitiseNamespace(data: "DATA.creativeResponse.creative.copy", namespace: .dataCreativeResponse), "creative.copy")
+        XCTAssertEqual(
+            sut.sanitiseNamespace(data: "DATA.creativeCopy.creative.copy", namespace: .dataCreativeCopy),
+            "creative.copy"
+        )
+        XCTAssertEqual(
+            sut.sanitiseNamespace(data: "DATA.creativeResponse.creative.copy", namespace: .dataCreativeResponse),
+            "creative.copy"
+        )
         XCTAssertEqual(sut.sanitiseNamespace(data: "STATE.creative.title", namespace: .state), "creative.title")
     }
 

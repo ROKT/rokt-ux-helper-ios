@@ -32,7 +32,8 @@ final class TestLayoutTransformer: XCTestCase {
             shortSuccessLabel: "",
             isPositive: true,
             url: "",
-            responseJWTToken: "response-jwt")
+            responseJWTToken: "response-jwt"
+        )
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: responseOption,
                                                                    negative: nil))
         
@@ -227,6 +228,7 @@ final class TestLayoutTransformer: XCTestCase {
     }
     
     // MARK: - ProgressIndicatorTests
+
     func test_progressIndicator_withSingleDataExpansion_parsesUnexpandedData() throws {
         let model = ModelTestData.ProgressIndicatorData.progressIndicator()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
@@ -271,6 +273,7 @@ final class TestLayoutTransformer: XCTestCase {
     }
     
     //MARK: Onebyone
+
     func test_transform_onebyone() throws {
         // Arrange
         guard let model = ModelTestData.OneByOneData.oneByOne(),
@@ -294,7 +297,10 @@ final class TestLayoutTransformer: XCTestCase {
                                                                    negative: responseOption),
                             layoutVariant: response)
         
-        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: .oneByOneDistribution(model), slots: [slot]))
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(
+            layout: .oneByOneDistribution(model),
+            slots: [slot]
+        ))
         
         // Act
         let transformedOneByOne = try layoutTransformer.getOneByOne(oneByOneModel: model)
@@ -317,6 +323,7 @@ final class TestLayoutTransformer: XCTestCase {
     }
     
     //MARK: Column
+
     func test_column_breakpoint() throws {
         // Arrange
         let model = ModelTestData.ColumnData.columnWithBasicText()
@@ -332,6 +339,7 @@ final class TestLayoutTransformer: XCTestCase {
     }
     
     //MARK: ToggleButtonStateTrigger
+
     func test_toggleButton_transformed() throws {
         // Arrange
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
@@ -342,7 +350,8 @@ final class TestLayoutTransformer: XCTestCase {
         let transformedToggleButton = try layoutTransformer.getToggleButton(
             customStateKey: model.customStateKey,
             styles: model.styles,
-            children: nil)
+            children: nil
+        )
         
         // Assert
         XCTAssertEqual(transformedToggleButton.customStateKey, "stateKey")
@@ -352,6 +361,7 @@ final class TestLayoutTransformer: XCTestCase {
     }
     
     //MARK: mock objects
+
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {
         return get_mock_layout_plugin(layout: layout, slots: slots)
     }

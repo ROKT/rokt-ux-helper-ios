@@ -75,11 +75,14 @@ final class TestOverlayComponent: XCTestCase {
         XCTAssertEqual(try zStack.alignment().asVerticalType, VerticalAlignment.center)
     }
     
-    
     func getModel(_ layoutName: LayoutName) throws -> OverlayViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let overlay = getOverlayModel(layoutName: layoutName)
-        return try transformer.getOverlay(overlay.styles, allowBackdropToClose: nil, children: transformer.transformChildren(overlay.children, slot: nil))
+        return try transformer.getOverlay(
+            overlay.styles,
+            allowBackdropToClose: nil,
+            children: transformer.transformChildren(overlay.children, slot: nil)
+        )
     }
     
     func getOverlayModel(layoutName: LayoutName) -> OverlayModel<RichTextModel<WhenPredicate>, WhenPredicate> {
