@@ -85,7 +85,7 @@ extension LayoutSchemaViewModel {
         return LayoutSchemaViewModel.closeButton(
             try transformer.getCloseButton(
                 styles: closeButton.styles,
-                children: transformer.transformChildren(closeButton.children, slot: nil)
+                children: transformer.transformChildren(closeButton.children, context: .outer([]))
             )
         )
     }

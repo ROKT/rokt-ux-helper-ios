@@ -1,6 +1,8 @@
 //
-//  SlotOfferModel.swift
+//  BNFMapper.swift
 //  RoktUXHelper
+//
+//  Copyright 2020 Rokt Pte Ltd
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
 //  Version 2.0 (the "License");
@@ -11,7 +13,8 @@
 
 import Foundation
 
-// Compact version of SlotModel with only offer
-struct SlotOfferModel {
-    let offer: OfferModel?
+@available(iOS 15, *)
+protocol BNFMapper {
+    associatedtype Context
+    func map(consumer: LayoutSchemaViewModel, context: Context)
 }

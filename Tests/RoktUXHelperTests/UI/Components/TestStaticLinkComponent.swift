@@ -132,7 +132,7 @@ extension LayoutSchemaViewModel {
             try transformer.getStaticLink(src: model.src,
                                           open: model.open,
                                           styles: model.styles,
-                                          children: transformer.transformChildren(model.children, slot: nil))
+                                          children: transformer.transformChildren(model.children, context: .outer([])))
         )
     }
 }

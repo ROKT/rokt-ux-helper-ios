@@ -114,6 +114,6 @@ final class TestAccessibilityGroupedModelInRowComponent: XCTestCase {
     func get_model() throws -> LayoutSchemaViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let accessibilityGroup = ModelTestData.RowData.accessibilityGroupedRow()
-        return try transformer.getAccessibilityGrouped(child: accessibilityGroup.child, slot: nil)
+        return try transformer.getAccessibilityGrouped(child: accessibilityGroup.child, context: .outer([]))
     }
 }

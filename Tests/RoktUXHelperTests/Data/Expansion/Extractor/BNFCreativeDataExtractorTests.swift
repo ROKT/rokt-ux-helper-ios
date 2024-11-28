@@ -15,15 +15,15 @@ import XCTest
 @testable import RoktUXHelper
 
 @available(iOS 13, *)
-final class BNFDataExtractorTests: XCTestCase {
+final class BNFCreativeDataExtractorTests: XCTestCase {
     var offer: OfferModel!
-    var sut: BNFDataExtractor? = BNFDataExtractor()
+    var sut: BNFCreativeDataExtractor? = BNFCreativeDataExtractor()
 
     override func setUp() {
         super.setUp()
 
         offer = ModelTestData.PageModelData.withBNF().layoutPlugins?.first!.slots[0].offer!
-        sut = BNFDataExtractor()
+        sut = BNFCreativeDataExtractor()
     }
 
     override func tearDown() {

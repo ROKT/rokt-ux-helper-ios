@@ -1,5 +1,5 @@
 //
-//  BNFNodeMapper.swift
+//  BNFCreativeMapping.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,96 +13,84 @@
 
 import Foundation
 
-@available(iOS 15, *)
-protocol DomainMapper {
-    associatedtype T: DomainMappingSource
+enum BNFCreativeContext {
+    case outer
+    case generic(OfferModel?)
+    case positiveResponse(OfferModel)
+    case negativeResponse(OfferModel)
 
-    @discardableResult
-    func map(
-        consumer: LayoutSchemaViewModel,
-        creativeParent: CreativeResponseViewModel?,
-        dataSource: T
-    ) -> DomainMappable?
+    var creativeResponse: BNFNamespace.CreativeResponseKey? {
+        switch self {
+        case .generic, .outer: nil
+        case .positiveResponse: .positive
+        case .negativeResponse: .negative
+        }
+    }
+
+    var offerModel: OfferModel? {
+        switch self {
+        case .generic(.some(let offerModel)),
+                .positiveResponse(let offerModel),
+                .negativeResponse(let offerModel):
+            offerModel
+        case .outer,
+                .generic(.none): nil
+        }
+    }
 }
 
-/// Maps properties of `Node`s using values in `dataSource`.
+/// Maps properties of `Node`s using values in `context`.
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
 @available(iOS 15, *)
-class BNFNodeMapper<Extractor: DataExtractor>: DomainMapper where Extractor.MappingSource == OfferModel {
+struct BNFCreativeMapping<Extractor: DataExtractor>: BNFMapper where Extractor.MappingSource == OfferModel {
     let extractor: Extractor
 
     init(extractor: Extractor = BNFCreativeDataExtractor()) {
         self.extractor = extractor
     }
 
-    /// Given a node `consumer` with a BNF-formatted property. Extract the value from `dataSource` and mutate `consumer`
-    /// - Parameters:
-    ///   - consumer: Entity with a BNF-formatted property
-    ///   - parent: Top-level parent of the consumer
-    ///   - dataSource: Entity of values
-    /// - Returns: Updated `consumer` DATA MODEL whose BNF-formatted property was parsed and replaced with values from `dataSource`
-    @discardableResult
-    func map(
-        consumer: LayoutSchemaViewModel,
-        creativeParent: CreativeResponseViewModel?,
-        dataSource: OfferModel
-    ) -> DomainMappable? {
+    func map(consumer: LayoutSchemaViewModel, context: BNFCreativeContext) {
         switch consumer {
-        // assumption is that the `value` property will be the mappable value
-        // this is where we decide that only creative.responseOptions is allowed for buttons
+            // assumption is that the `value` property will be the mappable value
+            // this is where we decide that only creative.responseOptions is allowed for buttons
         case .richText(let textModel):
             let originalText = textModel.value ?? ""
 
             let transformedText = resolveDataExpansion(
                 originalText,
-                creativeParent: creativeParent,
-                dataSource: dataSource
+                context: context
             )
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
-
-            return textModel
         case .basicText(let textModel):
             let originalText = textModel.value ?? ""
 
             let transformedText = resolveDataExpansion(
                 originalText,
-                creativeParent: creativeParent,
-                dataSource: dataSource
+                context: context
             )
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
-
-            return textModel
         case .progressIndicator(let indicatorModel):
-            do {
-                let updatedText = try extractor.extractDataRepresentedBy(
-                    String.self,
-                    propertyChain: indicatorModel.indicator,
-                    responseKey: creativeParent?.responseKey.rawValue,
-                    from: dataSource
-                )
-                indicatorModel.updateDataBinding(dataBinding: updatedText)
-
-                return indicatorModel
-            } catch {
-                return nil
-            }
+            guard let updatedText = try? extractor.extractDataRepresentedBy(
+                String.self,
+                propertyChain: indicatorModel.indicator,
+                responseKey: context.creativeResponse?.rawValue,
+                from: context.offerModel
+            ) else { return }
+            indicatorModel.updateDataBinding(dataBinding: updatedText)
         default:
-            return consumer
+            break
         }
     }
 
-    private func resolveDataExpansion(
-        _ fullText: String,
-        creativeParent: CreativeResponseViewModel? = nil,
-        dataSource: OfferModel
-    ) -> String {
+    private func resolveDataExpansion(_ fullText: String, context: BNFCreativeContext) -> String {
         do {
+            guard let offerModel = context.offerModel else { throw LayoutTransformerError.InvalidBNFMapping() }
             let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
-                                                                          creativeParent: creativeParent,
-                                                                          dataSource: dataSource)
+                                                                          responseKey: context.creativeResponse,
+                                                                          dataSource: offerModel)
 
             var transformedText = fullText
 
@@ -120,7 +108,7 @@ class BNFNodeMapper<Extractor: DataExtractor>: DomainMapper where Extractor.Mapp
     // return type is a hashmap of placeholders to their resolved values
     private func placeholdersToResolvedValues(
         _ fullText: String,
-        creativeParent: CreativeResponseViewModel?,
+        responseKey: BNFNamespace.CreativeResponseKey?,
         dataSource: OfferModel
     ) throws -> [String: String] {
         // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
@@ -143,7 +131,7 @@ class BNFNodeMapper<Extractor: DataExtractor>: DomainMapper where Extractor.Mapp
             let resolvedDataBinding = try extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,
-                responseKey: creativeParent?.responseKey.rawValue,
+                responseKey: responseKey?.rawValue,
                 from: dataSource
             )
 

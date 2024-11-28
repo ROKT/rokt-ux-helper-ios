@@ -25,7 +25,7 @@ final class TestWhenViewModel: XCTestCase {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
-                             slots: [get_slot_offer(copy: copy)],
+                             offers: [get_slot_offer(copy: copy)],
                              globalBreakPoints: breakPoint,
                              layoutState: LayoutState())
     }
@@ -802,15 +802,13 @@ final class TestWhenViewModel: XCTestCase {
         XCTAssertEqual(fadeOutDuration, 0.3)
     }
     
-    private func get_slot_offer(copy: [String: String]) -> SlotOfferModel {
-        SlotOfferModel(
-            offer: .mock(
-                campaignId: "campaign1",
-                referralCreativeId: "referralCreativeId1",
-                instanceGuid: "instanceGuid",
-                copy: copy,
-                token: "jwtToken1"
-            )
+    private func get_slot_offer(copy: [String: String]) -> OfferModel {
+        .mock(
+            campaignId: "campaign1",
+            referralCreativeId: "referralCreativeId1",
+            instanceGuid: "instanceGuid",
+            copy: copy,
+            token: "jwtToken1"
         )
     }
     

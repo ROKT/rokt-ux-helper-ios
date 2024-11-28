@@ -43,8 +43,8 @@ final class TestLayoutTransformer: XCTestCase {
             responseKey: model.responseKey,
             openLinks: nil,
             styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, slot: slot.toSlotOfferModel()),
-            slot: slot.toSlotOfferModel()
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.positive(slot.offer!))),
+            offer: slot.offer!
         )
         
         // Assert
@@ -79,8 +79,8 @@ final class TestLayoutTransformer: XCTestCase {
             responseKey: model.responseKey,
             openLinks: nil,
             styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, slot: slot.toSlotOfferModel()),
-            slot: slot.toSlotOfferModel()
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.negative(slot.offer!))),
+            offer: slot.offer!
         )
         
         // Assert
@@ -115,8 +115,8 @@ final class TestLayoutTransformer: XCTestCase {
             responseKey: model.responseKey,
             openLinks: nil,
             styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, slot: slot.toSlotOfferModel()),
-            slot: slot.toSlotOfferModel()
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.negative(slot.offer!))),
+            offer: slot.offer!
         )
         
         // Assert
@@ -167,11 +167,8 @@ final class TestLayoutTransformer: XCTestCase {
         
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponse(
-            responseKey: model.responseKey,
-            openLinks: nil,
-            styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, slot: slot.toSlotOfferModel()),
-            slot: slot.toSlotOfferModel()
+            model: model,
+            context: .inner(.generic(slot.offer!))
         )
         
         // Assert
@@ -215,11 +212,8 @@ final class TestLayoutTransformer: XCTestCase {
         
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponse(
-            responseKey: model.responseKey,
-            openLinks: nil,
-            styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, slot: slot.toSlotOfferModel()),
-            slot: slot.toSlotOfferModel()
+            model: model,
+            context: .inner(.generic(slot.offer!))
         )
         
         // Assert
@@ -231,45 +225,45 @@ final class TestLayoutTransformer: XCTestCase {
         let model = ModelTestData.ProgressIndicatorData.progressIndicator()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
         
-        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicator(model)
-        
-        XCTAssertNotEqual(layoutSchemaUIModel, .empty)
-        
-        guard case .progressIndicator(let uiModel) = layoutSchemaUIModel
-        else {
-            XCTFail("Could not create progress indicator")
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
+        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+            XCTFail("Failed to get indicator state")
             return
         }
-        
-        XCTAssertEqual(uiModel.indicator, "%^STATE.IndicatorPosition^%")
+        XCTAssertEqual(stateLabel, "IndicatorPosition")
     }
-    
+
+    func test_progressIndicator_outerLayer_withSingleDataExpansion_parsesUnexpandedData() throws {
+        let model = ModelTestData.ProgressIndicatorData.progressIndicator()
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .outer([]))
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
+        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+            XCTFail("Failed to get indicator state")
+            return
+        }
+        XCTAssertEqual(stateLabel, "IndicatorPosition")
+    }
+
     func test_progressIndicator_withValidChainOfDataExpansion_parsesUnexpandedData() throws {
         let model = ModelTestData.ProgressIndicatorData.chainOfvaluesDataExpansion()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
         
-        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicator(model)
-        
-        XCTAssertNotEqual(layoutSchemaUIModel, .empty)
-        
-        guard case .progressIndicator(let uiModel) = layoutSchemaUIModel
-        else {
-            XCTFail("Could not create progress indicator")
-            return
-        }
-        
-        XCTAssertEqual(uiModel.indicator, "%^STATE.InitialWrongValue | STATE.IndicatorPosition^%")
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.InitialWrongValue | STATE.IndicatorPosition^%")
     }
-    
+
     func test_progressIndicator_withInvalidDataExpansion_shouldReturnEmpty() throws {
         let model = ModelTestData.ProgressIndicatorData.invalidDataExpansion()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-        
-        let uiModel = try layoutTransformer.getProgressIndicator(model)
-        
-        XCTAssertEqual(uiModel, .empty)
+
+        let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
+
+        XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.SomeValueThatDoesNotWork^%")
     }
-    
+
     //MARK: Onebyone
     func test_transform_onebyone() throws {
         // Arrange
@@ -297,7 +291,7 @@ final class TestLayoutTransformer: XCTestCase {
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: .oneByOneDistribution(model), slots: [slot]))
         
         // Act
-        let transformedOneByOne = try layoutTransformer.getOneByOne(oneByOneModel: model)
+        let transformedOneByOne = try layoutTransformer.getOneByOne(oneByOneModel: model, context: .outer([slot.offer]))
         
         // Assert
         
@@ -367,5 +361,4 @@ final class TestLayoutTransformer: XCTestCase {
             jwtToken: "slot-token"
         )
     }
-    
 }
