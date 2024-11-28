@@ -1,8 +1,8 @@
-## iOS Example App
+# iOS Example App
 
 This example demonstrates two ways to integrate RoktUXHelper using `RoktLayoutView` (SwiftUI) and `RoktLayoutUIView` (UIKit) to render a view showcasing multiple offers.
 
-### Prerequisites
+## Prerequisites
 
 - Ensure you have the latest version of Xcode installed.
 - clone the repository using `git clone git@github.com:ROKT/rokt-ux-helper-ios.git`
@@ -14,7 +14,7 @@ dependencies: [
 ]
 ```
 
-### SwiftUI Implementation: `RoktLayoutView`
+## SwiftUI Implementation: `RoktLayoutView`
 
 Key parameters:
 
@@ -51,7 +51,7 @@ var body: some View {
 }
 ```
 
-### UIKit Implementation: `RoktLayoutUIView`
+## UIKit Implementation: `RoktLayoutUIView`
 
 Similar to `RoktLayoutView`, handle the same parameters, add `RoktLayoutUIView` to your view hierarchy and layout your views accordingly.
 

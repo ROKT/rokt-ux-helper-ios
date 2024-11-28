@@ -1,6 +1,6 @@
-## fastlane documentation
+# fastlane documentation
 
-# Installation
+## Installation
 
 Make sure you have the latest version of the Xcode command line tools installed:
 
@@ -10,11 +10,11 @@ xcode-select --install
 
 For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-# Available Actions
+## Available Actions
 
-## iOS
+### iOS
 
-### ios test
+#### ios test
 
 ```sh
 [bundle exec] fastlane ios test
@@ -22,7 +22,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Runs all the tests
 
-### ios run_swift_package_tests
+#### ios run_swift_package_tests
 
 ```sh
 [bundle exec] fastlane ios run_swift_package_tests

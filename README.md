@@ -4,9 +4,9 @@ The RoktUXHelper enables partner applications to render tailored user experience
 
 ## Resident Experts
 
-- Danial Motahari - danial.motahari@rokt.com
-- Miran Nakamura - miran.nakamura@rokt.com
-- Wei Yew - wei.yew.teoh@rokt.com
+- Danial Motahari - <danial.motahari@rokt.com>
+- Miran Nakamura - <miran.nakamura@rokt.com>
+- Wei Yew - <wei.yew.teoh@rokt.com>
 
 | Environment | Build                                                                                               |
 | ----------- | --------------------------------------------------------------------------------------------------- |

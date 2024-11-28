@@ -6,32 +6,37 @@ labels: bug
 assignees: ""
 ---
 
-**Describe the bug**
+## Describe the bug
+
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+## To Reproduce
+
 Steps to reproduce the behavior:
 
 1. Install Rokt UX Helper for iOS
 2. Execute a layout with these parameters
 3. Encounter error
 
-**Expected behavior**
+## Expected behavior
+
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
+## Screenshots
+
 If applicable, add screenshots to help explain your problem.
 
-**Debug information (please complete the following information):**
+## Debug information (please complete the following information)
 
 - UX Helper version
 - XCode version
 - Swift version
 - Where and how are you rendering the layout in the application
 
-**Stacktrace (if applicable)**
+## Stacktrace (if applicable)
 
-**Additional context**
+## Additional context
+
 Add any other context about the problem here.
 
 > [!IMPORTANT]
