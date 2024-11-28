@@ -134,9 +134,7 @@ final class TestCreativeResponseComponent: XCTestCase {
         return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
                                                           openLinks: nil,
                                                           styles: creativeResponse?.styles,
-                                                          children: transformer.transformChildren(creativeResponse?.children,
-                                                                                                  slot: nil),
-                                                          slot: nil)
-        
+                                                          children: transformer.transformChildren(creativeResponse?.children, context: .outer([])),
+                                                          offer: .mock())
     }
 }

@@ -131,13 +131,15 @@ final class TestDataImageComponent: XCTestCase {
     func get_model(isValid: Bool = true) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""
-        let transformer = LayoutTransformer(layoutPlugin: 
-                                                get_mock_layout_plugin(slots:
-                                                                        [get_slot(image: isValid ? validImage : invalidImage)]))
-        return try transformer.getDataImage(ModelTestData.DataImageData.dataImage(), 
-                                            slot: get_slot(image: isValid ? validImage : invalidImage).toSlotOfferModel())
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(slots: [get_slot(image: isValid ? validImage : invalidImage)])
+        )
+        return try transformer.getDataImage(
+            ModelTestData.DataImageData.dataImage(),
+            context: .inner(.generic(get_slot(image: isValid ? validImage : invalidImage).offer!))
+        )
     }
-    
+
     func get_slot(image: String) -> SlotModel {
         return SlotModel(instanceGuid: "",
                          offer: OfferModel(campaignId: "", creative:
@@ -145,15 +147,16 @@ final class TestDataImageComponent: XCTestCase {
                                                           instanceGuid: "",
                                                           copy: [:],
                                                           images: [
-                                                              "creativeImage": CreativeImage(light: image,
-                                                                                                   dark: nil, alt: "",
-                                                                                                   title: nil)
+                                                            "creativeImage": CreativeImage(
+                                                                light: image,
+                                                                dark: nil, alt: "",
+                                                                title: nil
+                                                            )
                                                           ],
                                                           links: nil,
-                                                          responseOptionsMap: nil, 
+                                                          responseOptionsMap: nil,
                                                           jwtToken: "creative-token")),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
     }
-    
 }

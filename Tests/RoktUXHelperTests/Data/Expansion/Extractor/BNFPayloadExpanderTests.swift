@@ -41,7 +41,7 @@ final class BNFPayloadExpanderTests: XCTestCase {
             return
         }
 
-        let transformedUIModel = try layoutTransformer.transform(innerLayout)
+        let transformedUIModel = try layoutTransformer.transform(innerLayout, context: .outer([]))
 
         sut?.expand(
             layoutVariant: transformedUIModel,

@@ -263,6 +263,10 @@ extension LayoutSchemaViewModel {
                                             layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.GroupedDistributionData.groupedDistribution()
-        return LayoutSchemaViewModel.groupDistribution(try transformer.getGroupedDistribution(groupedModel: model!))
+        return LayoutSchemaViewModel.groupDistribution(
+            try transformer.getGroupedDistribution(
+                groupedModel: model!, context: .outer(slots!.map(\.offer))
+            )
+        )
     }
 }

@@ -149,6 +149,6 @@ final class TestProgressIndicatorComponent: XCTestCase {
 #endif
     func get_model(model: ProgressIndicatorModel<WhenPredicate>) throws -> ProgressIndicatorViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        return try transformer.getProgressIndicatorUIModel(model)
+        return try transformer.getProgressIndicatorUIModel(model, context: .outer([]))
     }
 }

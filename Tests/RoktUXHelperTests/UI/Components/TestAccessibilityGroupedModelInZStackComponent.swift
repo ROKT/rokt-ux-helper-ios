@@ -95,6 +95,6 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
     func get_model() throws -> LayoutSchemaViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let accessibilityGroup = ModelTestData.ZStackData.accessibilityGroupedZStack()
-        return try transformer.getAccessibilityGrouped(child: accessibilityGroup.child, slot: nil)
+        return try transformer.getAccessibilityGrouped(child: accessibilityGroup.child, context: .outer([]))
     }
 }

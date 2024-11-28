@@ -271,6 +271,6 @@ final class TestRowComponent: XCTestCase {
             row = ModelTestData.RowData.rowWithChildren()
         }
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        return try transformer.getRow(row.styles, children: transformer.transformChildren(row.children, slot: nil))
+        return try transformer.getRow(row.styles, children: transformer.transformChildren(row.children, context: .outer([])))
     }
 }

@@ -162,6 +162,6 @@ extension LayoutSchemaViewModel {
                                             layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.CarouselData.carousel()
-        return LayoutSchemaViewModel.carousel(try transformer.getCarousel(carouselModel: model!))
+        return LayoutSchemaViewModel.carousel(try transformer.getCarousel(carouselModel: model!, context: .outer([])))
     }
 }
