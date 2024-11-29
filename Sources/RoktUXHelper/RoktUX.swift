@@ -115,7 +115,7 @@ public class RoktUX: UXEventsDelegate {
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
-        onPluginViewStateChange: @escaping (RoktPluginViewStateUpdates) -> Void
+        onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
@@ -201,7 +201,7 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
-        onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)? = nil,
+        onPluginViewStateChange: ((RoktPluginViewState) -> Void)? = nil,
         processor: EventProcessing
     ) {
         onRoktEvent = onRoktUXEvent
