@@ -55,13 +55,13 @@ class LayoutState: LayoutStateRepresenting {
 
     public let initialPluginViewState: RoktPluginViewState?
     private let pluginId: String?
-    private let onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)?
+    private let onPluginViewStateChange: ((RoktPluginViewState) -> Void)?
 
     init(actionCollection: ActionCollecting = ActionCollection(),
          config: RoktUXConfig? = nil,
          pluginId: String? = nil,
          initialPluginViewState: RoktPluginViewState? = nil,
-         onPluginViewStateChange: ((RoktPluginViewStateUpdates) -> Void)? = nil) {
+         onPluginViewStateChange: ((RoktPluginViewState) -> Void)? = nil) {
         self.actionCollection = actionCollection
         self.config = config
         self.pluginId = pluginId
@@ -73,10 +73,10 @@ class LayoutState: LayoutStateRepresenting {
         guard let pluginId else { return }
         let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
         let customStateMap: Binding<CustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<CustomStateMap?>
-        onPluginViewStateChange?(RoktPluginViewStateUpdates(pluginId: pluginId,
-                                                            offerIndex: offerIndex ?? currentProgress?.wrappedValue,
-                                                            isPluginDismissed: dismiss,
-                                                            customStateMap: customStateMap?.wrappedValue))
+        onPluginViewStateChange?(RoktPluginViewState(pluginId: pluginId,
+                                                     offerIndex: offerIndex ?? currentProgress?.wrappedValue,
+                                                     isPluginDismissed: dismiss,
+                                                     customStateMap: customStateMap?.wrappedValue))
     }
 
     func setLayoutType(_ type: PlacementLayoutCode) {

@@ -15,11 +15,11 @@ import Foundation
 
 @objc public class RoktPluginViewState: NSObject {
     public let pluginId: String
-    public var offerIndex: Int
-    public var isPluginDismissed: Bool
+    public var offerIndex: Int?
+    public var isPluginDismissed: Bool?
     public var customStateMap: CustomStateMap?
     
-    /// Shortcut initialiser that, given a pluginId, defaults to standard, initial plugin view states
+    /// Shortcut initialiser that, when only given a pluginId, defaults to standard, initial plugin view states
     public convenience init(pluginId: String) {
         self.init(pluginId: pluginId,
                   offerIndex: 0,
@@ -28,14 +28,15 @@ import Foundation
     }
 
     public init(pluginId: String,
-                offerIndex: Int,
-                isPluginDismissed: Bool,
+                offerIndex: Int?,
+                isPluginDismissed: Bool?,
                 customStateMap: CustomStateMap?) {
         self.pluginId = pluginId
         self.offerIndex = offerIndex
         self.isPluginDismissed = isPluginDismissed
         self.customStateMap = customStateMap
     }
+
     public override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? RoktPluginViewState else { return false }
 
@@ -43,22 +44,5 @@ import Foundation
                 self.offerIndex == rhs.offerIndex &&
                 self.isPluginDismissed == rhs.isPluginDismissed &&
                 self.customStateMap == rhs.customStateMap)
-    }
-}
-
-@objc public class RoktPluginViewStateUpdates: NSObject {
-    public let pluginId: String
-    public let offerIndex: Int?
-    public let isPluginDismissed: Bool?
-    public let customStateMap: CustomStateMap?
-    
-    public init(pluginId: String,
-                offerIndex: Int? = nil,
-                isPluginDismissed: Bool? = nil,
-                customStateMap: CustomStateMap? = nil) {
-        self.pluginId = pluginId
-        self.offerIndex = offerIndex
-        self.isPluginDismissed = isPluginDismissed
-        self.customStateMap = customStateMap
     }
 }
