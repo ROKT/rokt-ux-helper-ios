@@ -63,8 +63,6 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
             context: .outer(layoutPlugin.slots.map(\.offer))
         )
 
-        AttributedStringTransformer.convertRichTextHTMLIfExists(uiModel: transformedUIModels, config: layoutState.config)
-
         return transformedUIModels
     }
 
@@ -404,6 +402,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
         }
+        vm.transformValueToAttributedString(layoutState.colorMode)
         return vm
     }
 

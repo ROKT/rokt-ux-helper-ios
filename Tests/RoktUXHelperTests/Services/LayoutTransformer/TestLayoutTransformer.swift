@@ -344,7 +344,43 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedToggleButton.pressedStyle?[0].background?.backgroundColor?.light, "#F5C1C4")
         XCTAssertEqual(transformedToggleButton.defaultStyle?[1].background?.backgroundColor?.light, "#F2A7AB")
     }
-    
+
+    func test_expand_withValidBNF_updatesNestedValues() throws {
+        let bnfPageModel = ModelTestData.PageModelData.withBNF()
+
+        let layoutTransformer = LayoutTransformer(layoutPlugin: (bnfPageModel.layoutPlugins?.first!)!)
+
+        let transformedUIModel = try layoutTransformer.transform()
+
+        guard case let .overlay(outerVM) = transformedUIModel else {
+            XCTFail("Could not get outer layout")
+            return
+        }
+
+        guard case .oneByOne(let oneByOneVM) = outerVM.children?[1] else {
+            XCTFail("Could not get outer layout")
+            return
+        }
+
+        guard case .column(let colVM) = oneByOneVM.children?.first else {
+            XCTFail("Could not get outer layout")
+            return
+        }
+
+        if case .basicText(let textModel) = colVM.children?[0] {
+            XCTAssertEqual(textModel.boundValue, "my_t_and_cs_link ")
+        } else {
+            XCTFail("Could not parse BNF layouts test data")
+        }
+
+        // chain of offer descriptions
+        if case .richText(let textModel) = colVM.children?[1] {
+            XCTAssertEqual(textModel.boundValue, "My Offer TitleOffer description goes heremy_t_and_cs_link")
+        } else {
+            XCTFail("Could not parse BNF layouts test data")
+        }
+    }
+
     //MARK: mock objects
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {
         return get_mock_layout_plugin(layout: layout, slots: slots)

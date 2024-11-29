@@ -11,6 +11,71 @@
 
 import Foundation
 
+protocol ComponentViewModel {}
+
+@available(iOS 15, *)
+extension OverlayViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension BottomSheetViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension RowViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension ColumnViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension ZStackViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension WhenViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension OneByOneViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension CarouselViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension GroupedDistributionViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension RichTextViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension BasicTextViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension CreativeResponseViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension StaticImageViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension DataImageViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension ProgressIndicatorViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension CloseButtonViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension StaticLinkViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension ProgressControlViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension ToggleButtonViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension CatalogStackedCollectionViewModel: ComponentViewModel {}
+
+@available(iOS 15, *)
+extension CatalogResponseButtonViewModel: ComponentViewModel {}
+
 @available(iOS 15, *)
 enum LayoutSchemaViewModel: Hashable {
     // top-level
@@ -40,6 +105,70 @@ enum LayoutSchemaViewModel: Hashable {
     case catalogStackedCollection(CatalogStackedCollectionViewModel)
     case catalogResponseButton(CatalogResponseButtonViewModel)
     case empty
+}
+
+@available(iOS 15, *)
+extension LayoutSchemaViewModel {
+    var componentViewModel: ComponentViewModel? {
+        switch self {
+        case .overlay(let componentViewModel):
+            componentViewModel
+        case .bottomSheet(let componentViewModel):
+            componentViewModel
+        case .row(let componentViewModel):
+            componentViewModel
+        case .column(let componentViewModel):
+            componentViewModel
+        case .zStack(let componentViewModel):
+            componentViewModel
+        case .scrollableRow(let componentViewModel):
+            componentViewModel
+        case .scrollableColumn(let componentViewModel):
+            componentViewModel
+        case .when(let componentViewModel):
+            componentViewModel
+        case .oneByOne(let componentViewModel):
+            componentViewModel
+        case .carousel(let componentViewModel):
+            componentViewModel
+        case .groupDistribution(let componentViewModel):
+            componentViewModel
+        case .richText(let componentViewModel):
+            componentViewModel
+        case .basicText(let componentViewModel):
+            componentViewModel
+        case .creativeResponse(let componentViewModel):
+            componentViewModel
+        case .staticImage(let componentViewModel):
+            componentViewModel
+        case .dataImage(let componentViewModel):
+            componentViewModel
+        case .progressIndicator(let componentViewModel):
+            componentViewModel
+        case .closeButton(let componentViewModel):
+            componentViewModel
+        case .staticLink(let componentViewModel):
+            componentViewModel
+        case .progressControl(let componentViewModel):
+            componentViewModel
+        case .toggleButton(let componentViewModel):
+            componentViewModel
+        case .catalogStackedCollection(let componentViewModel):
+            componentViewModel
+        case .catalogResponseButton(let componentViewModel):
+            componentViewModel
+        case .empty:
+            nil
+        }
+    }
+
+    var isDomainMappableParent: Bool {
+        componentViewModel is DomainMappableParent
+    }
+}
+
+@available(iOS 15, *)
+extension LayoutSchemaViewModel: Hashable {
 
     static func == (lhs: LayoutSchemaViewModel, rhs: LayoutSchemaViewModel) -> Bool {
         switch (lhs, rhs) {
