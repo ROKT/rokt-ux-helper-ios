@@ -67,9 +67,9 @@ public struct RoktEventRequest: Codable, Hashable {
         self.eventData = RoktEventRequest.convertDictionaryToNameValue(eventData)
         self.pageInstanceGuid = pageInstanceGuid
         self.metadata = [RoktEventNameValue(name: BE_CLIENT_TIME_STAMP,
-                                        value: EventDateFormatter.getDateString(eventTime)),
+                                            value: EventDateFormatter.getDateString(eventTime)),
                          RoktEventNameValue(name: BE_CAPTURE_METHOD,
-                                        value: kClientProvided)] + extraMetadata
+                                            value: kClientProvided)] + extraMetadata
         self.jwtToken = jwtToken
     }
 

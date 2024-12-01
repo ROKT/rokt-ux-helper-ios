@@ -18,7 +18,7 @@ enum TestConstants {
 
 @available(iOS 13, *)
 final class TestWidthProperty: XCTestCase {
-    func test_width_percentage_nil()  {
+    func test_width_percentage_nil() {
         // Arrange
         let width = WidthProperty(dimensionType: nil)
         // Act
@@ -27,7 +27,7 @@ final class TestWidthProperty: XCTestCase {
         XCTAssertNil(widthPercentage)
     }
     
-    func test_width_percentage_value_nil()  {
+    func test_width_percentage_value_nil() {
         // Arrange
         let width = WidthProperty(dimensionType: nil)
         // Act
@@ -36,7 +36,7 @@ final class TestWidthProperty: XCTestCase {
         XCTAssertNil(widthPercentage)
     }
     
-    func test_width_percentage_value_valid()  {
+    func test_width_percentage_value_valid() {
         // Arrange
         let width = WidthProperty(dimensionType: .percentage(100))
         // Act

@@ -76,7 +76,10 @@ final class TestCreativeResponseComponent: XCTestCase {
         let creativeResponse = ModelTestData.CreativeResponseData.positive()
         return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
                                                           openLinks: nil,
-                                                          styles: creativeResponse?.styles, children: transformer.transformChildren(creativeResponse?.children, slot: nil), slot: nil)
+                                                          styles: creativeResponse?.styles,
+                                                          children: transformer.transformChildren(creativeResponse?.children,
+                                                                                                  slot: nil),
+                                                          slot: nil)
         
     }
     

@@ -49,7 +49,13 @@ class TestEventRequest: XCTestCase {
 
     func test_event_create_date() {
         let eventTime = Date()
-        let eventRequest = RoktEventRequest(sessionId: "", eventType: EventType.SignalImpression, parentGuid: "", eventTime: eventTime, jwtToken: "jwt")
+        let eventRequest = RoktEventRequest(
+            sessionId: "",
+            eventType: EventType.SignalImpression,
+            parentGuid: "",
+            eventTime: eventTime,
+            jwtToken: "jwt"
+        )
 
         XCTAssertNotNil(eventRequest.metadata)
         XCTAssertNotNil(eventRequest.metadata[0])

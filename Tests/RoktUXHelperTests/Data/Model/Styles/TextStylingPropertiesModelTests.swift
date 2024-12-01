@@ -22,7 +22,20 @@ final class TestTextStyleModel: XCTestCase {
             XCTFail()
             return
         }
-        let textStylingProperties = TextStylingProperties(textColor: nil, fontSize: 18, fontFamily: "Arial", fontWeight: .w100, lineHeight: nil, horizontalTextAlign: nil, baselineTextAlign: .super, fontStyle: nil, textTransform: nil, letterSpacing: nil, textDecoration: nil, lineLimit: nil)
+        let textStylingProperties = TextStylingProperties(
+            textColor: nil,
+            fontSize: 18,
+            fontFamily: "Arial",
+            fontWeight: .w100,
+            lineHeight: nil,
+            horizontalTextAlign: nil,
+            baselineTextAlign: .super,
+            fontStyle: nil,
+            textTransform: nil,
+            letterSpacing: nil,
+            textDecoration: nil,
+            lineLimit: nil
+        )
         // Act
         let baseline = textStylingProperties.baselineOffset
         // Assert
@@ -35,7 +48,20 @@ final class TestTextStyleModel: XCTestCase {
             XCTFail()
             return
         }
-        let textStylingProperties = TextStylingProperties(textColor: nil, fontSize: 18, fontFamily: "Arial", fontWeight: nil, lineHeight: nil, horizontalTextAlign: nil, baselineTextAlign: .sub, fontStyle: nil, textTransform: nil, letterSpacing: nil, textDecoration: nil, lineLimit: nil)
+        let textStylingProperties = TextStylingProperties(
+            textColor: nil,
+            fontSize: 18,
+            fontFamily: "Arial",
+            fontWeight: nil,
+            lineHeight: nil,
+            horizontalTextAlign: nil,
+            baselineTextAlign: .sub,
+            fontStyle: nil,
+            textTransform: nil,
+            letterSpacing: nil,
+            textDecoration: nil,
+            lineLimit: nil
+        )
         // Act
         let baseline = textStylingProperties.baselineOffset
         // Assert

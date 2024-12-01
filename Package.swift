@@ -9,7 +9,8 @@ let package = Package(
     products: [
         .library(
             name: "RoktUXHelper",
-            targets: ["RoktUXHelper"])
+            targets: ["RoktUXHelper"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "2.1.0"),

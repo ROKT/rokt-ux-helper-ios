@@ -35,17 +35,17 @@ struct HomeView: View {
                         .padding()
                     Spacer()
 
-                    Button(action: {
+                    Button {
                         isShowingSwiftUIView = true
-                    }) {
+                    } label: {
                         Text("Load SwiftUI")
                     }
                     .padding(.top)
                     .buttonStyle(ButtonDefaultOutlined())
 
-                    Button(action: {
+                    Button {
                         isShowingUIKitView = true
-                    }) {
+                    } label: {
                         Text("Load UIKit")
                     }
                     .padding(.top)

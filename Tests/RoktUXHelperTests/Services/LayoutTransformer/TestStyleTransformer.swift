@@ -24,10 +24,12 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        offsetY: 0,
                                                                                                        blurRadius: 0,
                                                                                                        spreadRadius: 0,
-                                                                                                       color: ThemeColor(light: "#111111", dark: nil)),
+                                                                                                       color: ThemeColor(light: "#111111",
+                                                                                                                         dark: nil)),
                                                                                         overflow: .visible, gap: nil, blur: 0),
                                                   background: BackgroundStylingProperties(backgroundColor:
-                                                                                            ThemeColor(light: "#111111", dark: nil),
+                                                                                            ThemeColor(light: "#111111",
+                                                                                                       dark: nil),
                                                                                           backgroundImage: nil),
                                                   dimension: DimensionStylingProperties(minWidth: 0,
                                                                                         maxWidth: 0,
@@ -42,7 +44,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                     margin: "0",
                                                                                     offset: nil),
                                                   border: BorderStylingProperties(borderRadius: 10,
-                                                                                  borderColor: ThemeColor(light: "#111111", dark: nil),
+                                                                                  borderColor: ThemeColor(light: "#111111",
+                                                                                                          dark: nil),
                                                                                   borderWidth: "2",
                                                                                   borderStyle: .solid))
         
@@ -63,10 +66,12 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                         offsetY: 0,
                                                                                                         blurRadius: 0,
                                                                                                         spreadRadius: 0,
-                                                                                                        color: ThemeColor(light: "#111111", dark: nil)),
+                                                                                                        color: ThemeColor(light: "#111111",
+                                                                                                                          dark: nil)),
                                                                                          overflow: .visible, gap: nil, blur: 0),
                                                    background: BackgroundStylingProperties(backgroundColor:
-                                                                                            ThemeColor(light: "#111112", dark: nil),
+                                                                                            ThemeColor(light: "#111112",
+                                                                                                       dark: nil),
                                                                                            backgroundImage: nil),
                                                    dimension: DimensionStylingProperties(minWidth: 0,
                                                                                          maxWidth: 0,
@@ -81,7 +86,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                      margin: "0",
                                                                                      offset: nil),
                                                    border: BorderStylingProperties(borderRadius: 10,
-                                                                                   borderColor: ThemeColor(light: "#111111", dark: nil),
+                                                                                   borderColor: ThemeColor(light: "#111111",
+                                                                                                           dark: nil),
                                                                                    borderWidth: "2",
                                                                                    borderStyle: .solid))
         
@@ -191,11 +197,13 @@ final class TestStyleTransformer: XCTestCase {
                                            flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                                            spacing: nil)
         
-        let pressed = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
+        let pressed = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                          dark: nil),
                                                                               backgroundImage: nil),
                                       border: nil, dimension: nil, flexChild: nil, spacing: nil)
         
-        let expectedStyle = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
+        let expectedStyle = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                                dark: nil),
                                                                                     backgroundImage: nil),
                                             border: nil,
                                             dimension: DimensionStylingProperties(minWidth: nil,
@@ -222,33 +230,36 @@ final class TestStyleTransformer: XCTestCase {
     func test_get_updated_style_static_image() throws {
         // Arrange
         let defaultStyle = StaticImageStyles(background: nil,
-                                           border: nil,
-                                           dimension: DimensionStylingProperties(minWidth: nil,
-                                                                                 maxWidth: nil,
-                                                                                 width: .fit(.wrapContent),
-                                                                                 minHeight: nil,
-                                                                                 maxHeight: nil,
-                                                                                 height: nil, 
+                                             border: nil,
+                                             dimension: DimensionStylingProperties(minWidth: nil,
+                                                                                   maxWidth: nil,
+                                                                                   width: .fit(.wrapContent),
+                                                                                   minHeight: nil,
+                                                                                   maxHeight: nil,
+                                                                                   height: nil, 
                                                                                  rotateZ: nil),
-                                           flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
-                                           spacing: nil)
+                                             flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
+                                             spacing: nil)
         
-        let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
-                                                                              backgroundImage: nil),
-                                      border: nil, dimension: nil, flexChild: nil, spacing: nil)
+        let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                            dark: nil),
+                                                                                backgroundImage: nil),
+                                        border: nil, dimension: nil, flexChild: nil, spacing: nil)
         
-        let expectedStyle = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
-                                                                                    backgroundImage: nil),
-                                            border: nil,
-                                            dimension: DimensionStylingProperties(minWidth: nil,
-                                                                                  maxWidth: nil,
-                                                                                  width: .fit(.wrapContent),
-                                                                                  minHeight: nil,
-                                                                                  maxHeight: nil,
-                                                                                  height: nil, 
+        let expectedStyle =
+            StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                  dark: nil),
+                                                                      backgroundImage: nil),
+                              border: nil,
+                              dimension: DimensionStylingProperties(minWidth: nil,
+                                                                    maxWidth: nil,
+                                                                    width: .fit(.wrapContent),
+                                                                    minHeight: nil,
+                                                                    maxHeight: nil,
+                                                                    height: nil, 
                                                                                   rotateZ: nil),
-                                            flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
-                                            spacing: nil)
+                              flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
+                              spacing: nil)
         
         // ACT
         let transformedStyle = try StyleTransformer.updatedStyle(defaultStyle, newStyle: pressed)
@@ -264,33 +275,36 @@ final class TestStyleTransformer: XCTestCase {
     func test_get_updated_style_static_image_with_breakpoints() throws {
         // Arrange
         let defaultStyle = StaticImageStyles(background: nil,
-                                           border: nil,
-                                           dimension: DimensionStylingProperties(minWidth: nil,
-                                                                                 maxWidth: nil,
-                                                                                 width: .fit(.wrapContent),
-                                                                                 minHeight: nil,
-                                                                                 maxHeight: nil,
-                                                                                 height: nil, 
+                                             border: nil,
+                                             dimension: DimensionStylingProperties(minWidth: nil,
+                                                                                   maxWidth: nil,
+                                                                                   width: .fit(.wrapContent),
+                                                                                   minHeight: nil,
+                                                                                   maxHeight: nil,
+                                                                                   height: nil, 
                                                                                  rotateZ: nil),
-                                           flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
-                                           spacing: nil)
+                                             flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
+                                             spacing: nil)
         
-        let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
-                                                                              backgroundImage: nil),
-                                      border: nil, dimension: nil, flexChild: nil, spacing: nil)
+        let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                            dark: nil),
+                                                                                backgroundImage: nil),
+                                        border: nil, dimension: nil, flexChild: nil, spacing: nil)
         
-        let expectedStyle = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000", dark: nil),
-                                                                                    backgroundImage: nil),
-                                            border: nil,
-                                            dimension: DimensionStylingProperties(minWidth: nil,
-                                                                                  maxWidth: nil,
-                                                                                  width: .fit(.wrapContent),
-                                                                                  minHeight: nil,
-                                                                                  maxHeight: nil,
-                                                                                  height: nil, 
+        let expectedStyle =
+            StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
+                                                                                                  dark: nil),
+                                                                      backgroundImage: nil),
+                              border: nil,
+                              dimension: DimensionStylingProperties(minWidth: nil,
+                                                                    maxWidth: nil,
+                                                                    width: .fit(.wrapContent),
+                                                                    minHeight: nil,
+                                                                    maxHeight: nil,
+                                                                    height: nil, 
                                                                                   rotateZ: nil),
-                                            flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
-                                            spacing: nil)
+                              flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
+                              spacing: nil)
         let styles = [BasicStateStylingBlock<StaticImageStyles>(default: defaultStyle,
                                                                 pressed: nil,
                                                                 hovered: nil,
@@ -367,42 +381,41 @@ final class TestStyleTransformer: XCTestCase {
     func test_get_updated_style_progress_indicator_with_breakpoints() throws {
         // Arrange
         let defaultStyle1 = IndicatorStyles(container: nil,
-                                           background: nil,
-                                           border: nil,
-                                           dimension: nil,
-                                           flexChild: nil,
-                                           spacing: SpacingStylingProperties(padding: "0",
-                                                                             margin: nil,
-                                                                             offset: nil),
-                                           text: nil)
+                                            background: nil,
+                                            border: nil,
+                                            dimension: nil,
+                                            flexChild: nil,
+                                            spacing: SpacingStylingProperties(padding: "0",
+                                                                              margin: nil,
+                                                                              offset: nil),
+                                            text: nil)
         
         let backgroundColor = ThemeColor(light: "#000000", dark: nil)
         let pressedStyle1 = IndicatorStyles(container: nil,
-                                           background: BackgroundStylingProperties(backgroundColor: backgroundColor,
-                                                                                   backgroundImage: nil),
-                                           border: nil,
-                                           dimension: nil,
-                                           flexChild: nil,
-                                           spacing: nil,
-                                           text: nil)
+                                            background: BackgroundStylingProperties(backgroundColor: backgroundColor,
+                                                                                    backgroundImage: nil),
+                                            border: nil,
+                                            dimension: nil,
+                                            flexChild: nil,
+                                            spacing: nil,
+                                            text: nil)
         let defaultStyle2 = IndicatorStyles(container: nil,
+                                            background: nil,
+                                            border: nil,
+                                            dimension: nil,
+                                            flexChild: nil,
+                                            spacing: nil,
+                                            text: nil)
+       
+        let activeStyle1 = IndicatorStyles(container: nil,
                                            background: nil,
                                            border: nil,
                                            dimension: nil,
                                            flexChild: nil,
-                                           spacing: nil,
+                                           spacing: SpacingStylingProperties(padding: nil,
+                                                                             margin: "1",
+                                                                             offset: nil),
                                            text: nil)
-       
-        
-        let activeStyle1 = IndicatorStyles(container: nil,
-                                          background: nil,
-                                          border: nil,
-                                          dimension: nil,
-                                          flexChild: nil,
-                                          spacing: SpacingStylingProperties(padding: nil,
-                                                                            margin: "1",
-                                                                            offset: nil),
-                                          text: nil)
         
         let indicator = [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, disabled: nil),
                          BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
@@ -442,7 +455,6 @@ final class TestStyleTransformer: XCTestCase {
                                      flexChild: FlexChildStylingProperties(weight: 10, order: 10, alignSelf: nil),
                                      spacing: nil)
         
-        
         let styles = [BasicStateStylingBlock(default: defaultStyle1, pressed: nil, hovered: hoveredStyle1, disabled: nil),
                       BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
 
@@ -457,7 +469,6 @@ final class TestStyleTransformer: XCTestCase {
         XCTAssertEqual(transformedStyle[1].hovered?.flexChild?.weight, 10)
         XCTAssertEqual(transformedStyle[1].hovered?.flexChild?.order, 10)
 
-        
     }
     
     func test_get_updated_style_empty_default_creative_response() throws {
@@ -472,7 +483,8 @@ final class TestStyleTransformer: XCTestCase {
         let pressed = CreativeResponseStyles(container: nil,
                                              background: nil,
                                              border: BorderStylingProperties(borderRadius: 12,
-                                                                             borderColor: ThemeColor(light: "#FF0000", dark: "#FF0000"),
+                                                                             borderColor: ThemeColor(light: "#FF0000",
+                                                                                                     dark: "#FF0000"),
                                                                              borderWidth: "2",
                                                                              borderStyle: nil),
                                              dimension: nil,
@@ -482,7 +494,8 @@ final class TestStyleTransformer: XCTestCase {
         let expectedStyle = CreativeResponseStyles(container: nil,
                                                    background: nil,
                                                    border: BorderStylingProperties(borderRadius: 12,
-                                                                                   borderColor: ThemeColor(light: "#FF0000", dark: "#FF0000"),
+                                                                                   borderColor: ThemeColor(light: "#FF0000",
+                                                                                                           dark: "#FF0000"),
                                                                                    borderWidth: "2",
                                                                                    borderStyle: nil),
                                                    dimension: nil,
@@ -509,7 +522,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        offsetY: 0,
                                                                                                        blurRadius: 0,
                                                                                                        spreadRadius: 0,
-                                                                                                       color: ThemeColor(light: "#333333", dark: nil)),
+                                                                                                       color: ThemeColor(light: "#333333",
+                                                                                                                         dark: nil)),
                                                                                         overflow: .visible, gap: nil,
                                                                                         blur: nil),
                                                   background: BackgroundStylingProperties(backgroundColor:
@@ -529,7 +543,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                     margin: "0",
                                                                                     offset: nil),
                                                   border: BorderStylingProperties(borderRadius: 10,
-                                                                                  borderColor: ThemeColor(light: "#111111", dark: nil),
+                                                                                  borderColor: ThemeColor(light: "#111111",
+                                                                                                          dark: nil),
                                                                                   borderWidth: "2",
                                                                                   borderStyle: .solid))
         
@@ -546,7 +561,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        offsetY: 0,
                                                                                                        blurRadius: 0,
                                                                                                        spreadRadius: 0,
-                                                                                                       color: ThemeColor(light: "color", dark: nil)),
+                                                                                                       color: ThemeColor(light: "color",
+                                                                                                                         dark: nil)),
                                                                                         overflow: .visible, gap: nil, blur: nil),
                                                   background: nil,
                                                   dimension: DimensionStylingProperties(minWidth: 0,
@@ -562,7 +578,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                     margin: "0",
                                                                                     offset: nil),
                                                   border: BorderStylingProperties(borderRadius: 10,
-                                                                                  borderColor: ThemeColor(light: "#111111", dark: nil),
+                                                                                  borderColor: ThemeColor(light: "#111111",
+                                                                                                          dark: nil),
                                                                                   borderWidth: "2",
                                                                                   borderStyle: .solid))
         

@@ -33,34 +33,75 @@ final class BNFDataExtractorTests: XCTestCase {
     }
 
     func test_extractDataRepresentedBy_usingValidCreativeCopyPropertyChain_returnsNestedString() {
-        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeCopy.creative.termsAndConditions.link", responseKey: nil, from: offer))
+        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(
+            String.self,
+            propertyChain: "DATA.creativeCopy.creative.termsAndConditions.link",
+            responseKey: nil,
+            from: offer
+        ))
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeCopy.creative.termsAndConditions.link", responseKey: nil, from: offer),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creativeCopy.creative.termsAndConditions.link",
+                responseKey: nil,
+                from: offer
+            ),
             .value("my_t_and_cs_link")
         )
     }
 
     func test_extractDataRepresentedBy_usingValidCreativeResponsePropertyChain_returnsNestedString() {
-        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeResponse.shortSuccessLabel", responseKey: "positive", from: offer))
+        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(
+            String.self,
+            propertyChain: "DATA.creativeResponse.shortSuccessLabel",
+            responseKey: "positive",
+            from: offer
+        ))
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeResponse.shortSuccessLabel", responseKey: "positive", from: offer),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creativeResponse.shortSuccessLabel",
+                responseKey: "positive",
+                from: offer
+            ),
             .value("Short Success Label!")
         )
     }
 
     func test_extractDataRepresentedBy_usingInvalidPropertyChain_returnsNestedString() {
-        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creative.missingTestId", responseKey: nil, from: offer))
+        XCTAssertNoThrow(try sut?.extractDataRepresentedBy(
+            String.self,
+            propertyChain: "DATA.creative.missingTestId",
+            responseKey: nil,
+            from: offer
+        ))
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creative.missingTestId", responseKey: nil, from: offer),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creative.missingTestId",
+                responseKey: nil,
+                from: offer
+            ),
             .value("DATA.creative.missingTestId")
         )
     }
 
     func test_extractDataRepresentedBy_usingValidCreativeLinkPropertyChain_returnsNestedString() {
         XCTAssertNoThrow(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeLink.privacyPolicy", responseKey: nil, from: offer))
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creativeLink.privacyPolicy",
+                responseKey: nil,
+                from: offer
+            )
+        )
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.creativeLink.privacyPolicy", responseKey: nil, from: offer),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creativeLink.privacyPolicy",
+                responseKey: nil,
+                from: offer
+            ),
             .value("<a href=\"https://rokt.com\" target=\"_blank\">Privacy Policy Link</a>")
         )
     }

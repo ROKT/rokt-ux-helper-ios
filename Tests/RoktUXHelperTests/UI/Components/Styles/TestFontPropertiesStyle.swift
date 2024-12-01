@@ -59,7 +59,20 @@ final class TestFontPropertiesStyle: XCTestCase {
     
     private func assert_font_weight(_ weight: String?, fontWeight: FontWeightUIModel) {
         // Arrange
-        let text = TextStylingProperties(textColor: nil, fontSize: 10, fontFamily: "Arial", fontWeight: FontWeight(rawValue: weight ?? ""), lineHeight: nil, horizontalTextAlign: nil, baselineTextAlign: nil, fontStyle: nil, textTransform: nil, letterSpacing: nil, textDecoration: nil, lineLimit: nil)
+        let text = TextStylingProperties(
+            textColor: nil,
+            fontSize: 10,
+            fontFamily: "Arial",
+            fontWeight: FontWeight(rawValue: weight ?? ""),
+            lineHeight: nil,
+            horizontalTextAlign: nil,
+            baselineTextAlign: nil,
+            fontStyle: nil,
+            textTransform: nil,
+            letterSpacing: nil,
+            textDecoration: nil,
+            lineLimit: nil
+        )
         // Act
         let convertedWeight = text.convertedWeight
         // Assert

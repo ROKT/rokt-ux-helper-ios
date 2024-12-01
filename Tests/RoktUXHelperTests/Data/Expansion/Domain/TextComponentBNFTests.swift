@@ -87,11 +87,11 @@ final class TextComponentBNFTests: XCTestCase {
     }
     
     func test_invalidStates_nsattributedstring_withIncompleteDelimiters_usesDefaultValueIncludingDelimiter() {
-        let originalString = NSAttributedString(string: "%^STATE.SomeInvalidKey|^% %^STATE.SecondInvalidKey|^% SomeDefaultValue^%")
+        let originalString =
+            NSAttributedString(string: "%^STATE.SomeInvalidKey|^% %^STATE.SecondInvalidKey|^% SomeDefaultValue^%")
         let result = TextComponentBNFHelper.replaceStates(originalString, currentOffer: "2", totalOffers: "4")
 
         XCTAssertEqual(result, NSAttributedString(string: "  SomeDefaultValue^%"))
     }
-
 
 }

@@ -14,7 +14,7 @@ import XCTest
 
 @available(iOS 13, *)
 final class TestHeightProperty: XCTestCase {
-    func test_height_percentage_nil()  {
+    func test_height_percentage_nil() {
         // Arrange
         let height = HeightProperty(dimensionType: nil)
         // Act
@@ -23,7 +23,7 @@ final class TestHeightProperty: XCTestCase {
         XCTAssertNil(heightPercentage)
     }
     
-    func test_height_percentage_value_nil()  {
+    func test_height_percentage_value_nil() {
         // Arrange
         let height = HeightProperty(dimensionType: nil)
         // Act
@@ -32,7 +32,7 @@ final class TestHeightProperty: XCTestCase {
         XCTAssertNil(heightPercentage)
     }
     
-    func test_height_percentage_value_valid()  {
+    func test_height_percentage_value_valid() {
         // Arrange
         let height = HeightProperty(dimensionType: .percentage(100))
         // Act

@@ -19,6 +19,6 @@ extension Double {
 
     func precised(_ value: Int = 1) -> Double {
         let offset = pow(10, Double(value))
-        return (self * offset).rounded() / offset
+        return (self * offset).rounded()/offset
     }
 }

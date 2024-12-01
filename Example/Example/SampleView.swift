@@ -33,7 +33,7 @@ struct SampleView: View {
                 vm.handleURL(uxEvent)
             }
             // Handle UX events here
-            
+
         } onPlatformEvent: { _ in
             // Send these platform events to Rokt API
         }.sheet(item: $vm.urlToOpen) {

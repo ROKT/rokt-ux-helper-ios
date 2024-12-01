@@ -35,7 +35,6 @@ final class TestActionCollection: XCTestCase {
         XCTAssertTrue(closeCalled)
     }
     
-    
     func test_event_collection_invalid() {
         // Arrange
         var closeCalled = false
