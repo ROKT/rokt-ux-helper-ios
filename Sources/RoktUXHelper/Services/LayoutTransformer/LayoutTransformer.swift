@@ -623,8 +623,6 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
                         )
                     )
                 )
-            default:
-                throw RoktUXError.experienceResponseMapping
             }
         }
         return CatalogStackedCollectionViewModel(
