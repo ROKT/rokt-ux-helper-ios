@@ -12,11 +12,11 @@
 import Foundation
 
 public struct ProcessedEvent: Hashable, Equatable {
-    public let sessionId: String
-    public let parentGuid: String
-    public let eventType: EventType
-    public let pageInstanceGuid: String
-    public let eventData: [RoktEventNameValue]
+    let sessionId: String
+    let parentGuid: String
+    let eventType: EventType
+    let pageInstanceGuid: String
+    let eventData: [RoktEventNameValue]
 }
 
 extension ProcessedEvent {
