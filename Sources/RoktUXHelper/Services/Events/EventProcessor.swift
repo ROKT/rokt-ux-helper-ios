@@ -24,7 +24,7 @@ protocol EventProcessing {
 @available(iOS 13.0, *)
 class EventProcessor: EventProcessing {
     private var cancellables: Set<AnyCancellable> = .init()
-    private var processedEvents: Set<ProcessedEvent> = .init()
+    private var processedEventHashes: Set<String>
     private var onRoktPlatformEvent: (([String: Any]) -> Void)?
     private(set) var publisher: PassthroughSubject<RoktEventRequest, Never> = .init()
 
@@ -32,8 +32,10 @@ class EventProcessor: EventProcessing {
         delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
         integrationType: HelperIntegrationType = .s2s,
+        processedEventHashes: Set<String>? = nil,
         onRoktPlatformEvent: (([String: Any]) -> Void)?
     ) {
+        self.processedEventHashes = processedEventHashes ?? .init()
         self.onRoktPlatformEvent = onRoktPlatformEvent
         publisher
             .filter {
@@ -45,7 +47,9 @@ class EventProcessor: EventProcessing {
                 return true
             }
             .filter { [weak self] in
-                self?.processedEvents.insert(.init($0)).inserted == true
+                let processedEvent: ProcessedEvent = .init($0)
+                return self?.processedEventHashes.insert(
+                    processedEvent.getHashString()).inserted == true
             }
             .collect(.byTime(queue, .seconds(delay)), options: nil)
             .map(EventsPayload.init(events:))

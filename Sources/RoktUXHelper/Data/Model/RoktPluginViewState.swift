@@ -28,9 +28,9 @@ import Foundation
     }
 
     public init(pluginId: String,
-                offerIndex: Int?,
-                isPluginDismissed: Bool?,
-                customStateMap: CustomStateMap?) {
+                offerIndex: Int? = nil,
+                isPluginDismissed: Bool? = nil,
+                customStateMap: CustomStateMap? = nil) {
         self.pluginId = pluginId
         self.offerIndex = offerIndex
         self.isPluginDismissed = isPluginDismissed
