@@ -26,7 +26,6 @@ final class TestAccessibilityGroupedModelInRowComponent: XCTestCase {
             return
         }
 
-
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(rowUIModel))
         
         let hstack = try view.inspect().view(TestPlaceHolder.self)
@@ -80,7 +79,6 @@ final class TestAccessibilityGroupedModelInRowComponent: XCTestCase {
             XCTFail()
             return
         }
-
 
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(rowUIModel))
         

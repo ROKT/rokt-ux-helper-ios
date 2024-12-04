@@ -157,7 +157,11 @@ final class TestEventProcessor: XCTestCase {
         sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key2": "value2"]))
         
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: date, extraMetadata: [.init(name: "name", value: "value")]))
-        sut.handle(event: mockEvent(eventType: .SignalResponse, date: date, extraMetadata: [.init(name: "name2", value: "value2")]))
+        sut.handle(event: mockEvent(
+            eventType: .SignalResponse,
+            date: date,
+            extraMetadata: [.init(name: "name2", value: "value2")]
+        ))
         
         wait(for: [expectation], timeout: 1)
         XCTAssertEqual(receivedPayload?.count, 4)
