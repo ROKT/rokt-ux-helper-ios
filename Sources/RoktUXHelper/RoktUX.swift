@@ -92,7 +92,6 @@ public class RoktUX: UXEventsDelegate {
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
        - layoutPluginViewStates: Plugin view states ([RoktPluginViewState]) to be restored.
-       - processedEventHashes: Set of hash strings representing processed events to be restored.
        - defaultLayoutLoader: Default loader for the layout.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
        - config: Configuration for the RoktUX.
@@ -107,7 +106,6 @@ public class RoktUX: UXEventsDelegate {
     public func loadLayout(
         startDate: Date = Date(),
         experienceResponse: String,
-        processedEventHashes: Set<String>? = nil,
         layoutPluginViewStates: [RoktPluginViewState]? = nil,
         defaultLayoutLoader: LayoutLoader? = nil,
         layoutLoaders: [String: LayoutLoader?]? = nil,
@@ -120,9 +118,7 @@ public class RoktUX: UXEventsDelegate {
         onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
         let integrationType: HelperIntegrationType = .sdk
-        let processor = EventProcessor(integrationType: integrationType,
-                                       processedEventHashes: processedEventHashes,
-                                       onRoktPlatformEvent: onRoktPlatformEvent)
+        let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
             let layoutPage = try initiatePageModel(integrationType: integrationType,
                                                    startDate: startDate,

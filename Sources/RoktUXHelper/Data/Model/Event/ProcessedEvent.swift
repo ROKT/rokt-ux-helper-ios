@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct ProcessedEvent: Hashable, Equatable {
+struct ProcessedEvent: Hashable, Equatable {
     let sessionId: String
     let parentGuid: String
     let eventType: EventType
@@ -20,7 +20,7 @@ public struct ProcessedEvent: Hashable, Equatable {
 }
 
 extension ProcessedEvent {
-    public init(_ event: RoktEventRequest) {
+    init(_ event: RoktEventRequest) {
         self = .init(
             sessionId: event.sessionId,
             parentGuid: event.parentGuid,
@@ -28,27 +28,5 @@ extension ProcessedEvent {
             pageInstanceGuid: event.pageInstanceGuid,
             eventData: event.eventData
         )
-    }
-    
-    private var attributesAsString: String {
-        let eventDataDict: [String: String] = eventData
-            .map { $0.getDictionary() }
-            .flatMap { $0 }
-            .reduce([String:String]()) { (dict, tuple) in
-                var nextDict = dict
-                nextDict.updateValue(tuple.1, forKey: tuple.0)
-                return nextDict
-            }
-        return eventDataDict
-            .sorted(by: { $0.0 < $1.0 })
-            .map { "\($0):\($1)" }
-            .joined(separator: "")
-    }
-    
-    @available(iOS 13.0, *)
-    public func getHashString() -> String {
-        return [sessionId, parentGuid, eventType.rawValue, pageInstanceGuid, attributesAsString]
-            .joined(separator: "")
-            .sha256()
     }
 }
