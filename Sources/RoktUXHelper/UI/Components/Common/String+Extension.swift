@@ -231,11 +231,3 @@ internal extension StringProtocol {
         }
     }
 }
-
-@available(iOS 13, *)
-internal extension StringProtocol {
-    func sha256() -> String {
-        guard let data = self.data(using: .utf8) else { return "" }
-        return CryptoKit.SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-    }
-}
