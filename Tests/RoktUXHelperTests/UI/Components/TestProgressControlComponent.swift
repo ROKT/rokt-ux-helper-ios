@@ -46,6 +46,5 @@ final class TestProgressControlComponent: XCTestCase {
         let progressControl = ModelTestData.ProgressControlData.progressControl()
         return try transformer.getProgressControl(styles: progressControl.styles, direction: progressControl.direction,
                                                   children: transformer.transformChildren(progressControl.children, context: .outer([])))
-    }
-    
+    }    
 }

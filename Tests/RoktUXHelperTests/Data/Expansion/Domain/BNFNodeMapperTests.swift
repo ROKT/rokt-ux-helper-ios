@@ -234,7 +234,6 @@ final class BNFNodeMapperTests: XCTestCase {
         )
     }
 
-
     private func assertRichTextDataExpansion(childIndex: Int, expectedValue: String) {
         guard let firstOffer else {
             XCTFail("No data source offer")
@@ -248,7 +247,11 @@ final class BNFNodeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        guard let mappedUIModel = sut?.map(consumer: .richText(uiModel), creativeParent: nil, dataSource: firstOffer) as? RichTextViewModel
+        guard let mappedUIModel = sut?.map(
+            consumer: .richText(uiModel),
+            creativeParent: nil,
+            dataSource: firstOffer
+        ) as? RichTextViewModel
         else {
             XCTFail("Could not perform data mapping on RichText")
             return
@@ -270,7 +273,11 @@ final class BNFNodeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        guard let mappedUIModel = sut?.map(consumer: .basicText(uiModel), creativeParent: nil, dataSource: firstOffer) as? BasicTextViewModel
+        guard let mappedUIModel = sut?.map(
+            consumer: .basicText(uiModel),
+            creativeParent: nil,
+            dataSource: firstOffer
+        ) as? BasicTextViewModel
         else {
             XCTFail("Could not perform data mapping on BasicText")
             return

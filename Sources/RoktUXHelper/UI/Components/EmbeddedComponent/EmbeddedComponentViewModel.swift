@@ -15,7 +15,7 @@ import SwiftUI
 class EmbeddedComponentViewModel: ObservableObject {
     let layout: LayoutSchemaViewModel
     private let layoutState: LayoutState?
-    private let eventService: EventServicing?
+    private weak var eventService: EventServicing?
     private var onLoadCallback: (() -> Void)?
     private var onSizeChange: ((CGFloat) -> Void)?
     private var lastUpdatedHeight: CGFloat = 0

@@ -17,6 +17,7 @@ import SwiftUI
 final class TestStyleModel: XCTestCase {
     
     // MARK: ImageScaleProperty
+
     func test_image_scale_property_fill() {
         // Arrange
         let imageScale = ImageScaleProperty.fill
@@ -36,6 +37,7 @@ final class TestStyleModel: XCTestCase {
     }
     
     // MARK: VerticalAlignmentProperty
+
     func test_vertical_alignment_property_alignment_top() {
         assert_alignment(VerticalAlignmentProperty.top, alignmnent: .top)
     }
@@ -50,20 +52,21 @@ final class TestStyleModel: XCTestCase {
     
     func test_vertical_alignment_property_vertical_alignment_top() {
         assert_vertical_alignment(VerticalAlignmentProperty.top,
-                                verticalAlignment: .top)
+                                  verticalAlignment: .top)
     }
     
     func test_vertical_alignment_property_vertical_alignment_bottom() {
         assert_vertical_alignment(VerticalAlignmentProperty.bottom,
-                                verticalAlignment: .bottom)
+                                  verticalAlignment: .bottom)
     }
     
     func test_vertical_alignment_property_vertical_alignment_center() {
         assert_vertical_alignment(VerticalAlignmentProperty.center,
-                                verticalAlignment: .center)
+                                  verticalAlignment: .center)
     }
     
     // MARK: HorizontalAlignmentProperty
+
     func test_horizontal_alignment_property_alignment_start() {
         assert_alignment(HorizontalAlignmentProperty.start, alignmnent: .leading)
     }
@@ -78,34 +81,36 @@ final class TestStyleModel: XCTestCase {
     
     func test_horizontal_alignment_property_horizontal_alignment_start() {
         assert_horizontal_alignment(HorizontalAlignmentProperty.start,
-                                  horizontalAlignmnent: .leading)
+                                    horizontalAlignmnent: .leading)
     }
     
     func test_horizontal_alignment_property_horizontal_alignment_end() {
         assert_horizontal_alignment(HorizontalAlignmentProperty.end,
-                                  horizontalAlignmnent: .trailing)
+                                    horizontalAlignmnent: .trailing)
     }
     
     func test_horizontal_alignment_property_horizontal_alignment_center() {
         assert_horizontal_alignment(HorizontalAlignmentProperty.center,
-                                  horizontalAlignmnent: .center)
+                                    horizontalAlignmnent: .center)
     }
     
     // MARK: HorizontalTextAlignmentProperty
+
     func test_horizontal_text_alignment_property_horizontal_alignment_start() {
         assert_horizontal_text_alignment(HorizontalTextAlignmentProperty.start,
-                                      horizontalTextAlignmnent: .leading)
+                                         horizontalTextAlignmnent: .leading)
     }
     
     func test_horizontal_text_alignment_property_horizontal_alignment_end() {
         assert_horizontal_text_alignment(HorizontalTextAlignmentProperty.end,
-                                      horizontalTextAlignmnent: .trailing)
+                                         horizontalTextAlignmnent: .trailing)
     }
     
     func test_horizontal_text_alignment_property_horizontal_alignment_center() {
         assert_horizontal_text_alignment(HorizontalTextAlignmentProperty.center,
-                                      horizontalTextAlignmnent: .center)
+                                         horizontalTextAlignmnent: .center)
     }
+
     // MARK: FrameAlignmentProperty
     
     func test_frame_alignmnet_valid() {
@@ -190,27 +195,27 @@ final class TestStyleModel: XCTestCase {
     }
     
     private func assert_alignment(_ horizonAlignment: HorizontalAlignmentProperty,
-                         alignmnent: Alignment) {
+                                  alignmnent: Alignment) {
         XCTAssertEqual(horizonAlignment.getAlignment(), alignmnent)
     }
     
     private func assert_alignment(_ verticalAlignment: VerticalAlignmentProperty,
-                         alignmnent: Alignment) {
+                                  alignmnent: Alignment) {
         XCTAssertEqual(verticalAlignment.getAlignment(), alignmnent)
     }
     
     private func assert_horizontal_alignment(_ horizontalAlignmentProperty: HorizontalAlignmentProperty,
-                                   horizontalAlignmnent: HorizontalAlignment) {
+                                             horizontalAlignmnent: HorizontalAlignment) {
         XCTAssertEqual(horizontalAlignmentProperty.getHorizontalAlignment(), horizontalAlignmnent)
     }
     
     private func assert_horizontal_text_alignment(_ horizonTextAlignment: HorizontalTextAlignmentProperty,
-                                       horizontalTextAlignmnent: TextAlignment) {
+                                                  horizontalTextAlignmnent: TextAlignment) {
         XCTAssertEqual(horizonTextAlignment.getTextAlignment(), horizontalTextAlignmnent)
     }
     
     private func assert_vertical_alignment(_ verticalAlignmentProperty: VerticalAlignmentProperty,
-                                 verticalAlignment: VerticalAlignment) {
+                                           verticalAlignment: VerticalAlignment) {
         XCTAssertEqual(verticalAlignmentProperty.getVerticalAlignment(), verticalAlignment)
     }
     

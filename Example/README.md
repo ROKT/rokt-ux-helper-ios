@@ -1,19 +1,20 @@
-iOS Example App
-----
+# iOS Example App
 
 This example demonstrates two ways to integrate RoktUXHelper using `RoktLayoutView` (SwiftUI) and `RoktLayoutUIView` (UIKit) to render a view showcasing multiple offers.
 
-### Prerequisites
+## Prerequisites
+
 - Ensure you have the latest version of Xcode installed.
 - clone the repository using `git clone git@github.com:ROKT/rokt-ux-helper-ios.git`
 - RoktUXHelper is integrated via Swift Package Manager (SPM). To add the package, simply include the following dependency in your `Package.swift` file:
+
 ```swift
 dependencies: [
     .package(url: "https://github.com/ROKT/rokt-ux-helper-ios.git", .upToNextMajor(from: "0.1.0"))
 ]
 ```
 
-### SwiftUI Implementation: `RoktLayoutView`
+## SwiftUI Implementation: `RoktLayoutView`
 
 Key parameters:
 
@@ -32,16 +33,16 @@ var body: some View {
         location: "#target_element", // "targetElementSelector" in experience JSON file
         config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
     ) { uxEvent in
-        
+
         if uxEvent as? RoktUXEvent.LayoutCompleted != nil {
             dismiss()
         } else if let uxEvent = (uxEvent as? RoktUXEvent.OpenUrl) {
             // Handle open URL event
             vm.handleURL(uxEvent)
         }
-        
+
         // Handle UX events here
-        
+
     } onPlatformEvent: { platformPayload in
         // Send these platform events to Rokt API
     }.sheet(item: $vm.urlToOpen) {
@@ -50,7 +51,7 @@ var body: some View {
 }
 ```
 
-### UIKit Implementation: `RoktLayoutUIView`
+## UIKit Implementation: `RoktLayoutUIView`
 
 Similar to `RoktLayoutView`, handle the same parameters, add `RoktLayoutUIView` to your view hierarchy and layout your views accordingly.
 
@@ -58,7 +59,7 @@ For more details, refer to the [UIKit integration guide](https://docs.rokt.com/s
 
 ```swift
 let roktView = RoktLayoutUIView(
-    experienceResponse: experience, 
+    experienceResponse: experience,
     location: "#target_element" // "targetElementSelector" in experience JSON file
 ) { [weak self] uxEvent in
     guard let self else { return }
@@ -82,9 +83,9 @@ let roktView = RoktLayoutUIView(
     } else if uxEvent as? RoktUXEvent.LayoutCompleted != nil {
         dismiss(animated: true)
     }
-    
+
     // Handle UX events here
-    
+
 } onPlatformEvent: { platformEvent in
     // Send these platform events to Rokt API
 }
