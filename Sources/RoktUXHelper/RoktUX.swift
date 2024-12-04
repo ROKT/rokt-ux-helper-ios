@@ -216,7 +216,7 @@ public class RoktUX: UXEventsDelegate {
         let catalogItems = layoutPlugin.slots
             .compactMap(\.offer)
             .map(\.catalogItems)
-            .flatMap { $0 }
+            .compactMap { $0 }
             .flatMap { $0 }
 
         let eventService = EventService(
@@ -334,7 +334,7 @@ public class RoktUX: UXEventsDelegate {
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
 
-                    var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                    let onSizeChange = { [weak layoutLoader] (size: CGFloat) in
                         layoutLoader?.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
                     }

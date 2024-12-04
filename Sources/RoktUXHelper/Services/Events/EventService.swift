@@ -174,6 +174,7 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
     }
 
     func cartItemInstantPurchaseSuccess(itemId: String) {
@@ -202,7 +203,6 @@ class EventService: Hashable, EventDiagnosticServicing {
                 ],
             jwtToken: catalogItem.token ?? ""
         )
-        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
     }
 
     private func canOpenUrl(_ url: URL) {
