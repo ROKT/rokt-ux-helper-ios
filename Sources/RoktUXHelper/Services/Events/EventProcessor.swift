@@ -29,11 +29,6 @@ class EventProcessor: EventProcessing {
     // EventProcessor is being passed in so that the publisher will always finish publishing before the Processor class gets deallocated.
     private(set) var publisher: PassthroughSubject<(RoktEventRequest, EventProcessor?), Never> = .init()
 
-    struct Payload {
-        let processor: EventProcessor
-        let event: RoktEventRequest
-    }
-
     init(
         delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
@@ -50,16 +45,16 @@ class EventProcessor: EventProcessing {
                 }
                 return true
             }
-            .filter { [weak self] (event, processor) in
+            .filter { [weak self] (event, _) in
                 self?.processedEvents.insert(.init(event)).inserted == true
             }
             .collect(.byTime(queue, .seconds(delay)), options: nil)
             .map {
                 (EventsPayload.init(events: $0.map(\.0)), $0.first?.1)
             }
-            .compactMap { [weak self] in
-                guard let payload = self?.serializeData(payload: $0) else { return nil }
-                return (payload, $1)
+            .compactMap { [weak self] (events, processor) in
+                guard let payload = self?.serializeData(payload: events) else { return nil }
+                return (payload, processor)
             }
             .sink(
                 receiveCompletion: {_ in },
