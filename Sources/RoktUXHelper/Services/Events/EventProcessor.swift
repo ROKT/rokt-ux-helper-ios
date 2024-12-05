@@ -45,21 +45,21 @@ class EventProcessor: EventProcessing {
                 }
                 return true
             }
-            .filter { [weak self] (event, _) in
-                self?.processedEvents.insert(.init(event)).inserted == true
+            .filter { (event, processor) in
+                processor?.processedEvents.insert(.init(event)).inserted == true
             }
             .collect(.byTime(queue, .seconds(delay)), options: nil)
             .map {
                 (EventsPayload.init(events: $0.map(\.0)), $0.first?.1)
             }
-            .compactMap { [weak self] (events, processor) in
-                guard let payload = self?.serializeData(payload: events) else { return nil }
+            .compactMap { (events, processor) in
+                guard let payload = processor?.serializeData(payload: events) else { return nil }
                 return (payload, processor)
             }
             .sink(
                 receiveCompletion: {_ in },
-                receiveValue: { [weak self] (event: [String: Any], processor: EventProcessor?) in
-                    self?.onRoktPlatformEvent?(event)
+                receiveValue: { (event: [String: Any], processor: EventProcessor?) in
+                    processor?.onRoktPlatformEvent?(event)
                 }
             )
             .store(in: &cancellables)
