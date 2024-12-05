@@ -135,7 +135,7 @@ final class TestEventProcessor: XCTestCase {
         XCTAssertEqual(receivedPayload?[1].eventType, .SignalImpression)
         XCTAssertEqual(receivedPayload?[2].eventType, .SignalResponse)
     }
-    
+
     func testEventRemoveDuplicates() {
         let expectation = expectation(description: "test duplicates")
         var receivedPayload: [RoktEventRequest]?
@@ -172,7 +172,31 @@ final class TestEventProcessor: XCTestCase {
         
         XCTAssertEqual(receivedPayload?[3].eventType, .SignalResponse)
     }
-    
+
+    func testDelayProcessorDeallocation() {
+        let expectation = expectation(description: "wait")
+        var receivedPayload: [RoktEventRequest]?
+        weak var weakSut: EventProcessor?
+        var sut: EventProcessor? = EventProcessor(delay: 1) { [weak self] payload in
+            guard let self else {
+                XCTFail("Fail self")
+                return
+            }
+            XCTAssertNotNil(weakSut)
+            receivedPayload = deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        weakSut = sut
+        sut?.handle(event: mockEvent(eventType: .SignalActivation, date: Date()))
+        sut = nil
+
+        wait(for: [expectation], timeout: 2)
+
+        XCTAssertNil(weakSut)
+        XCTAssertEqual(receivedPayload?.count, 1)
+        XCTAssertEqual(receivedPayload?.first?.eventType, .SignalActivation)
+    }
+
     private func microSleep(_ seconds: Double) {
         usleep(useconds_t(Int32(seconds * 1000000)))
     }
