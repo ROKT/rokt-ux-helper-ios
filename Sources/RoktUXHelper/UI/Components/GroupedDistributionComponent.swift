@@ -42,7 +42,7 @@ struct GroupedDistributionComponent: View {
 
     @State var currentGroup = 0
     @State private var toggleTransition = false
-    @State private var currentLeadingOffer = 0
+    @State private var currentLeadingOffer: Int
 
     @State var customStateMap: CustomStateMap?
 
@@ -74,6 +74,9 @@ struct GroupedDistributionComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
+        _currentLeadingOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
+        setRecalculatedCurrentGroup()
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -161,11 +164,15 @@ struct GroupedDistributionComponent: View {
                 .accessibilityFocused($shouldFocusAccessibility)
                 .accessibilityLabel(accessibilityAnnouncement)
                 .onChange(of: currentLeadingOffer) { newValue in
+                    model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     model.sendViewableImpressionEvents(viewableItems: viewableItems,
                                                        currentLeadingOffer: newValue)
                     shouldFocusAccessibility = true
                     UIAccessibility.post(notification: .announcement,
                                          argument: accessibilityAnnouncement)
+                }
+                .onChange(of: customStateMap) { _ in
+                    model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
                 }
                 .onChange(of: globalScreenSize.width) { newSize in
                     // run it in background thread for smooth transition
@@ -353,6 +360,12 @@ struct GroupedDistributionComponent: View {
                 }
                 newPageIndex += 1
             }
+        }
+    }
+    
+    func setRecalculatedCurrentGroup() {
+        if currentLeadingOffer >= 0 {
+            self.currentGroup = Int(floor(Double(currentLeadingOffer+1/viewableItems)))
         }
     }
 }

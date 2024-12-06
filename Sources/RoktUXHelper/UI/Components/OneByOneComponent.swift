@@ -40,7 +40,7 @@ struct OneByOneComponent: View {
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
-    @State var currentOffer = 0
+    @State var currentOffer: Int
     @State private var toggleTransition = false
     @State var customStateMap: CustomStateMap?
 
@@ -72,6 +72,8 @@ struct OneByOneComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
+        _currentOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -127,11 +129,15 @@ struct OneByOneComponent: View {
                     shouldFocusAccessibility = true
                 }
                 .onChange(of: currentOffer) { newValue in
+                    model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     transitionIn()
                     model.sendImpressionEvents(currentOffer: newValue)
                     shouldFocusAccessibility = true
                     UIAccessibility.post(notification: .announcement,
                                          argument: accessibilityAnnouncement)
+                }
+                .onChange(of: customStateMap) { _ in
+                    model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
                 }
                 .onChange(of: globalScreenSize.width) { newSize in
                     // run it in background thread for smooth transition
@@ -153,7 +159,6 @@ struct OneByOneComponent: View {
     func registerActions() {
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
-
         model.setupBindings(
             currentProgess: $currentOffer,
             customStateMap: $customStateMap,

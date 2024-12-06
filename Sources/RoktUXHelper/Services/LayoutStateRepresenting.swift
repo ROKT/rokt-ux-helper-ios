@@ -19,9 +19,11 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     var imageLoader: ImageLoader? { get }
     var colorMode: RoktUXConfig.ColorMode? { get }
     var config: RoktUXConfig? { get }
+    var initialPluginViewState: RoktPluginViewState? { get }
 
     func setLayoutType(_ type: PlacementLayoutCode)
     func layoutType() -> PlacementLayoutCode
     func closeOnComplete() -> Bool
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int
+    func capturePluginViewState(offerIndex: Int?, dismiss: Bool?)
 }

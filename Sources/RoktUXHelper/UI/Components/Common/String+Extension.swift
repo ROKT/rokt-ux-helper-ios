@@ -11,6 +11,7 @@
 
 import SwiftUI
 import DcuiSchema
+import CryptoKit
 
 @available(iOS 15, *)
 internal extension StringProtocol {

@@ -42,7 +42,7 @@ struct CarouselComponent: View {
 
     // states to track paging when we have multiple viewable items
     @State private var currentPage = 0
-    @State private var currentLeadingOffer = 0
+    @State private var currentLeadingOffer: Int
     @State private var indexWithinPage = 0
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
@@ -87,6 +87,9 @@ struct CarouselComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
+        _currentLeadingOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
+        setRecalculatedCurrentPage()
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -188,11 +191,15 @@ struct CarouselComponent: View {
                 shouldFocusAccessibility = true
             }
             .onChange(of: currentLeadingOffer) { newValue in
+                model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                 model.sendViewableImpressionEvents(viewableItems: viewableItems,
                                                    currentLeadingOffer: newValue)
                 shouldFocusAccessibility = true
                 UIAccessibility.post(notification: .announcement,
                                      argument: accessibilityAnnouncement)
+            }
+            .onChange(of: customStateMap) { _ in
+                model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
             }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
