@@ -15,7 +15,7 @@ import Combine
 
 @available(iOS 13.0, *)
 class MockEventProcessor: EventProcessing {
-    var publisher: PassthroughSubject<RoktEventRequest, Never> = .init()
+    var publisher: PassthroughSubject<(RoktEventRequest, EventProcessor?), Never> = .init()
     var handler: ((RoktEventRequest) -> Void)?
     
     init(handler: ((RoktEventRequest) -> Void)? = nil) {
