@@ -186,7 +186,7 @@ public final class SwiftUIViewController: UIHostingController<AnyView> {
     }
 
     public func closeModal() {
-        
+
         if let eventService {
             eventService.dismissOption = .partnerTriggered
             eventService.sendDismissalEvent()

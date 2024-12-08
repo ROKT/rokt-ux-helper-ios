@@ -268,6 +268,137 @@ final class TestEventService: XCTestCase {
         let result = XCTWaiter().wait(for: [expectation], timeout: 2)
         XCTAssertEqual(result, .timedOut, "The test should time out since the expectation was not fulfilled.")
     }
+
+    func test_send_instant_purchase_initiated() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemInstantPurchase(catalogItem: .mock())
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemInstantPurchase))
+    }
+
+    func test_send_instant_purchase_succeeded() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "staples.861425")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemInstantPurchaseSuccess(itemId: "staples.861425")
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
+    }
+
+    func test_send_instant_purchase_failed() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "xyz"), .mock(catalogItemId: "staples.861425")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemInstantPurchaseFailure(itemId: "staples.861425")
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseFailure)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
+    }
+
+    func test_given_no_catalogItems_then_send_nothing() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemInstantPurchaseSuccess(itemId: "staples.861425")
+        eventService.cartItemInstantPurchaseFailure(itemId: "staples.861425")
+
+        // Assert
+        XCTAssertEqual(events.count, 0)
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
+    }
 }
 
 class MockUXHelper: UXEventsDelegate {
