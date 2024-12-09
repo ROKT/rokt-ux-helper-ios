@@ -163,6 +163,6 @@ extension RoktLayoutUIView: LayoutLoader {
         roktEmbeddedSwiftUIView = nil
         // notify the changes
         onEmbeddedSizeChange?(0)
-        config?.debugLog("Rokt: User journey endded on Embedded view")
+        config?.debugLog("Rokt: User journey ended on Embedded view")
     }
 }
