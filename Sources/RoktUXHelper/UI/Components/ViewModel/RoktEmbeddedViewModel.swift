@@ -34,6 +34,7 @@ class RoktEmbeddedViewModel {
     }
 
     func sendOnLoadEvents() {
+        layoutState?.config?.debugLog("Rokt: view loaded")
         eventService?.sendEventsOnLoad()
     }
 
