@@ -76,12 +76,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -154,12 +156,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -304,11 +308,13 @@ public class RoktUX: UXEventsDelegate {
             // invalid color error
             eventService?.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kColorInvalid + color)
+            config?.debugLog("Rokt: Invalid color in schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
             eventService?.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kLayoutInvalid)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
     }
@@ -360,6 +366,7 @@ public class RoktUX: UXEventsDelegate {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
                                                   callStack: kEmbeddedLayoutDoesntExistMessage
                                                     + targetElement + kLocationDoesNotExist)
+                    config?.debugLog("Rokt: Embedded layout doesn't exist")
                     onUnload()
                     self.onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
                 }

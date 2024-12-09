@@ -19,10 +19,17 @@ public struct RoktUXConfig {
     let colorMode: ColorMode
     /// Optional image loader for the UX.
     let imageLoader: ImageLoader?
+    /// A Boolean value that determines whether debug logging is enabled.
+    let loggingEnabled: Bool
 
-    private init(colorMode: ColorMode, imageLoader: ImageLoader?) {
+    private init(
+        colorMode: ColorMode, 
+        imageLoader: ImageLoader?,
+        loggingEnabled: Bool
+    ) {
         self.colorMode = colorMode
         self.imageLoader = imageLoader
+        self.loggingEnabled = loggingEnabled
     }
 
     /// Enum representing the color modes available.
@@ -39,6 +46,7 @@ public struct RoktUXConfig {
     public class Builder: NSObject {
         var colorMode: ColorMode?
         weak var imageLoader: ImageLoader?
+        var loggingEnabled: Bool?
 
         /// Sets the color mode for the configuration.
         /// - Parameter colorMode: The color mode to be set.
@@ -55,11 +63,31 @@ public struct RoktUXConfig {
             self.imageLoader = imageLoader
             return self
         }
+        
+        /// Enables or disables debug logging for the RoktUXConfig.
+        /// - Parameter enable: A Boolean value indicating whether debug logging should be enabled.
+        /// - Returns: The Builder instance with the updated logging configuration.
+        public func enableLogging(_ enable: Bool) -> Builder {
+            self.loggingEnabled = enable
+            return self
+        }
 
         /// Builds the `RoktUXConfig` instance with the specified settings.
         /// - Returns: A configured `RoktUXConfig` instance.
         public func build() -> RoktUXConfig {
-            RoktUXConfig(colorMode: colorMode ?? .system, imageLoader: imageLoader)
+            RoktUXConfig(
+                colorMode: colorMode ?? .system,
+                imageLoader: imageLoader,
+                loggingEnabled: loggingEnabled ?? false
+            )
+        }
+    }
+}
+
+extension RoktUXConfig {
+    func debugLog(_ message: String) {
+        if loggingEnabled {
+            debugPrint(message)
         }
     }
 }
