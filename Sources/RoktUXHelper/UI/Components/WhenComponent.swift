@@ -73,11 +73,7 @@ struct WhenComponent: View {
 
     var body: some View {
         Group {
-            if let visible {
-                if visible {
-                    buildComponent()
-                }
-            } else if shouldApply {
+            if visible == true || shouldApply {
                 buildComponent()
             }
         }
