@@ -39,13 +39,6 @@ extension UIViewController {
                                           eventService: eventService,
                                           layoutState: layoutState,
                                           onUnload: onUnLoad)
-        
-        if let isPluginDismissed = layoutState.initialPluginViewState?.isPluginDismissed,
-           isPluginDismissed {
-            modal.dismiss(animated: true, completion: nil)
-            return
-        }
-
         if #available(iOS 16.0, *),
            let type = placementType,
            type == .BottomSheet(.dynamic),
