@@ -211,6 +211,14 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         onRoktEvent = onRoktUXEvent
+        
+        if let isPluginDismissed = layoutPluginViewState?.isPluginDismissed,
+           isPluginDismissed {
+            onPlacementCompleted(layoutPlugin.pluginId)
+            onUnload()
+            return
+        }
+
         let actionCollection = ActionCollection()
 
         let layoutState = LayoutState(actionCollection: actionCollection,
@@ -337,13 +345,6 @@ public class RoktUX: UXEventsDelegate {
                     var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
                         layoutLoader?.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
-                    }
-                    
-                    if let isPluginDismissed = layoutState.initialPluginViewState?.isPluginDismissed,
-                       isPluginDismissed {
-                        layoutLoader.closeEmbedded()
-                        onUnload()
-                        return
                     }
 
                     layoutLoader.load(onSizeChanged: onSizeChange,
