@@ -97,6 +97,7 @@ import SwiftUI
                            onUXEvent: ((RoktUXEvent) -> Void)?,
                            onPlatformEvent: (([String: Any]) -> Void)?,
                            onEmbeddedSizeChange: ((CGFloat) -> Void)? = nil) {
+        self.onEmbeddedSizeChange = onEmbeddedSizeChange
         uxHelper = RoktUX()
         uxHelper?.loadLayout(
             experienceResponse: experienceResponse,

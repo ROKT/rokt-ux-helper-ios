@@ -67,6 +67,7 @@ extension RoktLayoutViewModel: LayoutLoader {
 
     /// Closes the embedded view.
     public func closeEmbedded() {
+        updateEmbeddedSize(0)
         state = .empty
         config?.debugLog("Rokt: User journey ended on Embedded view")
     }
