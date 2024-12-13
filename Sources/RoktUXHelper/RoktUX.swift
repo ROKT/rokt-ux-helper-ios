@@ -214,7 +214,7 @@ public class RoktUX: UXEventsDelegate {
         
         if let isPluginDismissed = layoutPluginViewState?.isPluginDismissed,
            isPluginDismissed {
-            onPlacementClosed(layoutPlugin.pluginId)
+            onPlacementCompleted(layoutPlugin.pluginId)
             onUnload()
             return
         }
