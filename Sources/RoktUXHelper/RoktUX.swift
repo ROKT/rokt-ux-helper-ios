@@ -330,7 +330,7 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak layoutLoader] in
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
 
@@ -357,10 +357,10 @@ public class RoktUX: UXEventsDelegate {
                         )
                         .customColorMode(colorMode: config?.colorMode)
                     })
-                    layoutState.actionCollection[.close] = { [weak layoutLoader] _ in
+                    layoutState.actionCollection[.close] = { [weak layoutLoader, weak layoutState] _ in
                         layoutLoader?.closeEmbedded()
                         onUnload()
-                        layoutState.capturePluginViewState(offerIndex: nil, dismiss: true)
+                        layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
