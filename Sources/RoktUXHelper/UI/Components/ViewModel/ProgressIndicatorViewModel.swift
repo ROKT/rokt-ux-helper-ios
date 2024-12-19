@@ -31,16 +31,11 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
         layoutState?.imageLoader
     }
 
-    var currentIndex: Binding<Int> {
-        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
-    }
+    var currentIndex: Binding<Int>
+    var viewableItems: Binding<Int>
 
     var totalOffer: Int {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
-    }
-
-    var viewableItems: Binding<Int> {
-        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(
@@ -64,6 +59,8 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
         self.accessibilityHidden = accessibilityHidden
         self.layoutState = layoutState
         self.eventService = eventService
+        self.viewableItems = layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.currentIndex = layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
