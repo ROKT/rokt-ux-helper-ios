@@ -32,7 +32,7 @@ struct OuterLayerComponent: View {
     @Binding var parentHeight: CGFloat?
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-
+    @State private var styleState: StyleState = .default
     @State var lastUpdatedHeight: CGFloat = 0
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -110,7 +110,7 @@ struct OuterLayerComponent: View {
                                       layout: child,
                                       parentWidth: $availableWidth,
                                       parentHeight: $availableHeight,
-                                      styleState: .constant(.default),
+                                      styleState: $styleState,
                                       parentOverride: ComponentParentOverride(parentVerticalAlignment: nil,
                                                                               parentHorizontalAlignment: nil,
                                                                               parentBackgroundStyle: backgroundStyle,
@@ -129,6 +129,6 @@ struct OuterLayerComponent: View {
 
 @available(iOS 15, *)
 class GlobalScreenSize: ObservableObject, Equatable {
-    @Published var width: CGFloat?
-    @Published var height: CGFloat?
+    @LazyPublished var width: CGFloat?
+    @LazyPublished var height: CGFloat?
 }
