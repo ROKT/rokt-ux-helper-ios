@@ -38,8 +38,8 @@ class LazyPublished<Value: Equatable>: ObservableObject {
          message: "@LazyPublished can only be applied to classes"
     )
     var wrappedValue: Value {
-        get { fatalError() }
-        set { fatalError() }
+        get { storage }
+        set { assertionFailure("Can only be applied to classes") }
     }
 
     var projectedValue: Published<Value>.Publisher {
