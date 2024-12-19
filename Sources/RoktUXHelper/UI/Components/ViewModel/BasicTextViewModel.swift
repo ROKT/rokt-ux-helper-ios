@@ -30,10 +30,10 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     private(set) var dataBinding: DataBinding<String> = .value("")
 
     // extracted data from `dataBinding` that's published externally
-    @Published var boundValue = ""
+    @LazyPublished var boundValue = ""
 
-    @Published var styleState = StyleState.default
-    @Published var breakpointIndex = 0
+    @LazyPublished var styleState = StyleState.default
+    @LazyPublished var breakpointIndex = 0
     var currentStylingProperties: BasicTextStyle? {
         switch styleState {
         case .hovered:
@@ -60,16 +60,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         layoutState?.imageLoader
     }
 
-    var currentIndex: Binding<Int> {
-        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
-    }
+    var currentIndex: Binding<Int> = .constant(0)
+    var viewableItems: Binding<Int> = .constant(1)
 
     var totalOffer: Int {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
-    }
-
-    var viewableItems: Binding<Int> {
-        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(
@@ -94,6 +89,8 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.stateDataExpansionClosure = stateDataExpansionClosure
         self.layoutState = layoutState
         self.diagnosticService = diagnosticService
+        self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
     }
 
