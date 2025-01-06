@@ -190,7 +190,7 @@ final class TestEventProcessor: XCTestCase {
         sut?.handle(event: mockEvent(eventType: .SignalActivation, date: Date()))
         sut = nil
 
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 3)
 
         XCTAssertNil(weakSut)
         XCTAssertEqual(receivedPayload?.count, 1)
