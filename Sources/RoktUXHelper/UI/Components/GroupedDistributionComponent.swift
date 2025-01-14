@@ -362,10 +362,10 @@ struct GroupedDistributionComponent: View {
             }
         }
     }
-    
+
     func setRecalculatedCurrentGroup() {
         if currentLeadingOffer >= 0 {
-            self.currentGroup = Int(floor(Double(currentLeadingOffer+1/viewableItems)))
+            self.currentGroup = Int(floor(Double(currentLeadingOffer + 1/viewableItems)))
         }
     }
 }

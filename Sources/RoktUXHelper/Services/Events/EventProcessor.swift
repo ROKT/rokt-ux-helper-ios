@@ -37,7 +37,7 @@ class EventProcessor: EventProcessing {
     ) {
         self.onRoktPlatformEvent = onRoktPlatformEvent
         publisher
-            .filter { (event, processor) in
+            .filter { (event, _) in
                 if integrationType == .s2s &&
                     (event.eventType == .SignalLoadStart ||
                      event.eventType == .SignalLoadComplete) {
