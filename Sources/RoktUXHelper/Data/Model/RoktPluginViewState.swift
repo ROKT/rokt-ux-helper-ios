@@ -18,7 +18,7 @@ import Foundation
     public var offerIndex: Int?
     public var isPluginDismissed: Bool?
     public var customStateMap: CustomStateMap?
-    
+
     /// Shortcut initialiser that, when only given a pluginId, defaults to standard, initial plugin view states
     public convenience init(pluginId: String) {
         self.init(pluginId: pluginId,

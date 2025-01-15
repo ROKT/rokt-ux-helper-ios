@@ -23,7 +23,7 @@ public struct RoktUXConfig {
     let loggingEnabled: Bool
 
     private init(
-        colorMode: ColorMode, 
+        colorMode: ColorMode,
         imageLoader: ImageLoader?,
         loggingEnabled: Bool
     ) {
@@ -63,7 +63,7 @@ public struct RoktUXConfig {
             self.imageLoader = imageLoader
             return self
         }
-        
+
         /// Enables or disables debug logging for the RoktUXConfig.
         /// - Parameter enable: A Boolean value indicating whether debug logging should be enabled.
         /// - Returns: The Builder instance with the updated logging configuration.

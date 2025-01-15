@@ -35,11 +35,11 @@ class LazyPublished<Value: Equatable>: ObservableObject {
 
     @available(
         *, unavailable,
-         message: "@LazyPublished can only be applied to classes"
+        message: "@LazyPublished can only be applied to classes"
     )
     var wrappedValue: Value {
         get { storage }
-        set { assertionFailure("Can only be applied to classes") }
+        set { assertionFailure("Can only be applied to classes") } // swiftlint:disable:this unused_setter_value
     }
 
     var projectedValue: Published<Value>.Publisher {

@@ -68,7 +68,7 @@ class LayoutState: LayoutStateRepresenting {
         self.initialPluginViewState = initialPluginViewState
         self.onPluginViewStateChange = onPluginViewStateChange
     }
-    
+
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {
         guard let pluginId else { return }
         let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
