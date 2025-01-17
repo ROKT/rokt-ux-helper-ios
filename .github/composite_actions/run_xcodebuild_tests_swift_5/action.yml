@@ -1,0 +1,17 @@
+name: "Run unit tests"
+description: "Action runs `xcodebuild test` on xcode 15.4"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: "15.4"
+
+    - name: Run unit-tests
+      run: >
+        set -o pipefail &&
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper test -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5'
+        | xcbeautify --renderer github-actions
+      shell: bash
