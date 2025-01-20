@@ -342,7 +342,7 @@ public class RoktUX: UXEventsDelegate {
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
 
-                    var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                    let onSizeChange = { [weak layoutLoader] (size: CGFloat) in
                         layoutLoader?.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
                     }
