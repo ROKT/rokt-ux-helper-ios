@@ -45,7 +45,7 @@ extension UIViewController {
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            var onSizeChange = { [weak self, weak modal] size in
+            let onSizeChange = { [weak modal] size in
                 DispatchQueue.main.async {
                     if let sheet = modal?.sheetPresentationController {
                         sheet.animateChanges {
@@ -95,7 +95,7 @@ extension UIViewController {
         }
 
         modal.view.isOpaque = false
-        layoutState.actionCollection[.close] = { [weak self, weak modal, weak layoutState] _ in
+        layoutState.actionCollection[.close] = { [weak modal, weak layoutState] _ in
             modal?.dismiss(animated: true, completion: nil)
             layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
         }
@@ -186,7 +186,7 @@ public final class SwiftUIViewController: UIHostingController<AnyView> {
     }
 
     public func closeModal() {
-        
+
         if let eventService {
             eventService.dismissOption = .partnerTriggered
             eventService.sendDismissalEvent()

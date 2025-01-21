@@ -24,7 +24,7 @@ final class TestEventProcessor: XCTestCase {
         let allEventTypes = EventType.allCases
         let date = Date()
         
-        let sut = EventProcessor(integrationType: .sdk) { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated, integrationType: .sdk) { [weak self] payload in
             guard let self,
             let processedPayload: EventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
@@ -77,7 +77,7 @@ final class TestEventProcessor: XCTestCase {
         let allEventTypes = EventType.allCases
         let date = Date()
         
-        let sut = EventProcessor(integrationType: .s2s) { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated, integrationType: .s2s) { [weak self] payload in
             guard let self,
                   let processedPayload: EventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
@@ -109,7 +109,7 @@ final class TestEventProcessor: XCTestCase {
     func testEventDelayProcessing() {
         var expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
-        let sut = EventProcessor(delay: 0.5) { [weak self] payload in
+        let sut = EventProcessor(delay: 0.5, queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -125,11 +125,11 @@ final class TestEventProcessor: XCTestCase {
         
         expectation = XCTestExpectation(description: "wait again")
         sut.handle(event: mockEvent(eventType: .SignalViewed, date: Date()))
-        microSleep(0.1)
+        microSleep(0.3)
         sut.handle(event: mockEvent(eventType: .SignalImpression, date: Date()))
-        microSleep(0.1)
+        microSleep(0.3)
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: Date()))
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 2)
         XCTAssertEqual(receivedPayload?.count, 3)
         XCTAssertEqual(receivedPayload?[0].eventType, .SignalViewed)
         XCTAssertEqual(receivedPayload?[1].eventType, .SignalImpression)
@@ -139,7 +139,7 @@ final class TestEventProcessor: XCTestCase {
     func testEventRemoveDuplicates() {
         let expectation = expectation(description: "test duplicates")
         var receivedPayload: [RoktEventRequest]?
-        let sut = EventProcessor() { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -177,7 +177,7 @@ final class TestEventProcessor: XCTestCase {
         let expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
         weak var weakSut: EventProcessor?
-        var sut: EventProcessor? = EventProcessor(delay: 1) { [weak self] payload in
+        var sut: EventProcessor? = EventProcessor(delay: 1, queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -190,7 +190,7 @@ final class TestEventProcessor: XCTestCase {
         sut?.handle(event: mockEvent(eventType: .SignalActivation, date: Date()))
         sut = nil
 
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 3)
 
         XCTAssertNil(weakSut)
         XCTAssertEqual(receivedPayload?.count, 1)

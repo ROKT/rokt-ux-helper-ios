@@ -211,7 +211,7 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         onRoktEvent = onRoktUXEvent
-        
+
         if let isPluginDismissed = layoutPluginViewState?.isPluginDismissed,
            isPluginDismissed {
             onPlacementCompleted(layoutPlugin.pluginId)
@@ -315,13 +315,13 @@ public class RoktUX: UXEventsDelegate {
         } catch LayoutTransformerError.InvalidColor(color: let color) {
             // invalid color error
             eventService?.sendDiagnostics(message: kValidationErrorCode,
-                                         callStack: kColorInvalid + color)
+                                          callStack: kColorInvalid + color)
             config?.debugLog("Rokt: Invalid color in schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
             eventService?.sendDiagnostics(message: kValidationErrorCode,
-                                         callStack: kLayoutInvalid)
+                                          callStack: kLayoutInvalid)
             config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
@@ -342,7 +342,7 @@ public class RoktUX: UXEventsDelegate {
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
 
-                    var onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                    let onSizeChange = { [weak layoutLoader] (size: CGFloat) in
                         layoutLoader?.updateEmbeddedSize(size)
                         onEmbeddedSizeChange(targetElement, size)
                     }
