@@ -24,5 +24,6 @@ jobs:
           brew list xcbeautify || brew install xcbeautify
 
       - name: Run unit tests
-        uses: ./.github/composite_actions/run_xcodebuild_tests_swift_5
-#        uses: ./.github/composite_actions/run_xcodebuild_tests_swift_6 # use this to run on xcode 16.1
+        uses: ./.github/composite_actions/run_xcodebuild_tests
+        with:
+          use-swift-5: true
