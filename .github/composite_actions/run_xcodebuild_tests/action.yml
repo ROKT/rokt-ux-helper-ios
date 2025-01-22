@@ -46,6 +46,7 @@ runs:
     - name: Install xcresultparser
       if: ${{ inputs.codecov-token != '' }}
       run: brew install xcresultparser
+      shell: bash
 
     - name: Process coverage report
       if: ${{ inputs.codecov-token != '' }}
