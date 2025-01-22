@@ -43,6 +43,10 @@ runs:
         | xcbeautify --renderer github-actions
       shell: bash
 
+    - name: Install xcresultparser
+      if: ${{ inputs.codecov-token != '' }}
+      run: brew install xcresultparser
+
     - name: Process coverage report
       if: ${{ inputs.codecov-token != '' }}
       shell: bash
