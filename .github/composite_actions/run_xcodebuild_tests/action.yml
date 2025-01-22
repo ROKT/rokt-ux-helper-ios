@@ -40,7 +40,6 @@ runs:
       shell: bash
 
     - name: Process coverage report
-      description: "Process the coverage report into a format that works with the Codecov action"
       run: xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
 
     - name: Upload coverage report
