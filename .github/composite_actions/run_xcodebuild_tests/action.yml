@@ -7,6 +7,10 @@ inputs:
     required: true
     type: boolean
     default: true
+  codecov-token:
+    description: "Codecov token"
+    type: string
+    required: false
 
 runs:
   using: "composite"
@@ -40,11 +44,14 @@ runs:
       shell: bash
 
     - name: Process coverage report
+      if: ${{ inputs.codecov-token != '' }}
+      shell: bash
       run: xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
 
     - name: Upload coverage report
+      if: ${{ inputs.codecov-token != '' }}
       uses: codecov/codecov-action@v5
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ inputs.codecov-token }}
         files: ./artifacts/coverage.xml
         flags: unittests
