@@ -46,7 +46,9 @@ runs:
     - name: Process coverage report
       if: ${{ inputs.codecov-token != '' }}
       shell: bash
-      run: xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
+      run: |
+        mkdir -p artifacts
+        xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
 
     - name: Upload coverage report
       if: ${{ inputs.codecov-token != '' }}
