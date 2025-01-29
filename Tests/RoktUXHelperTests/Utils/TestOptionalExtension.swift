@@ -22,12 +22,10 @@ class TestOptionalExtension: XCTestCase {
 
     func testUnwrapSuccess() {
         let optionalValue: Int? = 42
-        do {
+        XCTAssertNoThrow(try {
             let value = try optionalValue.unwrap(orThrow: TestError.unwrappingFailed)
             XCTAssertEqual(value, 42)
-        } catch {
-            XCTFail("Expected to unwrap successfully, but threw an error: \(error)")
-        }
+        }())
     }
 
     func testUnwrapFailure() {
