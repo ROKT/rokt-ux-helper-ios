@@ -1,5 +1,5 @@
 //
-//  PlacementResponse.swift
+//  RoktUXPlacementResponse.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -12,11 +12,11 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
-public class PlacementResponse: Decodable {
+public class RoktUXPlacementResponse: Decodable {
     public let sessionId: String
-    public let page: Page?
-    public let placementContext: PlacementContext
-    public let placements: [Placement]
+    public let page: RoktUXPage?
+    public let placementContext: RoktUXPlacementContext
+    public let placements: [RoktUXPlacement]
     // outermost `token`
     public let responseJWTToken: String
 
@@ -32,9 +32,9 @@ public class PlacementResponse: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         sessionId = try container.decode(String.self, forKey: .sessionId)
-        page = try container.decodeIfPresent(Page.self, forKey: .page)
-        placementContext = try container.decode(PlacementContext.self, forKey: .placementContext)
-        placements = try container.decode([Placement].self, forKey: .placements)
+        page = try container.decodeIfPresent(RoktUXPage.self, forKey: .page)
+        placementContext = try container.decode(RoktUXPlacementContext.self, forKey: .placementContext)
+        placements = try container.decode([RoktUXPlacement].self, forKey: .placements)
         responseJWTToken = try container.decode(String.self, forKey: .responseJWTToken)
     }
 }

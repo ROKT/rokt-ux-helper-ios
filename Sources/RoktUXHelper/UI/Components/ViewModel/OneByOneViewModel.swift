@@ -20,7 +20,7 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [OneByOneDistributionStyles]?
     let transition: DcuiSchema.Transition?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
@@ -44,7 +44,7 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
 
     func setupBindings(
         currentProgess: Binding<Int>,
-        customStateMap: Binding<CustomStateMap?>,
+        customStateMap: Binding<RoktUXCustomStateMap?>,
         totalItems: Int
     ) {
         layoutState?.items[LayoutState.currentProgressKey] = currentProgess

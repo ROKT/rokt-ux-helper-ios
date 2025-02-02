@@ -115,7 +115,7 @@ public class RoktUXEvent {
     public class OpenUrl: RoktUXEvent {
         public let url: String
         public let id: String
-        public let type: OpenURLType
+        public let type: RoktUXOpenURLType
         public let onClose: ((String) -> Void)?
         public let onError: ((String, Error?) -> Void)?
 
@@ -128,7 +128,7 @@ public class RoktUXEvent {
         ///   - onError: Closure to handle URL error event.
         init(url: String,
              id: String,
-             type: OpenURLType,
+             type: RoktUXOpenURLType,
              onClose: @escaping (String) -> Void,
              onError: @escaping (String, Error?) -> Void) {
             self.url = url

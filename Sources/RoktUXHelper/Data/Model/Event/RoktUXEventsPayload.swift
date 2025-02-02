@@ -1,5 +1,5 @@
 //
-//  Slot.swift
+//  RoktUXEventsPayload.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,14 +11,12 @@
 
 import Foundation
 
-public struct Slot: Codable {
-    public let instanceGuid: String
-    public let offer: Offer?
-    public let slotJWTToken: String
+public struct RoktUXEventsPayload: Codable {
+    public let integration: RoktIntegrationInfoDetails
+    public let events: [RoktEventRequest]
 
-    enum CodingKeys: String, CodingKey {
-        case instanceGuid
-        case offer
-        case slotJWTToken = "token"
+    init(events: [RoktEventRequest]) {
+        self.integration = RoktIntegrationInfo.shared.integration
+        self.events = events
     }
 }

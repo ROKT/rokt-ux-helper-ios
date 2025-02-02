@@ -480,7 +480,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                                         ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
                                     children: [LayoutSchemaViewModel]?,
                                     slot: SlotOfferModel?) throws -> CreativeResponseViewModel {
-        var responseOption: ResponseOption?
+        var responseOption: RoktUXResponseOption?
         var creativeResponseKey = BNFNamespace.CreativeResponseKey.positive
 
         if responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {

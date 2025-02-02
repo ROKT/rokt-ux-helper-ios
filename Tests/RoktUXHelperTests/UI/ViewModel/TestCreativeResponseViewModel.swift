@@ -132,7 +132,7 @@ final class TestCreativeResponseViewModel: XCTestCase {
             children: [],
             responseKey: .positive,
             responseOptions:
-                ResponseOption(id: "",
+                RoktUXResponseOption(id: "",
                                action: action,
                                instanceGuid: "creativeInstance",
                                signalType: signalType,

@@ -1,5 +1,5 @@
 //
-//  PlacementContext.swift
+//  RoktUXPlacementContext.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct PlacementContext: Codable {
+public struct RoktUXPlacementContext: Codable {
     public let roktTagId: String
     public let pageInstanceGuid: String
     public let placementContextJWTToken: String

@@ -34,7 +34,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     @LazyPublished var breakpointLinkIndex = 0
     @LazyPublished var attributedString = NSAttributedString("")
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

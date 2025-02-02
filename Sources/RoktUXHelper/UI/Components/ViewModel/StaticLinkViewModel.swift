@@ -25,7 +25,7 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [StaticLinkStyles]?
     let disabledStyle: [StaticLinkStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

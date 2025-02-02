@@ -22,7 +22,7 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let disabledStyle: [RowStyle]?
     let accessibilityGrouped: Bool
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

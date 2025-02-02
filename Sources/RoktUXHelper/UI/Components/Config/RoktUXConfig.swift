@@ -18,13 +18,13 @@ public struct RoktUXConfig {
     /// The color mode for the UX.
     let colorMode: ColorMode
     /// Optional image loader for the UX.
-    let imageLoader: ImageLoader?
+    let imageLoader: RoktUXImageLoader?
     /// A Boolean value that determines whether debug logging is enabled.
     let loggingEnabled: Bool
 
     private init(
         colorMode: ColorMode,
-        imageLoader: ImageLoader?,
+        imageLoader: RoktUXImageLoader?,
         loggingEnabled: Bool
     ) {
         self.colorMode = colorMode
@@ -45,7 +45,7 @@ public struct RoktUXConfig {
     /// Builder class for constructing `RoktUXConfig`
     public class Builder: NSObject {
         var colorMode: ColorMode?
-        weak var imageLoader: ImageLoader?
+        weak var imageLoader: RoktUXImageLoader?
         var loggingEnabled: Bool?
 
         /// Sets the color mode for the configuration.
@@ -59,7 +59,7 @@ public struct RoktUXConfig {
         /// Sets the image loader for the configuration.
         /// - Parameter imageLoader: The image loader to be set.
         /// - Returns: The builder instance for chaining.
-        public func imageLoader(_ imageLoader: ImageLoader) -> Builder {
+        public func imageLoader(_ imageLoader: RoktUXImageLoader) -> Builder {
             self.imageLoader = imageLoader
             return self
         }

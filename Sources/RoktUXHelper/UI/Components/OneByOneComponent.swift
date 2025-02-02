@@ -42,7 +42,7 @@ struct OneByOneComponent: View {
 
     @State var currentOffer: Int
     @State private var toggleTransition = false
-    @State var customStateMap: CustomStateMap?
+    @State var customStateMap: RoktUXCustomStateMap?
 
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
@@ -220,7 +220,7 @@ struct OneByOneComponent: View {
     }
 
     private func toggleCustomState(_ customStateId: Any?) {
-        var mutatingCustomStateMap: CustomStateMap = customStateMap ?? CustomStateMap()
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
     }
 

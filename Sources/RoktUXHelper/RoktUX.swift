@@ -171,17 +171,17 @@ public class RoktUX: UXEventsDelegate {
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
-                                   processor: EventProcessing) throws -> PageModel {
-        var layoutPage: PageModel
+                                   processor: EventProcessing) throws -> RoktUXPageModel {
+        var layoutPage: RoktUXPageModel
         switch integrationType {
         case .sdk:
             layoutPage = try RoktDecoder()
-                .decode(ExperienceResponse.self, experienceResponse)
+                .decode(RoktUXExperienceResponse.self, experienceResponse)
                 .getPageModel()
                 .unwrap(orThrow: RoktUXError.experienceResponseMapping)
         default:
             layoutPage = try RoktDecoder()
-                .decode(S2SExperienceResponse.self, experienceResponse)
+                .decode(RoktUXS2SExperienceResponse.self, experienceResponse)
                 .getPageModel()
                 .unwrap(orThrow: RoktUXError.experienceResponseMapping)
         }
@@ -196,7 +196,7 @@ public class RoktUX: UXEventsDelegate {
     }
 
     private func displayLayout(
-        page: PageModel,
+        page: RoktUXPageModel,
         layoutPlugin: LayoutPlugin,
         layoutPluginViewState: RoktPluginViewState? = nil,
         startDate: Date,
@@ -408,7 +408,7 @@ public class RoktUX: UXEventsDelegate {
     }
 
     private func sendPageIntialEvents(
-        pageModel: PageModel,
+        pageModel: RoktUXPageModel,
         startDate: Date,
         responseReceivedDate: Date,
         processor: EventProcessing
@@ -416,7 +416,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalInitialize,
+                eventType: RoktUXEventType.SignalInitialize,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: startDate,
                 jwtToken: pageModel.token
@@ -425,7 +425,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalLoadStart,
+                eventType: RoktUXEventType.SignalLoadStart,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: startDate,
                 jwtToken: pageModel.token
@@ -434,7 +434,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalLoadComplete,
+                eventType: RoktUXEventType.SignalLoadComplete,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: responseReceivedDate,
                 jwtToken: pageModel.token
@@ -508,7 +508,7 @@ public class RoktUX: UXEventsDelegate {
 
     func openURL(url: String,
                  id: String,
-                 type: OpenURLType,
+                 type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))

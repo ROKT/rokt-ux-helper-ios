@@ -56,7 +56,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

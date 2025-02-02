@@ -17,4 +17,4 @@ import Foundation
 protocol Payload {}
 
 @available(iOS 13, *)
-extension PageModel: Payload {}
+extension RoktUXPageModel: Payload {}

@@ -20,7 +20,7 @@ struct AsyncImageView: View {
     let imageUrl: ThemeUrl?
     let scale: BackgroundImageScale?
     var alt: String?
-    var imageLoader: ImageLoader?
+    var imageLoader: RoktUXImageLoader?
 
     private var altString: String {
         alt ?? ""

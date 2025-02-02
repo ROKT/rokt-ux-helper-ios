@@ -1,5 +1,5 @@
 //
-//  PlacementLayoutCode.swift
+//  RoktUXPlacementLayoutCode.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,7 +11,7 @@
 
 import Foundation
 
-public enum PlacementLayoutCode: String, Codable, CaseIterableDefaultLast {
+public enum RoktUXPlacementLayoutCode: String, Codable, RoktUXCaseIterableDefaultLast {
     case lightboxLayout = "MobileSdk.LightboxLayout"
     case embeddedLayout = "MobileSdk.EmbeddedLayout"
     case overlayLayout = "MobileSdk.OverlayLayout"
