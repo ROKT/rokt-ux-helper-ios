@@ -122,7 +122,7 @@ final class TestCreativeResponseViewModel: XCTestCase {
     }
 
     func get_model(
-        signalType: SignalType = .signalResponse,
+        signalType: RoktUXSignalType = .signalResponse,
         url: String? = nil,
         action: Action = .url,
         eventService: EventService,
