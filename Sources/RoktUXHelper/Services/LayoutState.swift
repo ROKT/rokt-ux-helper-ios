@@ -14,6 +14,7 @@
 import Foundation
 import SwiftUI
 import DcuiSchema
+import Combine
 
 @available(iOS 13.0, *)
 class LayoutState: LayoutStateRepresenting {
@@ -27,6 +28,7 @@ class LayoutState: LayoutStateRepresenting {
     static let customStateMap = "customStateMap" // CustomStateMap
 
     private var _items = [String: Any]()
+    private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
     let config: RoktUXConfig?
 
@@ -37,8 +39,10 @@ class LayoutState: LayoutStateRepresenting {
             }
         }
         set {
-            queue.async(flags: .barrier) {
+            queue.async(flags: .barrier) { [weak self] in
+                guard let self else { return }
                 self._items = newValue
+                self.itemsPublisher.send(newValue)
             }
         }
     }

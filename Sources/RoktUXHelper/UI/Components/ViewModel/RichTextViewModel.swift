@@ -41,6 +41,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     var viewableItems: Binding<Int>
     var currentIndex: Binding<Int>
     lazy var totalOffer: Int = layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
+    private var cancellable: AnyCancellable?
 
     var totalPages: Int {
         return Int(ceil(Double(totalOffer)/Double(viewableItems.wrappedValue)))
@@ -82,6 +83,10 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
         self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         updateBoundValueWithStyling()
+        cancellable = layoutState?.itemsPublisher.sink { newValue in
+            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        }
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {

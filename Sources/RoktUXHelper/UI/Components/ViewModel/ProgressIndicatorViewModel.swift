@@ -11,6 +11,7 @@
 
 import SwiftUI
 import DcuiSchema
+import Combine
 
 @available(iOS 15, *)
 class ProgressIndicatorViewModel: Identifiable, Hashable {
@@ -37,6 +38,7 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
     var totalOffer: Int {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
+    private var cancellable: AnyCancellable?
 
     init(
         indicator: String,
@@ -61,6 +63,11 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
         self.eventService = eventService
         self.viewableItems = layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
         self.currentIndex = layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+
+        cancellable = layoutState.itemsPublisher.sink { newValue in
+            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        }
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {

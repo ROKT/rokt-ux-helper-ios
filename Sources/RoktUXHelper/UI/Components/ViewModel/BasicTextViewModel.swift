@@ -55,6 +55,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     weak var diagnosticService: DiagnosticServicing?
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
+    private var cancellable: AnyCancellable?
 
     var imageLoader: ImageLoader? {
         layoutState?.imageLoader
@@ -92,6 +93,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
         self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
+
+        cancellable = layoutState?.itemsPublisher.sink { newValue in
+            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        }
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
