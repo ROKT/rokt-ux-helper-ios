@@ -37,7 +37,7 @@ class SampleViewModel: ObservableObject {
     }
 }
 
-extension SampleViewModel: ImageLoader {
+extension SampleViewModel: RoktUXImageLoader {
 
     func loadImage(
         urlString: String,
