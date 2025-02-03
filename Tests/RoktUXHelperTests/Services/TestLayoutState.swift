@@ -40,10 +40,10 @@ class TestLayoutState: XCTestCase {
         let cancellable = layoutState.itemsPublisher
             .dropFirst()
             .sink { newItems in
-                XCTAssertEqual(newItems[LayoutState.layoutType] as? PlacementLayoutCode, .overlayLayout)
+                XCTAssertEqual(newItems[LayoutState.layoutType] as? RoktUXPlacementLayoutCode, .overlayLayout)
                 expectation.fulfill()
             }
-        layoutState.items[LayoutState.layoutType] = PlacementLayoutCode.overlayLayout
+        layoutState.items[LayoutState.layoutType] = RoktUXPlacementLayoutCode.overlayLayout
         wait(for: [expectation], timeout: 1)
         XCTAssertEqual(layoutState.layoutType(), .overlayLayout)
     }
