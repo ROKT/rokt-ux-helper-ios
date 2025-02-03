@@ -7,6 +7,10 @@ inputs:
     required: true
     type: boolean
     default: true
+  codecov-token:
+    description: "Codecov token"
+    type: string
+    required: false
 
 runs:
   using: "composite"
@@ -21,7 +25,7 @@ runs:
       if: ${{ inputs.use-swift-5 == 'true' }}
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper test -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5'
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
 
@@ -35,6 +39,26 @@ runs:
       if: ${{ inputs.use-swift-5 == 'false' }}
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper test -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
+
+    - name: Install xcresultparser
+      if: ${{ inputs.codecov-token != '' }}
+      run: brew install xcresultparser
+      shell: bash
+
+    - name: Process coverage report
+      if: ${{ inputs.codecov-token != '' }}
+      shell: bash
+      run: |
+        mkdir -p artifacts
+        xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
+
+    - name: Upload coverage report
+      if: ${{ inputs.codecov-token != '' }}
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ./artifacts/coverage.xml
+        flags: unittests
