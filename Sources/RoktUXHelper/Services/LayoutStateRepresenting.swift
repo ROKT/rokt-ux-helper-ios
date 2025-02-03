@@ -12,9 +12,12 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
+import Combine
 
+@available(iOS 13.0, *)
 protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     var items: [String: Any] { get set }
+    var itemsPublisher: CurrentValueSubject<[String: Any], Never> { get }
     var actionCollection: ActionCollecting { get set }
     var imageLoader: ImageLoader? { get }
     var colorMode: RoktUXConfig.ColorMode? { get }
