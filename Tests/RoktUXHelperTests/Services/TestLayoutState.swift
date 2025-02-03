@@ -24,7 +24,7 @@ class TestLayoutState: XCTestCase {
     func testReceiveUpdateWhenItemsChange() {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test publisher")
-        let _ = layoutState.itemsPublisher
+        let cancellable = layoutState.itemsPublisher
             .dropFirst()
             .sink { newItems in
                 XCTAssertEqual(newItems["test"] as? Int, 1)
@@ -37,7 +37,7 @@ class TestLayoutState: XCTestCase {
     func testUpdateLayoutType() {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test layout type")
-        let _ = layoutState.itemsPublisher
+        let cancellable = layoutState.itemsPublisher
             .dropFirst()
             .sink { newItems in
                 XCTAssertEqual(newItems[LayoutState.layoutType] as? RoktUXPlacementLayoutCode, .overlayLayout)
