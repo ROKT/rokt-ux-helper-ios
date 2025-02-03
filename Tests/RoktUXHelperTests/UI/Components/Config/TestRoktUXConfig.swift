@@ -47,7 +47,7 @@ class RoktUXConfigTests: XCTestCase {
     }
 }
 
-class MockImageLoader: ImageLoader {
+class MockImageLoader: RoktUXImageLoader {
     func loadImage(urlString: String, completion: @escaping (Result<UIImage?, Error>) -> Void) {
         completion(.success(nil))
     }
