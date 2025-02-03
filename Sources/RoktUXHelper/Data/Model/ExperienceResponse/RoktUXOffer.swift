@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct Offer: Codable {
+public struct RoktUXOffer: Codable {
     public let campaignId: String?
-    public let creative: Creative
+    public let creative: RoktUXCreative
 }

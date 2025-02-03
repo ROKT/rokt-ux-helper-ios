@@ -1,5 +1,5 @@
 //
-//  ImageLoader.swift
+//  RoktUXImageLoader.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -13,7 +13,7 @@ import SwiftUI
 
 /// A type for loading images from a URL.
 /// The RoktLayoutView accepts an optional ImageLoader to give partners flexibility over image downloads.
-public protocol ImageLoader: AnyObject {
+public protocol RoktUXImageLoader: AnyObject {
     /// Loads an image from the specified URL string.
     /// - Parameters:
     ///   - urlString: The URL string of the image to be loaded.

@@ -45,13 +45,13 @@ enum WidthDimensionType: Decodable, Hashable {
 }
 
 @available(iOS 13, *)
-enum HeightFitProperty: String, Codable, Hashable, CaseIterableDefaultLast {
+enum HeightFitProperty: String, Codable, Hashable, RoktUXCaseIterableDefaultLast {
     case fitHeight = "fit-height"
     case wrapContent = "wrap-content"
 }
 
 @available(iOS 13, *)
-enum WidthFitProperty: String, Codable, Hashable, CaseIterableDefaultLast {
+enum WidthFitProperty: String, Codable, Hashable, RoktUXCaseIterableDefaultLast {
     case fitWidth = "fit-width"
     case wrapContent = "wrap-content"
 }

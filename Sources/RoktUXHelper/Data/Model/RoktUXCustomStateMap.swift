@@ -1,5 +1,5 @@
 //
-//  CustomStateMap.swift
+//  RoktUXCustomStateMap.swift
 //  
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,8 +11,8 @@
 
 import Foundation
 
-extension CustomStateMap {
-    mutating func toggleValueFor(_ customStateId: Any?) -> CustomStateMap {
+extension RoktUXCustomStateMap {
+    mutating func toggleValueFor(_ customStateId: Any?) -> RoktUXCustomStateMap {
         guard let customStateId = customStateId as? CustomStateIdentifiable else {
             return self
         }
@@ -22,7 +22,7 @@ extension CustomStateMap {
     }
 }
 
-public typealias CustomStateMap = [CustomStateIdentifiable: Int]
+public typealias RoktUXCustomStateMap = [CustomStateIdentifiable: Int]
 
 public struct CustomStateIdentifiable: Hashable, Codable {
     let position: Int?

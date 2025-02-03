@@ -24,7 +24,7 @@ struct WhenComponent: View {
     @Binding var currentProgress: Int
     let totalOffers: Int
 
-    @Binding var customStateMap: CustomStateMap?
+    @Binding var customStateMap: RoktUXCustomStateMap?
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
 
@@ -138,5 +138,5 @@ struct WhenComponentUIState {
     let position: Int?
     let width: CGFloat
     let isDarkMode: Bool
-    let customStateMap: CustomStateMap?
+    let customStateMap: RoktUXCustomStateMap?
 }

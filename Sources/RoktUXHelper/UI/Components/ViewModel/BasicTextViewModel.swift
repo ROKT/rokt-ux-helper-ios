@@ -57,7 +57,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     private var stateDataExpansionClosure: ((String?) -> String?)?
     private var cancellable: AnyCancellable?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

@@ -1,5 +1,5 @@
 //
-//  S2SExperienceResponse.swift
+//  RoktUXExperienceResponse.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -10,43 +10,36 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
+import DcuiSchema
 
 @available(iOS 13, *)
-public class S2SExperienceResponse: Decodable, PluginResponse {
-    let sessionId: String
-    let pageContext: PageContext
-    let options: [SDKOption]?
-
+public class RoktUXExperienceResponse: RoktUXPlacementResponse, PluginResponse {
     var plugins: [PluginWrapperModel]?
 
     enum CodingKeys: String, CodingKey {
-        case sessionId
-        case pageContext
         case plugins
-        case options
     }
 
-    public required init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        sessionId = try container.decode(String.self, forKey: .sessionId)
-        pageContext = try container.decode(PageContext.self, forKey: .pageContext)
         plugins = try container.decodeIfPresent([PluginWrapperModel].self, forKey: .plugins)
-        options = try container.decodeIfPresent([String: Bool].self, forKey: .options)?.compactMap(SDKOption.init)
+
+        try super.init(from: decoder)
     }
 
-    func getPageModel() -> PageModel? {
+    public func getPageModel() -> RoktUXPageModel? {
         guard let outerLayer = getOuterLayoutSchema(plugins: plugins),
               outerLayer.layout != nil && getAllInnerlayoutSchema(plugins: plugins) != nil
         else { return nil }
 
-        return PageModel(
-            pageId: pageContext.pageId,
+        return RoktUXPageModel(
+            pageId: page?.pageId,
             sessionId: sessionId,
-            pageInstanceGuid: pageContext.pageInstanceGuid,
+            pageInstanceGuid: placementContext.pageInstanceGuid,
             layoutPlugins: getPlugins(plugins: plugins),
-            token: pageContext.token,
-            options: options
+            token: placementContext.placementContextJWTToken,
+            options: .some([.useDiagnosticEvents])
         )
     }
 }

@@ -22,7 +22,7 @@ final class TestLayoutTransformer: XCTestCase {
             XCTFail("Could not load the json")
             return
         }
-        let responseOption = ResponseOption(
+        let responseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",
@@ -58,7 +58,7 @@ final class TestLayoutTransformer: XCTestCase {
             XCTFail("Could not load the json")
             return
         }
-        let responseOption = ResponseOption(
+        let responseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",
@@ -94,7 +94,7 @@ final class TestLayoutTransformer: XCTestCase {
             XCTFail("Could not load the json")
             return
         }
-        let responseOption = ResponseOption(
+        let responseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",
@@ -185,7 +185,7 @@ final class TestLayoutTransformer: XCTestCase {
             XCTFail("Could not load the json")
             return
         }
-        let positiveResponseOption = ResponseOption(
+        let positiveResponseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",
@@ -197,7 +197,7 @@ final class TestLayoutTransformer: XCTestCase {
             url: "",
             responseJWTToken: "response-token"
         )
-        let negativeResponseOption = ResponseOption(
+        let negativeResponseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",
@@ -281,7 +281,7 @@ final class TestLayoutTransformer: XCTestCase {
             XCTFail("Could not load the json")
             return
         }
-        let responseOption = ResponseOption(
+        let responseOption = RoktUXResponseOption(
             id: "",
             action: .url,
             instanceGuid: "",

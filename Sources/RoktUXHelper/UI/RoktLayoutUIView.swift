@@ -17,7 +17,7 @@ import SwiftUI
 /// A UIView class for loading and displaying Rokt UX layouts.
 /// The RoktLayoutUIView class provides multiple initialization options,
 /// allowing for configuration flexibility. You can initialize it with an experienceResponse
-/// and optional configuration parameters such as RoktUXConfig, ImageLoader, and event handlers.
+/// and optional configuration parameters such as RoktUXConfig, RoktUXImageLoader, and event handlers.
 @available(iOS 15, *)
 @objc public class RoktLayoutUIView: UIView {
     private(set) var roktEmbeddedSwiftUIView: UIView?

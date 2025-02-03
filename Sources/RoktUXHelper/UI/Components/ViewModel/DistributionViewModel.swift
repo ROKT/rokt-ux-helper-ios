@@ -22,7 +22,7 @@ class DistributionViewModel: Hashable {
     var initialCurrentIndex: Int? {
         layoutState?.initialPluginViewState?.offerIndex
     }
-    var initialCustomStateMap: CustomStateMap? {
+    var initialCustomStateMap: RoktUXCustomStateMap? {
         layoutState?.initialPluginViewState?.customStateMap
     }
 

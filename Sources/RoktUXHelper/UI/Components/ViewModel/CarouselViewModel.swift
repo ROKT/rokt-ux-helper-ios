@@ -20,7 +20,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
     let defaultStyle: [CarouselDistributionStyles]?
     let viewableItems: [UInt8]
     let peekThroughSize: [PeekThroughSize]
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
@@ -52,7 +52,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable {
         currentProgress: Binding<Int>,
         totalItems: Int,
         viewableItems: Binding<Int>,
-        customStateMap: Binding<CustomStateMap?>
+        customStateMap: Binding<RoktUXCustomStateMap?>
     ) {
         layoutState?.items[LayoutState.currentProgressKey] = currentProgress
         layoutState?.items[LayoutState.totalItemsKey] = totalItems

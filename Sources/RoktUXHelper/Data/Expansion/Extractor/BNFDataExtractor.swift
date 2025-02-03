@@ -100,7 +100,7 @@ class BNFDataExtractor<Validator: DataValidator>: DataExtractor where Validator.
                     let responseKey
                 else { continue }
 
-                var responseOption: ResponseOption?
+                var responseOption: RoktUXResponseOption?
 
                 if responseKey.caseInsensitiveCompare(
                     BNFNamespace.CreativeResponseKey.positive.rawValue

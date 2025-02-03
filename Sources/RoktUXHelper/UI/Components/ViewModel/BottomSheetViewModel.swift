@@ -20,7 +20,7 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let defaultStyle: [BottomSheetStyles]?
     weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

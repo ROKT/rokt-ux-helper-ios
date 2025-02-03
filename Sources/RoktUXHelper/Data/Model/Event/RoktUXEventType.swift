@@ -1,5 +1,5 @@
 //
-//  EventType.swift
+//  RoktUXEventType.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -13,7 +13,7 @@ import Foundation
 
 /// Enum representing different types of platform events
 /// Platform events are an essential part of integration and it has to be sent to Rokt via your backend
-public enum EventType: String, Codable, CaseIterable {
+public enum RoktUXEventType: String, Codable, CaseIterable {
     /// Triggered when the first offer is displayed and again when the user navigates to a different offer.
     case SignalImpression
     /// Indicates the initialisation of the ROKT

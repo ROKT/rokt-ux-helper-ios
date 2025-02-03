@@ -1,5 +1,5 @@
 //
-//  Page.swift
+//  RoktUXPage.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,6 +11,6 @@
 
 import Foundation
 
-public struct Page: Codable {
+public struct RoktUXPage: Codable {
     public let pageId: String?
 }

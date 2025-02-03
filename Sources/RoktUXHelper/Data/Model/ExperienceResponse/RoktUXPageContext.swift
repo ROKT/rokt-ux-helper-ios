@@ -1,5 +1,5 @@
 //
-//  PageContext.swift
+//  RoktUXPageContext.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,7 +11,7 @@
 
 import Foundation
 
-public struct PageContext: Codable {
+public struct RoktUXPageContext: Codable {
     public let pageId: String?
     public let pageInstanceGuid: String
     public let token: String

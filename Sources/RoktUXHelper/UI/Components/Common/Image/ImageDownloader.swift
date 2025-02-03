@@ -16,7 +16,7 @@ import SwiftUI
 class ImageDownloader: ObservableObject {
     var imageSubject = CurrentValueSubject<UIImage?, Never>(nil)
 
-    init(urlString: String, loader: ImageLoader) {
+    init(urlString: String, loader: RoktUXImageLoader) {
         loader.loadImage(urlString: urlString) { [weak self] result in
             switch result {
             case .success(let image):

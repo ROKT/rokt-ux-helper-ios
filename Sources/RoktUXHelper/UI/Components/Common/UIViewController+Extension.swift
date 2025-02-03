@@ -35,7 +35,7 @@ extension UIViewController {
                                 onUnLoad: @escaping (() -> Void),
                                 @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content) {
 
-        let modal = SwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
+        let modal = RoktUXSwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
                                           eventService: eventService,
                                           layoutState: layoutState,
                                           onUnload: onUnLoad)
@@ -158,7 +158,7 @@ extension UIViewController {
 }
 
 @available(iOS 15.0, *)
-public final class SwiftUIViewController: UIHostingController<AnyView> {
+public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
     weak var eventService: EventService?
     let layoutState: LayoutState?

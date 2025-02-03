@@ -1,5 +1,5 @@
 //
-//  Creative.swift
+//  Slot.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,18 +11,14 @@
 
 import Foundation
 
-public struct Creative: Codable {
-    public let referralCreativeId: String
+public struct RoktUXSlot: Codable {
     public let instanceGuid: String
-    public let copy: [String: String]
-    public let responseOptions: [ResponseOption]?
-    public let creativeJWTToken: String
+    public let offer: RoktUXOffer?
+    public let slotJWTToken: String
 
     enum CodingKeys: String, CodingKey {
-        case referralCreativeId
         case instanceGuid
-        case copy
-        case responseOptions
-        case creativeJWTToken = "token"
+        case offer
+        case slotJWTToken = "token"
     }
 }

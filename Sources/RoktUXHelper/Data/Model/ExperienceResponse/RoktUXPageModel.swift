@@ -12,7 +12,7 @@
 import Foundation
 import DcuiSchema
 
-public struct PageModel {
+public struct RoktUXPageModel {
     public let pageId: String?
     public let sessionId: String
     public let pageInstanceGuid: String

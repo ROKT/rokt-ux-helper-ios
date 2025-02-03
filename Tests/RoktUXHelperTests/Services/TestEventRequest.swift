@@ -19,14 +19,14 @@ class TestEventRequest: XCTestCase {
     func test_event_with_correct_session_id_and_parenet_guid_and_event_type_and_jwt_token() {
         let eventRequest = RoktEventRequest(
             sessionId: "sessionID",
-            eventType: EventType.SignalImpression,
+            eventType: RoktUXEventType.SignalImpression,
             parentGuid: "parentGuid",
             pageInstanceGuid: "page",
             jwtToken: "jwt-token"
         )
         
         XCTAssertEqual(eventRequest.sessionId, "sessionID")
-        XCTAssertEqual(eventRequest.eventType, EventType.SignalImpression)
+        XCTAssertEqual(eventRequest.eventType, RoktUXEventType.SignalImpression)
         XCTAssertEqual(eventRequest.parentGuid, "parentGuid")
         XCTAssertEqual(eventRequest.pageInstanceGuid, "page")
         XCTAssertEqual(eventRequest.jwtToken, "jwt-token")
@@ -35,14 +35,14 @@ class TestEventRequest: XCTestCase {
     func test_event_withoutJWTToken_returnsNil() {
         let eventRequest = RoktEventRequest(
             sessionId: "sessionID",
-            eventType: EventType.SignalImpression,
+            eventType: RoktUXEventType.SignalImpression,
             parentGuid: "parentGuid",
             pageInstanceGuid: "page",
             jwtToken: "jwt-token"
         )
 
         XCTAssertEqual(eventRequest.sessionId, "sessionID")
-        XCTAssertEqual(eventRequest.eventType, EventType.SignalImpression)
+        XCTAssertEqual(eventRequest.eventType, RoktUXEventType.SignalImpression)
         XCTAssertEqual(eventRequest.parentGuid, "parentGuid")
         XCTAssertEqual(eventRequest.pageInstanceGuid, "page")
     }
@@ -51,7 +51,7 @@ class TestEventRequest: XCTestCase {
         let eventTime = Date()
         let eventRequest = RoktEventRequest(
             sessionId: "",
-            eventType: EventType.SignalImpression,
+            eventType: RoktUXEventType.SignalImpression,
             parentGuid: "",
             eventTime: eventTime,
             jwtToken: "jwt"
@@ -65,7 +65,7 @@ class TestEventRequest: XCTestCase {
     }
 
     func test_event_create_capture_method() {
-        let eventRequest = RoktEventRequest(sessionId: "", eventType: EventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
+        let eventRequest = RoktEventRequest(sessionId: "", eventType: RoktUXEventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
 
         XCTAssertNotNil(eventRequest.metadata[1])
         XCTAssertEqual(eventRequest.metadata[1].name, BE_CAPTURE_METHOD)
@@ -73,7 +73,7 @@ class TestEventRequest: XCTestCase {
     }
 
     func test_event_create_currect_time_stamp() {
-        let eventRequest = RoktEventRequest(sessionId: "", eventType: EventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
+        let eventRequest = RoktEventRequest(sessionId: "", eventType: RoktUXEventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
         let timeStampRegex = "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([0-9]{2}:){2}[0-9]{2}.[0-9]{3}Z$"
 
         XCTAssertNotNil(eventRequest.metadata[0].value)
@@ -83,7 +83,7 @@ class TestEventRequest: XCTestCase {
     func test_event_get_params() {
         let eventRequest = RoktEventRequest(
             sessionId: "sessionID",
-            eventType: EventType.SignalImpression,
+            eventType: RoktUXEventType.SignalImpression,
             parentGuid: "parentGuid",
             pageInstanceGuid: "page",
             jwtToken: "jwt"
@@ -94,7 +94,7 @@ class TestEventRequest: XCTestCase {
         XCTAssertEqual(params[BE_SESSION_ID_KEY] as! String, "sessionID")
         XCTAssertEqual(params[BE_PARENT_GUID_KEY] as! String, "parentGuid")
         XCTAssertEqual(params[BE_PAGE_INSTANCE_GUID_KEY] as! String, "page")
-        XCTAssertEqual(params[BE_EVENT_TYPE_KEY] as! String, EventType.SignalImpression.rawValue)
+        XCTAssertEqual(params[BE_EVENT_TYPE_KEY] as! String, RoktUXEventType.SignalImpression.rawValue)
         XCTAssertNotNil(params[BE_EVENT_DATA_KEY])
         XCTAssertNotNil(params[BE_INSTANCE_GUID])
         XCTAssertNotNil(params[BE_METADATA_KEY])

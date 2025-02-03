@@ -47,7 +47,7 @@ struct CarouselComponent: View {
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
 
-    @State var customStateMap: CustomStateMap?
+    @State var customStateMap: RoktUXCustomStateMap?
 
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
@@ -369,7 +369,7 @@ struct CarouselComponent: View {
     }
 
     private func toggleCustomState(_ customStateId: Any?) {
-        var mutatingCustomStateMap: CustomStateMap = customStateMap ?? CustomStateMap()
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
     }
 

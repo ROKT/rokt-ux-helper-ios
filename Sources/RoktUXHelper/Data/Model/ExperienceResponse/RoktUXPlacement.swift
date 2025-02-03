@@ -1,5 +1,5 @@
 //
-//  Placement.swift
+//  RoktUXPlacement.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,14 +11,14 @@
 
 import Foundation
 
-public struct Placement: Codable {
+public struct RoktUXPlacement: Codable {
     public let id: String
     public let targetElementSelector: String
     public let offerLayoutCode: String
-    public let placementLayoutCode: PlacementLayoutCode?
+    public let placementLayoutCode: RoktUXPlacementLayoutCode?
     public let placementConfigurables: [String: String]?
     public let instanceGuid: String
-    public let slots: [Slot]?
+    public let slots: [RoktUXSlot]?
     public let placementsJWTToken: String
 
     enum CodingKeys: String, CodingKey {

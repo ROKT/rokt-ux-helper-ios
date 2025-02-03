@@ -53,7 +53,7 @@ class LayoutState: LayoutStateRepresenting {
         config?.colorMode
     }
 
-    var imageLoader: (any ImageLoader)? {
+    var imageLoader: (any RoktUXImageLoader)? {
         config?.imageLoader
     }
 
@@ -76,19 +76,19 @@ class LayoutState: LayoutStateRepresenting {
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {
         guard let pluginId else { return }
         let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
-        let customStateMap: Binding<CustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<CustomStateMap?>
+        let customStateMap: Binding<RoktUXCustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
         onPluginViewStateChange?(RoktPluginViewState(pluginId: pluginId,
                                                      offerIndex: offerIndex ?? currentProgress?.wrappedValue,
                                                      isPluginDismissed: dismiss,
                                                      customStateMap: customStateMap?.wrappedValue))
     }
 
-    func setLayoutType(_ type: PlacementLayoutCode) {
+    func setLayoutType(_ type: RoktUXPlacementLayoutCode) {
         items[LayoutState.layoutType] = type
     }
 
-    func layoutType() -> PlacementLayoutCode {
-        (items[LayoutState.layoutType] as? PlacementLayoutCode) ?? .unknown
+    func layoutType() -> RoktUXPlacementLayoutCode {
+        (items[LayoutState.layoutType] as? RoktUXPlacementLayoutCode) ?? .unknown
     }
 
     func closeOnComplete() -> Bool {

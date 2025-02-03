@@ -17,7 +17,7 @@ struct BackgroundModifier: ViewModifier {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     let backgroundStyle: BackgroundStylingProperties?
-    let imageLoader: ImageLoader?
+    let imageLoader: RoktUXImageLoader?
 
     var hasBackgroundColor: Bool {
         guard let backgroundColor = backgroundStyle?.backgroundColor,
@@ -54,7 +54,7 @@ struct BackgroundColorModifier: ViewModifier {
 @available(iOS 15, *)
 struct BackgroundImageModifier: ViewModifier {
     let backgroundImage: BackgroundImage?
-    let imageLoader: ImageLoader?
+    let imageLoader: RoktUXImageLoader?
     var hasBackgroundImage: Bool { backgroundImage?.url != nil && backgroundImage?.url.light.isEmpty == false }
     var bgAlignment: Alignment { (backgroundImage?.position ?? .center).getAlignment() }
 

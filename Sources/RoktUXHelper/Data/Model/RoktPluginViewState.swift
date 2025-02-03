@@ -17,7 +17,7 @@ import Foundation
     public let pluginId: String
     public var offerIndex: Int?
     public var isPluginDismissed: Bool?
-    public var customStateMap: CustomStateMap?
+    public var customStateMap: RoktUXCustomStateMap?
 
     /// Shortcut initialiser that, when only given a pluginId, defaults to standard, initial plugin view states
     public convenience init(pluginId: String) {
@@ -30,7 +30,7 @@ import Foundation
     public init(pluginId: String,
                 offerIndex: Int? = nil,
                 isPluginDismissed: Bool? = nil,
-                customStateMap: CustomStateMap? = nil) {
+                customStateMap: RoktUXCustomStateMap? = nil) {
         self.pluginId = pluginId
         self.offerIndex = offerIndex
         self.isPluginDismissed = isPluginDismissed

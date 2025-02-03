@@ -28,7 +28,7 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
     let accessibilityHidden: Bool?
     weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

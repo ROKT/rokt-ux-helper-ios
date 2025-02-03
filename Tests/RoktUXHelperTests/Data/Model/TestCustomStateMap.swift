@@ -17,7 +17,7 @@ import XCTest
 class CustomStateMapTests: XCTestCase {
 
     func testToggleValueFor_existingKey() {
-        var customStateMap: CustomStateMap = [CustomStateIdentifiable(position: 1, key: "testKey"): 1]
+        var customStateMap: RoktUXCustomStateMap = [CustomStateIdentifiable(position: 1, key: "testKey"): 1]
         let customStateId = CustomStateIdentifiable(position: 1, key: "testKey")
         
         customStateMap = customStateMap.toggleValueFor(customStateId)
@@ -26,7 +26,7 @@ class CustomStateMapTests: XCTestCase {
     }
     
     func testToggleValueFor_nonExistingKey() {
-        var customStateMap: CustomStateMap = [:]
+        var customStateMap: RoktUXCustomStateMap = [:]
         let customStateId = CustomStateIdentifiable(position: 1, key: "testKey")
         
         customStateMap = customStateMap.toggleValueFor(customStateId)
@@ -35,7 +35,7 @@ class CustomStateMapTests: XCTestCase {
     }
     
     func testToggleValueFor_invalidKey() {
-        var customStateMap: CustomStateMap = [CustomStateIdentifiable(position: 1, key: "testKey"): 1]
+        var customStateMap: RoktUXCustomStateMap = [CustomStateIdentifiable(position: 1, key: "testKey"): 1]
         
         customStateMap = customStateMap.toggleValueFor(nil)
         

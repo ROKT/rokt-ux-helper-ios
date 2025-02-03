@@ -22,5 +22,5 @@ protocol EventServicing: AnyObject {
     func sendSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool)
     func sendGatedSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool)
     func sendDismissalEvent()
-    func openURL(url: URL, type: OpenURLType, completionHandler: @escaping () -> Void)
+    func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void)
 }

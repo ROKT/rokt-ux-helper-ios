@@ -51,7 +51,7 @@ class EventProcessor: EventProcessing {
             }
             .debounceCollect(for: delay, scheduler: queue)
             .map {
-                (EventsPayload.init(events: $0.map(\.0)), $0.first?.1)
+                (RoktUXEventsPayload.init(events: $0.map(\.0)), $0.first?.1)
             }
             .compactMap { (events, processor) in
                 guard let payload = processor?.serializeData(payload: events) else { return nil }
@@ -70,7 +70,7 @@ class EventProcessor: EventProcessing {
         publisher.send((event, self))
     }
 
-    private func serializeData(payload: EventsPayload) -> [String: Any]? {
+    private func serializeData(payload: RoktUXEventsPayload) -> [String: Any]? {
         guard let data = try? JSONEncoder().encode(payload) else { return nil }
         return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
     }
