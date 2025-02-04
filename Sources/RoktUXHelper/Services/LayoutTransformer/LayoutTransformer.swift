@@ -235,13 +235,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     // MARK: Component Models
 
     func getStaticImage(_ imageModel: StaticImageModel<WhenPredicate>) throws -> StaticImageViewModel {
-        let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
+        let updatedStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own, transform: BaseStyles.init)
         return StaticImageViewModel(url: imageModel.url,
                                     alt: imageModel.alt,
-                                    defaultStyle: updateStyles.compactMap {$0.default},
-                                    pressedStyle: updateStyles.compactMap {$0.pressed},
-                                    hoveredStyle: updateStyles.compactMap {$0.hovered},
-                                    disabledStyle: updateStyles.compactMap {$0.disabled},
+                                    stylingProperties: updatedStyles,
                                     layoutState: layoutState)
     }
 
