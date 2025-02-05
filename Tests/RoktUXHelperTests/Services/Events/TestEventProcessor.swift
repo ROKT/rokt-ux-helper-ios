@@ -125,9 +125,9 @@ final class TestEventProcessor: XCTestCase {
         
         expectation = XCTestExpectation(description: "wait again")
         sut.handle(event: mockEvent(eventType: .SignalViewed, date: Date()))
-        microSleep(0.3)
+        microSleep(0.1)
         sut.handle(event: mockEvent(eventType: .SignalImpression, date: Date()))
-        microSleep(0.3)
+        microSleep(0.1)
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: Date()))
         wait(for: [expectation], timeout: 2)
         XCTAssertEqual(receivedPayload?.count, 3)
