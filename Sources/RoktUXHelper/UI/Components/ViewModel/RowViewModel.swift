@@ -16,28 +16,23 @@ import DcuiSchema
 class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
-    let defaultStyle: [RowStyle]?
-    let pressedStyle: [RowStyle]?
-    let hoveredStyle: [RowStyle]?
-    let disabledStyle: [RowStyle]?
+    let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
     let accessibilityGrouped: Bool
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
+    var defaultStyle: [BaseStyles]? {
+        stylingProperties?.map(\.default)
+    }
+
     init(children: [LayoutSchemaViewModel]?,
-         defaultStyle: [RowStyle]?,
-         pressedStyle: [RowStyle]?,
-         hoveredStyle: [RowStyle]?,
-         disabledStyle: [RowStyle]?,
+         stylingProperties: [BasicStateStylingBlock<BaseStyles>]?,
          accessibilityGrouped: Bool,
          layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
-        self.defaultStyle = defaultStyle
-        self.pressedStyle = pressedStyle
-        self.hoveredStyle = hoveredStyle
-        self.disabledStyle = disabledStyle
+        self.stylingProperties = stylingProperties
         self.accessibilityGrouped = accessibilityGrouped
         self.layoutState = layoutState
     }

@@ -49,9 +49,9 @@ extension BaseStyles {
             background: try? StyleTransformer.updatedBackground(style?.background, newStyle: diff.background),
             border: try? StyleTransformer.updatedBorder(style?.border, newStyle: diff.border),
             container: try? StyleTransformer.updatedContainer(style?.container, newStyle: diff.container),
-            dimension: try? StyleTransformer.updatedDimension(style?.dimension, newStyle: diff.dimension),
-            flexChild: try? StyleTransformer.updatedFlexChild(style?.flexChild, newStyle: diff.flexChild),
-            spacing: try? StyleTransformer.updatedSpacing(style?.spacing, newStyle: diff.spacing),
+            dimension: StyleTransformer.updatedDimension(style?.dimension, newStyle: diff.dimension),
+            flexChild: StyleTransformer.updatedFlexChild(style?.flexChild, newStyle: diff.flexChild),
+            spacing: StyleTransformer.updatedSpacing(style?.spacing, newStyle: diff.spacing),
             text: try? StyleTransformer.updatedText(style?.text, newStyle: diff.text)
         )
     }
@@ -63,6 +63,28 @@ extension BaseStyles {
         self.init(
             background: style.background,
             border: style.border,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
+
+    init(_ style: RowStyle) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
+    
+    init(_ style: ScrollableRowStyle) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
             dimension: style.dimension,
             flexChild: style.flexChild,
             spacing: style.spacing
