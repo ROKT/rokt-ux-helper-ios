@@ -43,12 +43,12 @@ class RoktEmbeddedViewModel {
     }
 
     func updateAttributedStrings(_ newColor: ColorScheme) {
-        DispatchQueue.main.async { [weak self] in
-            if let layouts = self?.layouts {
+        DispatchQueue.main.async { [config, layouts] in
+            if let layouts = layouts {
                 layouts.forEach { layout in
                     AttributedStringTransformer.convertRichTextHTMLIfExists(
                         uiModel: layout,
-                        config: self?.config,
+                        config: config,
                         colorScheme: newColor
                     )
                 }
