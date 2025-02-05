@@ -13,7 +13,7 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, *)
-private let defaultEventBufferDuration: DispatchQueue.SchedulerTimeType.Stride = 0.025
+private let defaultEventBufferDuration = 0.025
 
 @available(iOS 13.0, *)
 protocol EventProcessing {
@@ -31,7 +31,7 @@ class EventProcessor: EventProcessing {
     private(set) var publisher: PassthroughSubject<(RoktEventRequest, EventProcessor?), Never> = .init()
 
     init(
-        delay: DispatchQueue.SchedulerTimeType.Stride = defaultEventBufferDuration,
+        delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
         integrationType: HelperIntegrationType = .s2s,
         onRoktPlatformEvent: (([String: Any]) -> Void)?
@@ -49,7 +49,7 @@ class EventProcessor: EventProcessing {
             .filter { (event, processor) in
                 processor?.processedEvents.insert(.init(event)).inserted == true
             }
-            .debounceCollect(for: delay, scheduler: queue)
+            .collect(.byTime(queue, .seconds(delay)), options: nil)
             .map {
                 (RoktUXEventsPayload.init(events: $0.map(\.0)), $0.first?.1)
             }
