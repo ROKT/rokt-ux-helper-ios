@@ -235,13 +235,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     // MARK: Component Models
 
     func getStaticImage(_ imageModel: StaticImageModel<WhenPredicate>) throws -> StaticImageViewModel {
-        let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
+        let updatedStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own, transform: BaseStyles.init)
         return StaticImageViewModel(url: imageModel.url,
                                     alt: imageModel.alt,
-                                    defaultStyle: updateStyles.compactMap {$0.default},
-                                    pressedStyle: updateStyles.compactMap {$0.pressed},
-                                    hoveredStyle: updateStyles.compactMap {$0.hovered},
-                                    disabledStyle: updateStyles.compactMap {$0.disabled},
+                                    stylingProperties: updatedStyles,
                                     layoutState: layoutState)
     }
 
@@ -360,13 +357,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
     func getRow(_ styles: LayoutStyle<RowElements, ConditionalStyleTransition<RowTransitions, WhenPredicate>>?,
                 children: [LayoutSchemaViewModel]?,
                 accessibilityGrouped: Bool = false) throws -> RowViewModel {
-        let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
+        let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
         return RowViewModel(children: children,
-                            defaultStyle: updateStyles.compactMap {$0.default},
-                            pressedStyle: updateStyles.compactMap {$0.pressed},
-                            hoveredStyle: updateStyles.compactMap {$0.hovered},
-                            disabledStyle: updateStyles.compactMap {$0.disabled},
+                            stylingProperties: updatedStyles,
                             accessibilityGrouped: accessibilityGrouped,
                             layoutState: layoutState)
     }
@@ -375,21 +369,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                                 ConditionalStyleTransition<ScrollableRowTransitions, WhenPredicate>>?,
                           children: [LayoutSchemaViewModel]?,
                           accessibilityGrouped: Bool = false) throws -> RowViewModel {
-        let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
+        let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
         return RowViewModel(children: children,
-                            defaultStyle: updateStyles.compactMap {
-            StyleTransformer.convertToRowStyles($0.default)
-        },
-                            pressedStyle: updateStyles.compactMap {
-            StyleTransformer.convertToRowStyles($0.pressed)
-        },
-                            hoveredStyle: updateStyles.compactMap {
-            StyleTransformer.convertToRowStyles($0.hovered)
-        },
-                            disabledStyle: updateStyles.compactMap {
-            StyleTransformer.convertToRowStyles($0.disabled)
-        },
+                            stylingProperties: updatedStyles,
                             accessibilityGrouped: accessibilityGrouped,
                             layoutState: layoutState)
     }
