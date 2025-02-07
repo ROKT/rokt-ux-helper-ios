@@ -359,10 +359,19 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                 accessibilityGrouped: Bool = false) throws -> RowViewModel {
         let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
-        return RowViewModel(children: children,
-                            stylingProperties: updatedStyles,
-                            accessibilityGrouped: accessibilityGrouped,
-                            layoutState: layoutState)
+        return RowViewModel(
+            children: children,
+            stylingProperties: updatedStyles,
+            animatableStyle: AnimationStyle(
+                transition: styles?.conditionalTransitions,
+                transform: { $0.own.map(BaseStyles.init) }
+            ),
+            accessibilityGrouped: accessibilityGrouped,
+            layoutState: layoutState,
+            predicates: styles?.conditionalTransitions?.predicates,
+            globalBreakPoints: layoutPlugin.breakpoints,
+            slots: layoutPlugin.slots.map{$0.toSlotOfferModel()}
+        )
     }
 
     func getScrollableRow(_ styles: LayoutStyle<ScrollableRowElements,
@@ -371,10 +380,19 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                           accessibilityGrouped: Bool = false) throws -> RowViewModel {
         let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
-        return RowViewModel(children: children,
-                            stylingProperties: updatedStyles,
-                            accessibilityGrouped: accessibilityGrouped,
-                            layoutState: layoutState)
+        return RowViewModel(
+            children: children,
+            stylingProperties: updatedStyles,
+            animatableStyle: AnimationStyle(
+                transition: styles?.conditionalTransitions,
+                transform: { $0.own.map(BaseStyles.init) }
+            ),
+            accessibilityGrouped: accessibilityGrouped,
+            layoutState: layoutState,
+            predicates: styles?.conditionalTransitions?.predicates,
+            globalBreakPoints: layoutPlugin.breakpoints,
+            slots: layoutPlugin.slots.map{$0.toSlotOfferModel()}
+        )
     }
 
     func getZStack(_ styles: LayoutStyle<ZStackElements, ConditionalStyleTransition<ZStackTransitions, WhenPredicate>>?,
