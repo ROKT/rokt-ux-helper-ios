@@ -29,7 +29,7 @@ extension AnimatableStyleHandling {
     func subscribeToAnimation() {
         cancellable = layoutState?.itemsPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] newCustomStateMap in
+            .sink { [weak self] _ in
                 guard let self else { return }
                 animate = shouldApply(width)
             }

@@ -370,7 +370,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             layoutState: layoutState,
             predicates: styles?.conditionalTransitions?.predicates,
             globalBreakPoints: layoutPlugin.breakpoints,
-            slots: layoutPlugin.slots.map{$0.toSlotOfferModel()}
+            slots: layoutPlugin.slots.map { $0.toSlotOfferModel() }
         )
     }
 
@@ -391,7 +391,7 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
             layoutState: layoutState,
             predicates: styles?.conditionalTransitions?.predicates,
             globalBreakPoints: layoutPlugin.breakpoints,
-            slots: layoutPlugin.slots.map{$0.toSlotOfferModel()}
+            slots: layoutPlugin.slots.map { $0.toSlotOfferModel() }
         )
     }
 

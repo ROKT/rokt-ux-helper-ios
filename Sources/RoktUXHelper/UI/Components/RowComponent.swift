@@ -120,7 +120,7 @@ struct RowComponent: View {
                 currentStyle = style
                 updateStyle()
             }
-            .onChange(of: model.animate) { map in
+            .onChange(of: model.animate) { _ in
                 updateStyle()
             }
     }

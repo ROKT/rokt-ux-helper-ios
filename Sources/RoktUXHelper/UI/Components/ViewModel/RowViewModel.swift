@@ -53,7 +53,7 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive, AnimatableStyleH
         self.predicates = predicates
         self.globalBreakPoints = globalBreakPoints
         self.slots = slots
-        
+
         animate = shouldApply(width)
         subscribeToAnimation()
     }
