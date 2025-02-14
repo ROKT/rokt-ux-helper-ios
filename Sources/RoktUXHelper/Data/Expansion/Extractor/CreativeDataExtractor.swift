@@ -1,5 +1,5 @@
 //
-//  BNFCreativeDataExtractor.swift
+//  CreativeDataExtractor.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -12,16 +12,16 @@
 import Foundation
 
 @available(iOS 13, *)
-class BNFCreativeDataExtractor<Validator: DataValidator>: DataExtractor where Validator.T == String {
+class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Validator.T == String {
 
     private let dataValidator: Validator
-    private let parser: PropertyChainDataParser
-    private let dataReflector: any DataReflector
+    private let parser: PropertyChainDataParsing
+    private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = BNFPlaceholderValidator(),
-        parser: PropertyChainDataParser = BNFPropertyChainDataParser(),
-        dataReflector: any DataReflector = BNFDataReflector()
+        dataValidator: Validator = PlaceholderValidator(),
+        parser: PropertyChainDataParsing = PropertyChainDataParser(),
+        dataReflector: any DataReflecting = DataReflector()
     ) {
         self.dataValidator = dataValidator
         self.parser = parser
@@ -106,8 +106,6 @@ class BNFCreativeDataExtractor<Validator: DataValidator>: DataExtractor where Va
                 mappedData = keyAndNamespace.key
 
                 isStateType = true
-            case .dataCatalogItem:
-                throw LayoutTransformerError.InvalidBNFMapping()
             }
 
             // found a match

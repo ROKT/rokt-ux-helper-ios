@@ -1,5 +1,5 @@
 //
-//  BNFDataSanitiserTests.swift
+//  DataSanitiserTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,13 +14,13 @@
 import XCTest
 @testable import RoktUXHelper
 
-final class BNFDataSanitiserTests: XCTestCase {
-    var sut: BNFDataSanitiser!
+final class DataSanitiserTests: XCTestCase {
+    var sut: DataSanitiser!
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFDataSanitiser()
+        sut = DataSanitiser()
     }
 
     override func tearDown() {

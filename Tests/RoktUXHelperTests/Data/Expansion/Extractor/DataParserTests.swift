@@ -1,5 +1,5 @@
 //
-//  BNFDataParserTests.swift
+//  DataParserTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,13 +14,13 @@
 import XCTest
 @testable import RoktUXHelper
 
-final class BNFDataParserTests: XCTestCase {
-    var sut: PropertyChainDataParser!
+final class DataParserTests: XCTestCase {
+    var sut: PropertyChainDataParsing!
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFPropertyChainDataParser()
+        sut = PropertyChainDataParser()
     }
 
     override func tearDown() {

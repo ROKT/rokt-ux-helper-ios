@@ -1,5 +1,5 @@
 //
-//  BNFCreativeMappingTests.swift
+//  CreativeMapperTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -16,16 +16,16 @@ import XCTest
 import DcuiSchema
 
 @available(iOS 15, *)
-final class BNFCreativeMappingTests: XCTestCase {
+final class CreativeMapperTests: XCTestCase {
 
-    var sut: BNFCreativeMapping<BNFCreativeDataExtractor<BNFPlaceholderValidator<BNFDataSanitiser>>>!
+    var sut: CreativeMapper<CreativeDataExtractor<PlaceholderValidator<DataSanitiser>>>!
     var bnfColumn: ColumnModel<LayoutSchemaModel, WhenPredicate>?
     var firstOffer: OfferModel?
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFCreativeMapping()
+        sut = CreativeMapper()
 
         let bnfPageModel = ModelTestData.PageModelData.withBNF()
         let firstSlot = bnfPageModel.layoutPlugins?.first?.slots[0]

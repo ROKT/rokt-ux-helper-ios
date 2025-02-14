@@ -14,10 +14,10 @@ import DcuiSchema
 
 @available(iOS 15, *)
 struct LayoutTransformer<
-    CreativeMapper: BNFMapper,
-    Extractor: DataExtractor
+    CreativeSyntaxMapper: SyntaxMapping,
+    Extractor: DataExtracting
 >
-where CreativeMapper.Context == BNFCreativeContext {
+where CreativeSyntaxMapper.Context == CreativeContext {
 
     enum Context {
         case outer([OfferModel?])
@@ -33,13 +33,13 @@ where CreativeMapper.Context == BNFCreativeContext {
     let layoutPlugin: LayoutPlugin
     let layoutState: LayoutState
     let eventService: EventDiagnosticServicing?
-    let creativeMapper: CreativeMapper
+    let creativeMapper: CreativeSyntaxMapper
     let extractor: Extractor
 
     init(
         layoutPlugin: LayoutPlugin,
-        creativeMapper: CreativeMapper = BNFCreativeMapping(),
-        extractor: Extractor = BNFCreativeDataExtractor(),
+        creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
+        extractor: Extractor = CreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
         eventService: EventDiagnosticServicing? = nil
     ) {
@@ -361,7 +361,7 @@ where CreativeMapper.Context == BNFCreativeContext {
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState,
                                     diagnosticService: eventService)
-        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
+        if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
         }
         return vm
@@ -376,7 +376,7 @@ where CreativeMapper.Context == BNFCreativeContext {
                                    openLinks: richTextModel.openLinks,
                                    layoutState: layoutState,
                                    eventService: eventService)
-        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
+        if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .richText(vm), context: bnfContext)
         }
         return vm
@@ -593,7 +593,7 @@ where CreativeMapper.Context == BNFCreativeContext {
             layoutState: layoutState,
             eventService: eventService
         )
-        if let bnfContext = context.mapToBNFCreativeContext {
+        if let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .progressIndicator(vm), context: bnfContext)
         }
         return vm
@@ -627,7 +627,7 @@ where CreativeMapper.Context == BNFCreativeContext {
 
 @available(iOS 15, *)
 private extension LayoutTransformer.Context {
-    var mapToBNFCreativeContext: BNFCreativeContext? {
+    var mapToCreativeContext: CreativeContext? {
         switch self {
         case .outer:
                 .outer

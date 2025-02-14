@@ -1,5 +1,5 @@
 //
-//  BNFCreativeMapping.swift
+//  CreativeMapper.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,7 +13,7 @@
 
 import Foundation
 
-enum BNFCreativeContext {
+enum CreativeContext {
     case outer
     case generic(OfferModel?)
     case positiveResponse(OfferModel)
@@ -43,14 +43,14 @@ enum BNFCreativeContext {
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
 @available(iOS 15, *)
-struct BNFCreativeMapping<Extractor: DataExtractor>: BNFMapper where Extractor.MappingSource == OfferModel {
+struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.MappingSource == OfferModel {
     let extractor: Extractor
 
-    init(extractor: Extractor = BNFCreativeDataExtractor()) {
+    init(extractor: Extractor = CreativeDataExtractor()) {
         self.extractor = extractor
     }
 
-    func map(consumer: LayoutSchemaViewModel, context: BNFCreativeContext) {
+    func map(consumer: LayoutSchemaViewModel, context: CreativeContext) {
         switch consumer {
             // assumption is that the `value` property will be the mappable value
             // this is where we decide that only creative.responseOptions is allowed for buttons
@@ -85,9 +85,9 @@ struct BNFCreativeMapping<Extractor: DataExtractor>: BNFMapper where Extractor.M
         }
     }
 
-    private func resolveDataExpansion(_ fullText: String, context: BNFCreativeContext) -> String {
+    private func resolveDataExpansion(_ fullText: String, context: CreativeContext) -> String {
         do {
-            guard let offerModel = context.offerModel else { throw LayoutTransformerError.InvalidBNFMapping() }
+            guard let offerModel = context.offerModel else { throw LayoutTransformerError.InvalidSyntaxMapping() }
             let placeholdersToResolved = try placeholdersToResolvedValues(fullText,
                                                                           responseKey: context.creativeResponse,
                                                                           dataSource: offerModel)

@@ -1,5 +1,5 @@
 //
-//  BNFDataExtractor.swift
+//  DataExtracting.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,7 +13,7 @@
 
 import Foundation
 
-protocol DataExtractor {
+protocol DataExtracting {
     associatedtype MappingSource: DomainMappingSource
 
     func extractDataRepresentedBy<T>(

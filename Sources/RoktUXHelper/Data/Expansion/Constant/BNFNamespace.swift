@@ -28,7 +28,4 @@ enum BNFNamespace: String, CaseIterable {
         case positive
         case negative
     }
-
-    // MARK: Catalog Item
-    case dataCatalogItem = "DATA.catalogItem"
 }

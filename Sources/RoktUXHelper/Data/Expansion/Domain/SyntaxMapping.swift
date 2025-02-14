@@ -1,5 +1,5 @@
 //
-//  BNFMapper.swift
+//  SyntaxMapping.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,7 +14,7 @@
 import Foundation
 
 @available(iOS 15, *)
-protocol BNFMapper {
+protocol SyntaxMapping {
     associatedtype Context
     func map(consumer: LayoutSchemaViewModel, context: Context)
 }
