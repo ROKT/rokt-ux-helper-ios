@@ -1,5 +1,5 @@
 //
-//  BNFDataReflector.swift
+//  DataReflector.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,13 +14,13 @@
 import Foundation
 
 /// Extracts nested property values from entity `Data` given a sequential chain of property keys in `keys`
-protocol DataReflector {
+protocol DataReflecting {
     associatedtype U
 
     func getReflectedValue(data: Mirror, keys: [String]) -> U?
 }
 
-struct BNFDataReflector: DataReflector {
+struct DataReflector: DataReflecting {
     func getReflectedValue(data: Mirror, keys: [String]) -> String? {
         guard let keyToCheck = keys.first else { return nil }
 

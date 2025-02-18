@@ -20,20 +20,20 @@ class WhenViewModel: Identifiable, Hashable {
     var children: [LayoutSchemaViewModel]?
     let predicates: [WhenPredicate]?
     let transition: WhenTransition?
-    let slots: [SlotOfferModel]
+    let offers: [OfferModel?]
     let globalBreakPoints: BreakPoint?
     weak var layoutState: (any LayoutStateRepresenting)?
 
     init(children: [LayoutSchemaViewModel]? = nil,
          predicates: [WhenPredicate]?,
          transition: WhenTransition?,
-         slots: [SlotOfferModel],
+         offers: [OfferModel?],
          globalBreakPoints: BreakPoint?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.predicates = predicates
         self.transition = transition
-        self.slots = slots
+        self.offers = offers
         self.globalBreakPoints = globalBreakPoints
         self.layoutState = layoutState
     }
@@ -280,8 +280,8 @@ class WhenViewModel: Identifiable, Hashable {
     }
 
     private func getCreativeCopy(_ offerPosition: Int) -> [String: String] {
-        guard slots.count > offerPosition else { return [:] }
-        return slots[offerPosition].offer?.creative.copy ?? [:]
+        guard offers.count > offerPosition else { return [:] }
+        return offers[offerPosition]?.creative.copy ?? [:]
     }
 
     private func staticStringPredicatesMatched() -> Bool? {

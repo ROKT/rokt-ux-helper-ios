@@ -1,5 +1,5 @@
 //
-//  BNFDataExtractorTests.swift
+//  CreativeDataExtractorTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -15,15 +15,15 @@ import XCTest
 @testable import RoktUXHelper
 
 @available(iOS 13, *)
-final class BNFDataExtractorTests: XCTestCase {
+final class CreativeDataExtractorTests: XCTestCase {
     var offer: OfferModel!
-    var sut: BNFDataExtractor? = BNFDataExtractor()
+    var sut: CreativeDataExtractor? = CreativeDataExtractor()
 
     override func setUp() {
         super.setUp()
 
         offer = ModelTestData.PageModelData.withBNF().layoutPlugins?.first!.slots[0].offer!
-        sut = BNFDataExtractor()
+        sut = CreativeDataExtractor()
     }
 
     override func tearDown() {

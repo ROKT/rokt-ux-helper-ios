@@ -73,3 +73,28 @@ func get_mock_event_processor(startDate: Date = Date(),
                         pluginConfigJWTToken: mockPluginConfigJWTToken,
                         useDiagnosticEvents: useDiagnosticEvents)
 }
+
+extension OfferModel {
+    static func mock(
+        campaignId: String = "",
+        referralCreativeId: String = "",
+        instanceGuid: String = "",
+        copy: [String: String] = [:],
+        images: [String: CreativeImage]? = nil,
+        responseOptionList: ResponseOptionList? = nil,
+        token: String = ""
+    ) -> Self {
+        .init(
+            campaignId: campaignId,
+            creative: .init(
+                referralCreativeId: referralCreativeId,
+                instanceGuid: instanceGuid,
+                copy: copy,
+                images: images,
+                links: [:],
+                responseOptionsMap: responseOptionList,
+                jwtToken: token
+            )
+        )
+    }
+}

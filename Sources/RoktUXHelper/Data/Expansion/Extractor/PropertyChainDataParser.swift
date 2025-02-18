@@ -1,5 +1,5 @@
 //
-//  BNFPropertyChainDataParser.swift
+//  PropertyChainDataParser.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,16 +13,16 @@
 
 import Foundation
 
-protocol PropertyChainDataParser {
+protocol PropertyChainDataParsing {
     func parse(propertyChain: String) -> BNFPlaceholder
     func namespaceIn(placeholder: String) -> BNFNamespace?
 }
 
 /// Strips namespace and separators from a BNF-formatted String and separates it into possible values, including default
-struct BNFPropertyChainDataParser<Sanitiser: DataSanitiser>: PropertyChainDataParser where Sanitiser.T == String {
+struct PropertyChainDataParser<Sanitiser: DataSanitising>: PropertyChainDataParsing where Sanitiser.T == String {
     private let sanitiser: Sanitiser
 
-    init(sanitiser: Sanitiser = BNFDataSanitiser()) {
+    init(sanitiser: Sanitiser = DataSanitiser()) {
         self.sanitiser = sanitiser
     }
 

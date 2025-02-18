@@ -170,6 +170,6 @@ extension LayoutSchemaViewModel {
                                             layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.OneByOneData.oneByOne()
-        return LayoutSchemaViewModel.oneByOne(try transformer.getOneByOne(oneByOneModel: model!))
+        return LayoutSchemaViewModel.oneByOne(try transformer.getOneByOne(oneByOneModel: model!, context: .outer(slots!.map(\.offer))))
     }
 }
