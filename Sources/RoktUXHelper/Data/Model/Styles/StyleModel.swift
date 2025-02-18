@@ -12,7 +12,7 @@
 import SwiftUI
 
 @available(iOS 13, *)
-enum ImageScaleProperty: String, Codable, CaseIterableDefaultLast {
+enum ImageScaleProperty: String, Codable, RoktUXCaseIterableDefaultLast {
     case fill
     case fit
 
@@ -27,7 +27,7 @@ enum ImageScaleProperty: String, Codable, CaseIterableDefaultLast {
 }
 
 @available(iOS 13, *)
-enum VerticalAlignmentProperty: String, Codable, CaseIterableDefaultLast {
+enum VerticalAlignmentProperty: String, Codable, RoktUXCaseIterableDefaultLast {
     case center
     case bottom = "flex-end"
     case top = "flex-start"
@@ -56,7 +56,7 @@ enum VerticalAlignmentProperty: String, Codable, CaseIterableDefaultLast {
 }
 
 @available(iOS 13, *)
-enum HorizontalAlignmentProperty: String, Codable, CaseIterableDefaultLast {
+enum HorizontalAlignmentProperty: String, Codable, RoktUXCaseIterableDefaultLast {
     case end = "flex-end"
     case center
     case start = "flex-start"
@@ -85,7 +85,7 @@ enum HorizontalAlignmentProperty: String, Codable, CaseIterableDefaultLast {
 }
 
 @available(iOS 13, *)
-enum HorizontalTextAlignmentProperty: String, Codable, CaseIterableDefaultLast {
+enum HorizontalTextAlignmentProperty: String, Codable, RoktUXCaseIterableDefaultLast {
     case end = "flex-end"
     case center
     case start = "flex-start"

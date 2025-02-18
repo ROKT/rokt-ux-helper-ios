@@ -68,8 +68,8 @@ class WhenViewModel: Identifiable, Hashable {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 0
     }
 
-    var customStateMap: Binding<CustomStateMap?> {
-        layoutState?.items[LayoutState.customStateMap] as? Binding<CustomStateMap?> ?? .constant(nil)
+    var customStateMap: Binding<RoktUXCustomStateMap?> {
+        layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
     }
 
     private var darkModePredicates: [DarkModePredicate] {
@@ -304,7 +304,7 @@ class WhenViewModel: Identifiable, Hashable {
         return matched
     }
 
-    private func customStatePredicatesMatched(customStateMap: CustomStateMap?, position: Int?) -> Bool? {
+    private func customStatePredicatesMatched(customStateMap: RoktUXCustomStateMap?, position: Int?) -> Bool? {
         guard !customStatePredicates.isEmpty else { return nil }
 
         // Predicates need to applied if all of the predicates are met.

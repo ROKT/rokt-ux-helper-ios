@@ -14,6 +14,7 @@
 import Foundation
 import SwiftUI
 import DcuiSchema
+import Combine
 
 @available(iOS 13.0, *)
 class LayoutState: LayoutStateRepresenting {
@@ -27,6 +28,7 @@ class LayoutState: LayoutStateRepresenting {
     static let customStateMap = "customStateMap" // CustomStateMap
 
     private var _items = [String: Any]()
+    private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
     let config: RoktUXConfig?
 
@@ -37,8 +39,10 @@ class LayoutState: LayoutStateRepresenting {
             }
         }
         set {
-            queue.async(flags: .barrier) {
+            queue.async(flags: .barrier) { [weak self] in
+                guard let self else { return }
                 self._items = newValue
+                self.itemsPublisher.send(newValue)
             }
         }
     }
@@ -49,21 +53,42 @@ class LayoutState: LayoutStateRepresenting {
         config?.colorMode
     }
 
-    var imageLoader: (any ImageLoader)? {
+    var imageLoader: (any RoktUXImageLoader)? {
         config?.imageLoader
     }
 
-    init(actionCollection: ActionCollecting = ActionCollection(), config: RoktUXConfig? = nil) {
+    public let initialPluginViewState: RoktPluginViewState?
+    private let pluginId: String?
+    private let onPluginViewStateChange: ((RoktPluginViewState) -> Void)?
+
+    init(actionCollection: ActionCollecting = ActionCollection(),
+         config: RoktUXConfig? = nil,
+         pluginId: String? = nil,
+         initialPluginViewState: RoktPluginViewState? = nil,
+         onPluginViewStateChange: ((RoktPluginViewState) -> Void)? = nil) {
         self.actionCollection = actionCollection
         self.config = config
+        self.pluginId = pluginId
+        self.initialPluginViewState = initialPluginViewState
+        self.onPluginViewStateChange = onPluginViewStateChange
     }
 
-    func setLayoutType(_ type: PlacementLayoutCode) {
+    func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {
+        guard let pluginId else { return }
+        let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
+        let customStateMap: Binding<RoktUXCustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
+        onPluginViewStateChange?(RoktPluginViewState(pluginId: pluginId,
+                                                     offerIndex: offerIndex ?? currentProgress?.wrappedValue,
+                                                     isPluginDismissed: dismiss,
+                                                     customStateMap: customStateMap?.wrappedValue))
+    }
+
+    func setLayoutType(_ type: RoktUXPlacementLayoutCode) {
         items[LayoutState.layoutType] = type
     }
 
-    func layoutType() -> PlacementLayoutCode {
-        (items[LayoutState.layoutType] as? PlacementLayoutCode) ?? .unknown
+    func layoutType() -> RoktUXPlacementLayoutCode {
+        (items[LayoutState.layoutType] as? RoktUXPlacementLayoutCode) ?? .unknown
     }
 
     func closeOnComplete() -> Bool {

@@ -174,7 +174,7 @@ internal extension View {
         modifier(OverflowModifier(overFlow: overflow))
     }
 
-    func background(backgroundStyle: BackgroundStylingProperties?, imageLoader: ImageLoader?) -> some View {
+    func background(backgroundStyle: BackgroundStylingProperties?, imageLoader: RoktUXImageLoader?) -> some View {
         modifier(BackgroundModifier(backgroundStyle: backgroundStyle, imageLoader: imageLoader))
     }
 
@@ -182,7 +182,7 @@ internal extension View {
         modifier(BackgroundColorModifier(backgroundColor: hex))
     }
 
-    func backgroundImage(backgroundImage: BackgroundImage?, imageLoader: ImageLoader?) -> some View {
+    func backgroundImage(backgroundImage: BackgroundImage?, imageLoader: RoktUXImageLoader?) -> some View {
         modifier(BackgroundImageModifier(backgroundImage: backgroundImage, imageLoader: imageLoader))
     }
 

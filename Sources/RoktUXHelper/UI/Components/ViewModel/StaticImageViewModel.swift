@@ -25,7 +25,7 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
     let disabledStyle: [StaticImageStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

@@ -560,7 +560,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "otherState")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 1)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -572,7 +572,7 @@ final class TestWhenViewModel: XCTestCase {
             key: "state", condition: .is, value: 1))
         let whenVM = get_when_view_model(predicates: [predicate])
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 1)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -585,7 +585,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 0)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -598,7 +598,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 11)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -611,7 +611,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 1)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -624,7 +624,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 21)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -637,7 +637,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 1)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -650,7 +650,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 0)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -663,7 +663,7 @@ final class TestWhenViewModel: XCTestCase {
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 11)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(customStateMap: customStateMap))
 
@@ -677,7 +677,7 @@ final class TestWhenViewModel: XCTestCase {
         
         // Setup customStateMap with ["state": 1] on position 0
         let customStateId = CustomStateIdentifiable(position: 0, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 1)])
         // Should not apply as uiState on position 1
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 1,
@@ -751,7 +751,7 @@ final class TestWhenViewModel: XCTestCase {
                                          breakPoint: get_shared_data_with_breakpoints())
         // Act
         let customStateId = CustomStateIdentifiable(position: 0, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 21)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0,
                                                               width: 1,
@@ -777,7 +777,7 @@ final class TestWhenViewModel: XCTestCase {
                                          breakPoint: get_shared_data_with_breakpoints())
         // Act
         let customStateId = CustomStateIdentifiable(position: 0, key: "state")
-        let customStateMap = CustomStateMap(uniqueKeysWithValues: [(key: customStateId,
+        let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
                                                                     value: 2)])
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0,
                                                               width: 1,

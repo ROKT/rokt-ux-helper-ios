@@ -17,11 +17,11 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let responseKey: BNFNamespace.CreativeResponseKey
-    let responseOptions: ResponseOption?
+    let responseOptions: RoktUXResponseOption?
     let openLinks: LinkOpenTarget?
     weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
@@ -32,7 +32,7 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     init(children: [LayoutSchemaViewModel]?,
          responseKey: BNFNamespace.CreativeResponseKey,
-         responseOptions: ResponseOption?,
+         responseOptions: RoktUXResponseOption?,
          openLinks: LinkOpenTarget?,
          layoutState: (any LayoutStateRepresenting)?,
          eventService: EventDiagnosticServicing?,

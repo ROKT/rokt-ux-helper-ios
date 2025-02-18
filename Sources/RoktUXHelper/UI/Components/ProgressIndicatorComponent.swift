@@ -225,7 +225,7 @@ struct ProgressIndicatorComponent: View {
         defaultStyle: [IndicatorStyles]?,
         layoutState: (any LayoutStateRepresenting)?,
         eventService: EventDiagnosticServicing?,
-        imageLoader: ImageLoader?
+        imageLoader: RoktUXImageLoader?
     ) -> RichTextViewModel {
         let model = RichTextViewModel(
             value: value,

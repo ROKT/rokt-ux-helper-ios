@@ -24,7 +24,7 @@ protocol DiagnosticServicing: AnyObject {
     var useDiagnosticEvents: Bool { get }
 
     func sendEvent(
-        _ eventType: EventType,
+        _ eventType: RoktUXEventType,
         parentGuid: String,
         extraMetadata: [RoktEventNameValue],
         eventData: [String: String],

@@ -281,18 +281,18 @@ class ModelTestData: NSObject {
 
     @available(iOS 13, *)
     enum PageModelData {
-        static func withBNF() -> PageModel {
+        static func withBNF() -> RoktUXPageModel {
             let data = toData(jsonFilename: "page_model")
-            let experienceResponse = try! JSONDecoder().decode(S2SExperienceResponse.self, from: data)
+            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
             return experienceResponse.getPageModel()!
         }
     }
 
     @available(iOS 13, *)
     enum CatalogPageModelData {
-        static func withBNF() -> PageModel {
+        static func withBNF() -> RoktUXPageModel {
             let data = toData(jsonFilename: "add_to_cart_page_model")
-            let experienceResponse = try! JSONDecoder().decode(S2SExperienceResponse.self, from: data)
+            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
             return experienceResponse.getPageModel()!
         }
     }

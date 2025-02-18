@@ -30,10 +30,10 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     private(set) var dataBinding: DataBinding<String> = .value("")
 
     // extracted data from `dataBinding` that's published externally
-    @Published var boundValue = ""
+    @LazyPublished var boundValue = ""
 
-    @Published var styleState = StyleState.default
-    @Published var breakpointIndex = 0
+    @LazyPublished var styleState = StyleState.default
+    @LazyPublished var breakpointIndex = 0
     var currentStylingProperties: BasicTextStyle? {
         switch styleState {
         case .hovered:
@@ -55,21 +55,17 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     weak var diagnosticService: DiagnosticServicing?
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
+    private var cancellable: AnyCancellable?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
-    var currentIndex: Binding<Int> {
-        layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
-    }
+    var currentIndex: Binding<Int> = .constant(0)
+    var viewableItems: Binding<Int> = .constant(1)
 
     var totalOffer: Int {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
-    }
-
-    var viewableItems: Binding<Int> {
-        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
     }
 
     init(
@@ -94,7 +90,14 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.stateDataExpansionClosure = stateDataExpansionClosure
         self.layoutState = layoutState
         self.diagnosticService = diagnosticService
+        self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
+
+        cancellable = layoutState?.itemsPublisher.sink { newValue in
+            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        }
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {

@@ -17,6 +17,7 @@ import ViewInspector
 @available(iOS 15.0, *)
 final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
     
+#if compiler(>=6)
     func test_zStackComponent_computedProperties_accessibility() throws {
         let model = try get_model()
         
@@ -24,7 +25,44 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
             XCTFail()
             return
         }
+
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(zStackUIModel))
         
+        let sut = try view.inspect()
+            .view(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ZStackComponent.self)
+            .actualView()
+        
+        let defaultStyle = sut.model.defaultStyle?[0]
+        
+        XCTAssertEqual(sut.style, defaultStyle)
+        
+        XCTAssertEqual(sut.containerStyle, defaultStyle?.container)
+        XCTAssertEqual(sut.dimensionStyle, defaultStyle?.dimension)
+        XCTAssertEqual(sut.flexStyle, defaultStyle?.flexChild)
+        XCTAssertEqual(sut.backgroundStyle, defaultStyle?.background)
+        XCTAssertEqual(sut.spacingStyle, defaultStyle?.spacing)
+        XCTAssertEqual(sut.borderStyle, defaultStyle?.border)
+        
+        XCTAssertEqual(sut.passableBackgroundStyle, defaultStyle?.background)
+        
+        XCTAssertEqual(sut.verticalAlignment, .center)
+        XCTAssertEqual(sut.horizontalAlignment, .center)
+        
+        XCTAssertEqual(sut.accessibilityBehavior, .combine)
+    }
+#else
+    func test_zStackComponent_computedProperties_accessibility() throws {
+        let model = try get_model()
+        
+        guard case .zStack(let zStackUIModel) = model else {
+            XCTFail()
+            return
+        }
+
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(zStackUIModel))
         
         let sut = try view.inspect().view(TestPlaceHolder.self)
@@ -53,7 +91,7 @@ final class TestAccessibilityGroupedModelInZStackComponent: XCTestCase {
         XCTAssertEqual(sut.accessibilityBehavior, .combine)
         
     }
-    
+#endif
     func get_model() throws -> LayoutSchemaViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let accessibilityGroup = ModelTestData.ZStackData.accessibilityGroupedZStack()

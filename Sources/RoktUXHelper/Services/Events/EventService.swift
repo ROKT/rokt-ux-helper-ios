@@ -138,7 +138,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendEvent(
-        _ eventType: EventType,
+        _ eventType: RoktUXEventType,
         parentGuid: String,
         extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [:],
@@ -157,7 +157,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         )
     }
 
-    func openURL(url: URL, type: OpenURLType, completionHandler: @escaping () -> Void) {
+    func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void) {
         canOpenUrl(url)
         let id = UUID().uuidString
         uxEventDelegate?.openURL(url: url.absoluteString, id: id, type: type, onClose: { incomingId in
@@ -187,7 +187,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
-    private func sendCartItemEvent(eventType: EventType, catalogItem: CatalogItem) {
+    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
         sendEvent(
             eventType,
             parentGuid: catalogItem.instanceGuid ?? "",

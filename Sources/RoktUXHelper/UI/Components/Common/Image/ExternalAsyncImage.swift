@@ -20,7 +20,7 @@ struct ExternalAsyncImage: View {
     let altString: String
     @State private var image: UIImage?
 
-    init(urlString: String, scale: BackgroundImageScale?, altString: String, loader: ImageLoader) {
+    init(urlString: String, scale: BackgroundImageScale?, altString: String, loader: RoktUXImageLoader) {
         self.imageDownloader = ImageDownloader(urlString: urlString, loader: loader)
         self.scale = scale
         self.altString = altString

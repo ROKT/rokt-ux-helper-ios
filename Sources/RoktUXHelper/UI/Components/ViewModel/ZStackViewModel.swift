@@ -22,7 +22,7 @@ class ZStackViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let disabledStyle: [ZStackStyle]?
     let accessibilityGrouped: Bool
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

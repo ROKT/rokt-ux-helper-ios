@@ -20,7 +20,7 @@ class CatalogStackedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdapt
     let defaultStyle: [CatalogStackedCollectionStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
     init(

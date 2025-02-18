@@ -35,18 +35,17 @@ extension UIViewController {
                                 onUnLoad: @escaping (() -> Void),
                                 @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content) {
 
-        let modal = SwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
+        let modal = RoktUXSwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
                                           eventService: eventService,
                                           layoutState: layoutState,
                                           onUnload: onUnLoad)
-
         if #available(iOS 16.0, *),
            let type = placementType,
            type == .BottomSheet(.dynamic),
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            var onSizeChange = { [weak self, weak modal] size in
+            let onSizeChange = { [weak modal] size in
                 DispatchQueue.main.async {
                     if let sheet = modal?.sheetPresentationController {
                         sheet.animateChanges {
@@ -96,8 +95,9 @@ extension UIViewController {
         }
 
         modal.view.isOpaque = false
-        layoutState.actionCollection[.close] = { [weak self, weak modal] _ in
+        layoutState.actionCollection[.close] = { [weak modal, weak layoutState] _ in
             modal?.dismiss(animated: true, completion: nil)
+            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
         }
     }
 
@@ -158,7 +158,7 @@ extension UIViewController {
 }
 
 @available(iOS 15.0, *)
-public final class SwiftUIViewController: UIHostingController<AnyView> {
+public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
     weak var eventService: EventService?
     let layoutState: LayoutState?

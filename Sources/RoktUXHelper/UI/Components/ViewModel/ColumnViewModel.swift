@@ -23,7 +23,7 @@ class ColumnViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let accessibilityGrouped: Bool
     weak var layoutState: (any LayoutStateRepresenting)?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

@@ -21,7 +21,7 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
     let defaultStyle: [GroupedDistributionStyles]?
     let viewableItems: [UInt8]
     let transition: DcuiSchema.Transition
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         config?.imageLoader
     }
 
@@ -53,7 +53,7 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
         currentProgress: Binding<Int>,
         totalItems: Int,
         viewableItems: Binding<Int>,
-        customStateMap: Binding<CustomStateMap?>
+        customStateMap: Binding<RoktUXCustomStateMap?>
     ) {
         layoutState?.items[LayoutState.currentProgressKey] = currentProgress
         layoutState?.items[LayoutState.totalItemsKey] = totalItems
