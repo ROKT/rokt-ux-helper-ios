@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-02-20
+
 ### Fixed
 
-- limit view dimensions to 2 decimal places to resolve precision issues. 
+- limit view dimensions to 2 decimal places to resolve precision issues.
 
 ## [0.3.0] - 2025-02-06
 
@@ -32,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Replaced *attribute* with *eventData* in the RoktEventRequest
+- Replaced _attribute_ with _eventData_ in the RoktEventRequest
 
 ### Fixed
 
