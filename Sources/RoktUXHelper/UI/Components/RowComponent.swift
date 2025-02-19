@@ -33,21 +33,22 @@ struct RowComponent: View {
     @State var breakpointIndex: Int = 0
     @State var frameChangeIndex: Int = 0
 
-    var containerStyle: ContainerStylingProperties? { style?.container }
-    var dimensionStyle: DimensionStylingProperties? { style?.dimension }
-    var flexStyle: FlexChildStylingProperties? { style?.flexChild }
-    var borderStyle: BorderStylingProperties? { style?.border }
-    var spacingStyle: SpacingStylingProperties? { style?.spacing }
-    var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var containerStyle: ContainerStylingProperties? { (currentStyle ?? style)?.container }
+    var dimensionStyle: DimensionStylingProperties? { (currentStyle ?? style)?.dimension }
+    var flexStyle: FlexChildStylingProperties? { (currentStyle ?? style)?.flexChild }
+    var borderStyle: BorderStylingProperties? { (currentStyle ?? style)?.border }
+    var spacingStyle: SpacingStylingProperties? { (currentStyle ?? style)?.spacing }
+    var backgroundStyle: BackgroundStylingProperties? { (currentStyle ?? style)?.background }
 
     let config: ComponentConfig
-    let model: RowViewModel
+    @StateObject var model: RowViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
+    @State private var currentStyle: BaseStyles?
 
     let parentOverride: ComponentParentOverride?
 
@@ -107,12 +108,31 @@ struct RowComponent: View {
             }
             .onChange(of: globalScreenSize.width) { newSize in
                 // run it in background thread for smooth transition
+                model.width = newSize ?? 0
                 DispatchQueue.background.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
+                    updateStyle()
                 }
             }
             .accessibilityElement(children: accessibilityBehavior)
+            .onLoad {
+                currentStyle = style
+                updateStyle()
+            }
+            .onChange(of: model.animate) { _ in
+                updateStyle()
+            }
+    }
+
+    private func updateStyle() {
+        if model.animate {
+            withAnimation(.linear(duration: model.animatableStyle?.duration ?? 0)) {
+                currentStyle = .union(style, diff: model.animatableStyle?.style)
+            }
+        } else {
+            currentStyle = style
+        }
     }
 
     func build() -> some View {
@@ -142,5 +162,4 @@ struct RowComponent: View {
             }
         }
     }
-
 }
