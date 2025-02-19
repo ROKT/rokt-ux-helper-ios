@@ -20,7 +20,7 @@ struct AsyncImageView: View {
     let imageUrl: ThemeUrl?
     let scale: BackgroundImageScale?
     var alt: String?
-    var imageLoader: ImageLoader?
+    var imageLoader: RoktUXImageLoader?
 
     private var altString: String {
         alt ?? ""
@@ -86,6 +86,8 @@ struct AsyncImageView: View {
     }
 
     func setImageAsInvalid() {
-        isImageValid = false
+        DispatchQueue.background.async {
+            isImageValid = false
+        }
     }
 }

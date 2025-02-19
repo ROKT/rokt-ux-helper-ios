@@ -19,7 +19,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     var children: [LayoutSchemaViewModel]?
     weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

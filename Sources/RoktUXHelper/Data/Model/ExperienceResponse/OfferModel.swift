@@ -48,8 +48,8 @@ struct CreativeImage: Codable, Hashable {
 }
 
 struct ResponseOptionList: Codable {
-    let positive: ResponseOption?
-    let negative: ResponseOption?
+    let positive: RoktUXResponseOption?
+    let negative: RoktUXResponseOption?
 }
 
 struct CreativeLink: Codable, Hashable {

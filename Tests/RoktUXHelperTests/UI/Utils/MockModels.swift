@@ -45,7 +45,7 @@ func get_mock_uistate(currentProgress: Int = 0,
                       position: Int? = nil,
                       width: CGFloat = 100,
                       isDarkMode: Bool = false,
-                      customStateMap: CustomStateMap? = nil) -> WhenComponentUIState {
+                      customStateMap: RoktUXCustomStateMap? = nil) -> WhenComponentUIState {
     return WhenComponentUIState(currentProgress: currentProgress,
                                 totalOffers: totalOffers,
                                 position: position,
@@ -93,7 +93,7 @@ extension OfferModel {
                 instanceGuid: instanceGuid,
                 copy: copy,
                 images: images,
-                links: [:], 
+                links: [:],
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),

@@ -17,7 +17,7 @@ class RoktEmbeddedViewModel {
     weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
@@ -34,6 +34,7 @@ class RoktEmbeddedViewModel {
     }
 
     func sendOnLoadEvents() {
+        layoutState?.config?.debugLog("Rokt: view loaded")
         eventService?.sendEventsOnLoad()
     }
 
@@ -42,12 +43,12 @@ class RoktEmbeddedViewModel {
     }
 
     func updateAttributedStrings(_ newColor: ColorScheme) {
-        DispatchQueue.main.async { [weak self] in
-            if let layouts = self?.layouts {
+        DispatchQueue.main.async { [config, layouts] in
+            if let layouts = layouts {
                 layouts.forEach { layout in
                     AttributedStringTransformer.convertRichTextHTMLIfExists(
                         uiModel: layout,
-                        config: self?.config,
+                        config: config,
                         colorScheme: newColor
                     )
                 }

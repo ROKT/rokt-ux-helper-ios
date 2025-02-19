@@ -22,7 +22,7 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let disabledStyle: [ProgressControlStyle]?
     let direction: ProgressionDirection
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

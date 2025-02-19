@@ -13,7 +13,7 @@ import Foundation
 
 extension Optional {
 
-    var isEmpty: Bool {
+    var isNil: Bool {
         switch self {
         case .none:
             true

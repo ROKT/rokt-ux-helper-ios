@@ -73,7 +73,7 @@ class SampleViewController: UIViewController {
     }
 }
 
-extension SampleViewController: ImageLoader {
+extension SampleViewController: RoktUXImageLoader {
 
     func loadImage(urlString: String, completion: @escaping (Result<UIImage?, any Error>) -> Void) {
         guard let url = URL(string: urlString) else { return }

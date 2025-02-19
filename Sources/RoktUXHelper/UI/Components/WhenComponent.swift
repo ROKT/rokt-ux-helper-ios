@@ -24,7 +24,7 @@ struct WhenComponent: View {
     @Binding var currentProgress: Int
     let totalOffers: Int
 
-    @Binding var customStateMap: CustomStateMap?
+    @Binding var customStateMap: RoktUXCustomStateMap?
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
 
@@ -73,11 +73,7 @@ struct WhenComponent: View {
 
     var body: some View {
         Group {
-            if let visible {
-                if visible {
-                    buildComponent()
-                }
-            } else if shouldApply {
+            if visible == true || shouldApply {
                 buildComponent()
             }
         }
@@ -142,5 +138,5 @@ struct WhenComponentUIState {
     let position: Int?
     let width: CGFloat
     let isDarkMode: Bool
-    let customStateMap: CustomStateMap?
+    let customStateMap: RoktUXCustomStateMap?
 }

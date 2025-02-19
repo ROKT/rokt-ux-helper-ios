@@ -29,18 +29,19 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     weak var layoutState: (any LayoutStateRepresenting)?
 
     // extracted data from `dataBinding` that's published externally
-    @Published var boundValue = ""
-    @Published var breakpointIndex = 0
-    @Published var breakpointLinkIndex = 0
-    @Published var attributedString = NSAttributedString("")
+    @LazyPublished var boundValue = ""
+    @LazyPublished var breakpointIndex = 0
+    @LazyPublished var breakpointLinkIndex = 0
+    @LazyPublished var attributedString = NSAttributedString("")
 
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
-    lazy var currentIndex: Binding<Int> = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+    var viewableItems: Binding<Int>
+    var currentIndex: Binding<Int>
     lazy var totalOffer: Int = layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
-    lazy var viewableItems: Binding<Int> = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+    private var cancellable: AnyCancellable?
 
     var totalPages: Int {
         return Int(ceil(Double(totalOffer)/Double(viewableItems.wrappedValue)))
@@ -79,7 +80,13 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.stateDataExpansionClosure = stateDataExpansionClosure
         self.layoutState = layoutState
         self.eventService = eventService
+        self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         updateBoundValueWithStyling()
+        cancellable = layoutState?.itemsPublisher.sink { newValue in
+            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        }
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {

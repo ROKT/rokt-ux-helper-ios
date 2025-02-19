@@ -88,10 +88,10 @@ class TextComponentBNFHelper {
         currentOfferString: String,
         totalOffersString: String
     ) -> String {
-        let validator = BNFPlaceholderValidator()
+        let validator = PlaceholderValidator()
         guard validator.isValid(data: propertyChain) else { return propertyChain }
 
-        let parser = BNFPropertyChainDataParser()
+        let parser = PropertyChainDataParser()
         let parsedChain = parser.parse(propertyChain: propertyChain)
 
         for keyAndNamespace in parsedChain.parseableChains {

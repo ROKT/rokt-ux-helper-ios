@@ -14,11 +14,11 @@ import DcuiSchema
 
 @available(iOS 15, *)
 struct LayoutTransformer<
-    CreativeMapper: BNFMapper,
-    AddToCartMapper: BNFMapper,
-    Extractor: DataExtractor
+    CreativeSyntaxMapper: SyntaxMapping,
+    AddToCartMapper: SyntaxMapping,
+    Extractor: DataExtracting
 >
-where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == CatalogItem {
+where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context == CatalogItem {
 
     enum Context {
         case outer([OfferModel?])
@@ -35,15 +35,15 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
     let layoutPlugin: LayoutPlugin
     let layoutState: LayoutState
     let eventService: EventDiagnosticServicing?
-    let creativeMapper: CreativeMapper
+    let creativeMapper: CreativeSyntaxMapper
     let addToCartMapper: AddToCartMapper
     let extractor: Extractor
 
     init(
         layoutPlugin: LayoutPlugin,
-        creativeMapper: CreativeMapper = BNFCreativeMapping(),
-        addToCartMapper: AddToCartMapper = BNFCatalogMapping(),
-        extractor: Extractor = BNFCreativeDataExtractor(),
+        creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
+        addToCartMapper: AddToCartMapper = CatalogMapper(),
+        extractor: Extractor = CreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
         eventService: EventDiagnosticServicing? = nil
     ) {
@@ -81,7 +81,8 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
         case .row(let rowModel):
                 .row(
                     try getRow(
-                        rowModel.styles, children: transformChildren(rowModel.children, context: context)
+                        rowModel.styles,
+                        children: transformChildren(rowModel.children, context: context)
                     )
                 )
         case .column(let columnModel):
@@ -380,7 +381,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState,
                                     diagnosticService: eventService)
-        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
+        if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
@@ -397,7 +398,8 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
                                    openLinks: richTextModel.openLinks,
                                    layoutState: layoutState,
                                    eventService: eventService)
-        if case .inner = context, let bnfContext = context.mapToBNFCreativeContext {
+
+        if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .richText(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
@@ -566,7 +568,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
         children: [LayoutSchemaViewModel]?,
         offer: OfferModel
     ) throws -> CreativeResponseViewModel {
-        var responseOption: ResponseOption?
+        var responseOption: RoktUXResponseOption?
         var creativeResponseKey = BNFNamespace.CreativeResponseKey.positive
 
         if responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue {
@@ -680,7 +682,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
             layoutState: layoutState,
             eventService: eventService
         )
-        if let bnfContext = context.mapToBNFCreativeContext {
+        if let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .progressIndicator(vm), context: bnfContext)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .progressIndicator(vm), context: catalogItem)
@@ -716,7 +718,7 @@ where CreativeMapper.Context == BNFCreativeContext, AddToCartMapper.Context == C
 
 @available(iOS 15, *)
 private extension LayoutTransformer.Context {
-    var mapToBNFCreativeContext: BNFCreativeContext? {
+    var mapToCreativeContext: CreativeContext? {
         switch self {
         case .outer:
                 .outer

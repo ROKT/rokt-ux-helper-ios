@@ -22,7 +22,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ToggleButtonStateTriggerStyle]?
     let disabledStyle: [ToggleButtonStateTriggerStyle]?
     weak var layoutState: (any LayoutStateRepresenting)?
-    var imageLoader: ImageLoader? {
+    var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 

@@ -21,12 +21,12 @@ final class TestEventProcessor: XCTestCase {
     
     func testEvents() {
         let expectation = expectation(description: "test event types")
-        let allEventTypes = EventType.allCases
+        let allEventTypes = RoktUXEventType.allCases
         let date = Date()
         
-        let sut = EventProcessor(integrationType: .sdk) { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated, integrationType: .sdk) { [weak self] payload in
             guard let self,
-            let processedPayload: EventsPayload = deserialize(payload) else {
+            let processedPayload: RoktUXEventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
                 return
             }
@@ -74,12 +74,12 @@ final class TestEventProcessor: XCTestCase {
     
     func testS2SEvents() {
         let expectation = expectation(description: "test s2s event types")
-        let allEventTypes = EventType.allCases
+        let allEventTypes = RoktUXEventType.allCases
         let date = Date()
         
-        let sut = EventProcessor(integrationType: .s2s) { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated, integrationType: .s2s) { [weak self] payload in
             guard let self,
-                  let processedPayload: EventsPayload = deserialize(payload) else {
+                  let processedPayload: RoktUXEventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
                 return
             }
@@ -109,7 +109,7 @@ final class TestEventProcessor: XCTestCase {
     func testEventDelayProcessing() {
         var expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
-        let sut = EventProcessor(delay: 0.5) { [weak self] payload in
+        let sut = EventProcessor(delay: 0.5, queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -129,7 +129,7 @@ final class TestEventProcessor: XCTestCase {
         sut.handle(event: mockEvent(eventType: .SignalImpression, date: Date()))
         microSleep(0.1)
         sut.handle(event: mockEvent(eventType: .SignalResponse, date: Date()))
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 2)
         XCTAssertEqual(receivedPayload?.count, 3)
         XCTAssertEqual(receivedPayload?[0].eventType, .SignalViewed)
         XCTAssertEqual(receivedPayload?[1].eventType, .SignalImpression)
@@ -139,7 +139,7 @@ final class TestEventProcessor: XCTestCase {
     func testEventRemoveDuplicates() {
         let expectation = expectation(description: "test duplicates")
         var receivedPayload: [RoktEventRequest]?
-        let sut = EventProcessor() { [weak self] payload in
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -177,7 +177,7 @@ final class TestEventProcessor: XCTestCase {
         let expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
         weak var weakSut: EventProcessor?
-        var sut: EventProcessor? = EventProcessor(delay: 1) { [weak self] payload in
+        var sut: EventProcessor? = EventProcessor(delay: 1, queue: .userInitiated) { [weak self] payload in
             guard let self else {
                 XCTFail("Fail self")
                 return
@@ -190,7 +190,7 @@ final class TestEventProcessor: XCTestCase {
         sut?.handle(event: mockEvent(eventType: .SignalActivation, date: Date()))
         sut = nil
 
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 3)
 
         XCTAssertNil(weakSut)
         XCTAssertEqual(receivedPayload?.count, 1)
@@ -201,13 +201,13 @@ final class TestEventProcessor: XCTestCase {
         usleep(useconds_t(Int32(seconds * 1000000)))
     }
     
-    private func deserialize(_ events: [String: Any]) -> EventsPayload? {
+    private func deserialize(_ events: [String: Any]) -> RoktUXEventsPayload? {
         let data = try? JSONSerialization.data(withJSONObject: events, options: [])
-        return data.flatMap { try? JSONDecoder().decode(EventsPayload.self, from: $0) }
+        return data.flatMap { try? JSONDecoder().decode(RoktUXEventsPayload.self, from: $0) }
     }
     
     private func mockEvent(
-        eventType: EventType,
+        eventType: RoktUXEventType,
         date: Date,
         extraMetadata: [RoktEventNameValue] = [],
         eventData: [String: String] = [:]

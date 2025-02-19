@@ -8,9 +8,9 @@ The RoktUXHelper enables partner applications to render tailored user experience
 - Miran Nakamura - <miran.nakamura@rokt.com>
 - Wei Yew - <wei.yew.teoh@rokt.com>
 
-| Environment | Build                                                                                               |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| main        | ![Build status](https://badge.buildkite.com/3f45fe74f9be5dd74b831ade1af362b4c2afe4b61747e46e4e.svg) |
+| Environment | Build                                                                                               | Coverage                                                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |      
+| main        | ![Build status](https://badge.buildkite.com/3f45fe74f9be5dd74b831ade1af362b4c2afe4b61747e46e4e.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-ios/graph/badge.svg?token=xFMumIDkv8)](https://codecov.io/gh/ROKT/rokt-ux-helper-ios) |
 
 ## Requirements
 

@@ -43,7 +43,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
     let applyAlignSelf: Bool
     let applyMargin: Bool
     @Binding var frameChangeIndex: Int
-    let imageLoader: ImageLoader?
+    let imageLoader: RoktUXImageLoader?
 
     func body(content: Content) -> some View {
         content
@@ -128,7 +128,7 @@ internal extension View {
         applyAlignSelf: Bool = true,
         applyMargin: Bool = true,
         frameChangeIndex: Binding<Int> = .constant(0),
-        imageLoader: ImageLoader?
+        imageLoader: RoktUXImageLoader?
     ) -> some View {
         modifier(LayoutSchemaModifier(
             verticalAlignmentProperty: verticalAlignmentProperty,

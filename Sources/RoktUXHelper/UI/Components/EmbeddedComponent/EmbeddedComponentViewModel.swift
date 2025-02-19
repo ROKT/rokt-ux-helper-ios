@@ -35,6 +35,7 @@ class EmbeddedComponentViewModel: ObservableObject {
 
     func onLoad() {
         eventService?.sendEventsOnLoad()
+        layoutState?.config?.debugLog("Rokt: Embedded view loaded")
         onLoadCallback?()
         layoutState?.actionCollection[.checkBoundingBox](nil)
     }

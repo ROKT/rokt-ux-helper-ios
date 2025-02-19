@@ -17,7 +17,40 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestToggleButtonComponent: XCTestCase {
-    
+#if compiler(>=6)
+    func test_toggleButton_styles() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
+        
+        let sut = try view.inspect()
+            .find(TestPlaceHolder.self)
+            .find(EmbeddedComponent.self)
+            .find(ViewType.VStack.self)[0]
+            .find(LayoutSchemaComponent.self)
+            .find(ToggleButtonComponent.self)
+            .actualView()
+        
+        let model = sut.model
+        
+        XCTAssertEqual(sut.style, model.defaultStyle?[0])
+        XCTAssertEqual(sut.dimensionStyle, model.defaultStyle?[0].dimension)
+        XCTAssertEqual(sut.flexStyle, model.defaultStyle?[0].flexChild)
+        XCTAssertEqual(sut.backgroundStyle, model.defaultStyle?[0].background)
+        XCTAssertEqual(sut.spacingStyle, model.defaultStyle?[0].spacing)
+        
+        XCTAssertEqual(sut.verticalAlignment, .top)
+        XCTAssertEqual(sut.horizontalAlignment, .center)
+        
+        // test the effect of custom modifier
+        let modifier = try sut.inspect()
+            .implicitAnyView()
+            .modifierIgnoreAny(LayoutSchemaModifier.self)
+            .ignoreAny(ViewType.ViewModifierContent.self)
+        let backgroundModifier = try modifier.modifier(BackgroundModifier.self)
+        let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
+        
+        XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#FFFFFF", dark: "#000000"))
+    }
+#else
     func test_toggleButton_styles() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
         
@@ -47,7 +80,7 @@ final class TestToggleButtonComponent: XCTestCase {
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#FFFFFF", dark: "#000000"))
     }
-    
+#endif
     func get_model() throws -> ToggleButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
@@ -55,5 +88,4 @@ final class TestToggleButtonComponent: XCTestCase {
                                                styles: model.styles,
                                                children: transformer.transformChildren(model.children, context: .outer([])))
     }
-    
 }

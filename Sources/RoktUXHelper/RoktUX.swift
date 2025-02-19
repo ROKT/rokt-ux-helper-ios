@@ -76,12 +76,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -92,6 +94,7 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
+       - layoutPluginViewStates: Plugin view states ([RoktPluginViewState]) to be restored.
        - defaultLayoutLoader: Default loader for the layout.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
        - config: Configuration for the RoktUX.
@@ -101,10 +104,12 @@ public class RoktUX: UXEventsDelegate {
        - onRoktUXEvent: Closure to handle RoktUX events.
        - onRoktPlatformEvent: Closure to handle platform events. Platform events are an essential part of integration and it has to be sent to Rokt via your backend.
             For ease of use, platformEvent is defined as [String: Any]
+       - onPluginViewStateChange: Closure to handle changes to the RoktPluginViewState.
      */
     public func loadLayout(
         startDate: Date = Date(),
         experienceResponse: String,
+        layoutPluginViewStates: [RoktPluginViewState]? = nil,
         defaultLayoutLoader: LayoutLoader? = nil,
         layoutLoaders: [String: LayoutLoader?]? = nil,
         config: RoktUXConfig? = nil,
@@ -112,10 +117,12 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
-        onRoktPlatformEvent: @escaping ([String: Any]) -> Void
+        onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
+        onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
         let integrationType: HelperIntegrationType = .sdk
-        let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
+        let processor = EventProcessor(integrationType: integrationType,
+                                       onRoktPlatformEvent: onRoktPlatformEvent)
         do {
             let layoutPage = try initiatePageModel(integrationType: integrationType,
                                                    startDate: startDate,
@@ -127,9 +134,12 @@ public class RoktUX: UXEventsDelegate {
                     let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                         .first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
+                    let layoutPluginViewState = layoutPluginViewStates?
+                        .first { viewState in viewState.pluginId == layoutPlugin.pluginId }
                     displayLayout(
                         page: layoutPage,
                         layoutPlugin: layoutPlugin,
+                        layoutPluginViewState: layoutPluginViewState,
                         startDate: startDate,
                         responseReceivedDate: layoutPage.responseReceivedDate,
                         layoutLoader: layoutLoader,
@@ -138,6 +148,7 @@ public class RoktUX: UXEventsDelegate {
                         onUnload: onUnload,
                         onEmbeddedSizeChange: onEmbeddedSizeChange,
                         onRoktUXEvent: onRoktUXEvent,
+                        onPluginViewStateChange: onPluginViewStateChange,
                         processor: processor
                     )
                 }
@@ -145,12 +156,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -172,17 +185,17 @@ public class RoktUX: UXEventsDelegate {
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
-                                   processor: EventProcessing) throws -> PageModel {
-        var layoutPage: PageModel
+                                   processor: EventProcessing) throws -> RoktUXPageModel {
+        var layoutPage: RoktUXPageModel
         switch integrationType {
         case .sdk:
             layoutPage = try RoktDecoder()
-                .decode(ExperienceResponse.self, experienceResponse)
+                .decode(RoktUXExperienceResponse.self, experienceResponse)
                 .getPageModel()
                 .unwrap(orThrow: RoktUXError.experienceResponseMapping)
         default:
             layoutPage = try RoktDecoder()
-                .decode(S2SExperienceResponse.self, experienceResponse)
+                .decode(RoktUXS2SExperienceResponse.self, experienceResponse)
                 .getPageModel()
                 .unwrap(orThrow: RoktUXError.experienceResponseMapping)
         }
@@ -197,8 +210,9 @@ public class RoktUX: UXEventsDelegate {
     }
 
     private func displayLayout(
-        page: PageModel,
+        page: RoktUXPageModel,
         layoutPlugin: LayoutPlugin,
+        layoutPluginViewState: RoktPluginViewState? = nil,
         startDate: Date,
         responseReceivedDate: Date,
         layoutLoader: LayoutLoader?,
@@ -207,17 +221,30 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
+        onPluginViewStateChange: ((RoktPluginViewState) -> Void)? = nil,
         processor: EventProcessing
     ) {
         onRoktEvent = onRoktUXEvent
+
+        if let isPluginDismissed = layoutPluginViewState?.isPluginDismissed,
+           isPluginDismissed {
+            onPlacementCompleted(layoutPlugin.pluginId)
+            onUnload()
+            return
+        }
+
         let actionCollection = ActionCollection()
 
-        let layoutState = LayoutState(actionCollection: actionCollection, config: config)
         let catalogItems = layoutPlugin.slots
             .compactMap(\.offer)
             .map(\.catalogItems)
             .compactMap { $0 }
             .flatMap { $0 }
+        let layoutState = LayoutState(actionCollection: actionCollection,
+                                      config: config,
+                                      pluginId: layoutPlugin.pluginId,
+                                      initialPluginViewState: layoutPluginViewState,
+                                      onPluginViewStateChange: onPluginViewStateChange)
 
         let eventService = EventService(
             pageId: page.pageId,
@@ -309,12 +336,14 @@ public class RoktUX: UXEventsDelegate {
         } catch LayoutTransformerError.InvalidColor(color: let color) {
             // invalid color error
             eventService.sendDiagnostics(message: kValidationErrorCode,
-                                         callStack: kColorInvalid + color)
+                                          callStack: kColorInvalid + color)
+            config?.debugLog("Rokt: Invalid color in schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
             eventService.sendDiagnostics(message: kValidationErrorCode,
-                                         callStack: kLayoutInvalid)
+                                          callStack: kLayoutInvalid)
+            config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
     }
@@ -330,7 +359,7 @@ public class RoktUX: UXEventsDelegate {
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak layoutLoader] in
             if let targetElement = layoutPlugin.targetElementSelector {
                 if let layoutLoader {
 
@@ -350,14 +379,16 @@ public class RoktUX: UXEventsDelegate {
                         )
                         .customColorMode(colorMode: config?.colorMode)
                     })
-                    layoutState.actionCollection[.close] = { [weak layoutLoader] _ in
+                    layoutState.actionCollection[.close] = { [weak layoutLoader, weak layoutState] _ in
                         layoutLoader?.closeEmbedded()
                         onUnload()
+                        layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
                     }
                 } else {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
                                                   callStack: kEmbeddedLayoutDoesntExistMessage
                                                     + targetElement + kLocationDoesNotExist)
+                    config?.debugLog("Rokt: Embedded layout doesn't exist")
                     onUnload()
                     self.onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
                 }
@@ -398,7 +429,7 @@ public class RoktUX: UXEventsDelegate {
     }
 
     private func sendPageIntialEvents(
-        pageModel: PageModel,
+        pageModel: RoktUXPageModel,
         startDate: Date,
         responseReceivedDate: Date,
         processor: EventProcessing
@@ -406,7 +437,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalInitialize,
+                eventType: RoktUXEventType.SignalInitialize,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: startDate,
                 jwtToken: pageModel.token
@@ -415,7 +446,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalLoadStart,
+                eventType: RoktUXEventType.SignalLoadStart,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: startDate,
                 jwtToken: pageModel.token
@@ -424,7 +455,7 @@ public class RoktUX: UXEventsDelegate {
         processor.handle(
             event: RoktEventRequest(
                 sessionId: pageModel.sessionId,
-                eventType: EventType.SignalLoadComplete,
+                eventType: RoktUXEventType.SignalLoadComplete,
                 parentGuid: pageModel.pageInstanceGuid,
                 eventTime: responseReceivedDate,
                 jwtToken: pageModel.token
@@ -498,7 +529,7 @@ public class RoktUX: UXEventsDelegate {
 
     func openURL(url: String,
                  id: String,
-                 type: OpenURLType,
+                 type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))

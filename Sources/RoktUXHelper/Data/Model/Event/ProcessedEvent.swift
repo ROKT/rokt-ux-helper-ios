@@ -14,7 +14,7 @@ import Foundation
 struct ProcessedEvent: Hashable, Equatable {
     let sessionId: String
     let parentGuid: String
-    let eventType: EventType
+    let eventType: RoktUXEventType
     let pageInstanceGuid: String
     let eventData: [RoktEventNameValue]
 }

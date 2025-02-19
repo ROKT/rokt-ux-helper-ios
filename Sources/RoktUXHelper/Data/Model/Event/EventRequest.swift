@@ -1,5 +1,5 @@
 //
-//  EventRequest.swift
+//  RoktEventRequest.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -16,7 +16,7 @@ import Foundation
 public struct RoktEventRequest: Codable, Hashable {
     public let uuid: String
     public let sessionId: String
-    public let eventType: EventType
+    public let eventType: RoktUXEventType
     public let parentGuid: String
     public let eventTime: String
     public let eventData: [RoktEventNameValue]
@@ -39,7 +39,7 @@ public struct RoktEventRequest: Codable, Hashable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         sessionId = try container.decode(String.self, forKey: .sessionId)
-        eventType = try container.decode(EventType.self, forKey: .eventType)
+        eventType = try container.decode(RoktUXEventType.self, forKey: .eventType)
         parentGuid = try container.decode(String.self, forKey: .parentGuid)
         eventTime = try container.decode(String.self, forKey: .eventTime)
         eventData = try container.decode([RoktEventNameValue].self, forKey: .eventData)
@@ -51,7 +51,7 @@ public struct RoktEventRequest: Codable, Hashable {
 
     public init(
         sessionId: String,
-        eventType: EventType,
+        eventType: RoktUXEventType,
         parentGuid: String,
         eventTime: Date = Date(),
         extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),

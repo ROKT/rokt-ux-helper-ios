@@ -14,11 +14,11 @@ import DcuiSchema
 
 @available(iOS 15, *)
 extension View {
-    func readSize(spacing: SpacingStylingProperties? = nil, onChange: @escaping (CGSize) -> Void) -> some View {
+    func readSize(spacing: SpacingStylingProperties? = nil, onChange: ((CGSize) -> Void)?) -> some View {
         background(
             GeometryReader { geometryProxy in
                 Color.clear
-                    .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+                    .preference(key: SizePreferenceKey.self, value: geometryProxy.size.precised())
             }
         )
         .onPreferenceChange(SizePreferenceKey.self) { value in
@@ -37,19 +37,19 @@ extension View {
             }
 
             DispatchQueue.main.async {
-                onChange(newSize)
+                onChange?(newSize)
             }
         }
     }
 
     func readSize(
         weightProperties: WeightModifier.Properties? = nil,
-        onChange: @escaping (CGSizeWithMax, Alignment) -> Void
+        onChange: ((CGSizeWithMax, Alignment) -> Void)?
     ) -> some View {
         background(
             GeometryReader { geometryProxy in
                 Color.clear
-                    .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+                    .preference(key: SizePreferenceKey.self, value: geometryProxy.size.precised())
             }
         )
         .onPreferenceChange(SizePreferenceKey.self) { value in
@@ -64,7 +64,7 @@ extension View {
             }
 
             DispatchQueue.main.async {
-                onChange(newSizeWithMax, alignment)
+                onChange?(newSizeWithMax, alignment)
             }
         }
     }
@@ -73,7 +73,7 @@ extension View {
     // When timer is over and view is still inside this area, execute closure.
     func onBecomingViewed(
         currentOffer: Int? = nil,
-        execute: @escaping (() -> Void)
+        execute: (() -> Void)?
     ) -> some View {
         background(
             GeometryReader { geometryProxy in
@@ -84,7 +84,7 @@ extension View {
 
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute()
+                                    execute?()
                                 }
                             }
                         }
@@ -94,7 +94,7 @@ extension View {
 
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute()
+                                    execute?()
                                 }
                             }
                         }
@@ -104,7 +104,7 @@ extension View {
 
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute()
+                                    execute?()
                                 }
                             }
                         }

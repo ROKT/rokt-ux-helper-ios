@@ -455,7 +455,7 @@ class MockUXHelper: UXEventsDelegate {
     
     func openURL(url: String,
                  id: String,
-                 type: OpenURLType,
+                 type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         self.roktEvents.append(.OpenUrl)
