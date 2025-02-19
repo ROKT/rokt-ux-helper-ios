@@ -1,8 +1,6 @@
 //
-//  BNFDataExtractor.swift
+//  CreativeDataExtractor.swift
 //  RoktUXHelper
-//
-//  Copyright 2020 Rokt Pte Ltd
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
 //  Version 2.0 (the "License");
@@ -13,51 +11,17 @@
 
 import Foundation
 
-protocol DataExtractor {
-    associatedtype U: DomainMappingSource
-
-    func extractDataRepresentedBy<T>(
-        _ type: T.Type,
-        propertyChain: String,
-        responseKey: String?,
-        from data: U?
-    ) throws -> DataBinding<T>
-}
-
-enum DataBinding<T>: Hashable where T: Hashable {
-    case value(T)
-    case state(T)
-}
-
-enum DataBindingStateKeys {
-    static let indicatorPosition = "IndicatorPosition"
-    static let totalOffers = "TotalOffers"
-
-    static func isIndicatorPosition(_ key: String) -> Bool {
-        key.caseInsensitiveCompare(DataBindingStateKeys.indicatorPosition) == .orderedSame
-    }
-
-    static func isTotalOffers(_ key: String) -> Bool {
-        key.caseInsensitiveCompare(DataBindingStateKeys.totalOffers) == .orderedSame
-    }
-
-    static func isValidKey(_ key: String) -> Bool {
-        isIndicatorPosition(key) || isTotalOffers(key)
-    }
-}
-
-/// Expands a BNF-formatted String using values nested in an `OfferModel` entity
 @available(iOS 13, *)
-class BNFDataExtractor<Validator: DataValidator>: DataExtractor where Validator.T == String {
+class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Validator.T == String {
 
     private let dataValidator: Validator
-    private let parser: PropertyChainDataParser
-    private let dataReflector: any DataReflector
+    private let parser: PropertyChainDataParsing
+    private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = BNFPlaceholderValidator(),
-        parser: PropertyChainDataParser = BNFPropertyChainDataParser(),
-        dataReflector: any DataReflector = BNFDataReflector()
+        dataValidator: Validator = PlaceholderValidator(),
+        parser: PropertyChainDataParsing = PropertyChainDataParser(),
+        dataReflector: any DataReflecting = DataReflector()
     ) {
         self.dataValidator = dataValidator
         self.parser = parser
@@ -97,7 +61,7 @@ class BNFDataExtractor<Validator: DataValidator>: DataExtractor where Validator.
                 }
             case .dataCreativeResponse:
                 guard let data,
-                    let responseKey
+                      let responseKey
                 else { continue }
 
                 var responseOption: RoktUXResponseOption?

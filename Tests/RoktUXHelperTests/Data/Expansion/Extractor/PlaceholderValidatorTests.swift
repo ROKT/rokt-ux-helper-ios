@@ -1,5 +1,5 @@
 //
-//  BNFPlaceholderValidatorTests.swift
+//  PlaceholderValidatorTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,13 +14,13 @@
 import XCTest
 @testable import RoktUXHelper
 
-final class BNFPlaceholderValidatorTests: XCTestCase {
-    var sut: BNFPlaceholderValidator? = BNFPlaceholderValidator()
+final class PlaceholderValidatorTests: XCTestCase {
+    var sut: PlaceholderValidator? = PlaceholderValidator()
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFPlaceholderValidator()
+        sut = PlaceholderValidator()
     }
 
     override func tearDown() {

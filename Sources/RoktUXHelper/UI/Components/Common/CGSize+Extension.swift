@@ -1,5 +1,5 @@
 //
-//  TransformerError.swift
+//  CGSize+extension.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -10,8 +10,13 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
-enum LayoutTransformerError: Error, Equatable {
-    case InvalidColor(color: String)
-    case InvalidMapping(line: Int = #line, function: String = #function)
-    case InvalidSyntaxMapping(line: Int = #line, function: String = #function)
+
+extension CGSize {
+
+    func precised(_ value: Int = 2) -> CGSize {
+        .init(
+            width: width.precised(value),
+            height: height.precised(value)
+        )
+    }
 }

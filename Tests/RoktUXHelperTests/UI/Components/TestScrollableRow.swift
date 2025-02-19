@@ -188,6 +188,6 @@ final class TestScrollableRow: XCTestCase {
     func get_model() throws -> RowViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let row = ModelTestData.RowData.rowWithBasicText()
-        return try transformer.getRow(row.styles, children: transformer.transformChildren(row.children, slot: nil))
+        return try transformer.getRow(row.styles, children: transformer.transformChildren(row.children, context: .outer([])))
     }
 }

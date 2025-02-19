@@ -84,6 +84,20 @@ final class TestDataImageComponent: XCTestCase {
         // test the effect of custom modifier
         let padding = try image.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
+    }    
+    
+    func test_data_image_failed() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model(isValid: false)))
+        
+        let image = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(DataImageViewComponent.self)
+            .actualView()
+            .inspect()
+        // Invalid Image should be removed from view
+        XCTAssertNil(try? image.find(AsyncImageView.self))
     }
     
     func test_dataImage_computedProperties_usesModelProperties() throws {
@@ -114,27 +128,35 @@ final class TestDataImageComponent: XCTestCase {
     }
 #endif
     
-    func get_model() throws -> DataImageViewModel {
-        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: [get_slot()]))
-        return try transformer.getDataImage(ModelTestData.DataImageData.dataImage(), slot: get_slot().toSlotOfferModel())
+    func get_model(isValid: Bool = true) throws -> DataImageViewModel {
+        let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
+        let invalidImage = ""
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(slots: [get_slot(image: isValid ? validImage : invalidImage)])
+        )
+        return try transformer.getDataImage(
+            ModelTestData.DataImageData.dataImage(),
+            context: .inner(.generic(get_slot(image: isValid ? validImage : invalidImage).offer!))
+        )
     }
-    
-    func get_slot() -> SlotModel {
+
+    func get_slot(image: String) -> SlotModel {
         return SlotModel(instanceGuid: "",
                          offer: OfferModel(campaignId: "", creative:
                                             CreativeModel(referralCreativeId: "",
                                                           instanceGuid: "",
                                                           copy: [:],
                                                           images: [
-                                                              "creativeImage": CreativeImage(light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
-                                                                                                   dark: nil, alt: "",
-                                                                                                   title: nil)
+                                                            "creativeImage": CreativeImage(
+                                                                light: image,
+                                                                dark: nil, alt: "",
+                                                                title: nil
+                                                            )
                                                           ],
                                                           links: nil,
-                                                          responseOptionsMap: nil, 
+                                                          responseOptionsMap: nil,
                                                           jwtToken: "creative-token")),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
     }
-    
 }

@@ -1,5 +1,5 @@
 //
-//  BNFPlaceholderValidator.swift
+//  PlaceholderValidator.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,20 +13,20 @@
 
 import Foundation
 
-protocol DataValidator {
+protocol DataValidating {
     associatedtype T
 
     func isValid(data: T) -> Bool
 }
 
 /// Checks if a BNF-formatted String is correctly formatted
-struct BNFPlaceholderValidator<Sanitiser: DataSanitiser>: DataValidator where Sanitiser.T == String {
+struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where Sanitiser.T == String {
     private let sanitiser: Sanitiser
-    private let parser: PropertyChainDataParser
+    private let parser: PropertyChainDataParsing
 
     init(
-        sanitiser: Sanitiser = BNFDataSanitiser(),
-        parser: PropertyChainDataParser = BNFPropertyChainDataParser()
+        sanitiser: Sanitiser = DataSanitiser(),
+        parser: PropertyChainDataParsing = PropertyChainDataParser()
     ) {
         self.sanitiser = sanitiser
         self.parser = parser

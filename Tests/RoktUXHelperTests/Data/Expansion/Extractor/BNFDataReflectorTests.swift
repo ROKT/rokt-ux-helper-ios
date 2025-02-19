@@ -1,5 +1,5 @@
 //
-//  BNFDataReflectorTests.swift
+//  DataReflectorTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -14,13 +14,13 @@
 import XCTest
 @testable import RoktUXHelper
 
-final class BNFDataReflectorTests: XCTestCase {
-    var sut: BNFDataReflector!
+final class DataReflectorTests: XCTestCase {
+    var sut: DataReflector!
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFDataReflector()
+        sut = DataReflector()
     }
 
     override func tearDown() {

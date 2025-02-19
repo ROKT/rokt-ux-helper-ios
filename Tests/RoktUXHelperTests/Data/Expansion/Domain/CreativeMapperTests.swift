@@ -1,5 +1,5 @@
 //
-//  BNFNodeMapperTests.swift
+//  CreativeMapperTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -16,16 +16,16 @@ import XCTest
 import DcuiSchema
 
 @available(iOS 15, *)
-final class BNFNodeMapperTests: XCTestCase {
-    
-    var sut: BNFNodeMapper? = BNFNodeMapper()
+final class CreativeMapperTests: XCTestCase {
+
+    var sut: CreativeMapper<CreativeDataExtractor<PlaceholderValidator<DataSanitiser>>>!
     var bnfColumn: ColumnModel<LayoutSchemaModel, WhenPredicate>?
     var firstOffer: OfferModel?
 
     override func setUp() {
         super.setUp()
 
-        sut = BNFNodeMapper()
+        sut = CreativeMapper()
 
         let bnfPageModel = ModelTestData.PageModelData.withBNF()
         let firstSlot = bnfPageModel.layoutPlugins?.first?.slots[0]
@@ -215,7 +215,7 @@ final class BNFNodeMapperTests: XCTestCase {
             expectedValue: ""
         )
     }
-    
+
     // sentence with an invalid mandatory and a valid optional copy should still return empty
     func test_richText_sentenceWithInvalidMandatoryCreativeCopy_returnsEmptyString() {
         // Sentence with %^DATA.creativeCopy.nonexistent^% and %^DATA.creativeCopy.title|^%
@@ -224,7 +224,7 @@ final class BNFNodeMapperTests: XCTestCase {
             expectedValue: ""
         )
     }
-    
+
     // sentence with an invalid mandatory and a valid optional link should still return empty
     func test_richText_sentenceWithInvalidMandatoryCreativeLink_returnsEmptyString() {
         // Sentence with %^DATA.creativeLink.nonexistent^% and %^DATA.creativeLink.privacyPolicy|^%
@@ -233,6 +233,7 @@ final class BNFNodeMapperTests: XCTestCase {
             expectedValue: ""
         )
     }
+
 
     private func assertRichTextDataExpansion(childIndex: Int, expectedValue: String) {
         guard let firstOffer else {
@@ -247,17 +248,8 @@ final class BNFNodeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        guard let mappedUIModel = sut?.map(
-            consumer: .richText(uiModel),
-            creativeParent: nil,
-            dataSource: firstOffer
-        ) as? RichTextViewModel
-        else {
-            XCTFail("Could not perform data mapping on RichText")
-            return
-        }
-
-        XCTAssertEqual(mappedUIModel.boundValue, expectedValue)
+        sut?.map(consumer: .richText(uiModel), context: .generic(firstOffer))
+        XCTAssertEqual(uiModel.boundValue, expectedValue)
     }
 
     private func assertBasicTextDataExpansion(childIndex: Int, expectedValue: String) {
@@ -273,17 +265,9 @@ final class BNFNodeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        guard let mappedUIModel = sut?.map(
-            consumer: .basicText(uiModel),
-            creativeParent: nil,
-            dataSource: firstOffer
-        ) as? BasicTextViewModel
-        else {
-            XCTFail("Could not perform data mapping on BasicText")
-            return
-        }
+        sut?.map(consumer: .basicText(uiModel), context: .generic(firstOffer))
 
-        XCTAssertEqual(mappedUIModel.boundValue, expectedValue)
+        XCTAssertEqual(uiModel.boundValue, expectedValue)
     }
 
 }
@@ -296,7 +280,7 @@ fileprivate extension RichTextModel {
             defaultStyle: nil,
             linkStyle: nil,
             openLinks: nil,
-            stateDataExpansionClosure: nil, 
+            stateDataExpansionClosure: nil,
             layoutState: LayoutState(),
             eventService: nil
         )
@@ -312,7 +296,7 @@ fileprivate extension BasicTextModel {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            layoutState: LayoutState(), 
+            layoutState: LayoutState(),
             diagnosticService: nil
         )
     }

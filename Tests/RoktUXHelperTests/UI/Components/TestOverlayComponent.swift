@@ -131,7 +131,7 @@ final class TestOverlayComponent: XCTestCase {
         return try transformer.getOverlay(
             overlay.styles,
             allowBackdropToClose: nil,
-            children: transformer.transformChildren(overlay.children, slot: nil)
+            children: transformer.transformChildren(overlay.children, context: .outer([]))
         )
     }
     

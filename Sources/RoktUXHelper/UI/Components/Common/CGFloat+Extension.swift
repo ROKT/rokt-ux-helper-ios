@@ -1,5 +1,5 @@
 //
-//  SlotOfferModel.swift
+//  CGFloat+extension.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -11,7 +11,8 @@
 
 import Foundation
 
-// Compact version of SlotModel with only offer
-struct SlotOfferModel {
-    let offer: OfferModel?
+extension CGFloat {
+    func precised(_ value: Int = 2) -> CGFloat {
+        (self * pow(10.0, CGFloat(value))).rounded()/pow(10.0, CGFloat(value))
+    }
 }

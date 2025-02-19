@@ -1,5 +1,5 @@
 //
-//  Payload.swift
+//  SyntaxMapping.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -13,8 +13,8 @@
 
 import Foundation
 
-/// Contains one or more BNF-formatted Strings as property
-protocol Payload {}
-
-@available(iOS 13, *)
-extension RoktUXPageModel: Payload {}
+@available(iOS 15, *)
+protocol SyntaxMapping {
+    associatedtype Context
+    func map(consumer: LayoutSchemaViewModel, context: Context)
+}

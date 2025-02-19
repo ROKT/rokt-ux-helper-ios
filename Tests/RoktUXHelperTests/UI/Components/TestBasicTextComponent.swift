@@ -157,6 +157,6 @@ final class TestBasicTextComponent: XCTestCase {
 #endif
     func get_model() throws -> BasicTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        return try transformer.getBasicText(ModelTestData.TextData.basicText())
+        return try transformer.getBasicText(ModelTestData.TextData.basicText(), context: .outer([]))
     }
 }
