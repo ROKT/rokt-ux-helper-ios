@@ -16,6 +16,20 @@ import DcuiSchema
 struct StyleTransformer {
 
     static func updatedStyles<T: Codable>(
+        _ styles: [BasicStateStylingBlock<T>]?,
+        transform: (T) -> BaseStyles
+    ) throws -> [BasicStateStylingBlock<BaseStyles>] {
+        try updatedStyles(styles).map {
+            BasicStateStylingBlock(
+                default: transform($0.default),
+                pressed: $0.pressed.map(transform),
+                hovered: $0.hovered.map(transform),
+                disabled: $0.disabled.map(transform)
+            )
+        }
+    }
+
+    static func updatedStyles<T: Codable>(
         _ styles: [BasicStateStylingBlock<T>]?
     ) throws -> [BasicStateStylingBlock<T>] {
         var updatedStyles: [BasicStateStylingBlock<T>] = []

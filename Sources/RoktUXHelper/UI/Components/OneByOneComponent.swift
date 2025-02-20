@@ -222,6 +222,7 @@ struct OneByOneComponent: View {
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
+        model.publishStateChange()
     }
 
     func getOpacity() -> Double {

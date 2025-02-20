@@ -19,10 +19,12 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
 
     let url: StaticImageUrl?
     let alt: String?
-    let defaultStyle: [StaticImageStyles]?
-    let pressedStyle: [StaticImageStyles]?
-    let hoveredStyle: [StaticImageStyles]?
-    let disabledStyle: [StaticImageStyles]?
+    let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
+
+    var defaultStyle: [BaseStyles]? {
+        stylingProperties?.map(\.default)
+    }
+
     weak var layoutState: (any LayoutStateRepresenting)?
 
     var imageLoader: RoktUXImageLoader? {
@@ -31,18 +33,12 @@ class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
 
     init(url: StaticImageUrl?,
          alt: String?,
-         defaultStyle: [StaticImageStyles]?,
-         pressedStyle: [StaticImageStyles]?,
-         hoveredStyle: [StaticImageStyles]?,
-         disabledStyle: [StaticImageStyles]?,
+         stylingProperties: [BasicStateStylingBlock<BaseStyles>]?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.url = url
         self.alt = alt
 
-        self.defaultStyle = defaultStyle
-        self.pressedStyle = pressedStyle
-        self.hoveredStyle = hoveredStyle
-        self.disabledStyle = disabledStyle
+        self.stylingProperties = stylingProperties
         self.layoutState = layoutState
     }
 }
