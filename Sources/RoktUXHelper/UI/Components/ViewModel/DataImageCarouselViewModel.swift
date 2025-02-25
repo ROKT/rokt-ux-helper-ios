@@ -19,6 +19,7 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     let id: UUID = UUID()
 
     let images: [CreativeImage]?
+    let duration: Int32
     let defaultStyle: [DataImageCarouselStyles]?
     let pressedStyle: [DataImageCarouselStyles]?
     let hoveredStyle: [DataImageCarouselStyles]?
@@ -35,6 +36,7 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     }
 
     init(images: [CreativeImage]?,
+         duration: Int32,
          ownStyle: [BasicStateStylingBlock<DataImageCarouselStyles>]?,
          indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
@@ -42,6 +44,7 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
          progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.images = images
+        self.duration = duration
         self.defaultStyle = ownStyle?.compactMap {$0.default}
         self.pressedStyle = ownStyle?.compactMap {$0.pressed}
         self.hoveredStyle = ownStyle?.compactMap {$0.hovered}
