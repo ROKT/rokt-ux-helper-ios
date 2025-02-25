@@ -587,4 +587,85 @@ final class TestStyleTransformer: XCTestCase {
         // Assert
         XCTAssertThrowsError(try StyleTransformer.getUpdatedStyle(defaultStyle, newStyle: nil))
     }
+
+    func test_get_updated_carousel_indicator_styles() throws {
+        // Arrange
+        let defaultStyle = DataImageCarouselIndicatorStyles(container: nil,
+                                                            background: nil,
+                                                            border: nil,
+                                                            dimension: nil,
+                                                            flexChild: nil,
+                                                            spacing: SpacingStylingProperties(padding: "0",
+                                                                                              margin: nil,
+                                                                                              offset: nil))
+
+        let activeStyle = DataImageCarouselIndicatorStyles(container: nil,
+                                                           background: nil,
+                                                           border: nil,
+                                                           dimension: nil,
+                                                           flexChild: nil,
+                                                           spacing: SpacingStylingProperties(padding: nil,
+                                                                                             margin: "1",
+                                                                                             offset: nil))
+
+        let indicator = [BasicStateStylingBlock(default: defaultStyle, pressed: nil, hovered: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, disabled: nil)]
+
+        // ACT
+        let transformedStyle = try StyleTransformer.updatedCarouselIndicatorStyles(indicator, newStyles: active)
+
+        // Assert
+        XCTAssertEqual(transformedStyle.first?.default.spacing?.margin, "1")
+        XCTAssertEqual(transformedStyle.first?.default.spacing?.padding, "0")
+    }
+
+    func test_get_updated_carousel_indicator_styles_with_breakpoints() throws {
+        // Arrange
+        let defaultStyle1 = DataImageCarouselIndicatorStyles(container: nil,
+                                                             background: nil,
+                                                             border: nil,
+                                                             dimension: nil,
+                                                             flexChild: nil,
+                                                             spacing: SpacingStylingProperties(padding: "0",
+                                                                                               margin: nil,
+                                                                                               offset: nil))
+
+        let backgroundColor = ThemeColor(light: "#000000", dark: nil)
+        let pressedStyle1 = DataImageCarouselIndicatorStyles(container: nil,
+                                                             background: BackgroundStylingProperties(backgroundColor: backgroundColor,
+                                                                                                     backgroundImage: nil),
+                                                             border: nil,
+                                                             dimension: nil,
+                                                             flexChild: nil,
+                                                             spacing: nil)
+
+        let defaultStyle2 = DataImageCarouselIndicatorStyles(container: nil,
+                                                             background: nil,
+                                                             border: nil,
+                                                             dimension: nil,
+                                                             flexChild: nil,
+                                                             spacing: nil)
+
+        let activeStyle1 = DataImageCarouselIndicatorStyles(container: nil,
+                                                            background: nil,
+                                                            border: nil,
+                                                            dimension: nil,
+                                                            flexChild: nil,
+                                                            spacing: SpacingStylingProperties(padding: nil,
+                                                                                              margin: "1",
+                                                                                              offset: nil))
+
+        let indicator = [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, disabled: nil),
+                         BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, disabled: nil)]
+
+        // ACT
+        let transformedStyle = try StyleTransformer.updatedCarouselIndicatorStyles(indicator, newStyles: active)
+
+        // Assert
+        // Check the second breakpoint
+        XCTAssertEqual(transformedStyle[1].pressed?.spacing?.margin, "1")
+        XCTAssertEqual(transformedStyle[1].pressed?.spacing?.padding, "0")
+        XCTAssertEqual(transformedStyle[1].pressed?.background?.backgroundColor, backgroundColor)
+    }
 }
