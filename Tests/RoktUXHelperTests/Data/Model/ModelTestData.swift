@@ -202,6 +202,13 @@ class ModelTestData: NSObject {
         }
     }
     
+    enum DataImageCarouselData {
+        static func dataImageCarousel() -> DataImageCarouselModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_data_image_carousel")
+            return try! JSONDecoder().decode(DataImageCarouselModel.self, from: data)
+        }
+    }
+
     enum StaticImageData {
         static func staticImage() -> StaticImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_static_image")

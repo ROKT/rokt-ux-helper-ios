@@ -174,6 +174,13 @@ struct LayoutSchemaComponent: View {
                                   parentWidth: $parentWidth,
                                   parentHeight: $parentHeight,
                                   parentOverride: parentOverride)
+        case .dataImageCarousel(let dataImageCarouselModel):
+            DataImageCarouselComponent(config: config,
+                                       model: dataImageCarouselModel,
+                                       parentWidth: $parentWidth,
+                                       parentHeight: $parentHeight,
+                                       styleState: $styleState,
+                                       parentOverride: parentOverride)
         default:
             EmptyView()
         }
