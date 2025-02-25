@@ -14,6 +14,7 @@ import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestRichTextComponent: XCTestCase {
@@ -372,6 +373,14 @@ final class TestRichTextComponent: XCTestCase {
             let foregroundColor = nsAttrString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor
             XCTAssertEqual(foregroundColor?.isEqualIgnoringSpaceContext(UIColor(hexString: "#000000")), true)
         }
+    }
+    
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_model()))
+            .frame(width: 350, height: 350)
+        
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image)
     }
     
     func get_model() throws -> RichTextViewModel {

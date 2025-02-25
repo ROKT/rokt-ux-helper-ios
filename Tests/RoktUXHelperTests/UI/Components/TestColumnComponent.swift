@@ -14,6 +14,7 @@ import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestColumnComponent: XCTestCase {
@@ -102,10 +103,22 @@ final class TestColumnComponent: XCTestCase {
         XCTAssertEqual(alignment, .center)
     }
 #endif
+    
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
+            .frame(width: 300)
+        
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image)
+    }
+    
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithBasicText()
-        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, context: .outer([])))
+        return try transformer.getColumn(
+            column.styles,
+            children: transformer.transformChildren(column.children, context: .outer([]))
+        )
     }
     
 }

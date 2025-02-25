@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 
 @available(iOS 15.0, *)
@@ -155,6 +156,15 @@ final class TestBasicTextComponent: XCTestCase {
         XCTAssertEqual(sut.stateReplacedValue, "ORDER Number: Uk171359906")
     }
 #endif
+    
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
+            .frame(width: 300)
+        
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image)
+    }
+    
     func get_model() throws -> BasicTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         return try transformer.getBasicText(ModelTestData.TextData.basicText(), context: .outer([]))
