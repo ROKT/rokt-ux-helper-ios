@@ -29,4 +29,5 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     func closeOnComplete() -> Bool
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?)
+    func publishStateChange()
 }

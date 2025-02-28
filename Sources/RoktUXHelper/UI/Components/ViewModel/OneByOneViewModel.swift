@@ -51,4 +51,8 @@ class OneByOneViewModel: DistributionViewModel, Identifiable, ScreenSizeAdaptive
         layoutState?.items[LayoutState.customStateMap] = customStateMap
         layoutState?.items[LayoutState.totalItemsKey] = totalItems
     }
+
+    func publishStateChange() {
+        layoutState?.publishStateChange()
+    }
 }
