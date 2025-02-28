@@ -27,16 +27,16 @@ struct ScrollableRowComponent: View {
     @State private var contentMaxWidth: CGFloat = .zero
     @State private var contentAlignment: Alignment = .center // SwiftUI default frame alignment
 
-    var style: RowStyle? {
+    var style: BaseStyles? {
         switch styleState {
         case .hovered:
-            return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.hovered
         case .pressed:
-            return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.pressed
         case .disabled:
-            return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.disabled
         default:
-            return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.default
         }
     }
 

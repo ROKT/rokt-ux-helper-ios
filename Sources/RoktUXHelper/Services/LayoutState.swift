@@ -117,4 +117,8 @@ class LayoutState: LayoutStateRepresenting {
 
         return index
     }
+
+    func publishStateChange() {
+        itemsPublisher.send(items)
+    }
 }
