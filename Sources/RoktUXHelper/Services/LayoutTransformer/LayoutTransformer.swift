@@ -195,6 +195,8 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                                     context: context)
                     )
                 )
+        case .dataImageCarousel(let dataImageCarouselModel):
+                .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
         }
     }
 
@@ -538,7 +540,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
         responseKey: String,
         openLinks: LinkOpenTarget?,
         styles: LayoutStyle<CreativeResponseElements,
-        ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
+                            ConditionalStyleTransition<CreativeResponseTransitions, WhenPredicate>>?,
         children: [LayoutSchemaViewModel]?,
         offer: OfferModel
     ) throws -> CreativeResponseViewModel {
@@ -622,6 +624,41 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                      hoveredStyle: updateStyles.compactMap {$0.hovered},
                                      disabledStyle: updateStyles.compactMap {$0.disabled},
                                      layoutState: layoutState)
+    }
+
+    func getDataImageCarousel(_ dataImageCarouselModel: DataImageCarouselModel<WhenPredicate>,
+                              context: Context) throws -> DataImageCarouselViewModel {
+        var carouselImages: [CreativeImage]?
+        switch context {
+        case .inner(.generic(let offer?)),
+                .inner(.negative(let offer)),
+                .inner(.positive(let offer)):
+            carouselImages = offer.creative.images?.filter { $0.key.contains(dataImageCarouselModel.imageKey) }
+                .compactMap { $0.value }
+        default:
+            throw LayoutTransformerError.InvalidMapping()
+        }
+        let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
+        let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.indicator)
+        let seenIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+            indicatorStyle,
+            newStyles: dataImageCarouselModel.styles?.elements?.seenIndicator
+        )
+        // active falls back to seen (which then falls back to indicator)
+        let activeIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+            seenIndicatorStyle,
+            newStyles: dataImageCarouselModel.styles?.elements?.activeIndicator
+        )
+        let progressIndicatorStyle = try StyleTransformer
+            .updatedStyles(dataImageCarouselModel.styles?.elements?.progressIndicatorContainer)
+        return DataImageCarouselViewModel(images: carouselImages,
+                                          duration: dataImageCarouselModel.duration,
+                                          ownStyle: ownStyle,
+                                          indicatorStyle: indicatorStyle,
+                                          seenIndicatorStyle: seenIndicatorStyle,
+                                          activeIndicatorStyle: activeIndicatorStyle,
+                                          progressIndicatorContainer: progressIndicatorStyle,
+                                          layoutState: layoutState)
     }
 }
 
