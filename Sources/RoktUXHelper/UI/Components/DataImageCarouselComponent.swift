@@ -52,7 +52,7 @@ struct DataImageCarouselComponent: View {
     let parentOverride: ComponentParentOverride?
 
     // Carousel specific states
-    @State private var currentPage = 0
+    @State private var currentImage = 0
     @State private var timer: Timer?
     @State private var isAutoScrolling = true
     @State private var opacities: [Double] = []
@@ -186,15 +186,15 @@ struct DataImageCarouselComponent: View {
 
         // Fade out current image
         withAnimation(.easeInOut(duration: 0.5)) {
-            opacities[currentPage] = 0.0
+            opacities[currentImage] = 0.0
         }
 
-        // Advance to next page
-        currentPage = (currentPage + 1) % images.count
+        // Advance to next image
+        currentImage = (currentImage + 1) % images.count
 
         // Fade in new image
         withAnimation(.easeInOut(duration: 0.5)) {
-            opacities[currentPage] = 1.0
+            opacities[currentImage] = 1.0
         }
     }
 
