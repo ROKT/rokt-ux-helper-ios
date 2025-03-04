@@ -22,13 +22,13 @@ struct DataImageCarouselComponent: View {
     private var style: DataImageCarouselStyles? {
         switch styleState {
         case .hovered:
-            return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.hovered
         case .pressed:
-            return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.pressed
         case .disabled:
-            return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.disabled
         default:
-            return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
+            model.defaultStyle?[safe: breakpointIndex]
         }
     }
 
@@ -48,6 +48,25 @@ struct DataImageCarouselComponent: View {
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
+    @Binding var customStateMap: RoktUXCustomStateMap?
+
+    init(
+        config: ComponentConfig,
+        model: DataImageCarouselViewModel,
+        parentWidth: Binding<CGFloat?>,
+        parentHeight: Binding<CGFloat?>,
+        styleState: Binding<StyleState>,
+        parentOverride: ComponentParentOverride?
+    ) {
+        self.config = config
+        self.model = model
+        self._parentWidth = parentWidth
+        self._parentHeight = parentHeight
+        self._styleState = styleState
+        self.parentOverride = parentOverride
+
+        _customStateMap = model.layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
+    }
 
     let parentOverride: ComponentParentOverride?
 
@@ -87,12 +106,13 @@ struct DataImageCarouselComponent: View {
     }
 
     var body: some View {
-        if let images = model.images, !images.isEmpty {
+
+        if !model.images.isEmpty {
             VStack(spacing: 0) {
                 // Initialize opacities array if needed
                 ZStack {
-                    ForEach(0..<images.count, id: \.self) { index in
-                        imageView(for: images[index])
+                    ForEach(0..<model.images.count, id: \.self) { index in
+                        imageView(for: model.images[index])
                             .opacity(index < opacities.count ? opacities[index] : 0)
                     }
                 }
@@ -103,7 +123,7 @@ struct DataImageCarouselComponent: View {
                 .onAppear {
                     // Initialize opacities array with first image visible
                     if opacities.isEmpty {
-                        opacities = Array(repeating: 0.0, count: images.count)
+                        opacities = Array(repeating: 0.0, count: model.images.count)
                         opacities[0] = 1.0
                     }
                     setupTimer()
@@ -113,8 +133,26 @@ struct DataImageCarouselComponent: View {
                 }
 
                 // Custom progress indicator to be implemented separately
-                if images.count > 1 {
-                    // Placeholder for progress indicator
+                if model.images.count > 1 {
+                    ImageCarouselIndicator(
+                        config: config,
+                        model: model.indicatorViewModel,
+                        styleState: $styleState,
+                        parentWidth: $parentWidth,
+                        parentHeight: $parentHeight,
+                        parentOverride: parentOverride
+                    )
+                    .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
+                        let key = CustomStateIdentifiable(position: 0, key: "creativeImage")
+                        customStateMap?[key] = currentProgress
+                        model.layoutState?.publishStateChange()
+                    }
+                    .onLoad {
+                        model.onAppear()
+                    }
+                    .onDisappear {
+                        model.onDisappear()
+                    }
                 }
             }
             .applyLayoutModifier(
@@ -161,7 +199,7 @@ struct DataImageCarouselComponent: View {
         stopTimer()
 
         // Only setup timer if there are multiple images and duration is greater than 0
-        if let images = model.images, images.count > 1 && model.duration > 0 {
+        if model.images.count > 1 && model.duration > 0 {
             // Create a timer publisher with the specified duration
             timerPublisher = Timer.publish(every: TimeInterval(model.duration)/1000.0, on: .main, in: .common)
             timerCancellable = timerPublisher.connect()
@@ -182,7 +220,7 @@ struct DataImageCarouselComponent: View {
     }
 
     private func advanceToNextImage() {
-        guard let images = model.images, !images.isEmpty else { return }
+        guard !model.images.isEmpty else { return }
 
         // Fade out current image
         withAnimation(.easeInOut(duration: 0.5)) {
@@ -190,7 +228,7 @@ struct DataImageCarouselComponent: View {
         }
 
         // Advance to next image
-        currentImage = (currentImage + 1) % images.count
+        currentImage = (currentImage + 1) % model.images.count
 
         // Fade in new image
         withAnimation(.easeInOut(duration: 0.5)) {

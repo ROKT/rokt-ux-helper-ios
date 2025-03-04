@@ -27,6 +27,7 @@ class LayoutState: LayoutStateRepresenting {
     static let layoutSettingsKey = "layoutSettings" // LayoutSettings
     static let customStateMap = "customStateMap" // CustomStateMap
 
+    private(set) var imageCarouselPosition: Int = 1
     private var _items = [String: Any]()
     private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
@@ -71,6 +72,14 @@ class LayoutState: LayoutStateRepresenting {
         self.pluginId = pluginId
         self.initialPluginViewState = initialPluginViewState
         self.onPluginViewStateChange = onPluginViewStateChange
+    }
+
+    func incrementImageCarouselPosition(with limit: Int) {
+        imageCarouselPosition = max((imageCarouselPosition + 1) % limit, 1)
+    }
+
+    func resetImageCarouselPosition(with value: Int) {
+        imageCarouselPosition = value
     }
 
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {

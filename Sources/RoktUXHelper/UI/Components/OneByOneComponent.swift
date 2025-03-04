@@ -73,7 +73,7 @@ struct OneByOneComponent: View {
         self.parentOverride = parentOverride
         self.model = model
         _currentOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
-        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
     }
 
     var verticalAlignment: VerticalAlignmentProperty {

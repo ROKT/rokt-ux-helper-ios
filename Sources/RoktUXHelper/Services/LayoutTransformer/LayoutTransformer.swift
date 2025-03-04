@@ -196,7 +196,9 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                     )
                 )
         case .dataImageCarousel(let dataImageCarouselModel):
+            transformWithFallback {
                 .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
+            }
         }
     }
 
@@ -629,24 +631,24 @@ where CreativeSyntaxMapper.Context == CreativeContext {
 
     func getDataImageCarousel(_ dataImageCarouselModel: DataImageCarouselModel<WhenPredicate>,
                               context: Context) throws -> DataImageCarouselViewModel {
-        var carouselImages: [CreativeImage]?
+        var carouselImages: [CreativeImage]
         switch context {
         case .inner(.generic(let offer?)),
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
             carouselImages = offer.creative.images?.filter { $0.key.contains(dataImageCarouselModel.imageKey) }
-                .compactMap { $0.value }
+                .compactMap { $0.value } ?? []
         default:
             throw LayoutTransformerError.InvalidMapping()
         }
         let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
         let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.indicator)
-        let seenIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+        let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             indicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.seenIndicator
         )
         // active falls back to seen (which then falls back to indicator)
-        let activeIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+        let activeIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             seenIndicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.activeIndicator
         )
@@ -660,6 +662,14 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                           activeIndicatorStyle: activeIndicatorStyle,
                                           progressIndicatorContainer: progressIndicatorStyle,
                                           layoutState: layoutState)
+    }
+
+    private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) -> LayoutSchemaViewModel {
+        do {
+           return try transform()
+        } catch {
+            return .empty
+        }
     }
 }
 

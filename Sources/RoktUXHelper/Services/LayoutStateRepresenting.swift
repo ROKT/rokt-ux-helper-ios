@@ -23,6 +23,7 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     var colorMode: RoktUXConfig.ColorMode? { get }
     var config: RoktUXConfig? { get }
     var initialPluginViewState: RoktPluginViewState? { get }
+    var imageCarouselPosition: Int { get }
 
     func setLayoutType(_ type: RoktUXPlacementLayoutCode)
     func layoutType() -> RoktUXPlacementLayoutCode
@@ -30,4 +31,6 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?)
     func publishStateChange()
+    func incrementImageCarouselPosition(with limit: Int)
+    func resetImageCarouselPosition(with value: Int)
 }

@@ -18,12 +18,9 @@ import DcuiSchema
 class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     let id: UUID = UUID()
 
-    let images: [CreativeImage]?
+    let images: [CreativeImage]
     let duration: Int32
-    let defaultStyle: [DataImageCarouselStyles]?
-    let pressedStyle: [DataImageCarouselStyles]?
-    let hoveredStyle: [DataImageCarouselStyles]?
-    let disabledStyle: [DataImageCarouselStyles]?
+    let stylingProperties: [BasicStateStylingBlock<DataImageCarouselStyles>]?
 
     let indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
     let seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
@@ -31,11 +28,20 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     let progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
 
     weak var layoutState: (any LayoutStateRepresenting)?
+
+    @Published var currentProgress: Int = 1
+
+    private var timer: Timer?
+    
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
-    init(images: [CreativeImage]?,
+    var defaultStyle: [DataImageCarouselStyles]? {
+        stylingProperties?.map(\.default)
+    }
+
+    init(images: [CreativeImage],
          duration: Int32,
          ownStyle: [BasicStateStylingBlock<DataImageCarouselStyles>]?,
          indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
@@ -45,14 +51,53 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
          layoutState: (any LayoutStateRepresenting)?) {
         self.images = images
         self.duration = duration
-        self.defaultStyle = ownStyle?.compactMap {$0.default}
-        self.pressedStyle = ownStyle?.compactMap {$0.pressed}
-        self.hoveredStyle = ownStyle?.compactMap {$0.hovered}
-        self.disabledStyle = ownStyle?.compactMap {$0.disabled}
+        stylingProperties = ownStyle
         self.indicatorStyle = indicatorStyle
         self.seenIndicatorStyle = seenIndicatorStyle
         self.activeIndicatorStyle = activeIndicatorStyle
         self.progressIndicatorContainer = progressIndicatorContainer
         self.layoutState = layoutState
+    }
+
+    var indicatorViewModel: ImageCarouselIndicatorViewModel {
+        .init(
+            positions: images.count,
+            duration: duration,
+            stylingProperties: progressIndicatorContainer,
+            indicatorStyle: indicatorStyle,
+            seenIndicatorStyle: seenIndicatorStyle,
+            activeIndicatorStyle: activeIndicatorStyle,
+            layoutState: layoutState
+        )
+    }
+
+    func onAppear() {
+        /// currentProgress = 0 is needed to reset the customStateMap image carousel position to 0
+        /// so views can render its initial state without animations
+        currentProgress = 0
+        /// short delay needed for views to render initial state without animations
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self else { return }
+            timer?.invalidate()
+            currentProgress = 1
+            layoutState?.resetImageCarouselPosition(with: currentProgress)
+
+            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration)/1000.0, repeats: true) { [weak self] _ in
+                guard let self else { return }
+                incrementStateMap()
+            }
+        }
+    }
+
+    func onDisappear() {
+        timer?.invalidate()
+    }
+
+    private func incrementStateMap() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            layoutState?.incrementImageCarouselPosition(with: images.count + 1)
+            currentProgress = layoutState?.imageCarouselPosition ?? 0
+        }
     }
 }
