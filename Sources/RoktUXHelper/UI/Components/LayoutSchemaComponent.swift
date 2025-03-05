@@ -174,6 +174,12 @@ struct LayoutSchemaComponent: View {
                                   parentWidth: $parentWidth,
                                   parentHeight: $parentHeight,
                                   parentOverride: parentOverride)
+        case .escapeHatch(let escapeHatchModel):
+            EscapeHatchComponent(config: config,
+                                 model: escapeHatchModel,
+                                 parentWidth: $parentWidth,
+                                 parentHeight: $parentHeight,
+                                 parentOverride: parentOverride)
         default:
             EmptyView()
         }

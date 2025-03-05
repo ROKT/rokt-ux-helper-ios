@@ -1,0 +1,3 @@
+[submodule "dcui-schema"]
+	path = dcui-schema
+	url = git@github.com:ROKT/dcui-swift-schema.git

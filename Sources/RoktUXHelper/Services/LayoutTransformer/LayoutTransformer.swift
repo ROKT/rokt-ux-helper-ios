@@ -137,6 +137,8 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                                      styles: buttonModel.styles,
                                                      children: transformChildren(buttonModel.children,
                                                                                  slot: slot)))
+        case .escapeHatch(let escapeHatchModel):
+            return .escapeHatch(try getEscapeHatch(data: escapeHatchModel.data, slot: slot))
         }
     }
 
@@ -574,5 +576,10 @@ struct LayoutTransformer<Expander: PayloadExpander, Extractor: DataExtractor> wh
                                      hoveredStyle: updateStyles.compactMap {$0.hovered},
                                      disabledStyle: updateStyles.compactMap {$0.disabled},
                                      layoutState: layoutState)
+    }
+
+
+    func getEscapeHatch(data: String, slot: SlotOfferModel?) -> EscapeHatchViewModel {
+        return EscapeHatchViewModel(data: data, layoutState: layoutState, eventService: eventService, slot: slot)
     }
 }

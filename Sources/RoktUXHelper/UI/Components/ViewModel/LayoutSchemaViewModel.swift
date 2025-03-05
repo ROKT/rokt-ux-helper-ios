@@ -37,6 +37,7 @@ enum LayoutSchemaViewModel: Hashable {
     case staticLink(StaticLinkViewModel)
     case progressControl(ProgressControlViewModel)
     case toggleButton(ToggleButtonViewModel)
+    case escapeHatch(EscapeHatchViewModel)
     case empty
 
     static func == (lhs: LayoutSchemaViewModel, rhs: LayoutSchemaViewModel) -> Bool {
@@ -78,6 +79,8 @@ enum LayoutSchemaViewModel: Hashable {
         case (.progressControl(let lhsModel), .progressControl(let rhsModel)):
             return lhsModel == rhsModel
         case (.toggleButton(let lhsModel), .toggleButton(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.escapeHatch(let lhsModel), .escapeHatch(let rhsModel)):
             return lhsModel == rhsModel
         case (.empty, .empty):
             return true
