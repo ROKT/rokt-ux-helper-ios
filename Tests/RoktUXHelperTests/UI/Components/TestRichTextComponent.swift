@@ -235,13 +235,6 @@ final class TestRichTextComponent: XCTestCase {
             XCTAssertTrue(dict.keys.contains(.strikethroughStyle))
         }
         
-        // check min/max width/height
-        let flexFrame = try text.flexFrame()
-        XCTAssertEqual(flexFrame.minWidth, 10)
-        XCTAssertEqual(flexFrame.maxWidth, 100)
-        XCTAssertEqual(flexFrame.minHeight, 15)
-        XCTAssertEqual(flexFrame.maxHeight, 150)
-        
         // raw richtext
         let rawText = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)

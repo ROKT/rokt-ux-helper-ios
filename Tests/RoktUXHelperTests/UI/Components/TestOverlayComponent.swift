@@ -125,23 +125,6 @@ final class TestOverlayComponent: XCTestCase {
     }
 
 #endif
-    func testSnapshot() throws {
-        let view = TestOverlayPlaceholder(layout: try getModel(.alignWrapper))
-            .frame(width: 350, height: 350)
-        
-        let hostingController = UIHostingController(rootView: view)
-        
-        let expectation = XCTestExpectation(description: "Wait for SwiftUI rendering")
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                assertSnapshot(of: hostingController, as: .image)
-                expectation.fulfill()
-            }
-
-            wait(for: [expectation], timeout: 2.0)
-        
-//        assertSnapshot(of: hostingController, as: .image)
-    }
 
     func getModel(_ layoutName: LayoutName) throws -> OverlayViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

@@ -158,26 +158,11 @@ final class TestOneByOneComponent: XCTestCase {
     }
 #endif
     
-    func testSnapshot() throws {
-        let view = try TestPlaceHolder.make(
-            eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-//                    closeActionCalled = true
-                }
-            },
-            layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
-        )
-            .frame(width: 350, height: 350)
-        
-        let hostingController = UIHostingController(rootView: view)
-        let expectation = XCTestExpectation(description: "Wait for SwiftUI rendering")
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                assertSnapshot(of: hostingController, as: .image)
-                expectation.fulfill()
-            }
-
-            wait(for: [expectation], timeout: 3.0)
+    func testEmbeddedOneByOne() {
+        // Create a RoktLayoutUIView with TestViewController
+        waitForViewController("embedded_onebyone") { testViewController in
+            assertSnapshot(of: testViewController, as: .image)
+        }
     }
 }
 

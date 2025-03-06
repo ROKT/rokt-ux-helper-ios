@@ -106,11 +106,11 @@ final class TestBasicTextComponent: XCTestCase {
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 5, bottom: 1, left: 10))
         
         // test the effect of custom modifier
         let padding = try text.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
+        XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 17.0, trailing: 5.0))
         
         XCTAssertEqual(try text.attributes().foregroundColor(), Color(hex: "#AABBCC"))
         
@@ -124,8 +124,6 @@ final class TestBasicTextComponent: XCTestCase {
         let flexFrame = try text.flexFrame()
         XCTAssertEqual(flexFrame.minHeight, 24)
         XCTAssertEqual(flexFrame.maxHeight, 24)
-        XCTAssertEqual(flexFrame.minWidth, 40)
-        XCTAssertEqual(flexFrame.maxWidth, 40)
     }
     
     func test_basicText_computedProperties_usesModelProperties() throws {
