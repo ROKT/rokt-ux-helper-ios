@@ -1,0 +1,16 @@
+name: PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: "read"
+  id-token: "write"
+
+jobs:
+  pr-notifiy:
+    name: "Notify GChat"
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    secrets:
+      gchat_webhook: ${{ secrets.GCHAT_PRS_MOBILE_INTEGRATION_CHANNEL_WEBHOOK }}
