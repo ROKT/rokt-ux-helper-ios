@@ -22,6 +22,9 @@ struct EscapeHatchComponent: View {
 
     private let escapeHatchExtensionComponents: [String: (ExtensionData, ComponentConfig, (any LayoutStateRepresenting)?, EventDiagnosticServicing?, SlotOfferModel?) -> AnyExtensionComponent?] = [
         // Register extension components here
+        "count-down-timer": { data, config, layoutState, eventService, slot in
+            CountdownTimerComponent.create(from: data, config: config, layoutState: layoutState, eventService: eventService, slot: slot).map { AnyExtensionComponent($0) }
+        }
     ]
     
     @Binding var parentWidth: CGFloat?
