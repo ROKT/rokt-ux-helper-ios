@@ -72,10 +72,12 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     }
 
     func onAppear() {
+        guard images.count > 1 && duration > 0 else { return }
         /// currentProgress = 0 is needed to reset the customStateMap image carousel position to 0
         /// so views can render its initial state without animations
         currentProgress = 0
         /// short delay needed for views to render initial state without animations
+        /// and for customStateMap to be initialized in Distributions
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             guard let self else { return }
             timer?.invalidate()
@@ -90,14 +92,15 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     }
 
     func onDisappear() {
-        timer?.invalidate()
+        /// short delay incase appear and disappear are called the same time in landscape
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            timer?.invalidate()
+        }
     }
 
     private func incrementStateMap() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            layoutState?.incrementImageCarouselPosition(with: images.count + 1)
-            currentProgress = layoutState?.imageCarouselPosition ?? 0
-        }
+        layoutState?.incrementImageCarouselPosition(with: images.count + 1)
+        currentProgress = layoutState?.imageCarouselPosition ?? 0
     }
 }

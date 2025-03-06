@@ -72,11 +72,10 @@ struct DataImageCarouselComponent: View {
 
     // Carousel specific states
     @State private var currentImage = 0
-    @State private var timer: Timer?
     @State private var isAutoScrolling = true
     @State private var opacities: [Double] = []
-    @State private var timerPublisher = Timer.publish(every: 3.0, on: .main, in: .common)
-    @State private var timerCancellable: Cancellable?
+    @State private var availableWidth: CGFloat?
+    @State private var availableHeight: CGFloat?
 
     // Indicator styles
     private var indicatorStyle: DataImageCarouselIndicatorStyles? {
@@ -98,38 +97,38 @@ struct DataImageCarouselComponent: View {
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
-        parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty ?? .center
+        if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
+            return justifyContent
+        } else if let parentAlign = parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .top
+        }
     }
 
     var horizontalAlignment: HorizontalAlignmentProperty {
-        parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty ?? .center
+        if let alignItems = containerStyle?.justifyContent?.asHorizontalAlignmentProperty {
+            return alignItems
+        } else if let parentAlign = parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .start
+        }
     }
 
     var body: some View {
 
         if !model.images.isEmpty {
-            VStack(spacing: 0) {
-                // Initialize opacities array if needed
-                ZStack {
-                    ForEach(0..<model.images.count, id: \.self) { index in
-                        imageView(for: model.images[index])
-                            .opacity(index < opacities.count ? opacities[index] : 0)
-                    }
-                }
-                .frame(
-                    minHeight: getFixedHeight(),
-                    maxHeight: getMaxHeight()
+            // Initialize opacities array if needed
+            ZStack(
+                alignment: .init(
+                    horizontal: horizontalAlignment.getHorizontalAlignment(),
+                    vertical: verticalAlignment.getVerticalAlignment()
                 )
-                .onAppear {
-                    // Initialize opacities array with first image visible
-                    if opacities.isEmpty {
-                        opacities = Array(repeating: 0.0, count: model.images.count)
-                        opacities[0] = 1.0
-                    }
-                    setupTimer()
-                }
-                .onDisappear {
-                    stopTimer()
+            ) {
+                ForEach(0..<model.images.count, id: \.self) { index in
+                    imageView(for: model.images[index])
+                        .opacity(index < opacities.count ? opacities[index] : 0)
                 }
 
                 // Custom progress indicator to be implemented separately
@@ -138,23 +137,25 @@ struct DataImageCarouselComponent: View {
                         config: config,
                         model: model.indicatorViewModel,
                         styleState: $styleState,
-                        parentWidth: $parentWidth,
-                        parentHeight: $parentHeight,
+                        parentWidth: $availableWidth,
+                        parentHeight: $availableHeight,
                         parentOverride: parentOverride
                     )
                     .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
-                        let key = CustomStateIdentifiable(position: 0, key: "creativeImage")
+                        let newPosition = max(currentProgress - 1, 0)
+                        if currentImage != newPosition {
+                            advanceToNextImage()
+                        }
+                        let key = CustomStateIdentifiable(position: 0, key: .creativeImage)
                         customStateMap?[key] = currentProgress
                         model.layoutState?.publishStateChange()
                     }
-                    .onLoad {
-                        model.onAppear()
-                    }
-                    .onDisappear {
-                        model.onDisappear()
-                    }
                 }
             }
+            .frame(
+                minHeight: getFixedHeight(),
+                maxHeight: getMaxHeight()
+            )
             .applyLayoutModifier(
                 verticalAlignmentProperty: verticalAlignment,
                 horizontalAlignmentProperty: horizontalAlignment,
@@ -178,6 +179,21 @@ struct DataImageCarouselComponent: View {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                 }
             }
+            .readSize(spacing: spacingStyle) { size in
+                availableWidth = size.width
+                availableHeight = size.height
+            }
+            .onLoad {
+                // Initialize opacities array with first image visible
+                if opacities.isEmpty {
+                    opacities = Array(repeating: 0.0, count: model.images.count)
+                    opacities[0] = 1.0
+                }
+                model.onAppear()
+            }
+            .onDisappear {
+                model.onDisappear()
+            }
         } else {
             EmptyView()
         }
@@ -193,30 +209,6 @@ struct DataImageCarouselComponent: View {
         )
         .frame(maxWidth: .infinity)
         .aspectRatio(contentMode: .fit)
-    }
-
-    private func setupTimer() {
-        stopTimer()
-
-        // Only setup timer if there are multiple images and duration is greater than 0
-        if model.images.count > 1 && model.duration > 0 {
-            // Create a timer publisher with the specified duration
-            timerPublisher = Timer.publish(every: TimeInterval(model.duration)/1000.0, on: .main, in: .common)
-            timerCancellable = timerPublisher.connect()
-
-            // Subscribe to the timer publisher
-            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(model.duration)/1000.0, repeats: true) { _ in
-                if self.isAutoScrolling {
-                    self.advanceToNextImage()
-                }
-            }
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        timerCancellable?.cancel()
     }
 
     private func advanceToNextImage() {

@@ -88,7 +88,7 @@ class ImageCarouselIndicatorViewModel:
                 animatableStyle: .init(duration: Double(duration)/1000.0, style: activeStyle.default),
                 accessibilityGrouped: false,
                 layoutState: layoutState,
-                predicates: [.customState(.init(key: "creativeImage", condition: .is, value: Int32(i+1)))],
+                predicates: [.customState(.init(key: .creativeImage, condition: .is, value: Int32(i+1)))],
                 globalBreakPoints: nil,
                 offers: []
             )

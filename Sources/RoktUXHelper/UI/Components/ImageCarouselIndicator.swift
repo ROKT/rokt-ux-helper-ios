@@ -39,10 +39,6 @@ struct ImageCarouselIndicator: View {
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
 
-    var passableBackgroundStyle: BackgroundStylingProperties? {
-        backgroundStyle ?? parentOverride?.parentBackgroundStyle
-    }
-
     var verticalAlignmentOverride: VerticalAlignment? {
         containerStyle?.justifyContent?.asVerticalAlignment.vertical
     }
@@ -84,7 +80,7 @@ struct ImageCarouselIndicator: View {
                 parent: config.parent,
                 parentWidth: $parentWidth,
                 parentHeight: $parentHeight,
-                parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
+                parentOverride: parentOverride?.updateBackground(backgroundStyle),
                 verticalAlignmentOverride: verticalAlignmentOverride,
                 horizontalAlignmentOverride: horizontalAlignmentOverride,
                 defaultHeight: .wrapContent,
@@ -107,22 +103,20 @@ struct ImageCarouselIndicator: View {
     }
 
     func createContainer() -> some View {
-        VStack {
-            HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
-                   spacing: CGFloat(containerStyle?.gap ?? 0)) {
-                ForEach(model.rowViewModels) {
-                    RowComponent(
-                        config: config,
-                        model: $0,
-                        parentWidth: $model.availableWidth,
-                        parentHeight: $model.availableHeight,
-                        styleState: $model.styleState,
-                        parentOverride: parentOverride
-                    )
-                }
+        HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
+               spacing: CGFloat(containerStyle?.gap ?? 0)) {
+            ForEach(model.rowViewModels) {
+                RowComponent(
+                    config: config,
+                    model: $0,
+                    parentWidth: $model.availableWidth,
+                    parentHeight: $model.availableHeight,
+                    styleState: $model.styleState,
+                    parentOverride: parentOverride?.updateBackground(backgroundStyle)
+                )
             }
-                   .accessibilityElement(children: .ignore)
-                   .accessibilityHidden(true)
         }
+               .accessibilityElement(children: .ignore)
+               .accessibilityHidden(true)
     }
 }

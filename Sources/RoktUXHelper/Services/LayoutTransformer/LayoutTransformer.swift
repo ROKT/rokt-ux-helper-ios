@@ -196,7 +196,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                     )
                 )
         case .dataImageCarousel(let dataImageCarouselModel):
-            transformWithFallback {
+            try transformWithFallback {
                 .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
             }
         }
@@ -631,16 +631,18 @@ where CreativeSyntaxMapper.Context == CreativeContext {
 
     func getDataImageCarousel(_ dataImageCarouselModel: DataImageCarouselModel<WhenPredicate>,
                               context: Context) throws -> DataImageCarouselViewModel {
-        var carouselImages: [CreativeImage]
+        var carouselImages: [CreativeImage]?
         switch context {
         case .inner(.generic(let offer?)),
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
             carouselImages = offer.creative.images?.filter { $0.key.contains(dataImageCarouselModel.imageKey) }
-                .compactMap { $0.value } ?? []
+                .compactMap { $0.value }
         default:
             throw LayoutTransformerError.InvalidMapping()
         }
+        guard let carouselImages else { throw LayoutTransformerError.missingData }
+
         let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
         let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.indicator)
         let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
@@ -664,11 +666,13 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                           layoutState: layoutState)
     }
 
-    private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) -> LayoutSchemaViewModel {
+    private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) throws -> LayoutSchemaViewModel {
         do {
            return try transform()
-        } catch {
+        } catch LayoutTransformerError.missingData {
             return .empty
+        } catch {
+            throw error
         }
     }
 }
