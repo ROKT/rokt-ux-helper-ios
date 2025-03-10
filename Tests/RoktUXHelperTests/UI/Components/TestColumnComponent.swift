@@ -106,10 +106,10 @@ final class TestColumnComponent: XCTestCase {
     
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
-            .frame(width: 300)
+            .frame(width: 350, height: 350)
         
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image)
+        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
     }
     
     func get_model() throws -> ColumnViewModel {
