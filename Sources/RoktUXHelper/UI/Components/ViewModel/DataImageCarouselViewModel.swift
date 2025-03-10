@@ -82,8 +82,6 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
             guard let self else { return }
             timer?.invalidate()
             currentProgress = 1
-            layoutState?.resetImageCarouselPosition(with: currentProgress)
-
             timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration)/1000.0, repeats: true) { [weak self] _ in
                 guard let self else { return }
                 incrementStateMap()
@@ -100,7 +98,6 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     }
 
     private func incrementStateMap() {
-        layoutState?.incrementImageCarouselPosition(with: images.count + 1)
-        currentProgress = layoutState?.imageCarouselPosition ?? 0
+        currentProgress = max((currentProgress + 1) % (images.count + 1), 1)
     }
 }

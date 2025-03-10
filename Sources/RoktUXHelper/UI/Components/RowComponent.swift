@@ -119,6 +119,8 @@ struct RowComponent: View {
             .onLoad {
                 currentStyle = style
                 updateStyle()
+                // Pass the config to the model as early as possible
+                model.componentConfig = config
             }
             .onChange(of: model.animate) { _ in
                 updateStyle()

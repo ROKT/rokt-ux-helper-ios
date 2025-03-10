@@ -26,6 +26,7 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, AnimatableStyleHa
     let offers: [OfferModel?]
     var width: CGFloat = 0
     var cancellable: AnyCancellable?
+    var componentConfig: ComponentConfig?
 
     @Published var animate: Bool = false
 
