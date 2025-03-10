@@ -122,8 +122,8 @@ final class TestBasicTextComponent: XCTestCase {
         
         // frame
         let flexFrame = try text.flexFrame()
-        XCTAssertEqual(flexFrame.minHeight, 24)
-        XCTAssertEqual(flexFrame.maxHeight, 24)
+        XCTAssertEqual(flexFrame.minHeight, 48)
+        XCTAssertEqual(flexFrame.maxHeight, 48)
     }
     
     func test_basicText_computedProperties_usesModelProperties() throws {

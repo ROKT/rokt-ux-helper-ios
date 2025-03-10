@@ -21,7 +21,7 @@
                         "dimension": {
                             "height": {
                                 "type": "fixed",
-                                "value": 24
+                                "value": 48
                             }
                         },
                         "background": {
