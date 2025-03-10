@@ -161,7 +161,7 @@ final class TestOneByOneComponent: XCTestCase {
     func testEmbeddedOneByOne() {
         // Create a RoktLayoutUIView with TestViewController
         waitForViewController("embedded_onebyone") { testViewController in
-            assertSnapshot(of: testViewController, as: .image)
+            assertSnapshot(of: testViewController, as: .image(on: .iPhone13Pro(.portrait)))
         }
     }
 }
