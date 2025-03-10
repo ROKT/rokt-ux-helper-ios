@@ -25,14 +25,26 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
     let indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
     let seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
     let activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    let progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
+    let indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
 
     weak var layoutState: (any LayoutStateRepresenting)?
 
     @Published var currentProgress: Int = 1
 
     private var timer: Timer?
-    
+
+    private(set) lazy var indicatorViewModel: ImageCarouselIndicatorViewModel = {
+        .init(
+            positions: images.count,
+            duration: duration,
+            stylingProperties: indicatorContainer,
+            indicatorStyle: indicatorStyle,
+            seenIndicatorStyle: seenIndicatorStyle,
+            activeIndicatorStyle: activeIndicatorStyle,
+            layoutState: layoutState
+        )
+    }()
+
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
@@ -47,7 +59,7 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
          indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
+         indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.images = images
         self.duration = duration
@@ -55,20 +67,8 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
         self.indicatorStyle = indicatorStyle
         self.seenIndicatorStyle = seenIndicatorStyle
         self.activeIndicatorStyle = activeIndicatorStyle
-        self.progressIndicatorContainer = progressIndicatorContainer
+        self.indicatorContainer = indicatorContainer
         self.layoutState = layoutState
-    }
-
-    var indicatorViewModel: ImageCarouselIndicatorViewModel {
-        .init(
-            positions: images.count,
-            duration: duration,
-            stylingProperties: progressIndicatorContainer,
-            indicatorStyle: indicatorStyle,
-            seenIndicatorStyle: seenIndicatorStyle,
-            activeIndicatorStyle: activeIndicatorStyle,
-            layoutState: layoutState
-        )
     }
 
     func onAppear() {

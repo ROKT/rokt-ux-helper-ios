@@ -77,25 +77,6 @@ struct DataImageCarouselComponent: View {
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
 
-    // Indicator styles
-    private var indicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.indicatorStyle?.count ?? -1 > breakpointIndex ? model.indicatorStyle?[breakpointIndex].default : nil
-    }
-
-    private var seenIndicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.seenIndicatorStyle?.count ?? -1 > breakpointIndex ? model.seenIndicatorStyle?[breakpointIndex].default : nil
-    }
-
-    private var activeIndicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.activeIndicatorStyle?.count ?? -1 > breakpointIndex ? model.activeIndicatorStyle?[breakpointIndex]
-            .default : nil
-    }
-
-    private var progressIndicatorContainerStyle: DataImageCarouselIndicatorStyles? {
-        return model.progressIndicatorContainer?.count ?? -1 > breakpointIndex ? model
-            .progressIndicatorContainer?[breakpointIndex].default : nil
-    }
-
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
             return justifyContent

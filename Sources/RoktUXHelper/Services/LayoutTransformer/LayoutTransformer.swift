@@ -654,7 +654,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
             seenIndicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.activeIndicator
         )
-        let progressIndicatorStyle = try StyleTransformer
+        let indicatorContainerStyle = try StyleTransformer
             .updatedStyles(dataImageCarouselModel.styles?.elements?.progressIndicatorContainer)
         return DataImageCarouselViewModel(images: carouselImages,
                                           duration: dataImageCarouselModel.duration,
@@ -662,7 +662,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                           indicatorStyle: indicatorStyle,
                                           seenIndicatorStyle: seenIndicatorStyle,
                                           activeIndicatorStyle: activeIndicatorStyle,
-                                          progressIndicatorContainer: progressIndicatorStyle,
+                                          indicatorContainer: indicatorContainerStyle,
                                           layoutState: layoutState)
     }
 
