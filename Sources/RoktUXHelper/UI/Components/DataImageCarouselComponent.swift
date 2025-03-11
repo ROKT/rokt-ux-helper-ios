@@ -135,10 +135,6 @@ struct DataImageCarouselComponent: View {
                     }
                 }
             }
-            .frame(
-                minHeight: getFixedHeight(),
-                maxHeight: getMaxHeight()
-            )
             .applyLayoutModifier(
                 verticalAlignmentProperty: verticalAlignment,
                 horizontalAlignmentProperty: horizontalAlignment,
@@ -209,30 +205,5 @@ struct DataImageCarouselComponent: View {
         withAnimation(.easeInOut(duration: 0.5)) {
             opacities[currentImage] = 1.0
         }
-    }
-
-    private func getFixedHeight() -> CGFloat? {
-        if let height = dimensionStyle?.height, case .fixed(let value) = height {
-            return CGFloat(value ?? 0)
-        }
-        return nil
-    }
-
-    private func getMaxHeight() -> CGFloat? {
-        if let height = dimensionStyle?.height {
-            switch height {
-            case .fixed(let value):
-                return CGFloat(value ?? 0)
-            case .percentage:
-                // Percentage height is handled by applyLayoutModifier
-                return nil
-            case .fit(let fitProperty):
-                if fitProperty == .fitHeight {
-                    return parentHeight
-                }
-                return nil
-            }
-        }
-        return nil
     }
 }

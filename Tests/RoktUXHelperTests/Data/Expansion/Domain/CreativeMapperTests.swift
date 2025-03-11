@@ -234,6 +234,30 @@ final class CreativeMapperTests: XCTestCase {
         )
     }
 
+    func test_basicText_parsesSimpleCreativeImage() {
+        // %^DATA.creativeImage.creativeImage.title^%
+        assertBasicTextDataExpansion(
+            childIndex: 23,
+            expectedValue: "title"
+        )
+    }
+
+    func test_basicText_parsesImageCarouselVertical() {
+        // %^DATA.creativeImage.creativeCarouselImageVertical.1.title^%
+        assertBasicTextDataExpansion(
+            childIndex: 24,
+            expectedValue: "horizontal title 1"
+        )
+        assertBasicTextDataExpansion(
+            childIndex: 25,
+            expectedValue: "horizontal title 3"
+        )
+        assertBasicTextDataExpansion(
+            childIndex: 26,
+            expectedValue: "vertical alt 2"
+        )
+    }
+
 
     private func assertRichTextDataExpansion(childIndex: Int, expectedValue: String) {
         guard let firstOffer else {

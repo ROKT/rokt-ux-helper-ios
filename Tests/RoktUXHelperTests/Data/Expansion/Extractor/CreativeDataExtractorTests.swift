@@ -41,7 +41,9 @@ final class CreativeDataExtractorTests: XCTestCase {
             ("DATA.creativeImage.creativeCarouselImageHorizontal.3.title", "horizontal title 3"),
             ("DATA.creativeImage.creativeCarouselImageHorizontal.1.alt", "horizontal alt 1"),
             ("DATA.creativeImage.creativeCarouselImageHorizontal.2.alt", "horizontal alt 2"),
-            ("DATA.creativeImage.creativeCarouselImageHorizontal.3.alt", "horizontal alt 3")
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.3.alt", "horizontal alt 3"),
+            ("DATA.creativeImage.creativeImage.title", "title"),
+            ("DATA.creativeImage.creativeImage.alt", "alt")
         ].forEach { (input, output) in
             XCTAssertEqual(
                 try sut?.extractDataRepresentedBy(

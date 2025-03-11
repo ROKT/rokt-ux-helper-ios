@@ -15,7 +15,7 @@ import SwiftUI
 import Combine
 
 @available(iOS 13.0, *)
-protocol PredicateHandling: class {
+protocol PredicateHandling {
     var layoutState: (any LayoutStateRepresenting)? { get }
     var predicates: [WhenPredicate]? { get }
     var currentProgress: Binding<Int> { get }
@@ -24,9 +24,9 @@ protocol PredicateHandling: class {
     var globalBreakPoints: BreakPoint? { get }
     var offers: [OfferModel?] { get }
     var width: CGFloat { get }
-    var componentConfig: ComponentConfig? { get set }
+    var componentConfig: ComponentConfig? { get }
     var animate: Bool { get set }
-    var cancellable: AnyCancellable? { get set }
+    var cancellable: AnyCancellable? { get }
 
     func shouldApply(_ uiState: WhenComponentUIState) -> Bool
     func shouldApply() -> Bool
