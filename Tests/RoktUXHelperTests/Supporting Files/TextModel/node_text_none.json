@@ -15,17 +15,13 @@
                             }
                         },
                         "spacing":{
-                            "padding":"1 0 1 8",
+                            "padding":"10 5 1 10",
                             "margin":"0 0 16 0"
                         },
                         "dimension": {
                             "height": {
                                 "type": "fixed",
-                                "value": 24
-                            },
-                            "width": {
-                                "type": "fixed",
-                                "value": 40
+                                "value": 48
                             }
                         },
                         "background": {

@@ -279,6 +279,15 @@ class ModelTestData: NSObject {
             let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
             return experienceResponse.getPageModel()!
         }
+        static func getJsonString(jsonFilename: String) -> String {
+            let data = toData(jsonFilename: jsonFilename)
+            if let jsonObject = try? JSONSerialization.jsonObject(with: data),
+               let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            }
+            return "{}"
+        }
     }
 
     static func toData(jsonFilename: String) -> Data {

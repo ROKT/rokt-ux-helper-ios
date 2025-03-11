@@ -14,6 +14,7 @@ import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestOneByOneComponent: XCTestCase {
@@ -156,6 +157,15 @@ final class TestOneByOneComponent: XCTestCase {
         XCTAssertFalse(SignalResponseCalled)
     }
 #endif
+    
+    func testEmbeddedOneByOne() {
+        // Create a RoktLayoutUIView with TestViewController
+        withSnapshotTesting(diffTool: .ksdiff) {
+            waitForViewController("embedded_onebyone") { testViewController in
+                assertSnapshot(of: testViewController, as: .image(on: .iPhone13Pro(.portrait)))
+            }
+        }
+    }
 }
 
 @available(iOS 15.0, *)
@@ -170,6 +180,9 @@ extension LayoutSchemaViewModel {
                                             layoutState: layoutState,
                                             eventService: eventService)
         let model = ModelTestData.OneByOneData.oneByOne()
-        return LayoutSchemaViewModel.oneByOne(try transformer.getOneByOne(oneByOneModel: model!, context: .outer(slots!.map(\.offer))))
+        return LayoutSchemaViewModel.oneByOne(try transformer.getOneByOne(
+            oneByOneModel: model!,
+            context: .outer(slots!.map(\.offer))
+        ))
     }
 }

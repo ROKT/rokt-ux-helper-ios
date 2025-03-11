@@ -14,6 +14,7 @@ import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestOverlayComponent: XCTestCase {
