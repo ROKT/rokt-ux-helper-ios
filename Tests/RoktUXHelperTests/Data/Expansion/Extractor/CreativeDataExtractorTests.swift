@@ -32,6 +32,47 @@ final class CreativeDataExtractorTests: XCTestCase {
         super.tearDown()
     }
 
+    func test_extractDataRepresentedBy_usingValidImageCarouselPropertyChain_returnsNestedString() throws {
+        try [
+            ("DATA.creativeImage.creativeCarouselImageVertical.1.title", "vertical title 1"),
+            ("DATA.creativeImage.creativeCarouselImageVertical.2.title", "vertical title 2"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.1.title", "horizontal title 1"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.2.title", "horizontal title 2"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.3.title", "horizontal title 3"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.1.alt", "horizontal alt 1"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.2.alt", "horizontal alt 2"),
+            ("DATA.creativeImage.creativeCarouselImageHorizontal.3.alt", "horizontal alt 3"),
+            ("DATA.creativeImage.creativeImage.title", "title"),
+            ("DATA.creativeImage.creativeImage.alt", "alt")
+        ].forEach { (input, output) in
+            XCTAssertEqual(
+                try sut?.extractDataRepresentedBy(
+                    String.self,
+                    propertyChain: input,
+                    responseKey: nil,
+                    from: offer
+                ),
+                .value(output)
+            )
+        }
+    }
+
+    func test_extractDataRepresentedBy_usingInvalidImageCarouselPropertyChain_thenThrowError() throws {
+        do {
+            _ = try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.creativeImage.creativeCarousel",
+                responseKey: nil,
+                from: offer
+            )
+            XCTFail("Expected BNFPlaceholderError.mandatoryKeyEmpty to be thrown")
+        } catch BNFPlaceholderError.mandatoryKeyEmpty {
+            // Expected error, test passes
+        } catch {
+            XCTFail("Expected BNFPlaceholderError.mandatoryKeyEmpty but got \(error)")
+        }
+    }
+
     func test_extractDataRepresentedBy_usingValidCreativeCopyPropertyChain_returnsNestedString() {
         XCTAssertNoThrow(try sut?.extractDataRepresentedBy(
             String.self,

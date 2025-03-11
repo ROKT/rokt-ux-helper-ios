@@ -12,9 +12,10 @@
 import Foundation
 import DcuiSchema
 import SwiftUI
+import Combine
 
 @available(iOS 13.0, *)
-protocol PredicateHandling: class {
+protocol PredicateHandling {
     var layoutState: (any LayoutStateRepresenting)? { get }
     var predicates: [WhenPredicate]? { get }
     var currentProgress: Binding<Int> { get }
@@ -22,10 +23,13 @@ protocol PredicateHandling: class {
     var customStateMap: Binding<RoktUXCustomStateMap?> { get }
     var globalBreakPoints: BreakPoint? { get }
     var offers: [OfferModel?] { get }
-    var componentConfig: ComponentConfig? { get set }
+    var width: CGFloat { get }
+    var componentConfig: ComponentConfig? { get }
+    var animate: Bool { get set }
+    var cancellable: AnyCancellable? { get }
 
     func shouldApply(_ uiState: WhenComponentUIState) -> Bool
-    func shouldApply(_ width: CGFloat) -> Bool
+    func shouldApply() -> Bool
 }
 
 @available(iOS 13.0, *)
@@ -43,7 +47,7 @@ extension PredicateHandling {
         layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
     }
 
-    func shouldApply(_ width: CGFloat) -> Bool {
+    func shouldApply() -> Bool {
         shouldApply(
             WhenComponentUIState(
                 currentProgress: currentProgress.wrappedValue,

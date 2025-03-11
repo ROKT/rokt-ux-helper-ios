@@ -36,10 +36,8 @@ extension ScreenSizeAdaptive {
 }
 
 @available(iOS 13.0, *)
-protocol BaseStyleAdaptive: ScreenSizeAdaptive {
-
-    typealias Item = BaseStyles
-
+protocol BaseStyleAdaptive: ScreenSizeAdaptive where Item == BaseStyles {
+    
     var stylingProperties: [BasicStateStylingBlock<Item>]? { get }
     var defaultStyle: [Item]? { get }
 }

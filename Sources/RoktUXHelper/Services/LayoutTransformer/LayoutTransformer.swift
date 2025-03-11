@@ -637,6 +637,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
             carouselImages = offer.creative.images?.filter { $0.key.contains(dataImageCarouselModel.imageKey) }
+                .sorted(by: { $0.key < $1.key })
                 .compactMap { $0.value }
         default:
             throw LayoutTransformerError.InvalidMapping()
@@ -656,7 +657,8 @@ where CreativeSyntaxMapper.Context == CreativeContext {
         )
         let indicatorContainerStyle = try StyleTransformer
             .updatedStyles(dataImageCarouselModel.styles?.elements?.progressIndicatorContainer)
-        return DataImageCarouselViewModel(images: carouselImages,
+        return DataImageCarouselViewModel(key: dataImageCarouselModel.imageKey,
+                                          images: carouselImages,
                                           duration: dataImageCarouselModel.duration,
                                           ownStyle: ownStyle,
                                           indicatorStyle: indicatorStyle,
