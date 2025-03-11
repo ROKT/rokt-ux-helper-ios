@@ -96,11 +96,11 @@ struct StyleTransformer {
         return updatedStyles
     }
 
-    static func updatedIndicatorStyles(
-        _ styles: [BasicStateStylingBlock<IndicatorStyles>]?,
-        newStyles: [BasicStateStylingBlock<IndicatorStyles>]?
-    ) throws -> [BasicStateStylingBlock<IndicatorStyles>] {
-        var resultStyles: [BasicStateStylingBlock<IndicatorStyles>] = []
+    static func updatedIndicatorStyles<T: Codable>(
+        _ styles: [BasicStateStylingBlock<T>]?,
+        newStyles: [BasicStateStylingBlock<T>]?
+    ) throws -> [BasicStateStylingBlock<T>] {
+        var resultStyles: [BasicStateStylingBlock<T>] = []
 
         let prefilledStyle = try updatedStyles(styles)
         let prefilledNewStyle = try updatedStyles(newStyles)
@@ -108,86 +108,13 @@ struct StyleTransformer {
         var styleIndex = 0
         var newStyleIndex = 0
 
-        var lastDefaultIndicator: BasicStateStylingBlock<IndicatorStyles>?
-        var lastNewIndicator: BasicStateStylingBlock<IndicatorStyles>?
+        var lastDefaultIndicator: BasicStateStylingBlock<T>?
+        var lastNewIndicator: BasicStateStylingBlock<T>?
 
-        var lastDefault: IndicatorStyles?
-        var lastPressed: IndicatorStyles?
-        var lastHovered: IndicatorStyles?
-        var lastDisabled: IndicatorStyles?
-
-        while styleIndex < prefilledStyle.count || newStyleIndex < prefilledNewStyle.count {
-
-            if prefilledStyle.count > styleIndex {
-                lastDefaultIndicator = prefilledStyle[styleIndex]
-            }
-
-            if prefilledNewStyle.count > newStyleIndex {
-                lastNewIndicator = prefilledNewStyle[newStyleIndex]
-            }
-
-            if let lastDefaultValue = lastDefault {
-                lastDefault = try updatedStyle(lastDefaultValue, newStyle: lastDefaultIndicator?.default)
-            } else {
-                lastDefault = lastDefaultIndicator?.default
-            }
-            lastDefault = try updatedStyle(lastDefault, newStyle: lastNewIndicator?.default)
-
-            if let lastPressedValue = lastPressed, let pressedStyle = lastDefaultIndicator?.pressed {
-                lastPressed = try updatedStyle(lastPressedValue, newStyle: pressedStyle)
-            } else {
-                lastPressed = lastDefaultIndicator?.pressed
-            }
-            lastPressed = try updatedStyle(lastPressed, newStyle: lastNewIndicator?.pressed)
-
-            if let lastHoveredValue = lastHovered, let hoveredStyle = lastDefaultIndicator?.hovered {
-                lastHovered = try updatedStyle(lastHoveredValue, newStyle: hoveredStyle)
-            } else {
-                lastHovered = lastDefaultIndicator?.hovered
-            }
-            lastHovered = try updatedStyle(lastHovered, newStyle: lastNewIndicator?.hovered)
-
-            if let lastDisabledValue = lastDisabled, let disabledStyle = lastDefaultIndicator?.disabled {
-                lastDisabled = try updatedStyle(lastDisabledValue, newStyle: disabledStyle)
-            } else {
-                lastDisabled = lastDefaultIndicator?.disabled
-            }
-            lastDisabled = try updatedStyle(lastDisabled, newStyle: lastNewIndicator?.disabled)
-
-            guard let lastDefault else { break }
-            resultStyles.append(
-                BasicStateStylingBlock(default: lastDefault,
-                                       pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
-                                       hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
-                                       disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
-
-            styleIndex += 1
-            newStyleIndex += 1
-
-        }
-
-        return resultStyles
-    }
-
-    static func updatedCarouselIndicatorStyles(
-        _ styles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-        newStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    ) throws -> [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>] {
-        var resultStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>] = []
-
-        let prefilledStyle = try updatedStyles(styles)
-        let prefilledNewStyle = try updatedStyles(newStyles)
-
-        var styleIndex = 0
-        var newStyleIndex = 0
-
-        var lastDefaultIndicator: BasicStateStylingBlock<DataImageCarouselIndicatorStyles>?
-        var lastNewIndicator: BasicStateStylingBlock<DataImageCarouselIndicatorStyles>?
-
-        var lastDefault: DataImageCarouselIndicatorStyles?
-        var lastPressed: DataImageCarouselIndicatorStyles?
-        var lastHovered: DataImageCarouselIndicatorStyles?
-        var lastDisabled: DataImageCarouselIndicatorStyles?
+        var lastDefault: T?
+        var lastPressed: T?
+        var lastHovered: T?
+        var lastDisabled: T?
 
         while styleIndex < prefilledStyle.count || newStyleIndex < prefilledNewStyle.count {
 

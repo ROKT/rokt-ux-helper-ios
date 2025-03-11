@@ -612,7 +612,7 @@ final class TestStyleTransformer: XCTestCase {
         let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, disabled: nil)]
 
         // ACT
-        let transformedStyle = try StyleTransformer.updatedCarouselIndicatorStyles(indicator, newStyles: active)
+        let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)
 
         // Assert
         XCTAssertEqual(transformedStyle.first?.default.spacing?.margin, "1")
@@ -660,7 +660,7 @@ final class TestStyleTransformer: XCTestCase {
         let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, disabled: nil)]
 
         // ACT
-        let transformedStyle = try StyleTransformer.updatedCarouselIndicatorStyles(indicator, newStyles: active)
+        let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)
 
         // Assert
         // Check the second breakpoint

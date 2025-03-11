@@ -18,41 +18,86 @@ import DcuiSchema
 class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     let id: UUID = UUID()
 
-    let images: [CreativeImage]?
+    let images: [CreativeImage]
     let duration: Int32
-    let defaultStyle: [DataImageCarouselStyles]?
-    let pressedStyle: [DataImageCarouselStyles]?
-    let hoveredStyle: [DataImageCarouselStyles]?
-    let disabledStyle: [DataImageCarouselStyles]?
+    let stylingProperties: [BasicStateStylingBlock<DataImageCarouselStyles>]?
 
     let indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
     let seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
     let activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    let progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
+    let indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
 
     weak var layoutState: (any LayoutStateRepresenting)?
+
+    @Published var currentProgress: Int = 1
+
+    private var timer: Timer?
+
+    private(set) lazy var indicatorViewModel: ImageCarouselIndicatorViewModel = {
+        .init(
+            positions: images.count,
+            duration: duration,
+            stylingProperties: indicatorContainer,
+            indicatorStyle: indicatorStyle,
+            seenIndicatorStyle: seenIndicatorStyle,
+            activeIndicatorStyle: activeIndicatorStyle,
+            layoutState: layoutState
+        )
+    }()
+
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
     }
 
-    init(images: [CreativeImage]?,
+    var defaultStyle: [DataImageCarouselStyles]? {
+        stylingProperties?.map(\.default)
+    }
+
+    init(images: [CreativeImage],
          duration: Int32,
          ownStyle: [BasicStateStylingBlock<DataImageCarouselStyles>]?,
          indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         progressIndicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
+         indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.images = images
         self.duration = duration
-        self.defaultStyle = ownStyle?.compactMap {$0.default}
-        self.pressedStyle = ownStyle?.compactMap {$0.pressed}
-        self.hoveredStyle = ownStyle?.compactMap {$0.hovered}
-        self.disabledStyle = ownStyle?.compactMap {$0.disabled}
+        stylingProperties = ownStyle
         self.indicatorStyle = indicatorStyle
         self.seenIndicatorStyle = seenIndicatorStyle
         self.activeIndicatorStyle = activeIndicatorStyle
-        self.progressIndicatorContainer = progressIndicatorContainer
+        self.indicatorContainer = indicatorContainer
         self.layoutState = layoutState
+    }
+
+    func onAppear() {
+        guard images.count > 1 && duration > 0 else { return }
+        /// currentProgress = 0 is needed to reset the customStateMap image carousel position to 0
+        /// so views can render its initial state without animations
+        currentProgress = 0
+        /// short delay needed for views to render initial state without animations
+        /// and for customStateMap to be initialized in Distributions
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self else { return }
+            timer?.invalidate()
+            currentProgress = 1
+            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration)/1000.0, repeats: true) { [weak self] _ in
+                guard let self else { return }
+                incrementStateMap()
+            }
+        }
+    }
+
+    func onDisappear() {
+        /// short delay incase appear and disappear are called the same time in landscape
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            timer?.invalidate()
+        }
+    }
+
+    private func incrementStateMap() {
+        currentProgress = max((currentProgress + 1) % (images.count + 1), 1)
     }
 }

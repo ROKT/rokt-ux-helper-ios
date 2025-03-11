@@ -92,7 +92,7 @@ struct ScrollableColumnComponent: View {
                 contentAlignment = newAlignment
             }
         }
-        .ifLet(contentMaxHeight) { $0.frame(maxHeight: $1, alignment: contentAlignment) }
-        .ifLet(contentHeight) { $0.frame(height: $1, alignment: contentAlignment) }
+        .frame(maxHeight: contentMaxHeight, alignment: contentAlignment)
+        .frame(height: contentHeight, alignment: contentAlignment)
     }
 }

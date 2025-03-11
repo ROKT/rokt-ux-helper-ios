@@ -23,6 +23,7 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling {
     let offers: [OfferModel?]
     let globalBreakPoints: BreakPoint?
     weak var layoutState: (any LayoutStateRepresenting)?
+    var componentConfig: ComponentConfig?
 
     init(children: [LayoutSchemaViewModel]? = nil,
          predicates: [WhenPredicate]?,

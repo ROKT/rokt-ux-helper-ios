@@ -88,7 +88,7 @@ struct CarouselComponent: View {
         self.parentOverride = parentOverride
         self.model = model
         _currentLeadingOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
-        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
         setRecalculatedCurrentPage()
     }
 

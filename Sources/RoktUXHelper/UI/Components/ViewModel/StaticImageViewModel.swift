@@ -13,17 +13,13 @@ import Foundation
 import DcuiSchema
 
 @available(iOS 15, *)
-class StaticImageViewModel: Hashable, Identifiable, ScreenSizeAdaptive {
+class StaticImageViewModel: Hashable, Identifiable, BaseStyleAdaptive {
 
     let id: UUID = UUID()
 
     let url: StaticImageUrl?
     let alt: String?
     let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
-
-    var defaultStyle: [BaseStyles]? {
-        stylingProperties?.map(\.default)
-    }
 
     weak var layoutState: (any LayoutStateRepresenting)?
 

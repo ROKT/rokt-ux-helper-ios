@@ -73,7 +73,7 @@ struct OneByOneComponent: View {
         self.parentOverride = parentOverride
         self.model = model
         _currentOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
-        _customStateMap = State(wrappedValue: model.initialCustomStateMap)
+        _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -210,11 +210,11 @@ struct OneByOneComponent: View {
             // Wait to complete fade out of previous offer
             // Must not run on `main` as that prevents `@State` from changing
             DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                self.customStateMap = nil
+                self.customStateMap = RoktUXCustomStateMap()
                 self.currentOffer = currentOffer + 1
             }
         default:
-            self.customStateMap = nil
+            self.customStateMap = RoktUXCustomStateMap()
             self.currentOffer = currentOffer + 1
         }
     }

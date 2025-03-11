@@ -181,6 +181,7 @@ struct LayoutSchemaComponent: View {
                                        parentHeight: $parentHeight,
                                        styleState: $styleState,
                                        parentOverride: parentOverride)
+            .id(dataImageCarouselModel.id)
         default:
             EmptyView()
         }

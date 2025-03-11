@@ -22,13 +22,13 @@ struct DataImageCarouselComponent: View {
     private var style: DataImageCarouselStyles? {
         switch styleState {
         case .hovered:
-            return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.hovered
         case .pressed:
-            return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.pressed
         case .disabled:
-            return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
+            model.stylingProperties?[safe: breakpointIndex]?.disabled
         default:
-            return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
+            model.defaultStyle?[safe: breakpointIndex]
         }
     }
 
@@ -48,75 +48,95 @@ struct DataImageCarouselComponent: View {
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
+    @Binding var customStateMap: RoktUXCustomStateMap?
+
+    init(
+        config: ComponentConfig,
+        model: DataImageCarouselViewModel,
+        parentWidth: Binding<CGFloat?>,
+        parentHeight: Binding<CGFloat?>,
+        styleState: Binding<StyleState>,
+        parentOverride: ComponentParentOverride?
+    ) {
+        self.config = config
+        self.model = model
+        self._parentWidth = parentWidth
+        self._parentHeight = parentHeight
+        self._styleState = styleState
+        self.parentOverride = parentOverride
+
+        _customStateMap = model.layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
+    }
 
     let parentOverride: ComponentParentOverride?
 
     // Carousel specific states
     @State private var currentImage = 0
-    @State private var timer: Timer?
     @State private var isAutoScrolling = true
     @State private var opacities: [Double] = []
-    @State private var timerPublisher = Timer.publish(every: 3.0, on: .main, in: .common)
-    @State private var timerCancellable: Cancellable?
-
-    // Indicator styles
-    private var indicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.indicatorStyle?.count ?? -1 > breakpointIndex ? model.indicatorStyle?[breakpointIndex].default : nil
-    }
-
-    private var seenIndicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.seenIndicatorStyle?.count ?? -1 > breakpointIndex ? model.seenIndicatorStyle?[breakpointIndex].default : nil
-    }
-
-    private var activeIndicatorStyle: DataImageCarouselIndicatorStyles? {
-        return model.activeIndicatorStyle?.count ?? -1 > breakpointIndex ? model.activeIndicatorStyle?[breakpointIndex]
-            .default : nil
-    }
-
-    private var progressIndicatorContainerStyle: DataImageCarouselIndicatorStyles? {
-        return model.progressIndicatorContainer?.count ?? -1 > breakpointIndex ? model
-            .progressIndicatorContainer?[breakpointIndex].default : nil
-    }
+    @State private var availableWidth: CGFloat?
+    @State private var availableHeight: CGFloat?
 
     var verticalAlignment: VerticalAlignmentProperty {
-        parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty ?? .center
+        if let justifyContent = containerStyle?.alignItems?.asVerticalAlignmentProperty {
+            return justifyContent
+        } else if let parentAlign = parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .top
+        }
     }
 
     var horizontalAlignment: HorizontalAlignmentProperty {
-        parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty ?? .center
+        if let alignItems = containerStyle?.justifyContent?.asHorizontalAlignmentProperty {
+            return alignItems
+        } else if let parentAlign = parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .start
+        }
     }
 
     var body: some View {
-        if let images = model.images, !images.isEmpty {
-            VStack(spacing: 0) {
-                // Initialize opacities array if needed
-                ZStack {
-                    ForEach(0..<images.count, id: \.self) { index in
-                        imageView(for: images[index])
-                            .opacity(index < opacities.count ? opacities[index] : 0)
-                    }
-                }
-                .frame(
-                    minHeight: getFixedHeight(),
-                    maxHeight: getMaxHeight()
+
+        if !model.images.isEmpty {
+            // Initialize opacities array if needed
+            ZStack(
+                alignment: .init(
+                    horizontal: horizontalAlignment.getHorizontalAlignment(),
+                    vertical: verticalAlignment.getVerticalAlignment()
                 )
-                .onAppear {
-                    // Initialize opacities array with first image visible
-                    if opacities.isEmpty {
-                        opacities = Array(repeating: 0.0, count: images.count)
-                        opacities[0] = 1.0
-                    }
-                    setupTimer()
-                }
-                .onDisappear {
-                    stopTimer()
+            ) {
+                ForEach(0..<model.images.count, id: \.self) { index in
+                    imageView(for: model.images[index])
+                        .opacity(index < opacities.count ? opacities[index] : 0)
                 }
 
                 // Custom progress indicator to be implemented separately
-                if images.count > 1 {
-                    // Placeholder for progress indicator
+                if model.images.count > 1 {
+                    ImageCarouselIndicator(
+                        config: config,
+                        model: model.indicatorViewModel,
+                        styleState: $styleState,
+                        parentWidth: $availableWidth,
+                        parentHeight: $availableHeight,
+                        parentOverride: parentOverride
+                    )
+                    .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
+                        let newPosition = max(currentProgress - 1, 0)
+                        if currentImage != newPosition {
+                            advanceToNextImage()
+                        }
+                        let key = CustomStateIdentifiable(position: config.position, key: .creativeImage)
+                        customStateMap?[key] = currentProgress
+                        model.layoutState?.publishStateChange()
+                    }
                 }
             }
+            .frame(
+                minHeight: getFixedHeight(),
+                maxHeight: getMaxHeight()
+            )
             .applyLayoutModifier(
                 verticalAlignmentProperty: verticalAlignment,
                 horizontalAlignmentProperty: horizontalAlignment,
@@ -140,6 +160,21 @@ struct DataImageCarouselComponent: View {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                 }
             }
+            .readSize(spacing: spacingStyle) { size in
+                availableWidth = size.width
+                availableHeight = size.height
+            }
+            .onLoad {
+                // Initialize opacities array with first image visible
+                if opacities.isEmpty {
+                    opacities = Array(repeating: 0.0, count: model.images.count)
+                    opacities[0] = 1.0
+                }
+                model.onAppear()
+            }
+            .onDisappear {
+                model.onDisappear()
+            }
         } else {
             EmptyView()
         }
@@ -157,32 +192,8 @@ struct DataImageCarouselComponent: View {
         .aspectRatio(contentMode: .fit)
     }
 
-    private func setupTimer() {
-        stopTimer()
-
-        // Only setup timer if there are multiple images and duration is greater than 0
-        if let images = model.images, images.count > 1 && model.duration > 0 {
-            // Create a timer publisher with the specified duration
-            timerPublisher = Timer.publish(every: TimeInterval(model.duration)/1000.0, on: .main, in: .common)
-            timerCancellable = timerPublisher.connect()
-
-            // Subscribe to the timer publisher
-            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(model.duration)/1000.0, repeats: true) { _ in
-                if self.isAutoScrolling {
-                    self.advanceToNextImage()
-                }
-            }
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        timerCancellable?.cancel()
-    }
-
     private func advanceToNextImage() {
-        guard let images = model.images, !images.isEmpty else { return }
+        guard !model.images.isEmpty else { return }
 
         // Fade out current image
         withAnimation(.easeInOut(duration: 0.5)) {
@@ -190,7 +201,7 @@ struct DataImageCarouselComponent: View {
         }
 
         // Advance to next image
-        currentImage = (currentImage + 1) % images.count
+        currentImage = (currentImage + 1) % model.images.count
 
         // Fade in new image
         withAnimation(.easeInOut(duration: 0.5)) {

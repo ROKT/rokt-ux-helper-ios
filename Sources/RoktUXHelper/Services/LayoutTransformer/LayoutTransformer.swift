@@ -196,7 +196,9 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                     )
                 )
         case .dataImageCarousel(let dataImageCarouselModel):
+            try transformWithFallback {
                 .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
+            }
         }
     }
 
@@ -639,18 +641,20 @@ where CreativeSyntaxMapper.Context == CreativeContext {
         default:
             throw LayoutTransformerError.InvalidMapping()
         }
+        guard let carouselImages else { throw LayoutTransformerError.missingData }
+
         let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
         let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.indicator)
-        let seenIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+        let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             indicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.seenIndicator
         )
         // active falls back to seen (which then falls back to indicator)
-        let activeIndicatorStyle = try StyleTransformer.updatedCarouselIndicatorStyles(
+        let activeIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             seenIndicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.activeIndicator
         )
-        let progressIndicatorStyle = try StyleTransformer
+        let indicatorContainerStyle = try StyleTransformer
             .updatedStyles(dataImageCarouselModel.styles?.elements?.progressIndicatorContainer)
         return DataImageCarouselViewModel(images: carouselImages,
                                           duration: dataImageCarouselModel.duration,
@@ -658,8 +662,18 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                           indicatorStyle: indicatorStyle,
                                           seenIndicatorStyle: seenIndicatorStyle,
                                           activeIndicatorStyle: activeIndicatorStyle,
-                                          progressIndicatorContainer: progressIndicatorStyle,
+                                          indicatorContainer: indicatorContainerStyle,
                                           layoutState: layoutState)
+    }
+
+    private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) throws -> LayoutSchemaViewModel {
+        do {
+           return try transform()
+        } catch LayoutTransformerError.missingData {
+            return .empty
+        } catch {
+            throw error
+        }
     }
 }
 
