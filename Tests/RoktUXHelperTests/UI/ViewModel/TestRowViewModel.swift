@@ -26,7 +26,7 @@ class TestRowViewModel: XCTestCase {
         let sut = RowViewModel(
             children: nil,
             stylingProperties: nil,
-            animatableStyle: nil,
+            animatableStyle: .init(duration: 1, style: .init()),
             accessibilityGrouped: false,
             layoutState: layoutState,
             predicates: [WhenPredicate.progression(ProgressionPredicate(condition: .is, value: "0"))],
@@ -41,7 +41,7 @@ class TestRowViewModel: XCTestCase {
         let sut = RowViewModel(
             children: nil,
             stylingProperties: nil,
-            animatableStyle: nil,
+            animatableStyle: .init(duration: 1, style: .init()),
             accessibilityGrouped: false,
             layoutState: layoutState,
             predicates: [WhenPredicate.progression(ProgressionPredicate(condition: .is, value: "1"))],

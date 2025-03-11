@@ -119,7 +119,7 @@ struct ZStackComponent: View {
             if let children = model.children {
                 ForEach(children, id: \.self) { child in
                     LayoutSchemaComponent(
-                        config: config.updateParent(.row),
+                        config: config.updateParent(.column),
                         layout: child,
                         parentWidth: $availableWidth,
                         parentHeight: $availableHeight,

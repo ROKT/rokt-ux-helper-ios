@@ -36,8 +36,18 @@ public struct CustomStateIdentifiable: Hashable, Codable {
 }
 
 extension CustomStateIdentifiable {
-    enum Keys: String {
-        case creativeImage
+    enum Keys {
+        case imageCarouselPosition
+        case imageCarouselKey(key: String)
+
+        var rawValue: String {
+            switch self {
+            case .imageCarouselPosition:
+                return "imageCarouselPosition"
+            case .imageCarouselKey(let key):
+                return "DataImageCarousel.\(key)"
+            }
+        }
     }
     
     init(position: Int?, key: Keys) {

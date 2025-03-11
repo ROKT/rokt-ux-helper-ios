@@ -127,7 +127,9 @@ struct DataImageCarouselComponent: View {
                         if currentImage != newPosition {
                             advanceToNextImage()
                         }
-                        let key = CustomStateIdentifiable(position: config.position, key: .creativeImage)
+                        let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
+                        customStateMap?[positionKey] = currentProgress
+                        let key = CustomStateIdentifiable(position: config.position, key: .imageCarouselKey(key: model.key))
                         customStateMap?[key] = currentProgress
                         model.layoutState?.publishStateChange()
                     }

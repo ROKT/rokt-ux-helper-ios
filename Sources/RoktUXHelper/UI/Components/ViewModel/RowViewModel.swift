@@ -14,7 +14,7 @@ import DcuiSchema
 import Combine
 
 @available(iOS 15, *)
-class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, AnimatableStyleHandling {
+class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling, ObservableObject {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
@@ -51,12 +51,12 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, AnimatableStyleHa
         self.globalBreakPoints = globalBreakPoints
         self.offers = offers
 
-        animate = shouldApply(width) && !animatableStyle.isNil
+        animate = shouldApply() && !animatableStyle.isNil
         cancellable = layoutState?.itemsPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self else { return }
-                animate = shouldApply(width) && !animatableStyle.isNil
+                animate = shouldApply() && !animatableStyle.isNil
             }
     }
 }

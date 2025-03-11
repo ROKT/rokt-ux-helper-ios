@@ -19,6 +19,7 @@ enum BNFNamespace: String, CaseIterable {
     case dataCreativeCopy = "DATA.creativeCopy"
     case dataCreativeResponse = "DATA.creativeResponse"
     case dataCreativeLink = "DATA.creativeLink"
+    case dataImageCarousel = "DATA.creativeImage"
 
     case state = "STATE"
 

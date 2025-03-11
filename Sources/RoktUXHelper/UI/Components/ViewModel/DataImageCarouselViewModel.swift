@@ -17,7 +17,7 @@ import DcuiSchema
 @available(iOS 15, *)
 class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     let id: UUID = UUID()
-
+    let key: String
     let images: [CreativeImage]
     let duration: Int32
     let stylingProperties: [BasicStateStylingBlock<DataImageCarouselStyles>]?
@@ -53,7 +53,8 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
         stylingProperties?.map(\.default)
     }
 
-    init(images: [CreativeImage],
+    init(key: String,
+         images: [CreativeImage],
          duration: Int32,
          ownStyle: [BasicStateStylingBlock<DataImageCarouselStyles>]?,
          indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
@@ -61,6 +62,7 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
          activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
          layoutState: (any LayoutStateRepresenting)?) {
+        self.key = key
         self.images = images
         self.duration = duration
         stylingProperties = ownStyle
