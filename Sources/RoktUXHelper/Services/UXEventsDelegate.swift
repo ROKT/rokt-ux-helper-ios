@@ -27,6 +27,7 @@ protocol UXEventsDelegate: AnyObject {
     )
     func openURL(url: String,
                  id: String,
+                 layoutId: String?,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void)

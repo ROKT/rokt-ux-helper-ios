@@ -157,7 +157,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void) {
         canOpenUrl(url)
         let id = UUID().uuidString
-        uxEventDelegate?.openURL(url: url.absoluteString, id: id, type: type, onClose: { incomingId in
+        uxEventDelegate?.openURL(url: url.absoluteString, id: id, layoutId: pluginId, type: type, onClose: { incomingId in
             if id == incomingId {
                 completionHandler()
             }

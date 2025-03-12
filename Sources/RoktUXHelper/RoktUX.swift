@@ -508,9 +508,10 @@ public class RoktUX: UXEventsDelegate {
 
     func openURL(url: String,
                  id: String,
+                 layoutId: String?,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
-        onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))
+        onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, layoutId: layoutId, type: type, onClose: onClose, onError: onError))
     }
 }
