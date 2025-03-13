@@ -268,6 +268,26 @@ final class TestEventService: XCTestCase {
         let result = XCTWaiter().wait(for: [expectation], timeout: 2)
         XCTAssertEqual(result, .timedOut, "The test should time out since the expectation was not fulfilled.")
     }
+    
+    func test_openURL_containsCorrectLayoutId() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    useDiagnosticEvents: false,
+                                                    eventHandler: { event in
+            switch event.eventType {
+            default:
+                XCTFail("Should not be here")
+            }
+        })
+
+        eventService.openURL(url: URL(string: "https://www.rokt.com")!, type: .passthrough, completionHandler: {})
+        
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.OpenUrl))
+        XCTAssertEqual(stubUXHelper.layoutId, "pluginId")
+        XCTAssertEqual(stubUXHelper.url, "https://www.rokt.com")
+        XCTAssertEqual(stubUXHelper.openUrlType, .passthrough)
+    }
 }
 
 class MockUXHelper: UXEventsDelegate {
@@ -282,6 +302,8 @@ class MockUXHelper: UXEventsDelegate {
     var pluginInstanceGuid: String?
     var jwtToken: String?
     var layoutId: String?
+    var url: String?
+    var openUrlType: RoktUXOpenURLType?
     func onFirstPositiveEngagement(sessionId: String, pluginInstanceGuid: String, jwtToken: String, layoutId: String?) {
         self.sessionId = sessionId
         self.pluginInstanceGuid = pluginInstanceGuid
@@ -324,9 +346,13 @@ class MockUXHelper: UXEventsDelegate {
     
     func openURL(url: String,
                  id: String,
+                 layoutId: String?,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         self.roktEvents.append(.OpenUrl)
+        self.layoutId = layoutId
+        self.url = url
+        self.openUrlType = type
     }
 }

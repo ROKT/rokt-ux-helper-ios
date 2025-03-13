@@ -115,6 +115,7 @@ public class RoktUXEvent {
     public class OpenUrl: RoktUXEvent {
         public let url: String
         public let id: String
+        public let layoutId: String?
         public let type: RoktUXOpenURLType
         public let onClose: ((String) -> Void)?
         public let onError: ((String, Error?) -> Void)?
@@ -123,16 +124,19 @@ public class RoktUXEvent {
         /// - Parameters:
         ///   - url: The URL to open.
         ///   - id: The identifier associated with the URL.
+        ///   - layoutId: The identifier of the layout.
         ///   - type: The type of the URL.
         ///   - onClose: Closure to handle URL close event.
         ///   - onError: Closure to handle URL error event.
         init(url: String,
              id: String,
+             layoutId: String?,
              type: RoktUXOpenURLType,
              onClose: @escaping (String) -> Void,
              onError: @escaping (String, Error?) -> Void) {
             self.url = url
             self.id = id
+            self.layoutId = layoutId
             self.type = type
             self.onClose = onClose
             self.onError = onError

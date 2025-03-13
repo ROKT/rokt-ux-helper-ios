@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ROKT/dcui-swift-schema.git",
       "state" : {
-        "revision" : "34b7fba97a03da2b6940a2f2dcda21125e9aba3e",
-        "version" : "2.2.0-alpha2"
+        "revision" : "abbd24409c5ff4185c43e61d61e54f129a622797",
+        "version" : "2.2.0-alpha3"
       }
     },
     {
