@@ -28,7 +28,7 @@ public typealias RoktUXCustomStateMap = [CustomStateIdentifiable: Int]
 public struct CustomStateIdentifiable: Hashable, Codable {
     let position: Int?
     let key: String
-    
+
     public init(position: Int?, key: String) {
         self.position = position
         self.key = key

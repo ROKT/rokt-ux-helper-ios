@@ -36,8 +36,8 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
             
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 11)
-                
+            XCTAssertEqual(processedRequests.count, 14)
+
             allEventTypes.forEach { eventType in
                 
                 guard let request = try? XCTUnwrap(processedRequests.first(where: { $0.eventType == eventType })) else {
@@ -89,7 +89,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
             
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 9)
+            XCTAssertEqual(processedRequests.count, 12)
             expectation.fulfill()
         }
         allEventTypes.forEach {

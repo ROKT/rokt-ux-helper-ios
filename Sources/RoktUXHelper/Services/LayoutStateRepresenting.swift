@@ -23,7 +23,6 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     var colorMode: RoktUXConfig.ColorMode? { get }
     var config: RoktUXConfig? { get }
     var initialPluginViewState: RoktPluginViewState? { get }
-    
     func setLayoutType(_ type: RoktUXPlacementLayoutCode)
     func layoutType() -> RoktUXPlacementLayoutCode
     func closeOnComplete() -> Bool

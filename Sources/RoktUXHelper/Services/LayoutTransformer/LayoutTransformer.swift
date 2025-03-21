@@ -15,9 +15,10 @@ import DcuiSchema
 @available(iOS 15, *)
 struct LayoutTransformer<
     CreativeSyntaxMapper: SyntaxMapping,
+    AddToCartMapper: SyntaxMapping,
     Extractor: DataExtracting
 >
-where CreativeSyntaxMapper.Context == CreativeContext {
+where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context == CatalogItem {
 
     enum Context {
         case outer([OfferModel?])
@@ -27,6 +28,7 @@ where CreativeSyntaxMapper.Context == CreativeContext {
             case positive(OfferModel)
             case negative(OfferModel)
             case generic(OfferModel?)
+            case addToCart(CatalogItem)
         }
     }
 
@@ -34,17 +36,20 @@ where CreativeSyntaxMapper.Context == CreativeContext {
     let layoutState: LayoutState
     let eventService: EventDiagnosticServicing?
     let creativeMapper: CreativeSyntaxMapper
+    let addToCartMapper: AddToCartMapper
     let extractor: Extractor
-
+    
     init(
         layoutPlugin: LayoutPlugin,
         creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
+        addToCartMapper: AddToCartMapper = CatalogMapper(),
         extractor: Extractor = CreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
         eventService: EventDiagnosticServicing? = nil
     ) {
         self.layoutPlugin = layoutPlugin
         self.creativeMapper = creativeMapper
+        self.addToCartMapper = addToCartMapper
         self.extractor = extractor
         self.layoutState = layoutState
         self.eventService = eventService
@@ -103,7 +108,9 @@ where CreativeSyntaxMapper.Context == CreativeContext {
         case .richText(let richTextModel):
                 .richText(try getRichText(richTextModel, context: context))
         case .dataImage(let imageModel):
+            try transformWithFallback {
                 .dataImage(try getDataImage(imageModel, context: context))
+            }
         case .progressIndicator(let progressIndicatorModel):
                 .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel, context: context))
         case .creativeResponse(let model):
@@ -199,6 +206,21 @@ where CreativeSyntaxMapper.Context == CreativeContext {
             try transformWithFallback {
                 .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
             }
+        case .catalogStackedCollection(let model):
+                .catalogStackedCollection(
+                    try getCatalogStackedCollectionModel(
+                        model: model,
+                        context: context
+                    )
+                )
+        case .catalogResponseButton(let model):
+                .catalogResponseButton(
+                    try getCatalogResponseButtonModel(
+                        style: model.styles,
+                        children: transformChildren(model.children, context: context),
+                        context: context
+                    )
+                )
         }
     }
 
@@ -341,8 +363,10 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
             creativeImage = offer.creative.images?[imageModel.imageKey]
+        case let .inner(.addToCart(catalogItem)):
+            creativeImage = catalogItem.images?[imageModel.imageKey]
         default:
-            throw LayoutTransformerError.InvalidMapping()
+            throw LayoutTransformerError.missingData
         }
         let updateStyles = try StyleTransformer.updatedStyles(imageModel.styles?.elements?.own)
         return DataImageViewModel(image: creativeImage,
@@ -364,6 +388,8 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                     diagnosticService: eventService)
         if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
         }
         return vm
     }
@@ -377,8 +403,11 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                    openLinks: richTextModel.openLinks,
                                    layoutState: layoutState,
                                    eventService: eventService)
+
         if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .richText(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
         }
         return vm
     }
@@ -572,6 +601,69 @@ where CreativeSyntaxMapper.Context == CreativeContext {
                                          disabledStyle: updateStyles.compactMap {$0.disabled})
     }
 
+    private func getCatalogStackedCollectionModel(
+        model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
+        context: Context,
+        accessibilityGrouped: Bool = false
+    ) throws -> CatalogStackedCollectionViewModel {
+        guard case let .inner(.generic(.some(offer))) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        let children: [LayoutSchemaViewModel]? = try offer.catalogItems?.map { catalogItem in
+            switch model.template {
+            case .column(let model):
+                return .column(
+                    try getColumn(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
+            case .row(let model):
+                return .row(
+                    try getRow(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
+            }
+        }
+        return CatalogStackedCollectionViewModel(
+            children: children,
+            defaultStyle: updateStyles.compactMap {$0.default},
+            layoutState: layoutState
+        )
+    }
+
+    func getCatalogResponseButtonModel(
+        style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
+        children: [LayoutSchemaViewModel]?,
+        context: Context
+    ) throws -> CatalogResponseButtonViewModel {
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
+        let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
+        return CatalogResponseButtonViewModel(
+            catalogItem: catalogItem,
+            children: children,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: updateStyles.compactMap { $0.default },
+            pressedStyle: updateStyles.compactMap { $0.pressed },
+            hoveredStyle: updateStyles.compactMap { $0.hovered },
+            disabledStyle: updateStyles.compactMap { $0.disabled }
+        )
+    }
+
     func getProgressIndicatorUIModel(
         _ progressIndicatorModel: ProgressIndicatorModel<WhenPredicate>,
         context: Context
@@ -600,6 +692,8 @@ where CreativeSyntaxMapper.Context == CreativeContext {
         )
         if let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .progressIndicator(vm), context: bnfContext)
+        } else if case let .inner(.addToCart(catalogItem)) = context {
+            addToCartMapper.map(consumer: .progressIndicator(vm), context: catalogItem)
         }
         return vm
     }
@@ -693,6 +787,8 @@ private extension LayoutTransformer.Context {
                     .negativeResponse(offerModel)
             case .generic(let offerModel):
                     .generic(offerModel)
+            case .addToCart:
+                nil
             }
         }
     }

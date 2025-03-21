@@ -62,3 +62,9 @@ extension ZStackViewModel: DomainMappableParent {}
 
 @available(iOS 15, *)
 extension ToggleButtonViewModel: DomainMappableParent {}
+
+@available(iOS 15, *)
+extension CatalogStackedCollectionViewModel: DomainMappableParent {}
+
+@available(iOS 15, *)
+extension CatalogResponseButtonViewModel: DomainMappableParent {}

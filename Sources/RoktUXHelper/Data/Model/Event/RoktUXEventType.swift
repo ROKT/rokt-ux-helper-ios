@@ -34,6 +34,12 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalActivation
     /// Triggered when the content displays to user.
     case SignalViewed
+    /// Triggered when the user clicks catalog response button.
+    case SignalCartItemInstantPurchaseInitiated
+    /// Triggered when instant purchase succeeds
+    case SignalCartItemInstantPurchase
+    /// Triggered when instant purchase fails
+    case SignalCartItemInstantPurchaseFailure
     /// Not applicable
     case CaptureAttributes
 }

@@ -38,7 +38,13 @@ enum LayoutSchemaViewModel: Hashable {
     case progressControl(ProgressControlViewModel)
     case toggleButton(ToggleButtonViewModel)
     case dataImageCarousel(DataImageCarouselViewModel)
+    case catalogStackedCollection(CatalogStackedCollectionViewModel)
+    case catalogResponseButton(CatalogResponseButtonViewModel)
     case empty
+}
+
+@available(iOS 15, *)
+extension LayoutSchemaViewModel: Hashable {
 
     static func == (lhs: LayoutSchemaViewModel, rhs: LayoutSchemaViewModel) -> Bool {
         switch (lhs, rhs) {
@@ -46,6 +52,10 @@ enum LayoutSchemaViewModel: Hashable {
             return lhsModel == rhsModel
         case (.basicText(let lhsModel), .basicText(let rhsModel)):
             return lhsModel == rhsModel
+        case (.catalogResponseButton(let lhs), .catalogResponseButton(let rhs)):
+            return lhs == rhs
+        case (.catalogStackedCollection(let lhs), .catalogStackedCollection(let rhs)):
+            return lhs == rhs
         case (.column(let lhsModel), .column(let rhsModel)):
             return lhsModel == rhsModel
         case (.row(let lhsModel), .row(let rhsModel)):

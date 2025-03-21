@@ -56,6 +56,7 @@ func get_mock_uistate(currentProgress: Int = 0,
 
 @available(iOS 13.0, *)
 func get_mock_event_processor(startDate: Date = Date(),
+                              catalogItems: [CatalogItem] = [],
                               responseReceivedDate: Date = Date(),
                               uxEventDelegate: UXEventsDelegate = MockUXHelper(),
                               useDiagnosticEvents: Bool = false,
@@ -67,6 +68,7 @@ func get_mock_event_processor(startDate: Date = Date(),
                         pluginId: mockPluginId, 
                         pluginName: mockPluginName,
                         startDate: startDate,
+                        catalogItems: catalogItems,
                         uxEventDelegate: uxEventDelegate,
                         processor: MockEventProcessor(handler: eventHandler),
                         responseReceivedDate: responseReceivedDate,
@@ -94,7 +96,36 @@ extension OfferModel {
                 links: [:],
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
-            )
+            ),
+            catalogItems: nil)
+    }
+}
+
+extension CatalogItem {
+    static func mock(catalogItemId: String = "staples.861425") -> Self {
+        .init(
+            images: [
+                "catalogItemImage0": CreativeImage(
+                    light:  "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                    dark: nil,
+                    alt: nil,
+                    title: nil
+                )
+            ],
+            catalogItemId: catalogItemId,
+            cartItemId: "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail",
+            instanceGuid: "catalogInstanceGuid",
+            title: "Catalog Title",
+            description: "Catalog Description",
+            price: 14.99,
+            originalPrice: 14.99,
+            originalPriceFormatted: "$14.99",
+            currency: "USD",
+            linkedProductId: "linked",
+            positiveResponseText: "Add to order",
+            negativeResponseText: "Dismiss",
+            providerData: "861425",
+            token: "catalog1Token"
         )
     }
 }

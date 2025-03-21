@@ -102,17 +102,11 @@ final class TestDistributionViewModel: XCTestCase {
     private func getSlot() -> SlotModel {
         SlotModel(
             instanceGuid: "Slot1",
-            offer: OfferModel(
+            offer: .mock(
                 campaignId: "Campaign1",
-                creative: CreativeModel(
-                    referralCreativeId: "referralCreativeId1",
-                    instanceGuid: "instanceGuid",
-                    copy: [String: String](),
-                    images: nil,
-                    links: nil,
-                    responseOptionsMap: nil,
-                    jwtToken: "jwtToken1"
-                )
+                referralCreativeId: "referralCreativeId1",
+                instanceGuid: "instanceGuid",
+                token: "jwtToken1"
             ),
             layoutVariant: nil,
             jwtToken: "JwtToken0"
