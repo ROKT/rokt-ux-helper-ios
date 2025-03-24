@@ -181,7 +181,23 @@ struct LayoutSchemaComponent: View {
                                        parentHeight: $parentHeight,
                                        styleState: $styleState,
                                        parentOverride: parentOverride)
-            .id(dataImageCarouselModel.id)
+        case .catalogStackedCollection(let model):
+            CatalogStackedCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
+        case .catalogResponseButton(let model):
+            CatalogResponseButtonComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
         default:
             EmptyView()
         }

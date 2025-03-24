@@ -1,5 +1,5 @@
 //
-//  CreativeMapperTests.swift
+//  CatalogMapperTests.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
@@ -16,21 +16,21 @@ import XCTest
 import DcuiSchema
 
 @available(iOS 15, *)
-final class CreativeMapperTests: XCTestCase {
+final class CatalogMapperTests: XCTestCase {
 
-    var sut: CreativeMapper<CreativeDataExtractor<PlaceholderValidator<DataSanitiser>>>!
+    var sut: CatalogMapper? = CatalogMapper()
     var bnfColumn: ColumnModel<LayoutSchemaModel, WhenPredicate>?
-    var firstOffer: OfferModel?
+    var catalogItem: CatalogItem?
 
     override func setUp() {
         super.setUp()
 
-        sut = CreativeMapper()
+        sut = CatalogMapper()
 
-        let bnfPageModel = ModelTestData.PageModelData.withBNF()
+        let bnfPageModel = ModelTestData.CatalogPageModelData.withBNF()
         let firstSlot = bnfPageModel.layoutPlugins?.first?.slots[0]
         let bnfChildren = firstSlot?.layoutVariant?.layoutVariantSchema
-        firstOffer = firstSlot?.offer
+        catalogItem = firstSlot?.offer?.catalogItems?.first
 
         if case .column(let myColumn) = bnfChildren {
             bnfColumn = myColumn
@@ -38,7 +38,7 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     override func tearDown() {
-        firstOffer = nil
+        catalogItem = nil
         bnfColumn = nil
         sut = nil
 
@@ -48,23 +48,23 @@ final class CreativeMapperTests: XCTestCase {
     // MARK: - BasicText
 
     func test_basicText_parsesSingleValue() {
-        // %^DATA.creativeCopy.creative.termsAndConditions.link^%
+        // %^DATA.catalogItem.title^%
         assertBasicTextDataExpansion(
             childIndex: 0,
-            expectedValue: "my_t_and_cs_link "
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_basicText_invalidFirstValueValidSecondValue_parsesSecondValue() {
-        // %^DATA.creativeCopy.nonexistent | DATA.creativeCopy.creative.termsAndConditions.link^%
+        // %^DATA.catalogItem.nonexistent | DATA.catalogItem.title^%
         assertBasicTextDataExpansion(
             childIndex: 11,
-            expectedValue: "my_t_and_cs_link"
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_basicText_invalidFirstValueWithDefaultValue_parsesSecondValue() {
-        // %^DATA.creativeCopy.nonexistent | my default^%
+        // %^DATA.catalogItem.nonexistent | my default^%
         assertBasicTextDataExpansion(
             childIndex: 12,
             expectedValue: "my default"
@@ -72,58 +72,58 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     func test_basicText_chainOfValues_parsesAllValues() {
-        // %^DATA.creativeCopy.creative.termsAndConditions.link^% this is my sentence %^DATA.creativeCopy.creative.termsAndConditions.link^%
+        // %^DATA.catalogItem.title^% this is my sentence %^DATA.catalogItem.title^%
         assertBasicTextDataExpansion(
             childIndex: 13,
-            expectedValue: "my_t_and_cs_link this is my sentence my_t_and_cs_link"
+            expectedValue: "Catalog Title this is my sentence Catalog Title"
         )
     }
 
     // MARK: - RichText
 
     func test_richText_chainOfValues_parsesAllValues() {
-        // %^DATA.creativeCopy.title^%%^DATA.creativeCopy.description^%%^DATA.creativeCopy.creative.termsAndConditions.link^%
+        // %^DATA.catalogItem.title^%%^DATA.catalogItem.description^%%^DATA.catalogItem.priceFormatted^%%^DATA.catalogItem.positiveResponseText^%
         assertRichTextDataExpansion(
             childIndex: 1,
-            expectedValue: "My Offer TitleOffer description goes heremy_t_and_cs_link"
+            expectedValue: "Catalog TitleCatalog Description$14.99Add to order"
         )
     }
 
     func test_richText_withHTMLTags_performsDataExpansionAndRetainsTags() {
-        // <b>%^DATA.creativeCopy.title^%</b>
+        // <b>%^DATA.catalogItem.title^%</b>
         assertRichTextDataExpansion(
             childIndex: 2,
-            expectedValue: "<b>My Offer Title</b>"
+            expectedValue: "<b>Catalog Title</b>"
         )
 
-        // <u>%^DATA.creativeCopy.title^%</u>
+        // <u>%^DATA.catalogItem.title^%</u>
         assertRichTextDataExpansion(
             childIndex: 3,
-            expectedValue: "<u>My Offer Title</u>"
+            expectedValue: "<u>Catalog Title</u>"
         )
     }
 
     func test_richText_firstValueDoesNotExist_secondValueExists_shouldReturnSecondValue() {
-        // %^DATA.creativeCopy.nonexistent | DATA.creativeCopy.title^%
+        // %^DATA.catalogItem.nonexistent | DATA.catalogItem.title^%
         assertRichTextDataExpansion(
             childIndex: 4,
-            expectedValue: "My Offer Title"
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_richText_sentenceWithMultipleValidDataExpansion_parsesAll() {
-        // This is my sentence with %^DATA.creativeCopy.title^% and %^DATA.creativeCopy.subtitle^%
+        // This is my sentence with %^DATA.catalogItem.title^% and %^DATA.catalogItem.description^%
         assertRichTextDataExpansion(
             childIndex: 5,
-            expectedValue: "This is my sentence with My Offer Title and Test Subtitle"
+            expectedValue: "This is my sentence with Catalog Title and Catalog Description"
         )
     }
 
     func test_richText_multipleValidDataExpansion_returnsFirsMatch() {
-        // %^DATA.creativeCopy.title | DATA.creativeCopy.subtitle^%
+        // %^DATA.catalogItem.title | DATA.catalogItem.description^%
         assertRichTextDataExpansion(
             childIndex: 9,
-            expectedValue: "My Offer Title"
+            expectedValue: "Catalog Title"
         )
     }
 
@@ -144,7 +144,7 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     func test_richText_withNonExistentDataExpansionAndDefaultValue_usesDefaultValue() {
-        // %^DATA.creativeCopy.nonexistent | my default value^%
+        // %^DATA.catalogItem.nonexistent | my default value^%
         assertRichTextDataExpansion(
             childIndex: 7,
             expectedValue: "my default value"
@@ -152,23 +152,15 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     func test_richText_withValidDataExpansionAndDefaultValue_usesDataExpansion() {
-        // %^DATA.creativeCopy.title | my default value^%
+        // %^DATA.catalogItem.title | my default value^%
         assertRichTextDataExpansion(
             childIndex: 8,
-            expectedValue: "My Offer Title"
-        )
-    }
-
-    func test_richText_withEmbeddedLinks_usesDataExpansionAndRetainsHTMLTags() {
-        // This is <b>%^DATA.creativeLink.privacyPolicy^%</b> and that is <u>%^DATA.creativeLink.termsAndConditions^%</u>
-        assertRichTextDataExpansion(
-            childIndex: 15,
-            expectedValue: "This is <b><a href=\"https://rokt.com\" target=\"_blank\">Privacy Policy Link</a></b> and that is <u><a href=\"https://rokt.com\" target=\"_blank\">Terms And Conditions</a></u>"
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_richText_withInvalidChainAndEmptyPipe_usesEmptyString() {
-        // %^DATA.creativeCopy.nonexistent |^%
+        // %^DATA.catalogItem.nonexistent |^%
         assertRichTextDataExpansion(
             childIndex: 16,
             expectedValue: ""
@@ -176,15 +168,15 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     func test_richText_withValidChainAndEmptyPipe_usesDataExpansion() {
-        // %^DATA.creativeCopy.title |^%
+        // %^DATA.catalogItem.title |^%
         assertRichTextDataExpansion(
             childIndex: 17,
-            expectedValue: "My Offer Title"
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_richText_withMultipleInvalidChainAndEmptyPipe_usesEmptyString() {
-        // %^DATA.creativeCopy.nonexistent | DATA.creativeCopy.nonexistentv2 |^%
+        // %^DATA.catalogItem.nonexistent | DATA.catalogItem.nonexistentv2 |^%
         assertRichTextDataExpansion(
             childIndex: 18,
             expectedValue: ""
@@ -192,15 +184,15 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     func test_richText_withSecondValidChainAndEmptyPipe_usesDataExpansion() {
-        // %^DATA.creativeCopy.nonexistent | DATA.creativeCopy.title |^%
+        // %^DATA.catalogItem.nonexistent | DATA.catalogItem.title |^%
         assertRichTextDataExpansion(
             childIndex: 19,
-            expectedValue: "My Offer Title"
+            expectedValue: "Catalog Title"
         )
     }
 
     func test_richText_withInvalidChainAndEmptyPipeInSentence_usesEmptyString() {
-        // %^DATA.creativeCopy.nonexistent |^% is my sentence
+        // %^DATA.catalogItem.nonexistent |^% is my sentence
         assertRichTextDataExpansion(
             childIndex: 20,
             expectedValue: " is my sentence"
@@ -209,7 +201,7 @@ final class CreativeMapperTests: XCTestCase {
 
     // sad path
     func test_richText_withInvalidDataExpansion_returnsEmptyString() {
-        // %^DATA.creativeCopy.nonexistent^%
+        // %^DATA.catalogItem.nonexistent^%
         assertRichTextDataExpansion(
             childIndex: 10,
             expectedValue: ""
@@ -217,8 +209,8 @@ final class CreativeMapperTests: XCTestCase {
     }
 
     // sentence with an invalid mandatory and a valid optional copy should still return empty
-    func test_richText_sentenceWithInvalidMandatoryCreativeCopy_returnsEmptyString() {
-        // Sentence with %^DATA.creativeCopy.nonexistent^% and %^DATA.creativeCopy.title|^%
+    func test_richText_sentenceWithInvalidMandatorycatalogItem_returnsEmptyString() {
+        // Sentence with %^DATA.catalogItem.nonexistent^% and %^DATA.catalogItem.title|^%
         assertRichTextDataExpansion(
             childIndex: 21,
             expectedValue: ""
@@ -234,32 +226,9 @@ final class CreativeMapperTests: XCTestCase {
         )
     }
 
-    func test_basicText_parsesSimpleCreativeImage() {
-        // %^DATA.creativeImage.creativeImage.title^%
-        assertBasicTextDataExpansion(
-            childIndex: 23,
-            expectedValue: "title"
-        )
-    }
-
-    func test_basicText_parsesImageCarouselVertical() {
-        // %^DATA.creativeImage.creativeCarouselImageVertical.1.title^%
-        assertBasicTextDataExpansion(
-            childIndex: 24,
-            expectedValue: "horizontal title 1"
-        )
-        assertBasicTextDataExpansion(
-            childIndex: 25,
-            expectedValue: "horizontal title 3"
-        )
-        assertBasicTextDataExpansion(
-            childIndex: 26,
-            expectedValue: "vertical alt 2"
-        )
-    }
 
     private func assertRichTextDataExpansion(childIndex: Int, expectedValue: String) {
-        guard let firstOffer else {
+        guard let catalogItem else {
             XCTFail("No data source offer")
             return
         }
@@ -271,12 +240,12 @@ final class CreativeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        sut?.map(consumer: .richText(uiModel), context: .generic(firstOffer))
+        sut?.map(consumer: .richText(uiModel), context: catalogItem)
         XCTAssertEqual(uiModel.boundValue, expectedValue)
     }
 
     private func assertBasicTextDataExpansion(childIndex: Int, expectedValue: String) {
-        guard let firstOffer else {
+        guard let catalogItem else {
             XCTFail("No data source offer")
             return
         }
@@ -288,8 +257,7 @@ final class CreativeMapperTests: XCTestCase {
 
         let uiModel = textModel.asViewModel
 
-        sut?.map(consumer: .basicText(uiModel), context: .generic(firstOffer))
-
+        sut?.map(consumer: .basicText(uiModel), context: catalogItem)
         XCTAssertEqual(uiModel.boundValue, expectedValue)
     }
 

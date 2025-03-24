@@ -23,4 +23,7 @@ protocol EventServicing: AnyObject {
     func sendGatedSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool)
     func sendDismissalEvent()
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void)
+    func cartItemInstantPurchase(catalogItem: CatalogItem)
+    func cartItemInstantPurchaseSuccess(itemId: String)
+    func cartItemInstantPurchaseFailure(itemId: String)
 }

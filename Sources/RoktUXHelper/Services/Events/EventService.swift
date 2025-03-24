@@ -31,6 +31,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     let pluginConfigJWTToken: String
     let useDiagnosticEvents: Bool
     let processor: EventProcessing
+    let catalogItems: [CatalogItem]
 
     weak var uxEventDelegate: UXEventsDelegate?
     var responseReceivedDate: Date
@@ -44,6 +45,7 @@ class EventService: Hashable, EventDiagnosticServicing {
          pluginId: String?,
          pluginName: String?,
          startDate: Date,
+         catalogItems: [CatalogItem] = [],
          uxEventDelegate: UXEventsDelegate,
          processor: EventProcessing,
          responseReceivedDate: Date,
@@ -65,6 +67,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         self.dismissOption = dismissOption
         self.useDiagnosticEvents = useDiagnosticEvents
         self.processor = processor
+        self.catalogItems = catalogItems
     }
 
     func sendSignalLoadStartEvent() {
@@ -167,6 +170,39 @@ class EventService: Hashable, EventDiagnosticServicing {
                                       callStack: error?.localizedDescription ?? kStaticPageError)
             }
         })
+    }
+
+    func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
+    }
+
+    func cartItemInstantPurchaseSuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
+    }
+
+    func cartItemInstantPurchaseFailure(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
+    }
+
+    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
+        sendEvent(
+            eventType,
+            parentGuid: catalogItem.instanceGuid ?? "",
+            eventData: [
+                kCartItemId: catalogItem.cartItemId ?? "",
+                kCatalogItemId: catalogItem.catalogItemId ?? "",
+                kCurrency: catalogItem.currency ?? "",
+                kDescription: catalogItem.description ?? "",
+                kLinkedProductId: catalogItem.linkedProductId ?? "",
+                kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
+                kQuantity: "1",
+                kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
+                ],
+            jwtToken: catalogItem.token ?? ""
+        )
     }
 
     private func canOpenUrl(_ url: URL) {

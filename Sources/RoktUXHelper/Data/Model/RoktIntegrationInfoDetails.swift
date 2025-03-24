@@ -15,7 +15,7 @@ import UIKit
 private enum Constants {
     static let framework: String = "Swift"
     static let kBundleShort: String = "CFBundleShortVersionString"
-    static let layoutSchemaVersion: String = "2.1.0"
+    static let layoutSchemaVersion: String = "2.2.0"
     static let name: String = "UX Helper iOS"
     static let platform: String = "iOS"
     static let version: String = "0.1.0"

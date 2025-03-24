@@ -50,13 +50,13 @@ final class TestOneByOneComponent: XCTestCase {
         try oneByOneComponent.actualView().goToNextOffer()
         XCTAssertTrue(closeActionCalled)
     }
-    
+
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         var SignalResponseCalled = false
-        
+
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-        
+
         let view = try TestPlaceHolder.make(
             layoutSettings: closeOnCompleteSettings,
             eventHandler: { event in
@@ -141,7 +141,6 @@ final class TestOneByOneComponent: XCTestCase {
             },
             layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
         )
-
         let oneByOneComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -155,6 +154,7 @@ final class TestOneByOneComponent: XCTestCase {
         XCTAssertFalse(closeActionCalled)
         XCTAssertFalse(SignalResponseCalled)
     }
+
 #endif
 }
 

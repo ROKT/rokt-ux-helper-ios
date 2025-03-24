@@ -278,11 +278,27 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
+    
+    enum CatalogResponseButtonData {
+        static func catalogResponseButton() -> CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_response")
+            return try! JSONDecoder().decode(CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
 
     @available(iOS 13, *)
     enum PageModelData {
         static func withBNF() -> RoktUXPageModel {
             let data = toData(jsonFilename: "page_model")
+            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
+            return experienceResponse.getPageModel()!
+        }
+    }
+
+    @available(iOS 13, *)
+    enum CatalogPageModelData {
+        static func withBNF() -> RoktUXPageModel {
+            let data = toData(jsonFilename: "add_to_cart_page_model")
             let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
             return experienceResponse.getPageModel()!
         }

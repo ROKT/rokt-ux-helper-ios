@@ -127,7 +127,7 @@ final class TestDataImageComponent: XCTestCase {
                                 dark: ""))
     }
 #endif
-    
+
     func get_model(isValid: Bool = true) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""
@@ -155,7 +155,8 @@ final class TestDataImageComponent: XCTestCase {
                                                           ],
                                                           links: nil,
                                                           responseOptionsMap: nil,
-                                                          jwtToken: "creative-token")),
+                                                          jwtToken: "creative-token"),
+                                           catalogItems: nil),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
     }

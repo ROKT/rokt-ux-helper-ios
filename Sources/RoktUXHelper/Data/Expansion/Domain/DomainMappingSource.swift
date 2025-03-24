@@ -18,3 +18,6 @@ protocol DomainMappingSource {}
 
 @available(iOS 13, *)
 extension OfferModel: DomainMappingSource {}
+
+@available(iOS 13, *)
+extension CatalogItem: DomainMappingSource {}

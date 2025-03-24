@@ -86,3 +86,13 @@ let kProgressIndicatorAnnouncement = "%d of %d"
 let kCloseButtonAnnouncement = "Close button"
 let kNextPageButtonAnnouncement = "Next page button"
 let kPreviousPageButtonAnnouncement = "Previous page button"
+
+// MARK: Cart Item Instant purchase constants
+let kCartItemId = "cartItemId"
+let kCatalogItemId = "catalogItemId"
+let kCurrency = "currency"
+let kDescription = "description"
+let kLinkedProductId = "linkedProductId"
+let kTotalPrice = "totalPrice"
+let kQuantity = "quantity"
+let kUnitPrice = "unitPrice"
