@@ -16,6 +16,7 @@ import Combine
 
 @available(iOS 15, *)
 class WhenViewModel: Identifiable, Hashable, PredicateHandling, ObservableObject {
+
     let id: UUID = UUID()
 
     var children: [LayoutSchemaViewModel]?

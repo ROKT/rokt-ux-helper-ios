@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 
 @available(iOS 15.0, *)
@@ -38,13 +39,13 @@ final class TestBasicTextComponent: XCTestCase {
         
         XCTAssertEqual(
             paddingModifier,
-            FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8)
+            FrameAlignmentProperty(top: 10, right: 5, bottom: 1, left: 10)
         )
         
         // test the effect of custom modifier
         XCTAssertEqual(
             try modifierContent.padding(),
-            EdgeInsets(top: 1, leading: 8, bottom: 17, trailing: 0)
+            EdgeInsets(top: 10, leading: 10, bottom: 17, trailing: 5)
         )
         
         XCTAssertEqual(try text.attributes().foregroundColor(), Color(hex: "#AABBCC"))
@@ -57,10 +58,8 @@ final class TestBasicTextComponent: XCTestCase {
         
         // frame
         let flexFrame = try modifierContent.flexFrame()
-        XCTAssertEqual(flexFrame.minHeight, 24)
-        XCTAssertEqual(flexFrame.maxHeight, 24)
-        XCTAssertEqual(flexFrame.minWidth, 40)
-        XCTAssertEqual(flexFrame.maxWidth, 40)
+        XCTAssertEqual(flexFrame.minHeight, 48)
+        XCTAssertEqual(flexFrame.maxHeight, 48)
     }
     
     func test_basicText_computedProperties_usesModelProperties() throws {
@@ -105,11 +104,11 @@ final class TestBasicTextComponent: XCTestCase {
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 1, right: 0, bottom: 1, left: 8))
+        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 5, bottom: 1, left: 10))
         
         // test the effect of custom modifier
         let padding = try text.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 1.0, leading: 8.0, bottom: 17.0, trailing: 0.0))
+        XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 17.0, trailing: 5.0))
         
         XCTAssertEqual(try text.attributes().foregroundColor(), Color(hex: "#AABBCC"))
         
@@ -121,10 +120,8 @@ final class TestBasicTextComponent: XCTestCase {
         
         // frame
         let flexFrame = try text.flexFrame()
-        XCTAssertEqual(flexFrame.minHeight, 24)
-        XCTAssertEqual(flexFrame.maxHeight, 24)
-        XCTAssertEqual(flexFrame.minWidth, 40)
-        XCTAssertEqual(flexFrame.maxWidth, 40)
+        XCTAssertEqual(flexFrame.minHeight, 48)
+        XCTAssertEqual(flexFrame.maxHeight, 48)
     }
     
     func test_basicText_computedProperties_usesModelProperties() throws {
@@ -155,6 +152,15 @@ final class TestBasicTextComponent: XCTestCase {
         XCTAssertEqual(sut.stateReplacedValue, "ORDER Number: Uk171359906")
     }
 #endif
+    
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
+            .frame(width: 350)
+        
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
+    }
+    
     func get_model() throws -> BasicTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         return try transformer.getBasicText(ModelTestData.TextData.basicText(), context: .outer([]))

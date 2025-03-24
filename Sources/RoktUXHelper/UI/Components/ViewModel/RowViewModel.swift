@@ -34,6 +34,10 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling
         layoutState?.imageLoader
     }
 
+    var defaultStyle: [BaseStyles]? {
+        stylingProperties?.map(\.default)
+    }
+
     init(children: [LayoutSchemaViewModel]?,
          stylingProperties: [BasicStateStylingBlock<BaseStyles>]?,
          animatableStyle: AnimationStyle?,

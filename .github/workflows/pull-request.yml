@@ -19,6 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Resolve Packages
+        run: swift package resolve --verbose
+
       - name: Install xcbeautify
         run: |
           brew list xcbeautify || brew install xcbeautify

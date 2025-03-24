@@ -14,7 +14,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "2.2.0-alpha4"),
-        .package(url: "https://github.com/nalexn/ViewInspector.git", exact: "0.10.0")
+        .package(url: "https://github.com/nalexn/ViewInspector.git", exact: "0.10.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.18.1")
     ],
     targets: [
         .target(
@@ -26,7 +27,8 @@ let package = Package(
             name: "RoktUXHelperTests",
             dependencies: ["RoktUXHelper",
                            .product(name: "ViewInspector", package: "ViewInspector"),
-                           .product(name: "DcuiSchema", package: "dcui-swift-schema")],
+                           .product(name: "DcuiSchema", package: "dcui-swift-schema"),
+                           .product(name: "SnapshotTesting", package: "swift-snapshot-testing")],
             path: "Tests/RoktUXHelperTests",
             resources: [
                 .process("Supporting Files")

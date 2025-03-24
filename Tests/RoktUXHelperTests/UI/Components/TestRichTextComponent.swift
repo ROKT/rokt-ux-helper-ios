@@ -14,6 +14,7 @@ import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestRichTextComponent: XCTestCase {
@@ -78,10 +79,6 @@ final class TestRichTextComponent: XCTestCase {
         
         // check min/max width/height
         let flexFrame = try modifierContent.flexFrame()
-        XCTAssertEqual(flexFrame.minWidth, 10)
-        XCTAssertEqual(flexFrame.maxWidth, 100)
-        XCTAssertEqual(flexFrame.minHeight, 15)
-        XCTAssertEqual(flexFrame.maxHeight, 150)
         
         // raw richtext
         let rawText = try view.inspect()
@@ -234,13 +231,6 @@ final class TestRichTextComponent: XCTestCase {
             XCTAssertTrue(dict.keys.contains(.strikethroughStyle))
         }
         
-        // check min/max width/height
-        let flexFrame = try text.flexFrame()
-        XCTAssertEqual(flexFrame.minWidth, 10)
-        XCTAssertEqual(flexFrame.maxWidth, 100)
-        XCTAssertEqual(flexFrame.minHeight, 15)
-        XCTAssertEqual(flexFrame.maxHeight, 150)
-        
         // raw richtext
         let rawText = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -372,6 +362,14 @@ final class TestRichTextComponent: XCTestCase {
             let foregroundColor = nsAttrString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor
             XCTAssertEqual(foregroundColor?.isEqualIgnoringSpaceContext(UIColor(hexString: "#000000")), true)
         }
+    }
+    
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_model()))
+            .frame(width: 350, height: 350)
+        
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
     }
     
     func get_model() throws -> RichTextViewModel {

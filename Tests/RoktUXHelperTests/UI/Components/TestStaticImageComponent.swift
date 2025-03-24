@@ -13,6 +13,7 @@ import XCTest
 import SwiftUI
 import ViewInspector
 @testable import RoktUXHelper
+import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestStaticImageComponent: XCTestCase {
@@ -146,6 +147,7 @@ final class TestStaticImageComponent: XCTestCase {
         XCTAssertEqual(try image.accessibilityHidden(), false)
     }
 #endif
+    
     func get_model(_ layoutName: LayoutName) throws -> StaticImageViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         

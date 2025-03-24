@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactored BNF mapping logic to simplify logic
 
+## [0.3.1] - 2025-02-27
+
 ### Fixed
 
 - limit view dimensions to 2 decimal places to resolve precision issues. 
