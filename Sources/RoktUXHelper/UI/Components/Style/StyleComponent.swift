@@ -267,6 +267,10 @@ internal extension View {
     func onFirstTouch(perform action: (() -> Void)? = nil) -> some View {
         modifier(FirstTouchModifier(perform: action))
     }
+    
+    func onUserInteraction(perform action: (() -> Void)? = nil) -> some View {
+        modifier(UserInteractionModifier(perform: action))
+    }
 
     // return type must be `Alignment` since Width/Height uses the axis-independent type in `frame`
     func rowPrimaryAxisAlignment(justifyContent: FlexJustification?) -> Alignment {
@@ -657,6 +661,24 @@ struct FirstTouchModifier: ViewModifier {
                     loaded = true
                     action?()
                 }
+            })
+        )
+    }
+}
+
+@available(iOS 15, *)
+struct UserInteractionModifier: ViewModifier {
+    
+    private let action: (() -> Void)?
+    
+    init(perform action: (() -> Void)? = nil) {
+        self.action = action
+    }
+    
+    func body(content: Content) -> some View {
+        content.simultaneousGesture(
+            TapGesture().onEnded({
+                action?()
             })
         )
     }
