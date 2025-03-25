@@ -364,7 +364,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                 .inner(.positive(let offer)):
             creativeImage = offer.creative.images?[imageModel.imageKey]
         case let .inner(.addToCart(catalogItem)):
-            creativeImage = catalogItem.images?[imageModel.imageKey]
+            creativeImage = catalogItem.images[imageModel.imageKey]
         default:
             throw LayoutTransformerError.missingData
         }

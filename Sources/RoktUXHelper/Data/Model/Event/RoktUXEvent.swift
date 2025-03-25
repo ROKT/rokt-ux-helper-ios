@@ -144,27 +144,27 @@ public class RoktUXEvent {
     }
     
     public class CartItemInstantPurchase: RoktUXEvent {
-        public let layoutId: String?
-        public let name: String?
-        public let cartItemId: String?
-        public let catalogItemId: String?
-        public let currency: String?
-        public let description: String?
+        public let layoutId: String
+        public let name: String
+        public let cartItemId: String
+        public let catalogItemId: String
+        public let currency: String
+        public let description: String
         public let linkedProductId: String?
-        public let providerData: String?
-        public let quantity: Decimal?
+        public let providerData: String
+        public let quantity: Decimal
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
         
-        init(layoutId: String?,
-             name: String?,
-             cartItemId: String?,
-             catalogItemId: String?,
-             currency: String?,
-             description: String?,
+        init(layoutId: String,
+             name: String,
+             cartItemId: String,
+             catalogItemId: String,
+             currency: String,
+             description: String,
              linkedProductId: String?,
-             providerData: String?,
-             quantity: Decimal?,
+             providerData: String,
+             quantity: Decimal,
              totalPrice: Decimal?,
              unitPrice: Decimal?) {
             self.layoutId = layoutId

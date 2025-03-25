@@ -25,7 +25,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     let pageInstanceGuid: String
     let sessionId: String
     let pluginInstanceGuid: String
-    let pluginId: String?
+    let pluginId: String
     let pluginName: String?
     let startDate: Date
     let pluginConfigJWTToken: String
@@ -42,7 +42,7 @@ class EventService: Hashable, EventDiagnosticServicing {
          pageInstanceGuid: String,
          sessionId: String,
          pluginInstanceGuid: String,
-         pluginId: String?,
+         pluginId: String,
          pluginName: String?,
          startDate: Date,
          catalogItems: [CatalogItem] = [],
@@ -190,18 +190,18 @@ class EventService: Hashable, EventDiagnosticServicing {
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
         sendEvent(
             eventType,
-            parentGuid: catalogItem.instanceGuid ?? "",
+            parentGuid: catalogItem.instanceGuid,
             eventData: [
-                kCartItemId: catalogItem.cartItemId ?? "",
-                kCatalogItemId: catalogItem.catalogItemId ?? "",
-                kCurrency: catalogItem.currency ?? "",
-                kDescription: catalogItem.description ?? "",
+                kCartItemId: catalogItem.cartItemId,
+                kCatalogItemId: catalogItem.catalogItemId,
+                kCurrency: catalogItem.currency,
+                kDescription: catalogItem.description,
                 kLinkedProductId: catalogItem.linkedProductId ?? "",
                 kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
                 kQuantity: "1",
                 kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
                 ],
-            jwtToken: catalogItem.token ?? ""
+            jwtToken: catalogItem.token
         )
     }
 
@@ -227,17 +227,13 @@ class EventService: Hashable, EventDiagnosticServicing {
             RoktEventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
                                value: EventDateFormatter.getDateString(DateHandler.currentDate())),
             RoktEventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
-                               value: pageInstanceGuid)
+                               value: pageInstanceGuid),
+            RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
+                               value: pluginId)
         ]
         pageId.map {
             metaData.append(
                 RoktEventNameValue(name: BE_VIEW_NAME_KEY, value: $0)
-            )
-        }
-        pluginId.map {
-            metaData.append(
-                RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
-                                   value: $0)
             )
         }
         pluginName.map {

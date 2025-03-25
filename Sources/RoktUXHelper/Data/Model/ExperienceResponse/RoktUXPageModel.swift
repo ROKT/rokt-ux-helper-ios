@@ -31,7 +31,7 @@ public struct LayoutPlugin {
     let slots: [SlotModel]
     let targetElementSelector: String?
     let pluginConfigJWTToken: String
-    public let pluginId: String?
+    public let pluginId: String
     let pluginName: String?
 }
 
