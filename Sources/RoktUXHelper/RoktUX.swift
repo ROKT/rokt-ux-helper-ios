@@ -261,9 +261,7 @@ public class RoktUX: UXEventsDelegate {
             pluginConfigJWTToken: layoutPlugin.pluginConfigJWTToken,
             useDiagnosticEvents: page.options?.useDiagnosticEvents == true
         )
-        if let layoutId = layoutPlugin.pluginId {
-            eventServices[layoutId] = eventService
-        }
+        eventServices[layoutPlugin.pluginId] = eventService
         layoutState.items[LayoutState.breakPointsSharedKey] = layoutPlugin.breakpoints
         layoutState.items[LayoutState.layoutSettingsKey] = layoutPlugin.settings
 
@@ -483,7 +481,7 @@ public class RoktUX: UXEventsDelegate {
         )
     }
 
-    func onOfferEngagement(_ pluginId: String?) {
+    func onOfferEngagement(_ pluginId: String) {
         onRoktEvent?(RoktUXEvent.OfferEngagement(layoutId: pluginId))
     }
 
@@ -491,7 +489,7 @@ public class RoktUX: UXEventsDelegate {
         sessionId: String,
         pluginInstanceGuid: String,
         jwtToken: String,
-        layoutId: String?
+        layoutId: String
     ) {
         onRoktEvent?(
             .FirstPositiveEngagement(
@@ -503,40 +501,40 @@ public class RoktUX: UXEventsDelegate {
         )
     }
 
-    func onPositiveEngagement(_ layoutId: String?) {
+    func onPositiveEngagement(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.PositiveEngagement(layoutId: layoutId))
     }
 
-    func onPlacementInteractive(_ layoutId: String?) {
+    func onPlacementInteractive(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutInteractive(layoutId: layoutId))
     }
 
-    func onPlacementReady(_ layoutId: String?) {
+    func onPlacementReady(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutReady(layoutId: layoutId))
     }
 
-    func onPlacementClosed(_ layoutId: String?) {
+    func onPlacementClosed(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutClosed(layoutId: layoutId))
     }
 
-    func onPlacementCompleted(_ layoutId: String?) {
+    func onPlacementCompleted(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutCompleted(layoutId: layoutId))
     }
 
-    func onPlacementFailure(_ layoutId: String?) {
+    func onPlacementFailure(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutId))
     }
 
     func openURL(url: String,
                  id: String,
-                 layoutId: String?,
+                 layoutId: String,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, layoutId: layoutId, type: type, onClose: onClose, onError: onError))
     }
     
-    func onCartItemInstantPurchase(_ layoutId: String?, catalogItem: CatalogItem) {
+    func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem) {
         onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
             layoutId: layoutId,
             name: catalogItem.title,

@@ -425,7 +425,7 @@ class MockUXHelper: UXEventsDelegate {
     
     var roktEvents = [RoktEventListenerType]()
     
-    func onOfferEngagement(_ pluginId: String?) {
+    func onOfferEngagement(_ pluginId: String) {
         self.roktEvents.append(.OfferEngagement)
     }
     
@@ -435,7 +435,7 @@ class MockUXHelper: UXEventsDelegate {
     var layoutId: String?
     var url: String?
     var openUrlType: RoktUXOpenURLType?
-    func onFirstPositiveEngagement(sessionId: String, pluginInstanceGuid: String, jwtToken: String, layoutId: String?) {
+    func onFirstPositiveEngagement(sessionId: String, pluginInstanceGuid: String, jwtToken: String, layoutId: String) {
         self.sessionId = sessionId
         self.pluginInstanceGuid = pluginInstanceGuid
         self.jwtToken = jwtToken
@@ -443,41 +443,41 @@ class MockUXHelper: UXEventsDelegate {
         self.roktEvents.append(.FirstPositiveEngagement)
     }
     
-    func onPositiveEngagement(_ pluginId: String?) {
+    func onPositiveEngagement(_ pluginId: String) {
         self.roktEvents.append(.PositiveEngagement)
     }
     
-    func onShowLoadingIndicator(_ pluginId: String?) {
+    func onShowLoadingIndicator(_ pluginId: String) {
         self.roktEvents.append(.ShowLoadingIndicator)
     }
     
-    func onHideLoadingIndicator(_ pluginId: String?) {
+    func onHideLoadingIndicator(_ pluginId: String) {
         self.roktEvents.append(.HideLoadingIndicator)
     }
     
-    func onPlacementInteractive(_ pluginId: String?) {
+    func onPlacementInteractive(_ pluginId: String) {
         self.roktEvents.append(.PlacementInteractive)
     }
     
-    func onPlacementReady(_ pluginId: String?) {
+    func onPlacementReady(_ pluginId: String) {
         self.roktEvents.append(.PlacementReady)
     }
     
-    func onPlacementClosed(_ pluginId: String?) {
+    func onPlacementClosed(_ pluginId: String) {
         self.roktEvents.append(.PlacementClosed)
     }
     
-    func onPlacementCompleted(_ pluginId: String?) {
+    func onPlacementCompleted(_ pluginId: String) {
         self.roktEvents.append(.PlacementCompleted)
     }
     
-    func onPlacementFailure(_ pluginId: String?) {
+    func onPlacementFailure(_ pluginId: String) {
         self.roktEvents.append(.PlacementFailure)
     }
     
     func openURL(url: String,
                  id: String,
-                 layoutId: String?,
+                 layoutId: String,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
@@ -487,7 +487,7 @@ class MockUXHelper: UXEventsDelegate {
         self.openUrlType = type
     }
     
-    func onCartItemInstantPurchase(_ layoutId: String?, catalogItem: RoktUXHelper.CatalogItem) {
+    func onCartItemInstantPurchase(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
         self.roktEvents.append(.CartItemInstantPurchase)
     }
 }

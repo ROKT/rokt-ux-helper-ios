@@ -27,7 +27,7 @@ func get_mock_layout_plugin(pluginInstanceGuid: String = "",
                             slots: [SlotModel] = [],
                             targetElementSelector: String? = "",
                             pluginConfigJWTToken: String = "",
-                            pluginId: String? = "",
+                            pluginId: String = "",
                             pluginName: String? = "") -> LayoutPlugin {
     return LayoutPlugin(pluginInstanceGuid: pluginInstanceGuid,
                         breakpoints: breakpoints,
