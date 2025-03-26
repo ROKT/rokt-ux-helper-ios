@@ -207,6 +207,9 @@ struct GroupedDistributionComponent: View {
                     .onBecomingViewed {
                         model.sendCreativeViewedEvent(currentOffer: childIndex)
                     }
+                    .onUserInteraction {
+                        model.sendCreativeViewedEvent(currentOffer: childIndex)
+                    }
                 }
             }
 
