@@ -149,6 +149,9 @@ struct OneByOneComponent: View {
                 .onBecomingViewed(currentOffer: currentOffer) {
                     model.sendCreativeViewedEvent(currentOffer: currentOffer)
                 }
+                .onUserInteraction {
+                    model.sendCreativeViewedEvent(currentOffer: currentOffer)
+                }
             }
             .accessibilityElement(children: .contain)
             .accessibilityFocused($shouldFocusAccessibility)
