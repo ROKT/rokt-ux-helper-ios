@@ -22,7 +22,7 @@ public class RoktUX: UXEventsDelegate {
     public static var integrationInfo: RoktIntegrationInfo { RoktIntegrationInfo.shared }
 
     private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
-    private var eventService: EventService?
+    private var eventServices: [String: EventService] = [:]
 
     public init() {}
 
@@ -168,6 +168,20 @@ public class RoktUX: UXEventsDelegate {
         }
     }
 
+    /**
+     Call when instant purchase has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the purchase succeeded or failed.
+     */
+    public func instantPurchaseFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        success ?
+        eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId) :
+        eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
+    }
+
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
@@ -221,13 +235,18 @@ public class RoktUX: UXEventsDelegate {
 
         let actionCollection = ActionCollection()
 
+        let catalogItems = layoutPlugin.slots
+            .compactMap(\.offer)
+            .map(\.catalogItems)
+            .compactMap { $0 }
+            .flatMap { $0 }
         let layoutState = LayoutState(actionCollection: actionCollection,
                                       config: config,
                                       pluginId: layoutPlugin.pluginId,
                                       initialPluginViewState: layoutPluginViewState,
                                       onPluginViewStateChange: onPluginViewStateChange)
 
-        eventService = EventService(
+        let eventService = EventService(
             pageId: page.pageId,
             pageInstanceGuid: page.pageInstanceGuid,
             sessionId: page.sessionId,
@@ -235,18 +254,18 @@ public class RoktUX: UXEventsDelegate {
             pluginId: layoutPlugin.pluginId,
             pluginName: layoutPlugin.pluginName,
             startDate: startDate,
+            catalogItems: catalogItems,
             uxEventDelegate: self,
             processor: processor,
             responseReceivedDate: responseReceivedDate,
             pluginConfigJWTToken: layoutPlugin.pluginConfigJWTToken,
             useDiagnosticEvents: page.options?.useDiagnosticEvents == true
         )
-
+        eventServices[layoutPlugin.pluginId] = eventService
         layoutState.items[LayoutState.breakPointsSharedKey] = layoutPlugin.breakpoints
         layoutState.items[LayoutState.layoutSettingsKey] = layoutPlugin.settings
 
-        eventService?.sendSignalLoadStartEvent()
-
+        eventService.sendSignalLoadStartEvent()
         layoutState.setLayoutType(.unknown)
 
         let layoutTransformer = LayoutTransformer(layoutPlugin: layoutPlugin,
@@ -311,17 +330,17 @@ public class RoktUX: UXEventsDelegate {
 
                 }
             }
-            eventService?.sendEventsOnTransformerSuccess()
+            eventService.sendEventsOnTransformerSuccess()
         } catch LayoutTransformerError.InvalidColor(color: let color) {
             // invalid color error
-            eventService?.sendDiagnostics(message: kValidationErrorCode,
-                                          callStack: kColorInvalid + color)
+            eventService.sendDiagnostics(message: kValidationErrorCode,
+                                         callStack: kColorInvalid + color)
             config?.debugLog("Rokt: Invalid color in schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
-            eventService?.sendDiagnostics(message: kValidationErrorCode,
-                                          callStack: kLayoutInvalid)
+            eventService.sendDiagnostics(message: kValidationErrorCode,
+                                         callStack: kLayoutInvalid)
             config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
@@ -462,7 +481,7 @@ public class RoktUX: UXEventsDelegate {
         )
     }
 
-    func onOfferEngagement(_ pluginId: String?) {
+    func onOfferEngagement(_ pluginId: String) {
         onRoktEvent?(RoktUXEvent.OfferEngagement(layoutId: pluginId))
     }
 
@@ -470,7 +489,7 @@ public class RoktUX: UXEventsDelegate {
         sessionId: String,
         pluginInstanceGuid: String,
         jwtToken: String,
-        layoutId: String?
+        layoutId: String
     ) {
         onRoktEvent?(
             .FirstPositiveEngagement(
@@ -482,35 +501,51 @@ public class RoktUX: UXEventsDelegate {
         )
     }
 
-    func onPositiveEngagement(_ layoutId: String?) {
+    func onPositiveEngagement(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.PositiveEngagement(layoutId: layoutId))
     }
 
-    func onPlacementInteractive(_ layoutId: String?) {
+    func onPlacementInteractive(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutInteractive(layoutId: layoutId))
     }
 
-    func onPlacementReady(_ layoutId: String?) {
+    func onPlacementReady(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutReady(layoutId: layoutId))
     }
 
-    func onPlacementClosed(_ layoutId: String?) {
+    func onPlacementClosed(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutClosed(layoutId: layoutId))
     }
 
-    func onPlacementCompleted(_ layoutId: String?) {
+    func onPlacementCompleted(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutCompleted(layoutId: layoutId))
     }
 
-    func onPlacementFailure(_ layoutId: String?) {
+    func onPlacementFailure(_ layoutId: String) {
         onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutId))
     }
 
     func openURL(url: String,
                  id: String,
+                 layoutId: String,
                  type: RoktUXOpenURLType,
                  onClose: @escaping (String) -> Void,
                  onError: @escaping (String, Error?) -> Void) {
-        onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, type: type, onClose: onClose, onError: onError))
+        onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, layoutId: layoutId, type: type, onClose: onClose, onError: onError))
+    }
+    
+    func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem) {
+        onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice))
     }
 }

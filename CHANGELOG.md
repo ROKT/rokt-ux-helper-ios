@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- DataImageCarousel node supported
+- CatalogStackedCollection and CatalogResponseButton node supported
+- `Passthrough` support in `LinkOpenTarget`
+
 ### Changed
 
 - Refactored BNF mapping logic to simplify logic
@@ -38,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Replaced *attribute* with *eventData* in the RoktEventRequest
+- Replaced _attribute_ with _eventData_ in the RoktEventRequest
 
 ### Fixed
 

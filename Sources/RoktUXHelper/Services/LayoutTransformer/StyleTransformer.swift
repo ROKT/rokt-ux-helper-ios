@@ -96,11 +96,11 @@ struct StyleTransformer {
         return updatedStyles
     }
 
-    static func updatedIndicatorStyles(
-        _ styles: [BasicStateStylingBlock<IndicatorStyles>]?,
-        newStyles: [BasicStateStylingBlock<IndicatorStyles>]?
-    ) throws -> [BasicStateStylingBlock<IndicatorStyles>] {
-        var resultStyles: [BasicStateStylingBlock<IndicatorStyles>] = []
+    static func updatedIndicatorStyles<T: Codable>(
+        _ styles: [BasicStateStylingBlock<T>]?,
+        newStyles: [BasicStateStylingBlock<T>]?
+    ) throws -> [BasicStateStylingBlock<T>] {
+        var resultStyles: [BasicStateStylingBlock<T>] = []
 
         let prefilledStyle = try updatedStyles(styles)
         let prefilledNewStyle = try updatedStyles(newStyles)
@@ -108,13 +108,13 @@ struct StyleTransformer {
         var styleIndex = 0
         var newStyleIndex = 0
 
-        var lastDefaultIndicator: BasicStateStylingBlock<IndicatorStyles>?
-        var lastNewIndicator: BasicStateStylingBlock<IndicatorStyles>?
+        var lastDefaultIndicator: BasicStateStylingBlock<T>?
+        var lastNewIndicator: BasicStateStylingBlock<T>?
 
-        var lastDefault: IndicatorStyles?
-        var lastPressed: IndicatorStyles?
-        var lastHovered: IndicatorStyles?
-        var lastDisabled: IndicatorStyles?
+        var lastDefault: T?
+        var lastPressed: T?
+        var lastHovered: T?
+        var lastDisabled: T?
 
         while styleIndex < prefilledStyle.count || newStyleIndex < prefilledNewStyle.count {
 
@@ -230,6 +230,12 @@ struct StyleTransformer {
             return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
         } else if let defaultStyle = defaultStyle as? ToggleButtonStateTriggerStyle {
             let newStyle = newStyle as? ToggleButtonStateTriggerStyle
+            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
+        } else if let defaultStyle = defaultStyle as? DataImageCarouselStyles {
+            let newStyle = newStyle as? DataImageCarouselStyles
+            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
+        } else if let defaultStyle = defaultStyle as? DataImageCarouselIndicatorStyles {
+            let newStyle = newStyle as? DataImageCarouselIndicatorStyles
             return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
         }
         return nil
@@ -550,6 +556,38 @@ struct StyleTransformer {
                                                                          newStyle: newStyle?.flexChild),
                                              spacing: updatedSpacing(defaultStyle?.spacing,
                                                                      newStyle: newStyle?.spacing))
+    }
+
+    static func getUpdatedStyle(_ defaultStyle: DataImageCarouselStyles?,
+                                newStyle: DataImageCarouselStyles?) throws -> DataImageCarouselStyles {
+        return DataImageCarouselStyles(container: try updatedContainer(defaultStyle?.container,
+                                                                       newStyle: newStyle?.container),
+                                       background: try updatedBackground(defaultStyle?.background,
+                                                                         newStyle: newStyle?.background),
+                                       border: try updatedBorder(defaultStyle?.border,
+                                                                 newStyle: newStyle?.border),
+                                       dimension: updatedDimension(defaultStyle?.dimension,
+                                                                   newStyle: newStyle?.dimension),
+                                       flexChild: updatedFlexChild(defaultStyle?.flexChild,
+                                                                   newStyle: newStyle?.flexChild),
+                                       spacing: updatedSpacing(defaultStyle?.spacing,
+                                                               newStyle: newStyle?.spacing))
+    }
+
+    static func getUpdatedStyle(_ defaultStyle: DataImageCarouselIndicatorStyles?,
+                                newStyle: DataImageCarouselIndicatorStyles?) throws -> DataImageCarouselIndicatorStyles {
+        return DataImageCarouselIndicatorStyles(container: try updatedContainer(defaultStyle?.container,
+                                                                                newStyle: newStyle?.container),
+                                                background: try updatedBackground(defaultStyle?.background,
+                                                                                  newStyle: newStyle?.background),
+                                                border: try updatedBorder(defaultStyle?.border,
+                                                                          newStyle: newStyle?.border),
+                                                dimension: updatedDimension(defaultStyle?.dimension,
+                                                                            newStyle: newStyle?.dimension),
+                                                flexChild: updatedFlexChild(defaultStyle?.flexChild,
+                                                                            newStyle: newStyle?.flexChild),
+                                                spacing: updatedSpacing(defaultStyle?.spacing,
+                                                                        newStyle: newStyle?.spacing))
     }
 
     // MARK: Styling properties

@@ -14,7 +14,7 @@ import DcuiSchema
 import Combine
 
 @available(iOS 15, *)
-class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive, AnimatableStyleHandling {
+class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling, ObservableObject {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
@@ -26,6 +26,7 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive, AnimatableStyleH
     let offers: [OfferModel?]
     var width: CGFloat = 0
     var cancellable: AnyCancellable?
+    var componentConfig: ComponentConfig?
 
     @Published var animate: Bool = false
 
@@ -54,7 +55,12 @@ class RowViewModel: Identifiable, Hashable, ScreenSizeAdaptive, AnimatableStyleH
         self.globalBreakPoints = globalBreakPoints
         self.offers = offers
 
-        animate = shouldApply(width)
-        subscribeToAnimation()
+        animate = shouldApply() && !animatableStyle.isNil
+        cancellable = layoutState?.itemsPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                animate = shouldApply() && !animatableStyle.isNil
+            }
     }
 }

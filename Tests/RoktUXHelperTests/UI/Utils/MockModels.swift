@@ -27,7 +27,7 @@ func get_mock_layout_plugin(pluginInstanceGuid: String = "",
                             slots: [SlotModel] = [],
                             targetElementSelector: String? = "",
                             pluginConfigJWTToken: String = "",
-                            pluginId: String? = "",
+                            pluginId: String = "",
                             pluginName: String? = "") -> LayoutPlugin {
     return LayoutPlugin(pluginInstanceGuid: pluginInstanceGuid,
                         breakpoints: breakpoints,
@@ -56,6 +56,7 @@ func get_mock_uistate(currentProgress: Int = 0,
 
 @available(iOS 13.0, *)
 func get_mock_event_processor(startDate: Date = Date(),
+                              catalogItems: [CatalogItem] = [],
                               responseReceivedDate: Date = Date(),
                               uxEventDelegate: UXEventsDelegate = MockUXHelper(),
                               useDiagnosticEvents: Bool = false,
@@ -67,6 +68,7 @@ func get_mock_event_processor(startDate: Date = Date(),
                         pluginId: mockPluginId, 
                         pluginName: mockPluginName,
                         startDate: startDate,
+                        catalogItems: catalogItems,
                         uxEventDelegate: uxEventDelegate,
                         processor: MockEventProcessor(handler: eventHandler),
                         responseReceivedDate: responseReceivedDate,
@@ -94,7 +96,36 @@ extension OfferModel {
                 links: [:],
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
-            )
+            ),
+            catalogItems: nil)
+    }
+}
+
+extension CatalogItem {
+    static func mock(catalogItemId: String = "catalogItemId") -> Self {
+        .init(
+            images: [
+                "catalogItemImage0": CreativeImage(
+                    light:  "https://www.rokt.com",
+                    dark: nil,
+                    alt: nil,
+                    title: nil
+                )
+            ],
+            catalogItemId: catalogItemId,
+            cartItemId: "cartItemId",
+            instanceGuid: "catalogInstanceGuid",
+            title: "Catalog Title",
+            description: "Catalog Description",
+            price: 14.99,
+            originalPrice: 14.99,
+            originalPriceFormatted: "$14.99",
+            currency: "USD",
+            linkedProductId: "linked",
+            positiveResponseText: "Add to order",
+            negativeResponseText: "Dismiss",
+            providerData: "861425",
+            token: "catalog1Token"
         )
     }
 }

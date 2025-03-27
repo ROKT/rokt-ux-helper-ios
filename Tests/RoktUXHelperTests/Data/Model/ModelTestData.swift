@@ -202,6 +202,13 @@ class ModelTestData: NSObject {
         }
     }
     
+    enum DataImageCarouselData {
+        static func dataImageCarousel() -> DataImageCarouselModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_data_image_carousel")
+            return try! JSONDecoder().decode(DataImageCarouselModel.self, from: data)
+        }
+    }
+
     enum StaticImageData {
         static func staticImage() -> StaticImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_static_image")
@@ -271,6 +278,13 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
+    
+    enum CatalogResponseButtonData {
+        static func catalogResponseButton() -> CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_response")
+            return try! JSONDecoder().decode(CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
 
     @available(iOS 13, *)
     enum PageModelData {
@@ -287,6 +301,15 @@ class ModelTestData: NSObject {
                 return jsonString
             }
             return "{}"
+        }
+    }
+
+    @available(iOS 13, *)
+    enum CatalogPageModelData {
+        static func withBNF() -> RoktUXPageModel {
+            let data = toData(jsonFilename: "add_to_cart_page_model")
+            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
+            return experienceResponse.getPageModel()!
         }
     }
 

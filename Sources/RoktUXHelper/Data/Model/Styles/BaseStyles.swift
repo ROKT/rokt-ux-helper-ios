@@ -90,4 +90,44 @@ extension BaseStyles {
             spacing: style.spacing
         )
     }
+
+    init(_ style: DataImageCarouselStyles) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
+
+    init(_ style: DataImageCarouselIndicatorStyles) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
+}
+
+extension BasicStateStylingBlock where T: Codable {
+    func mapToBaseStyles(_ transform: (T) -> BaseStyles) -> BasicStateStylingBlock<BaseStyles> {
+        BasicStateStylingBlock<BaseStyles>(
+            default: transform(`default`),
+            pressed: pressed.map(transform),
+            hovered: hovered.map(transform),
+            disabled: disabled.map(transform)
+        )
+    }
+}
+
+extension Collection {
+    func mapToBaseStyles<T: Codable>(_ transform: (T) -> BaseStyles) -> [BasicStateStylingBlock<BaseStyles>]
+    where Element == BasicStateStylingBlock<T> {
+        self.map { $0.mapToBaseStyles(transform) }
+    }
 }

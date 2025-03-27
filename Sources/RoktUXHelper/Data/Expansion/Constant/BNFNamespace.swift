@@ -19,6 +19,7 @@ enum BNFNamespace: String, CaseIterable {
     case dataCreativeCopy = "DATA.creativeCopy"
     case dataCreativeResponse = "DATA.creativeResponse"
     case dataCreativeLink = "DATA.creativeLink"
+    case dataImageCarousel = "DATA.creativeImage"
 
     case state = "STATE"
 
@@ -28,4 +29,7 @@ enum BNFNamespace: String, CaseIterable {
         case positive
         case negative
     }
+
+    // MARK: Catalog Item
+    case dataCatalogItem = "DATA.catalogItem"
 }

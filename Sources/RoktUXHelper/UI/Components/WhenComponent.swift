@@ -15,7 +15,7 @@ import Combine
 @available(iOS 15, *)
 struct WhenComponent: View {
     let config: ComponentConfig
-    let model: WhenViewModel
+    @StateObject private var model: WhenViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
@@ -35,17 +35,6 @@ struct WhenComponent: View {
     @State private var visible: Bool?
     @State private var toggleTransition = false
 
-    private var shouldApply: Bool {
-        model.shouldApply(
-            WhenComponentUIState(
-                currentProgress: currentProgress,
-                totalOffers: totalOffers,
-                position: config.position,
-                width: globalScreenSize.width ?? 0,
-                isDarkMode: colorScheme == .dark,
-                customStateMap: customStateMap))
-    }
-
     private var getOpacity: Double {
         toggleTransition ? 1 : 0
     }
@@ -59,7 +48,7 @@ struct WhenComponent: View {
         parentOverride: ComponentParentOverride?
     ) {
         self.config = config
-        self.model = model
+        self._model = StateObject(wrappedValue: model)
 
         _parentWidth = parentWidth
         _parentHeight = parentHeight
@@ -69,21 +58,25 @@ struct WhenComponent: View {
         _customStateMap = model.customStateMap
 
         self.parentOverride = parentOverride
+        model.componentConfig = config
     }
 
     var body: some View {
         Group {
-            if visible == true || shouldApply {
+            if visible == true || model.shouldApply() {
                 buildComponent()
             }
         }
         .opacity(getOpacity)
-        .onChange(of: shouldApply) { newValue in
+        .onChange(of: model.animate) { newValue in
             if newValue {
                 transitionIn()
             } else {
                 transitionOut()
             }
+        }
+        .onChange(of: globalScreenSize.width) { newValue in
+            model.width = newValue ?? 0
         }
         .onLoad {
             transitionIn()

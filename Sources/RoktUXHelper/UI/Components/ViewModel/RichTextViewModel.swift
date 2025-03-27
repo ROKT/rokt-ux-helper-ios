@@ -142,12 +142,12 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         }
     }
 
-    func transformValueToAttributedString(_ colorMode: RoktUXConfig.ColorMode?, colorScheme: ColorScheme?) {
+    func transformValueToAttributedString(_ colorMode: RoktUXConfig.ColorMode?, colorScheme: ColorScheme? = nil) {
         let customColorScheme: ColorScheme = colorScheme ?? UITraitCollection.getConfigColorSchema(colorMode: colorMode)
         transformValueToAttributedString(customColorScheme)
     }
 
-    func transformValueToAttributedString(_ colorScheme: ColorScheme) {
+    private func transformValueToAttributedString(_ colorScheme: ColorScheme) {
         let valueToTransform = boundValue
 
         guard defaultStyle?.count ?? -1 > breakpointIndex,

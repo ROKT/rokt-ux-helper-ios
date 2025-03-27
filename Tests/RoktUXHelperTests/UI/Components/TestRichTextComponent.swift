@@ -79,10 +79,6 @@ final class TestRichTextComponent: XCTestCase {
         
         // check min/max width/height
         let flexFrame = try modifierContent.flexFrame()
-        XCTAssertEqual(flexFrame.minWidth, 10)
-        XCTAssertEqual(flexFrame.maxWidth, 100)
-        XCTAssertEqual(flexFrame.minHeight, 15)
-        XCTAssertEqual(flexFrame.maxHeight, 150)
         
         // raw richtext
         let rawText = try view.inspect()

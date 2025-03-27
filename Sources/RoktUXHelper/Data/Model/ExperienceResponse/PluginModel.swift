@@ -16,7 +16,7 @@ import Foundation
 @available(iOS 13, *)
 /// Each plugin object has a single key, plugin. The consumable data, `PluginModel`, is its value
 struct PluginWrapperModel: Decodable {
-    let plugin: PluginModel?
+    let plugin: PluginModel
 }
 
 @available(iOS 13, *)

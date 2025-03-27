@@ -24,11 +24,11 @@ protocol PluginResponse {
 @available(iOS 13, *)
 extension PluginResponse {
     func getOuterLayoutSchema(plugins: [PluginWrapperModel]?) -> OuterLayoutSchemaNetworkModel? {
-        plugins?.first?.plugin?.config.outerLayoutSchema
+        plugins?.first?.plugin.config.outerLayoutSchema
     }
 
     func getAllInnerlayoutSchema(plugins: [PluginWrapperModel]?) -> [LayoutSchemaModel]? {
-        guard let slots = plugins?.first?.plugin?.config.slots else { return nil }
+        guard let slots = plugins?.first?.plugin.config.slots else { return nil }
 
         return slots.compactMap { $0.layoutVariant?.layoutVariantSchema }
     }
@@ -39,18 +39,18 @@ extension PluginResponse {
         guard let plugins else { return layoutPlugins }
 
         for pluginItem in plugins {
-            guard let pluginConfigJWTToken = pluginItem.plugin?.configJWTToken else { continue }
+            guard let pluginConfigJWTToken = pluginItem.plugin.configJWTToken else { continue }
 
-            let outerLayer = pluginItem.plugin?.config.outerLayoutSchema
-            let layoutPlugin = LayoutPlugin(pluginInstanceGuid: pluginItem.plugin?.config.instanceGuid ?? "",
+            let outerLayer = pluginItem.plugin.config.outerLayoutSchema
+            let layoutPlugin = LayoutPlugin(pluginInstanceGuid: pluginItem.plugin.config.instanceGuid ?? "",
                                             breakpoints: outerLayer?.breakpoints,
                                             settings: outerLayer?.settings,
                                             layout: outerLayer?.layout,
-                                            slots: pluginItem.plugin?.config.slots ?? [],
-                                            targetElementSelector: pluginItem.plugin?.targetElementSelector,
+                                            slots: pluginItem.plugin.config.slots ?? [],
+                                            targetElementSelector: pluginItem.plugin.targetElementSelector,
                                             pluginConfigJWTToken: pluginConfigJWTToken,
-                                            pluginId: pluginItem.plugin?.id,
-                                            pluginName: pluginItem.plugin?.name)
+                                            pluginId: pluginItem.plugin.id,
+                                            pluginName: pluginItem.plugin.name)
             layoutPlugins.append(layoutPlugin)
         }
 

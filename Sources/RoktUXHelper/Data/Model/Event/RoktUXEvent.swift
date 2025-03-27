@@ -115,6 +115,7 @@ public class RoktUXEvent {
     public class OpenUrl: RoktUXEvent {
         public let url: String
         public let id: String
+        public let layoutId: String?
         public let type: RoktUXOpenURLType
         public let onClose: ((String) -> Void)?
         public let onError: ((String, Error?) -> Void)?
@@ -123,19 +124,60 @@ public class RoktUXEvent {
         /// - Parameters:
         ///   - url: The URL to open.
         ///   - id: The identifier associated with the URL.
+        ///   - layoutId: The identifier of the layout.
         ///   - type: The type of the URL.
         ///   - onClose: Closure to handle URL close event.
         ///   - onError: Closure to handle URL error event.
         init(url: String,
              id: String,
+             layoutId: String?,
              type: RoktUXOpenURLType,
              onClose: @escaping (String) -> Void,
              onError: @escaping (String, Error?) -> Void) {
             self.url = url
             self.id = id
+            self.layoutId = layoutId
             self.type = type
             self.onClose = onClose
             self.onError = onError
+        }
+    }
+    
+    public class CartItemInstantPurchase: RoktUXEvent {
+        public let layoutId: String
+        public let name: String
+        public let cartItemId: String
+        public let catalogItemId: String
+        public let currency: String
+        public let description: String
+        public let linkedProductId: String?
+        public let providerData: String
+        public let quantity: Decimal
+        public let totalPrice: Decimal?
+        public let unitPrice: Decimal?
+        
+        init(layoutId: String,
+             name: String,
+             cartItemId: String,
+             catalogItemId: String,
+             currency: String,
+             description: String,
+             linkedProductId: String?,
+             providerData: String,
+             quantity: Decimal,
+             totalPrice: Decimal?,
+             unitPrice: Decimal?) {
+            self.layoutId = layoutId
+            self.name = name
+            self.cartItemId = cartItemId
+            self.catalogItemId = catalogItemId
+            self.currency = currency
+            self.description = description
+            self.linkedProductId = linkedProductId
+            self.providerData = providerData
+            self.quantity = quantity
+            self.totalPrice = totalPrice
+            self.unitPrice = unitPrice
         }
     }
 }

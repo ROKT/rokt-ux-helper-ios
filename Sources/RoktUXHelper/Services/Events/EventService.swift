@@ -25,12 +25,13 @@ class EventService: Hashable, EventDiagnosticServicing {
     let pageInstanceGuid: String
     let sessionId: String
     let pluginInstanceGuid: String
-    let pluginId: String?
+    let pluginId: String
     let pluginName: String?
     let startDate: Date
     let pluginConfigJWTToken: String
     let useDiagnosticEvents: Bool
     let processor: EventProcessing
+    let catalogItems: [CatalogItem]
 
     weak var uxEventDelegate: UXEventsDelegate?
     var responseReceivedDate: Date
@@ -41,9 +42,10 @@ class EventService: Hashable, EventDiagnosticServicing {
          pageInstanceGuid: String,
          sessionId: String,
          pluginInstanceGuid: String,
-         pluginId: String?,
+         pluginId: String,
          pluginName: String?,
          startDate: Date,
+         catalogItems: [CatalogItem] = [],
          uxEventDelegate: UXEventsDelegate,
          processor: EventProcessing,
          responseReceivedDate: Date,
@@ -65,6 +67,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         self.dismissOption = dismissOption
         self.useDiagnosticEvents = useDiagnosticEvents
         self.processor = processor
+        self.catalogItems = catalogItems
     }
 
     func sendSignalLoadStartEvent() {
@@ -157,7 +160,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void) {
         canOpenUrl(url)
         let id = UUID().uuidString
-        uxEventDelegate?.openURL(url: url.absoluteString, id: id, type: type, onClose: { incomingId in
+        uxEventDelegate?.openURL(url: url.absoluteString, id: id, layoutId: pluginId, type: type, onClose: { incomingId in
             if id == incomingId {
                 completionHandler()
             }
@@ -167,6 +170,39 @@ class EventService: Hashable, EventDiagnosticServicing {
                                       callStack: error?.localizedDescription ?? kStaticPageError)
             }
         })
+    }
+
+    func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
+    }
+
+    func cartItemInstantPurchaseSuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
+    }
+
+    func cartItemInstantPurchaseFailure(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
+    }
+
+    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
+        sendEvent(
+            eventType,
+            parentGuid: catalogItem.instanceGuid,
+            eventData: [
+                kCartItemId: catalogItem.cartItemId,
+                kCatalogItemId: catalogItem.catalogItemId,
+                kCurrency: catalogItem.currency,
+                kDescription: catalogItem.description,
+                kLinkedProductId: catalogItem.linkedProductId ?? "",
+                kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
+                kQuantity: "1",
+                kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
+                ],
+            jwtToken: catalogItem.token
+        )
     }
 
     private func canOpenUrl(_ url: URL) {
@@ -191,17 +227,13 @@ class EventService: Hashable, EventDiagnosticServicing {
             RoktEventNameValue(name: BE_TIMINGS_EVENT_TIME_KEY,
                                value: EventDateFormatter.getDateString(DateHandler.currentDate())),
             RoktEventNameValue(name: BE_HEADER_PAGE_INSTANCE_GUID_KEY,
-                               value: pageInstanceGuid)
+                               value: pageInstanceGuid),
+            RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
+                               value: pluginId)
         ]
         pageId.map {
             metaData.append(
                 RoktEventNameValue(name: BE_VIEW_NAME_KEY, value: $0)
-            )
-        }
-        pluginId.map {
-            metaData.append(
-                RoktEventNameValue(name: BE_TIMINGS_PLUGIN_ID_KEY,
-                                   value: $0)
             )
         }
         pluginName.map {

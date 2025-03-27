@@ -41,94 +41,143 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
 
         let placeholder = parser.parse(propertyChain: propertyChain)
 
-        var isStateType = false
+        let processedData = try processChains(placeholder.parseableChains, responseKey: responseKey, data: data)
 
-        var mappedData: String?
+        // Use default value if no mapping was found
+        let finalData = processedData.mappedValue ?? placeholder.defaultValue
 
-        for keyAndNamespace in placeholder.parseableChains {
-            switch keyAndNamespace.namespace {
-            case .dataCreativeCopy:
-                guard let data else { continue }
+        // Return empty string if no data was found
+        guard let finalData else { return .value("" as! U) }
 
-                let creativeCopy = data.creative.copy
-                if let copyForKey = creativeCopy[keyAndNamespace.key],
-                   !copyForKey.isEmpty {
-                    mappedData = creativeCopy[keyAndNamespace.key]
-                } else if keyAndNamespace.isMandatory {
-                    throw BNFPlaceholderError.mandatoryKeyEmpty
-                } else {
-                    continue
-                }
-            case .dataCreativeResponse:
-                guard let data,
-                      let responseKey
-                else { continue }
+        // Return appropriate type based on whether it's a state or value
+        return processedData.isStateType ? .state(finalData as! U) : .value(finalData as! U)
+    }
 
-                var responseOption: RoktUXResponseOption?
-
-                if responseKey.caseInsensitiveCompare(
-                    BNFNamespace.CreativeResponseKey.positive.rawValue
-                ) == .orderedSame {
-                    responseOption = data.creative.responseOptionsMap?.positive
-                } else if responseKey.caseInsensitiveCompare(
-                    BNFNamespace.CreativeResponseKey.negative.rawValue
-                ) == .orderedSame {
-                    responseOption = data.creative.responseOptionsMap?.negative
-                }
-
-                guard let responseOption else { continue }
-
-                let responseOptionMirror = Mirror(reflecting: responseOption)
-                let chainAsList = toArray(propertyChain: keyAndNamespace.key)
-
-                if let nestedValue = dataReflector.getReflectedValue(data: responseOptionMirror, keys: chainAsList) {
-                    mappedData = (nestedValue as? String)
-                    break
-                }
-            case .dataCreativeLink:
-                guard let data else { continue }
-
-                let linkObject = data.creative.links?[keyAndNamespace.key]
-
-                let linkTitle = linkObject?.title ?? ""
-                let linkURL = linkObject?.url ?? ""
-
-                if !linkTitle.isEmpty && !linkURL.isEmpty {
-                    mappedData = "<a href=\"\(linkURL)\" target=\"_blank\">\(linkTitle)</a>"
-                } else if keyAndNamespace.isMandatory {
-                    throw BNFPlaceholderError.mandatoryKeyEmpty
-                } else {
-                    continue
-                }
-            case .state:
-                guard DataBindingStateKeys.isValidKey(keyAndNamespace.key) else { continue }
-
-                mappedData = keyAndNamespace.key
-
-                isStateType = true
-            }
-
-            // found a match
-            if mappedData != nil {
-                break
+    private func processChains(_ chains: [BNFKeyAndNamespace], responseKey: String?, data: OfferModel?) throws -> ProcessedData {
+        for chain in chains {
+            let result = try processChain(chain, responseKey: responseKey, data: data)
+            if result != .empty {
+                return result
             }
         }
+        return .empty
+    }
 
-        if mappedData == nil {
-            mappedData = placeholder.defaultValue
+    private func processChain(_ chain: BNFKeyAndNamespace, responseKey: String?, data: OfferModel?) throws -> ProcessedData {
+        switch chain.namespace {
+        case .dataImageCarousel:
+            return try processImageCarousel(chain: chain, data: data)
+        case .dataCreativeCopy:
+            return try processCreativeCopy(chain: chain, data: data)
+        case .dataCreativeResponse:
+            return try processCreativeResponse(chain: chain, responseKey: responseKey, data: data)
+        case .dataCreativeLink:
+            return try processCreativeLink(chain: chain, data: data)
+        case .state:
+            guard DataBindingStateKeys.isValidKey(chain.key) else { return .empty }
+            return .init(mappedValue: chain.key, isStateType: true)
+        case .dataCatalogItem:
+            return .empty
         }
+    }
 
-        // return empty if the mapped data is not found
-        guard let mappedData else { return .value("" as! U) }
+    private func processImageCarousel(chain: BNFKeyAndNamespace, data: OfferModel?) throws -> ProcessedData {
+        guard let data else { return .empty }
+        guard let creativeImage = data.creative.images?.first(where: { chain.key.contains($0.key) }) else {
+            if chain.isMandatory {
+                throw BNFPlaceholderError.mandatoryKeyEmpty
+            }
+            return .empty
+        }
+        let childNamespaceKey = chain.key.replacingOccurrences(of: creativeImage.key, with: "")
+        let creativeImagesMirror = Mirror(reflecting: creativeImage.value)
 
-        if isStateType {
-            return .state(mappedData as! U)
+        if let mappedValue = dataReflector.getReflectedValue(
+            data: creativeImagesMirror,
+            keys: childNamespaceKey.split(separator: ".").map(String.init)
+        ) as? String {
+            return ProcessedData(mappedValue: mappedValue)
+        } else if chain.isMandatory {
+            throw BNFPlaceholderError.mandatoryKeyEmpty
+        }
+        return .empty
+    }
+
+    private func processCreativeCopy(chain: BNFKeyAndNamespace, data: OfferModel?) throws -> ProcessedData {
+        guard let data else { return .empty }
+
+        let creativeCopy = data.creative.copy
+        if let copyForKey = creativeCopy[chain.key],
+           !copyForKey.isEmpty {
+            return ProcessedData(mappedValue: copyForKey)
+        } else if chain.isMandatory {
+            throw BNFPlaceholderError.mandatoryKeyEmpty
         } else {
-            return .value(mappedData as! U)
+            return .empty
+        }
+    }
+
+    private func processCreativeResponse(chain: BNFKeyAndNamespace, responseKey: String?, data: OfferModel?) throws -> ProcessedData {
+        guard let data,
+              let responseKey
+        else { return .empty }
+
+        var responseOption: RoktUXResponseOption?
+
+        if responseKey.caseInsensitiveCompare(
+            BNFNamespace.CreativeResponseKey.positive.rawValue
+        ) == .orderedSame {
+            responseOption = data.creative.responseOptionsMap?.positive
+        } else if responseKey.caseInsensitiveCompare(
+            BNFNamespace.CreativeResponseKey.negative.rawValue
+        ) == .orderedSame {
+            responseOption = data.creative.responseOptionsMap?.negative
+        }
+
+        guard let responseOption else { return .empty }
+
+        let responseOptionMirror = Mirror(reflecting: responseOption)
+        let chainAsList = toArray(propertyChain: chain.key)
+
+        if let nestedValue = dataReflector.getReflectedValue(data: responseOptionMirror, keys: chainAsList),
+        let mappedData = nestedValue as? String {
+            return  .init(mappedValue: mappedData)
+        }
+        return .empty
+    }
+
+    private func processCreativeLink(chain: BNFKeyAndNamespace, data: OfferModel?) throws -> ProcessedData {
+        guard let data else { return .empty }
+
+        let linkObject = data.creative.links?[chain.key]
+
+        let linkTitle = linkObject?.title ?? ""
+        let linkURL = linkObject?.url ?? ""
+
+        if !linkTitle.isEmpty && !linkURL.isEmpty {
+            return .init(mappedValue: "<a href=\"\(linkURL)\" target=\"_blank\">\(linkTitle)</a>")
+        } else if chain.isMandatory {
+            throw BNFPlaceholderError.mandatoryKeyEmpty
+        } else {
+            return .empty
         }
     }
 
     private func toArray(propertyChain: String) -> [String] {
         propertyChain.components(separatedBy: ".")
+    }
+
+    private struct ProcessedData: Equatable {
+        let mappedValue: String?
+        let isStateType: Bool
+
+        static var empty: ProcessedData {
+            return ProcessedData(mappedValue: nil, isStateType: false)
+        }
+
+        init(mappedValue: String?, isStateType: Bool = false) {
+            self.mappedValue = mappedValue
+            self.isStateType = isStateType
+        }
     }
 }

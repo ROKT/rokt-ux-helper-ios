@@ -12,8 +12,7 @@
 import Foundation
 import Combine
 
-@available(iOS 13.0, *)
-private let defaultEventBufferDuration = 0.025
+private let defaultEventBufferDuration: Double = 0.025
 
 @available(iOS 13.0, *)
 protocol EventProcessing {

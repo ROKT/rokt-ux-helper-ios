@@ -12,9 +12,11 @@
 import Foundation
 import SwiftUI
 import DcuiSchema
+import Combine
 
 @available(iOS 15, *)
-class WhenViewModel: Identifiable, Hashable, PredicateHandling {
+class WhenViewModel: Identifiable, Hashable, PredicateHandling, ObservableObject {
+
     let id: UUID = UUID()
 
     var children: [LayoutSchemaViewModel]?
@@ -23,6 +25,10 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling {
     let offers: [OfferModel?]
     let globalBreakPoints: BreakPoint?
     weak var layoutState: (any LayoutStateRepresenting)?
+    var componentConfig: ComponentConfig?
+    var width: CGFloat = 0
+    var cancellable: AnyCancellable?
+    @Published var animate: Bool = false
 
     init(children: [LayoutSchemaViewModel]? = nil,
          predicates: [WhenPredicate]?,
@@ -36,6 +42,13 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling {
         self.offers = offers
         self.globalBreakPoints = globalBreakPoints
         self.layoutState = layoutState
+
+        cancellable = layoutState?.itemsPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                animate = shouldApply() && predicates?.isEmpty == false
+            }
     }
 
     var fadeInDuration: Double {
