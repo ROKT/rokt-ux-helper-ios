@@ -305,9 +305,9 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first{$0.name == kCartItemId}
-        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
         let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
-        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
         let currency = event?.eventData.first{$0.name == kCurrency}
         XCTAssertEqual(currency?.value, "USD")
         let description = event?.eventData.first{$0.name == kDescription}
@@ -329,23 +329,23 @@ final class TestEventService: XCTestCase {
     func test_send_instant_purchase_succeeded() {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
-                                                    catalogItems: [.mock(catalogItemId: "staples.861425")],
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
                                                     eventHandler: { event in
             self.events.append(event)
         })
 
         // Act
-        eventService.cartItemInstantPurchaseSuccess(itemId: "staples.861425")
+        eventService.cartItemInstantPurchaseSuccess(itemId: "catalogItemId")
 
         // Assert
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first{$0.name == kCartItemId}
-        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
         let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
-        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
         let currency = event?.eventData.first{$0.name == kCurrency}
         XCTAssertEqual(currency?.value, "USD")
         let description = event?.eventData.first{$0.name == kDescription}
@@ -366,23 +366,23 @@ final class TestEventService: XCTestCase {
     func test_send_instant_purchase_failed() {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
-                                                    catalogItems: [.mock(catalogItemId: "xyz"), .mock(catalogItemId: "staples.861425")],
+                                                    catalogItems: [.mock(catalogItemId: "xyz"), .mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
                                                     eventHandler: { event in
             self.events.append(event)
         })
 
         // Act
-        eventService.cartItemInstantPurchaseFailure(itemId: "staples.861425")
+        eventService.cartItemInstantPurchaseFailure(itemId: "catalogItemId")
 
         // Assert
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseFailure)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first{$0.name == kCartItemId}
-        XCTAssertEqual(cartItemId?.value, "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail")
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
         let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
-        XCTAssertEqual(catalogItemId?.value, "staples.861425")
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
         let currency = event?.eventData.first{$0.name == kCurrency}
         XCTAssertEqual(currency?.value, "USD")
         let description = event?.eventData.first{$0.name == kDescription}
@@ -410,8 +410,8 @@ final class TestEventService: XCTestCase {
         })
 
         // Act
-        eventService.cartItemInstantPurchaseSuccess(itemId: "staples.861425")
-        eventService.cartItemInstantPurchaseFailure(itemId: "staples.861425")
+        eventService.cartItemInstantPurchaseSuccess(itemId: "catalogItemId")
+        eventService.cartItemInstantPurchaseFailure(itemId: "catalogItemId")
 
         // Assert
         XCTAssertEqual(events.count, 0)

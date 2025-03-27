@@ -51,11 +51,11 @@
                               },
                               "links": {
                                   "privacyPolicy": {
-                                      "url": "https://rokt.com",
+                                      "url": "https://www.rokt.com",
                                       "title": "Privacy Policy Link"
                                   },
                                   "termsAndConditions": {
-                                      "url": "https://rokt.com",
+                                      "url": "https://www.rokt.com",
                                       "title": "Terms And Conditions"
                                   }
                               }
@@ -64,20 +64,20 @@
                               {
                                   "images": {
                                       "catalogItemImage0": {
-                                          "light": "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                                          "light": "https://www.rokt.com",
                                           "dark": "",
                                           "alt": "",
                                           "title": ""
                                       },
                                       "catalogItemImage1": {
-                                          "light": "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                                          "light": "https://www.rokt.com",
                                           "dark": "",
                                           "alt": "",
                                           "title": ""
                                       }
                                   },
-                                  "catalogItemId": "staples.861425",
-                                  "cartItemId": "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail",
+                                  "catalogItemId": "catalogItemId",
+                                  "cartItemId": "cartItemId",
                                   "instanceGuid": "catalogInstanceGuid",
                                   "title": "Catalog Title",
                                   "description": "Catalog Description",
@@ -86,7 +86,7 @@
                                   "originalPriceFormatted": "$14.99",
                                   "currency": "USD",
                                   "signalType": "SignalResponse",
-                                  "url": "https://www.catalogUrl.com",
+                                  "url": "https://www.rokt.com",
                                   "minItemCount": 0,
                                   "maxItemCount": 1,
                                   "preSelectedQuantity": 0,
@@ -98,27 +98,27 @@
                                   "negativeResponseText": "Dismiss",
                                   "priceFormatted": "$14.99",
                                   "addOns": [],
-                                  "addOnPluginUrl": "https://wsdk.stage.rokt.com/plugins/arrive-plugin/index.html",
+                                  "addOnPluginUrl": "https://www.rokt.com",
                                   "addOnPluginName": "arrive-plugin",
                                   "token": "catalog1Token"
                               },
                               {
                                   "images": {
                                       "catalogItemImage0": {
-                                          "light": "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                                          "light": "https://www.rokt.com",
                                           "dark": "",
                                           "alt": "",
                                           "title": ""
                                       },
                                       "catalogItemImage1": {
-                                          "light": "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                                          "light": "https://www.rokt.com",
                                           "dark": "",
                                           "alt": "",
                                           "title": ""
                                       }
                                   },
-                                  "catalogItemId": "staples.861425",
-                                  "cartItemId": "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail",
+                                  "catalogItemId": "catalogItemId",
+                                  "cartItemId": "cartItemId",
                                   "instanceGuid": "catalog2InstanceGuid",
                                   "title": "Catalog2 Title",
                                   "description": "Catalog2 Description",
@@ -127,7 +127,7 @@
                                   "originalPriceFormatted": "$14.99",
                                   "currency": "USD",
                                   "signalType": "SignalResponse",
-                                  "url": "https://www.catalog2Url.com",
+                                  "url": "https://www.rokt.com",
                                   "minItemCount": 0,
                                   "maxItemCount": 1,
                                   "preSelectedQuantity": 0,
@@ -139,7 +139,7 @@
                                   "negativeResponseText": "Dismiss",
                                   "priceFormatted": "$14.99",
                                   "addOns": [],
-                                  "addOnPluginUrl": "https://wsdk.stage.rokt.com/plugins/arrive-plugin/index.html",
+                                  "addOnPluginUrl": "https://www.rokt.com",
                                   "addOnPluginName": "arrive-plugin",
                                   "token": "catalog2Token"
                               }

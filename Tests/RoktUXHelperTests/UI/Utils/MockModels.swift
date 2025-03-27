@@ -102,18 +102,18 @@ extension OfferModel {
 }
 
 extension CatalogItem {
-    static func mock(catalogItemId: String = "staples.861425") -> Self {
+    static func mock(catalogItemId: String = "catalogItemId") -> Self {
         .init(
             images: [
                 "catalogItemImage0": CreativeImage(
-                    light:  "https://apps.rokt.com/userfiles/3066947111576076810.png",
+                    light:  "https://www.rokt.com",
                     dark: nil,
                     alt: nil,
                     title: nil
                 )
             ],
             catalogItemId: catalogItemId,
-            cartItemId: "v1:d5bc61ab-1b92-45ed-a52c-63d4dd2661d2:staples-retail",
+            cartItemId: "cartItemId",
             instanceGuid: "catalogInstanceGuid",
             title: "Catalog Title",
             description: "Catalog Description",

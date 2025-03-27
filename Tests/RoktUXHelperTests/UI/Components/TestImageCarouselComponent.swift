@@ -58,7 +58,7 @@ final class TestImageCarouselComponent: XCTestCase {
     }
 
     func get_slot() -> SlotModel {
-        let image = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
+        let image = "https://www.rokt.com"
         return SlotModel(instanceGuid: "",
                          offer: OfferModel(campaignId: "", creative:
                                             CreativeModel(referralCreativeId: "",
