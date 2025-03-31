@@ -39,6 +39,17 @@ struct WhenComponent: View {
         toggleTransition ? 1 : 0
     }
 
+    private var shouldApply: Bool {
+        model.shouldApply(
+            WhenComponentUIState(
+                currentProgress: currentProgress,
+                totalOffers: totalOffers,
+                position: config.position,
+                width: globalScreenSize.width ?? 0,
+                isDarkMode: colorScheme == .dark,
+                customStateMap: customStateMap))
+    }
+
     init(
         config: ComponentConfig,
         model: WhenViewModel,
@@ -63,12 +74,12 @@ struct WhenComponent: View {
 
     var body: some View {
         Group {
-            if visible == true || model.shouldApply() {
+            if visible == true || shouldApply {
                 buildComponent()
             }
         }
         .opacity(getOpacity)
-        .onChange(of: model.animate) { newValue in
+        .onChange(of: shouldApply) { newValue in
             if newValue {
                 transitionIn()
             } else {
