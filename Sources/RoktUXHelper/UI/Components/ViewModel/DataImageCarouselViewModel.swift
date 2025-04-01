@@ -13,6 +13,7 @@
 
 import Foundation
 import DcuiSchema
+import SwiftUI
 
 @available(iOS 15, *)
 class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
@@ -84,8 +85,8 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
             guard let self else { return }
             timer?.invalidate()
             currentProgress = 1
-            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration)/1000.0, repeats: true) { [weak self] _ in
-                guard let self else { return }
+            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration)/1000.0, repeats: true) { [weak self] timer in
+                guard let self, timer.isValid else { return }
                 incrementStateMap()
             }
         }
@@ -97,6 +98,13 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
             guard let self else { return }
             timer?.invalidate()
         }
+    }
+
+    func requiresIndicator(_ colorScheme: ColorScheme) -> Bool {
+        images.filter {
+            ($0.light?.isEmpty == false && colorScheme == .light) ||
+            ($0.dark?.isEmpty == false && colorScheme == .dark)
+        }.count > 1
     }
 
     private func incrementStateMap() {

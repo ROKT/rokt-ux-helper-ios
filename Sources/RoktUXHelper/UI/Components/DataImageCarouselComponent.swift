@@ -112,8 +112,7 @@ struct DataImageCarouselComponent: View {
                         .opacity(index < opacities.count ? opacities[index] : 0)
                 }
 
-                // Custom progress indicator to be implemented separately
-                if model.images.count > 1 {
+                if model.requiresIndicator(colorScheme) {
                     ImageCarouselIndicator(
                         config: config,
                         model: model.indicatorViewModel,
