@@ -114,8 +114,8 @@ extension BaseStyles {
     }
 }
 
-extension BasicStateStylingBlock where T: Codable {
-    func mapToBaseStyles(_ transform: (T) -> BaseStyles) -> BasicStateStylingBlock<BaseStyles> {
+extension BasicStateStylingBlock where StyleProperties: Codable {
+    func mapToBaseStyles(_ transform: (StyleProperties) -> BaseStyles) -> BasicStateStylingBlock<BaseStyles> {
         BasicStateStylingBlock<BaseStyles>(
             default: transform(`default`),
             pressed: pressed.map(transform),
