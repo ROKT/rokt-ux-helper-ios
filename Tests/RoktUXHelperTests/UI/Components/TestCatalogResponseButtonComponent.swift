@@ -16,66 +16,9 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestCatalogResponseButtonComponent: XCTestCase {
-#if compiler(>=6)
+
     func test_creative_response() throws {
 
-        let view = try TestPlaceHolder.make(layoutMaker: LayoutSchemaViewModel.makeCatalogResponseButton(layoutState:eventService:))
-
-        let catalogResponseButton = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(CatalogResponseButtonComponent.self)
-
-        // test custom modifier class
-        let modifierContent = try catalogResponseButton
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-
-        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
-
-        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 5, right: 5, bottom: 5, left: 5))
-
-        let marginModifier = try modifierContent.modifier(MarginModifier.self)
-        XCTAssertEqual(try marginModifier.actualView().getMargin(), FrameAlignmentProperty(top: 24, right: 0, bottom: 24, left: 0))
-    }
-
-    func test_send_ux_event() throws {
-        var closeEventCalled = false
-        var signalCartItemInitiatedCalled = false
-        let eventDelegate = MockUXHelper()
-        let view = try TestPlaceHolder.make(
-            eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-                    closeEventCalled = true
-                } else if event.eventType == .SignalCartItemInstantPurchaseInitiated {
-                    signalCartItemInitiatedCalled = true
-                }
-            },
-            eventDelegate: eventDelegate,
-            layoutMaker: LayoutSchemaViewModel.makeCatalogResponseButton(layoutState:eventService:)
-        )
-
-        let catalogResponseButton = try view.inspect().view(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(CatalogResponseButtonComponent.self)
-            .actualView()
-
-        let sut = catalogResponseButton.model
-        sut.cartItemInstantPurchase()
-
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchase))
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))
-        XCTAssertTrue(signalCartItemInitiatedCalled)
-        XCTAssertTrue(closeEventCalled)
-        XCTAssertNotNil(sut.layoutState)
-    }
-#else
-    func test_creative_response() throws {
-        
         let view = try TestPlaceHolder.make(layoutMaker: LayoutSchemaViewModel.makeCatalogResponseButton(layoutState:eventService:))
 
         let catalogResponseButton = try view.inspect().view(TestPlaceHolder.self)
@@ -130,7 +73,6 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
         XCTAssertTrue(closeEventCalled)
         XCTAssertNotNil(sut.layoutState)
     }
-#endif
 }
 
 @available(iOS 15.0, *)

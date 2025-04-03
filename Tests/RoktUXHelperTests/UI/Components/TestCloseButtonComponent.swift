@@ -16,50 +16,9 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestCloseButtonComponent: XCTestCase {
-#if compiler(>=6)
-    func test_creative_response() throws {
-        
-        let view = try TestPlaceHolder.make(layoutMaker: LayoutSchemaViewModel.makeCloseButton(layoutState:eventService:))
-        
-        let closeButton = try view.inspect()
-            .view(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(CloseButtonComponent.self)
-        
-        // test custom modifier class
-        let modifierContent = try closeButton
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
 
-        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
-        
-        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
-        
-        // test the effect of custom modifier
-        XCTAssertEqual(
-            try modifierContent.padding(),
-            EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
-        )
-
-        XCTAssertEqual(
-            try closeButton
-                .implicitAnyView()
-                .implicitAnyView()
-                .implicitAnyView()
-                .implicitAnyView()
-                .implicitAnyView()
-                .implicitAnyView()
-                .implicitAnyView()
-                .accessibilityLabel()
-                .string(),
-            "Close button"
-        )
-    }
-#else
     func test_creative_response() throws {
-        
+
         let view = try TestPlaceHolder.make(layoutMaker: LayoutSchemaViewModel.makeCloseButton(layoutState:eventService:))
 
         let closeButton = try view.inspect().view(TestPlaceHolder.self)
@@ -109,7 +68,7 @@ final class TestCloseButtonComponent: XCTestCase {
         XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))
         XCTAssertNotNil(sut.layoutState)
     }
-#endif
+    
 }
 
 @available(iOS 15.0, *)

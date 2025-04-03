@@ -19,19 +19,7 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestImageCarouselComponent: XCTestCase {
-#if compiler(>=6)
-    func test_data_image() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImageCarousel(try get_model()))
 
-        let image = try view.inspect().find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(DataImageCarouselComponent.self)
-
-        XCTAssertNotNil(image)
-    }
-#else
     func test_data_image() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImageCarousel(try get_model()))
 
@@ -44,7 +32,6 @@ final class TestImageCarouselComponent: XCTestCase {
 
         XCTAssertNotNil(image)
     }
-#endif
 
     func get_model() throws -> DataImageCarouselViewModel {
 
