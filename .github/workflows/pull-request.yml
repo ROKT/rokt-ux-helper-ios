@@ -29,5 +29,4 @@ jobs:
       - name: Run unit tests
         uses: ./.github/composite_actions/run_xcodebuild_tests
         with:
-          use-swift-5: false
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
