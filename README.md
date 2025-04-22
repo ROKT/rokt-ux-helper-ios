@@ -68,9 +68,13 @@ The RoktUX Helper iOS follows a unidirectional data flow architecture with these
 
 Data flows from the backend response through the transformer and creative mapper to create view models with resolved placeholders, which are then rendered as UI components. User interactions flow back through the state management system to trigger callbacks and state updates.
 
-## How to run unit tests locally?
+## Opening the Project
 
-Open the `Package.swift` file with Xcode and press `command + U`, or `Product -> Test` from the menu bar.
+Open the `Package.swift` file with Xcode to start development.
+
+### How to run unit tests locally?
+
+Press `command + U`, or `Product -> Test` from the menu bar.
 
 ## Key Dependencies & Gotchas
 
