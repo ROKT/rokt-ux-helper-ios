@@ -76,8 +76,10 @@ final class TestDataImageComponent: XCTestCase {
         let asyncImage = try sut.inspect().find(AsyncImageView.self).actualView()
         // nil url is converted to empty string
         XCTAssertEqual(asyncImage.imageUrl,
-                       ThemeUrl(light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
-                                dark: ""))
+                       ThemeUrl(
+                           light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
+                           dark: ""
+                       ))
     }
 
     func get_model(isValid: Bool = true) throws -> DataImageViewModel {
@@ -99,7 +101,7 @@ final class TestDataImageComponent: XCTestCase {
                                                           instanceGuid: "",
                                                           copy: [:],
                                                           images: [
-                                                            "creativeImage": CreativeImage(
+                                                              "creativeImage": CreativeImage(
                                                                 light: image,
                                                                 dark: nil, alt: "",
                                                                 title: nil
