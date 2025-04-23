@@ -4,13 +4,14 @@ The RoktUXHelper enables partner applications to render tailored user experience
 
 ## Resident Experts
 
+- Thomson Thomas - <thomson.thomas@rokt.com>
 - Danial Motahari - <danial.motahari@rokt.com>
 - Miran Nakamura - <miran.nakamura@rokt.com>
 - Wei Yew - <wei.yew.teoh@rokt.com>
 
-| Environment | Build                                                                                               | Coverage                                                                                                                                    |
-| ----------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |      
-| main        | ![Build status](https://badge.buildkite.com/3f45fe74f9be5dd74b831ade1af362b4c2afe4b61747e46e4e.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-ios/graph/badge.svg?token=xFMumIDkv8)](https://codecov.io/gh/ROKT/rokt-ux-helper-ios) |
+| Environment | Build                                                                                                                                                                                     | Coverage                                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| main        | [![Build status](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml/badge.svg)](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-ios/graph/badge.svg?token=xFMumIDkv8)](https://codecov.io/gh/ROKT/rokt-ux-helper-ios) |
 
 ## Requirements
 
@@ -25,7 +26,7 @@ The RoktUXHelper enables partner applications to render tailored user experience
 
 To integrate to your Xcode project, select File > Add Package Dependency and enter
 `https://github.com/ROKT/rokt-ux-helper-ios`.
-You can also navigate to your target’s General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button, select Add Other, and choose Add Package Dependency.
+You can also navigate to your target's General pane, and in the "Frameworks, Libraries, and Embedded Content" section, click the + button, select Add Other, and choose Add Package Dependency.
 
 #### Swift package
 
@@ -37,20 +38,64 @@ dependencies: [
 ]
 ```
 
-## How to run unit tests locally?
+## Architecture
 
-Open the `Package.swift` file with Xcode and press `command + U`, or `Product -> Test` from the menu bar.
+```mermaid
+graph TD
+    RoktUX[RoktUX] --> |Initiates and manages| LayoutTransformer
+    RoktUX --> |Creates and manages| LayoutState
 
-## How to run tests on Buildkite?
 
-Just push a change to any of the feature branches and tests will be run on [Buildkite](https://buildkite.com/rokt/ux-helper-ios-build).
+    %% Layout transformation
+    LayoutTransformer --> |Transforms to| LayoutSchemaViewModel
+    LayoutTransformer --> |Uses| CreativeMapper[CreativeSyntaxMapper]
+    CreativeMapper --> |Processes BNF placeholders| LayoutSchemaViewModel
+    LayoutSchemaViewModel --> |Renders as| UIComponents
 
-## SDK Dependencies
+    %% Configuration and state
+    RoktUXConfig[RoktUXConfig] --> |Configures| RoktUX
+    LayoutState --> |Manages state for| UIComponents
+```
 
-There are 2 dependencies:
+The RoktUX Helper iOS follows a unidirectional data flow architecture with these key components:
 
-1. DcuiSchema, for deserializing the experience response
-2. ViewInspector, for SwiftUI unit testing
+- **RoktUX**: The main entry point that orchestrates the rendering process and manages the overall state
+- **LayoutTransformer**: Converts layout schema from backend responses into view models
+- **CreativeSyntaxMapper**: Processes BNF (Backus-Naur Form) placeholders in layout content, transforming them into the final display values
+- **LayoutSchemaViewModel**: Represents the UI structure in a framework-agnostic way
+- **LayoutState**: Maintains the state of UI components and handles user interactions
+- **UIComponents**: The actual UI components rendered on screen (compatible with both SwiftUI and UIKit)
+
+Data flows from the backend response through the transformer and creative mapper to create view models with resolved placeholders, which are then rendered as UI components. User interactions flow back through the state management system to trigger callbacks and state updates.
+
+## Opening the Project
+
+Open the `Package.swift` file with Xcode to start development.
+
+### How to run unit tests locally?
+
+Press `command + U`, or `Product -> Test` from the menu bar.
+
+## Key Dependencies & Gotchas
+
+### SDK Dependencies
+
+- **DcuiSchema**: Core library for parsing experience response. Any schema changes require careful testing to ensure compatibility.
+- **ViewInspector**: Used only for testing - not included in production builds.
+
+### Integration Gotchas
+
+1. **iOS Version Compatibility**: The library requires iOS 15.0+. Using with earlier iOS versions will not render any layouts.
+
+2. **Error Handling**:
+   - Schema parsing errors are handled gracefully but may result in empty views
+
+### How to Update the Layouts Schema File
+
+1. Ensure the Swift version of SSOT has been released in [DCUI-Schema-Repo](https://github.com/ROKT/dcui-layout-schema)
+2. Update dcui-swift-schema dependency version in package.swift to the latest version
+   `.package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "x.y.z"),`
+3. Verify `schema.swift` is updated
 
 ## Example App
 
@@ -70,6 +115,18 @@ There are main branches coresponding to each version : **Main**, **Release branc
 - **release branches** - This branch is production ready.
 - **feature branches** - After every push to this branch swift lint and tests are run to ensure no breaking changes are allowed.
 
-### 3. Where are the Buildkite configurations?
+## Creating a Release
 
-They are in `.buildkite/pipeline.yml`
+To create a new release version:
+
+1. Navigate to the "Actions" tab in the GitHub repository
+2. Select the "Create draft release" workflow
+3. Click "Run workflow" and use the dropdown to select the `main` branch
+4. Enter the version number in X.Y.Z format (e.g., 1.2.0)
+5. If needed, add a suffix (e.g., -alpha.1)
+6. Click "Run workflow" to start the process
+
+This workflow will:
+
+- Create a release PR with the specified version allowing you to review
+- Generate release notes based on CHANGELOG.md
