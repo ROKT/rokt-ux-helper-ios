@@ -546,6 +546,7 @@ public class RoktUX: UXEventsDelegate {
             providerData: catalogItem.providerData,
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice))
+            unitPrice: catalogItem.originalPrice
+        ))
     }
 }

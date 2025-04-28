@@ -45,7 +45,7 @@ protocol BaseStyleAdaptive: ScreenSizeAdaptive where Item == BaseStyles {
 @available(iOS 13.0, *)
 extension BaseStyleAdaptive {
 
-    var defaultStyle: [Item]?    {
+    var defaultStyle: [Item]? {
         stylingProperties?.map(\.default)
     }
 }

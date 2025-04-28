@@ -36,9 +36,9 @@ extension UIViewController {
                                 @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content) {
 
         let modal = RoktUXSwiftUIViewController(rootView: AnyView(EmptyView().background(Color.clear)),
-                                          eventService: eventService,
-                                          layoutState: layoutState,
-                                          onUnload: onUnLoad)
+                                                eventService: eventService,
+                                                layoutState: layoutState,
+                                                onUnload: onUnLoad)
         if #available(iOS 16.0, *),
            let type = placementType,
            type == .BottomSheet(.dynamic),

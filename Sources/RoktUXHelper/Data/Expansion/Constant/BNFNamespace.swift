@@ -16,6 +16,7 @@ import Foundation
 enum BNFNamespace: String, CaseIterable {
     
     // MARK: Creative
+
     case dataCreativeCopy = "DATA.creativeCopy"
     case dataCreativeResponse = "DATA.creativeResponse"
     case dataCreativeLink = "DATA.creativeLink"
@@ -31,5 +32,6 @@ enum BNFNamespace: String, CaseIterable {
     }
 
     // MARK: Catalog Item
+
     case dataCatalogItem = "DATA.catalogItem"
 }

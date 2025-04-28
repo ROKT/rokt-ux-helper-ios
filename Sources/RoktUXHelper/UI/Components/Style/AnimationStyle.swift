@@ -26,7 +26,7 @@ extension AnimationStyle {
         transform: (S) -> BaseStyles?
     ) {
         guard let transition, let style = transform(transition.value) else { return nil }
-        self.duration = Double(transition.duration) / 1000.0
+        self.duration = Double(transition.duration)/1000.0
         self.style = style
     }
 }

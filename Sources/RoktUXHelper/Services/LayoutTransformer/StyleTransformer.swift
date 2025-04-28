@@ -24,8 +24,7 @@ struct StyleTransformer {
                 default: transform($0.default),
                 pressed: $0.pressed.map(transform),
                 hovered: $0.hovered.map(transform),
-                disabled: $0.disabled.map(transform)
-            )
+                disabled: $0.disabled.map(transform))
         }
     }
 

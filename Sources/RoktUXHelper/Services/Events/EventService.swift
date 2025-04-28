@@ -200,7 +200,7 @@ class EventService: Hashable, EventDiagnosticServicing {
                 kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
                 kQuantity: "1",
                 kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
-                ],
+            ],
             jwtToken: catalogItem.token
         )
     }

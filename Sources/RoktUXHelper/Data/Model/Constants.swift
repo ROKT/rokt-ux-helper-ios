@@ -88,6 +88,7 @@ let kNextPageButtonAnnouncement = "Next page button"
 let kPreviousPageButtonAnnouncement = "Previous page button"
 
 // MARK: Cart Item Instant purchase constants
+
 let kCartItemId = "cartItemId"
 let kCatalogItemId = "catalogItemId"
 let kCurrency = "currency"

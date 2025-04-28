@@ -34,28 +34,48 @@ final class CatalogDataExtractorTests: XCTestCase {
 
     func test_extractDataRepresentedBy_usingValidCreativeCopyPropertyChain_returnsNestedString() {
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalogItem.title", responseKey: nil, from: catalogItem),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.title",
+                responseKey: nil,
+                from: catalogItem
+            ),
             .value("Catalog Title")
         )
     }
 
     func test_extractDataRepresentedBy_usingValidCreativeResponsePropertyChain_returnsNestedString() {
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalogItem.description", responseKey: nil, from: catalogItem),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.description",
+                responseKey: nil,
+                from: catalogItem
+            ),
             .value("Catalog Description")
         )
     }
 
     func test_extractDataRepresentedBy_usingInvalidPropertyChain_returnsNestedString() {
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalog.missingTestId", responseKey: nil, from: catalogItem),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalog.missingTestId",
+                responseKey: nil,
+                from: catalogItem
+            ),
             .value("DATA.catalog.missingTestId")
         )
     }
 
     func test_extractDataRepresentedBy_usingValidCreativeLinkPropertyChain_returnsNestedString() {
         XCTAssertEqual(
-            try sut?.extractDataRepresentedBy(String.self, propertyChain: "DATA.catalogItem.originalPriceFormatted", responseKey: nil, from: catalogItem),
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.originalPriceFormatted",
+                responseKey: nil,
+                from: catalogItem
+            ),
             .value("$14.99")
         )
     }

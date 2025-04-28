@@ -643,7 +643,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     }
 
     func getCatalogResponseButtonModel(
-        style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
+        style: LayoutStyle<
+            CatalogResponseButtonElements,
+            ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>
+        >?,
         children: [LayoutSchemaViewModel]?,
         context: Context
     ) throws -> CatalogResponseButtonViewModel {
