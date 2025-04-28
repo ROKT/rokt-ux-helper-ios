@@ -10,6 +10,9 @@ cli:
 # Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
 plugins:
   sources:
+    - id: rokt-trunk-plugin
+      ref: main
+      uri: https://github.com/ROKT/rokt-workflows
     - id: trunk
       ref: v1.6.5
       uri: https://github.com/trunk-io/plugins
@@ -22,6 +25,7 @@ runtimes:
 # This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
 lint:
   enabled:
+    - validate-actions-versions
     - checkov@3.2.321
     - osv-scanner@1.9.1
     - trufflehog@3.84.1
@@ -34,6 +38,7 @@ lint:
     - shfmt@3.6.0
     - svgo@3.3.2
     - swiftlint@0.57.0
+    - actionlint@1.7.7
   disabled:
     - yamllint
   ignore:
