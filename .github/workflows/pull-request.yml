@@ -11,10 +11,8 @@ permissions:
 on:
   push:
     branches:
-      - "main"
+      - main
   pull_request:
-    branches:
-      - "*"
 
 jobs:
   trunk-check:

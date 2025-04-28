@@ -39,8 +39,7 @@ lint:
     - svgo@3.3.2
     - swiftlint@0.58.2
     - actionlint@1.7.7
-  disabled:
-    - yamllint
+    - yamllint@1.37.0
   ignore:
     - linters: [ALL]
       paths:

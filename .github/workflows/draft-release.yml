@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       version:
-        description: "The version you want to release in the format X.Y.Z"
+        description: The version you want to release in the format X.Y.Z
         required: true
       version-suffix:
         description: "If not provided defaults to -alpha.{build-number}. The suffix to apply to the version e.g. -alpha.1"
