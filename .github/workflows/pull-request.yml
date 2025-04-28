@@ -6,7 +6,7 @@ name: Run tests
 permissions:
   contents: read
   pull-requests: read
-  id-token: "write"
+  id-token: write
 
 on:
   push:
