@@ -2,11 +2,11 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.8
+  version: 1.22.12
   sha256:
-    darwin_arm64: aa5721bac03ea4e244cfe71f41a12a4a1cbf36746bfae1bc125a13a26d8d1a59
-    darwin_x86_64: 9ad94bf53fd6f0232cc89ff744477251e7f33634c77326a7b710770fa91344aa
-    linux_x86_64: c02184f82905221f52a3bb43ec2ba9acb554d2727e69919d352a2386c49213e9
+    darwin_arm64: 744929fbd319da62b4f17a077002045664754017306c49887e3613c1435d5c97
+    darwin_x86_64: 9118290d392b8abdd5fa80d13c8fe422a86186458536f66700e9b1b2c0416fb4
+    linux_x86_64: 0c8d78f7d39d26bb8916fd1d05f912612916aa411c64c2d06a14de1dbca27c75
 # Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
 plugins:
   sources:
@@ -14,30 +14,30 @@ plugins:
       ref: main
       uri: https://github.com/ROKT/rokt-workflows
     - id: trunk
-      ref: v1.6.5
+      ref: v1.6.8
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
   enabled:
     - go@1.21.0
-    - node@18.12.1
+    - node@18.20.5
     - python@3.10.8
 # This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
 lint:
   enabled:
     - validate-actions-versions
-    - checkov@3.2.321
-    - osv-scanner@1.9.1
-    - trufflehog@3.84.1
-    - swiftformat@0.54.4
+    - checkov@3.2.408
+    - osv-scanner@2.0.1
+    - trufflehog@3.88.25
+    - swiftformat@0.55.5
     - git-diff-check
-    - markdownlint@0.43.0
-    - oxipng@9.1.2
-    - prettier@3.4.1
+    - markdownlint@0.44.0
+    - oxipng@9.1.4
+    - prettier@3.5.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - svgo@3.3.2
-    - swiftlint@0.57.0
+    - swiftlint@0.58.2
     - actionlint@1.7.7
   disabled:
     - yamllint
