@@ -17,8 +17,8 @@ class ImageCarouselIndicatorViewModel:
     Hashable,
     Identifiable,
     ObservableObject,
-    BaseStyleAdaptive
-{
+    BaseStyleAdaptive {
+
     let id: UUID = UUID()
 
     private let positions: Int

@@ -49,7 +49,7 @@ extension CustomStateIdentifiable {
             }
         }
     }
-    
+
     init(position: Int?, key: Keys) {
         self.position = position
         self.key = key.rawValue

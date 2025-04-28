@@ -38,7 +38,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     let creativeMapper: CreativeSyntaxMapper
     let addToCartMapper: AddToCartMapper
     let extractor: Extractor
-    
+
     init(
         layoutPlugin: LayoutPlugin,
         creativeMapper: CreativeSyntaxMapper = CreativeMapper(),

@@ -142,7 +142,7 @@ public class RoktUXEvent {
             self.onError = onError
         }
     }
-    
+
     public class CartItemInstantPurchase: RoktUXEvent {
         public let layoutId: String
         public let name: String
@@ -155,7 +155,7 @@ public class RoktUXEvent {
         public let quantity: Decimal
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
-        
+
         init(layoutId: String,
              name: String,
              cartItemId: String,

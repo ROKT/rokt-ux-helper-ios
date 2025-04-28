@@ -14,7 +14,7 @@
 import Foundation
 
 enum BNFNamespace: String, CaseIterable {
-    
+
     // MARK: Creative
 
     case dataCreativeCopy = "DATA.creativeCopy"
