@@ -1,0 +1,76 @@
+name: Release iOS UX Helper
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  setup-and-version:
+    runs-on: macos-latest
+    outputs:
+      final_version: ${{ steps.final-version.outputs.final-version }}
+      version_changed: ${{ steps.version-changed.outputs.any_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Check if VERSION file changed
+        id: version-changed
+        uses: tj-actions/changed-files@823fcebdb31bb35fdf2229d9f769b400309430d0 # v46.0.3
+        with:
+          files: VERSION
+
+      - name: Get current version
+        id: version-file
+        run: |
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+
+      - name: Determine final version
+        id: final-version
+        run: |
+          if [[ "${{ steps.version-changed.outputs.any_changed }}" == "true" ]]; then
+            echo "final-version=${{ steps.version-file.outputs.release-version }}" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-release:
+    needs: setup-and-version
+    runs-on: macos-latest
+    if: needs.setup-and-version.outputs.version_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve Packages
+        run: swift package resolve --verbose
+
+      - name: Install xcbeautify
+        run: |
+          brew list xcbeautify || brew install xcbeautify
+
+      - name: Run unit tests
+        uses: ./.github/composite_actions/run_xcodebuild_tests
+        with:
+          use-swift-5: true
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - uses: ffurrer2/extract-release-notes@cae32133495112d23e3569ad04fef240ba4e7bc8 # v2.3.0
+        id: extract-release-notes
+        with:
+          changelog_file: CHANGELOG.md
+
+      - name: Changelog
+        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+
+      - name: Create Github release
+        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1.16.0
+        with:
+          makeLatest: true
+          tag: ${{ needs.setup-and-version.outputs.final_version }}
+          body: |
+            ## Release notes:
+            ${{ steps.extract-release-notes.outputs.release_notes }}
