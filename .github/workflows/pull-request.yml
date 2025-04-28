@@ -6,6 +6,7 @@ name: Run tests
 permissions:
   contents: read
   pull-requests: read
+  id-token: "write"
 
 on:
   push:
@@ -45,3 +46,13 @@ jobs:
         with:
           use-swift-5: true
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+  pr-notify:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false
+    needs: [trunk-check, unit-test]
+    name: Notify GChat
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    secrets:
+      gchat_webhook: ${{ secrets.GCHAT_PRS_MOBILE_INTEGRATION_CHANNEL_WEBHOOK }}
