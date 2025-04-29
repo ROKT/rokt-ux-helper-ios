@@ -120,13 +120,15 @@ There are main branches coresponding to each version : **Main**, **Release branc
 To create a new release version:
 
 1. Navigate to the "Actions" tab in the GitHub repository
-2. Select the "Create draft release" workflow
-3. Click "Run workflow" and use the dropdown to select the `main` branch
-4. Enter the version number in X.Y.Z format (e.g., 1.2.0)
-5. If needed, add a suffix (e.g., -alpha.1)
-6. Click "Run workflow" to start the process
+2. Select the "Create draft release from main" workflow
+3. Click "Run workflow" and use the dropdown to bump the version
+4. Click "Run workflow" to start the process
 
 This workflow will:
 
 - Create a release PR with the specified version allowing you to review
 - Generate release notes based on CHANGELOG.md
+
+### Note
+
+The version number should only be updated from that workflow, so decline any PR with changes to the VERSION file.
