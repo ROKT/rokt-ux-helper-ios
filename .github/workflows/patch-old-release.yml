@@ -21,23 +21,29 @@ jobs:
           fetch-depth: 0
 
       - name: Validate release tag
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release-tag }}
         run: |
           git fetch --tags
-          if ! git tag -l "$release-tag"; then
-            echo "Release tag $release-tag does not exist"
+          if ! git tag -l "$RELEASE_TAG"; then
+            echo "Release tag $RELEASE_TAG does not exist"
             exit 1
           fi
 
       - name: Bump patch version
         id: bump-patch-version
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release-tag }}
         run: |
-          version=$(echo $release-tag | cut -d. -f3)
+          version=$(echo $RELEASE_TAG | cut -d. -f3)
           new_version=$(echo $version + 1 | bc)
           echo "New version: $new_version"
           echo "new-version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Create patch branch
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release-tag }}
         run: |
-          git checkout $release-tag
+          git checkout $RELEASE_TAG
           git checkout -b release/${{ steps.bump-patch-version.outputs.new-version }}
           git push --set-upstream origin release/${{ steps.bump-patch-version.outputs.new-version }}
