@@ -14,10 +14,6 @@ on:
       - main
   pull_request:
 
-permissions:
-  contents: "read"
-  id-token: "write"
-
 jobs:
   trunk-check:
     runs-on: macos-latest
