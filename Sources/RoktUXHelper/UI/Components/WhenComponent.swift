@@ -15,7 +15,7 @@ import Combine
 @available(iOS 15, *)
 struct WhenComponent: View {
     let config: ComponentConfig
-    @StateObject private var model: WhenViewModel
+    @ObservedObject private var model: WhenViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
@@ -59,7 +59,7 @@ struct WhenComponent: View {
         parentOverride: ComponentParentOverride?
     ) {
         self.config = config
-        self._model = StateObject(wrappedValue: model)
+        self._model = ObservedObject(wrappedValue: model)
 
         _parentWidth = parentWidth
         _parentHeight = parentHeight
