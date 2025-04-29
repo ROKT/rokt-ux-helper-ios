@@ -11,7 +11,6 @@
 //
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
-
 import Foundation
 import XCTest
 @testable import RoktUXHelper
@@ -20,7 +19,7 @@ class TestCGFloatExtension: XCTestCase {
 
     func testPrecisionAddition() {
         let a: CGFloat = 1.923, b: CGFloat = 59.240, c: CGFloat = 61.163
-        XCTAssertEqual((a+b).precised(), c.precised())
+        XCTAssertEqual((a + b).precised(), c.precised())
     }
 
     func testPrecised() {

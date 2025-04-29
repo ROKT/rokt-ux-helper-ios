@@ -38,7 +38,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     let creativeMapper: CreativeSyntaxMapper
     let addToCartMapper: AddToCartMapper
     let extractor: Extractor
-    
+
     init(
         layoutPlugin: LayoutPlugin,
         creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
@@ -643,7 +643,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     }
 
     func getCatalogResponseButtonModel(
-        style: LayoutStyle<CatalogResponseButtonElements, ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>>?,
+        style: LayoutStyle<
+            CatalogResponseButtonElements,
+            ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>
+        >?,
         children: [LayoutSchemaViewModel]?,
         context: Context
     ) throws -> CatalogResponseButtonViewModel {

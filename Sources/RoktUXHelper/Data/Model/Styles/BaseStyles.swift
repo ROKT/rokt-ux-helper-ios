@@ -79,7 +79,7 @@ extension BaseStyles {
             spacing: style.spacing
         )
     }
-    
+
     init(_ style: ScrollableRowStyle) {
         self.init(
             background: style.background,

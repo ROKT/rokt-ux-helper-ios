@@ -117,7 +117,11 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
         }
     }
 
-    private func processCreativeResponse(chain: BNFKeyAndNamespace, responseKey: String?, data: OfferModel?) throws -> ProcessedData {
+    private func processCreativeResponse(
+        chain: BNFKeyAndNamespace,
+        responseKey: String?,
+        data: OfferModel?
+    ) throws -> ProcessedData {
         guard let data,
               let responseKey
         else { return .empty }
@@ -141,7 +145,7 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
 
         if let nestedValue = dataReflector.getReflectedValue(data: responseOptionMirror, keys: chainAsList),
         let mappedData = nestedValue as? String {
-            return  .init(mappedValue: mappedData)
+            return .init(mappedValue: mappedData)
         }
         return .empty
     }

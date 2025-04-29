@@ -17,8 +17,8 @@ class ImageCarouselIndicatorViewModel:
     Hashable,
     Identifiable,
     ObservableObject,
-    BaseStyleAdaptive
-{
+    BaseStyleAdaptive {
+
     let id: UUID = UUID()
 
     private let positions: Int
@@ -62,7 +62,8 @@ class ImageCarouselIndicatorViewModel:
     private func createRowViewModels() -> [RowViewModel] {
         var rowViewModels: [RowViewModel] = []
         for i in 0..<positions {
-            guard let inactiveStyle = indicatorStyle, let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] else { continue }
+            guard let inactiveStyle = indicatorStyle,
+                  let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] else { continue }
             let activeIndicator = RowViewModel(
                 children: nil,
                 stylingProperties: [
@@ -88,7 +89,7 @@ class ImageCarouselIndicatorViewModel:
                 animatableStyle: .init(duration: Double(duration)/1000.0, style: activeStyle.default),
                 accessibilityGrouped: false,
                 layoutState: layoutState,
-                predicates: [.customState(.init(key: .imageCarouselPosition, condition: .is, value: Int32(i+1)))],
+                predicates: [.customState(.init(key: .imageCarouselPosition, condition: .is, value: Int32(i + 1)))],
                 globalBreakPoints: nil,
                 offers: []
             )

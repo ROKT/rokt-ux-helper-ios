@@ -97,7 +97,8 @@ extension OfferModel {
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),
-            catalogItems: nil)
+            catalogItems: nil
+        )
     }
 }
 
@@ -106,7 +107,7 @@ extension CatalogItem {
         .init(
             images: [
                 "catalogItemImage0": CreativeImage(
-                    light:  "https://www.rokt.com",
+                    light: "https://www.rokt.com",
                     dark: nil,
                     alt: nil,
                     title: nil

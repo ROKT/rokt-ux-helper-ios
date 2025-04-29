@@ -45,14 +45,14 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.layoutState = layoutState
         self.eventService = eventService
     }
-    
+
     func cartItemInstantPurchase() {
         if let catalogItem {
             eventService?.cartItemInstantPurchase(catalogItem: catalogItem)
         }
         sendCloseEvent()
     }
-    
+
     private func sendCloseEvent() {
         eventService?.dismissOption = .defaultDismiss
         eventService?.sendDismissalEvent()

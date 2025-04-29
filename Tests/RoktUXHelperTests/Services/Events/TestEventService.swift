@@ -366,7 +366,10 @@ final class TestEventService: XCTestCase {
     func test_send_instant_purchase_failed() {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
-                                                    catalogItems: [.mock(catalogItemId: "xyz"), .mock(catalogItemId: "catalogItemId")],
+                                                    catalogItems: [
+                                                        .mock(catalogItemId: "xyz"),
+                                                        .mock(catalogItemId: "catalogItemId")
+                                                    ],
                                                     uxEventDelegate: stubUXHelper,
                                                     eventHandler: { event in
             self.events.append(event)

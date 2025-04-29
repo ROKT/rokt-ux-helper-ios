@@ -65,7 +65,12 @@ class TestEventRequest: XCTestCase {
     }
 
     func test_event_create_capture_method() {
-        let eventRequest = RoktEventRequest(sessionId: "", eventType: RoktUXEventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
+        let eventRequest = RoktEventRequest(
+            sessionId: "",
+            eventType: RoktUXEventType.SignalImpression,
+            parentGuid: "",
+            jwtToken: "jwt"
+        )
 
         XCTAssertNotNil(eventRequest.metadata[1])
         XCTAssertEqual(eventRequest.metadata[1].name, BE_CAPTURE_METHOD)
@@ -73,7 +78,12 @@ class TestEventRequest: XCTestCase {
     }
 
     func test_event_create_currect_time_stamp() {
-        let eventRequest = RoktEventRequest(sessionId: "", eventType: RoktUXEventType.SignalImpression, parentGuid: "", jwtToken: "jwt")
+        let eventRequest = RoktEventRequest(
+            sessionId: "",
+            eventType: RoktUXEventType.SignalImpression,
+            parentGuid: "",
+            jwtToken: "jwt"
+        )
         let timeStampRegex = "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([0-9]{2}:){2}[0-9]{2}.[0-9]{3}Z$"
 
         XCTAssertNotNil(eventRequest.metadata[0].value)

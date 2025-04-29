@@ -177,9 +177,11 @@ public class RoktUX: UXEventsDelegate {
        - success: whether the purchase succeeded or failed.
      */
     public func instantPurchaseFinalized(layoutId: String, catalogItemId: String, success: Bool) {
-        success ?
-        eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId) :
-        eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
+        if success {
+            eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
+        }
     }
 
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
@@ -533,7 +535,7 @@ public class RoktUX: UXEventsDelegate {
                  onError: @escaping (String, Error?) -> Void) {
         onRoktEvent?(RoktUXEvent.OpenUrl(url: url, id: id, layoutId: layoutId, type: type, onClose: onClose, onError: onError))
     }
-    
+
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem) {
         onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
             layoutId: layoutId,
@@ -546,6 +548,7 @@ public class RoktUX: UXEventsDelegate {
             providerData: catalogItem.providerData,
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice))
+            unitPrice: catalogItem.originalPrice
+        ))
     }
 }

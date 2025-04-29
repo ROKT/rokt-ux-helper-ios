@@ -65,7 +65,8 @@ struct DataImageCarouselComponent: View {
         self._styleState = styleState
         self.parentOverride = parentOverride
 
-        _customStateMap = model.layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
+        _customStateMap = model.layoutState?
+            .items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
     }
 
     let parentOverride: ComponentParentOverride?

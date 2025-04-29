@@ -226,7 +226,6 @@ final class CatalogMapperTests: XCTestCase {
         )
     }
 
-
     private func assertRichTextDataExpansion(childIndex: Int, expectedValue: String) {
         guard let catalogItem else {
             XCTFail("No data source offer")
