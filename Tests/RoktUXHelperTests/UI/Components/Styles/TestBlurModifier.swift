@@ -16,29 +16,7 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestBlurModifier: XCTestCase {
-#if compiler(>=6)
-    func test_column_with_offset() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
-        
-        let sut = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(ColumnComponent.self)
-        
-        let modifier = try sut
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-        // test blur modifier
-        let blurModifier = try modifier.modifier(BlurModifier.self).actualView()
-        XCTAssertEqual(blurModifier.blur, 5)
-        
-        // test blur
-        let blur = try modifier.blur()
-        XCTAssertEqual(blur.radius, 5)
-    }
-#else
+
     func test_column_with_offset() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
@@ -60,7 +38,6 @@ final class TestBlurModifier: XCTestCase {
         XCTAssertEqual(blur.radius, 5)
         
     }
-#endif
     
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

@@ -26,8 +26,7 @@ jobs:
           check-mode: all
 
   unit-test:
-    runs-on: macos-latest
-    needs: trunk-check
+    runs-on: macos-15
     steps:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -42,7 +41,6 @@ jobs:
       - name: Run unit tests
         uses: ./.github/composite_actions/run_xcodebuild_tests
         with:
-          use-swift-5: true
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   pr-notify:
