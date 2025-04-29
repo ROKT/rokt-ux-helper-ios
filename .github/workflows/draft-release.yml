@@ -39,7 +39,7 @@ jobs:
         id: bump-version
         run: |
           version="${{ steps.version-file.outputs.release-version }}"
-          bump="${{ inputs.bump-type }}"
+          bump="${{ github.event.inputs.bump-type }}"
 
           IFS='.' read -r major minor patch <<< "$version"
 
