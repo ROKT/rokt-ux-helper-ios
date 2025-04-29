@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
-        description: "Specify if the version should be bumped as major, minor, patch"
+        description: Specify if the version should be bumped as major, minor, patch
         required: true
         type: choice
         options:

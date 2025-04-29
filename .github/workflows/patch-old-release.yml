@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       release-tag:
-        description: "The release tag you want to patch"
+        description: The release tag you want to patch
         required: true
         type: string
 
