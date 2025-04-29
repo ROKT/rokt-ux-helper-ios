@@ -41,7 +41,7 @@ struct RowComponent: View {
     var backgroundStyle: BackgroundStylingProperties? { (currentStyle ?? style)?.background }
 
     let config: ComponentConfig
-    @StateObject var model: RowViewModel
+    @ObservedObject var model: RowViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
