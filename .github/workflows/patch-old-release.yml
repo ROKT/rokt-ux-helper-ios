@@ -1,0 +1,43 @@
+name: Create patch branch for old release
+
+on:
+  workflow_dispatch: # checkov:skip=CKV_GHA_7
+    inputs:
+      release-tag:
+        description: "The release tag you want to patch"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-patch-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Validate release tag
+        run: |
+          git fetch --tags
+          if ! git tag -l "$release-tag"; then
+            echo "Release tag $release-tag does not exist"
+            exit 1
+          fi
+
+      - name: Bump patch version
+        id: bump-patch-version
+        run: |
+          version=$(echo $release-tag | cut -d. -f3)
+          new_version=$(echo $version + 1 | bc)
+          echo "New version: $new_version"
+          echo "new-version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Create patch branch
+        run: |
+          git checkout $release-tag
+          git checkout -b release/${{ steps.bump-patch-version.outputs.new-version }}
+          git push --set-upstream origin release/${{ steps.bump-patch-version.outputs.new-version }}
