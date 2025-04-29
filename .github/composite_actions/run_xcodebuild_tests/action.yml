@@ -6,7 +6,7 @@ inputs:
     description: "The Swift version 5"
     required: true
     type: boolean
-    default: true
+    default: false
   codecov-token:
     description: "Codecov token"
     type: string
@@ -33,7 +33,7 @@ runs:
       if: ${{ inputs.use-swift-5 == 'false' }}
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: "16.1.0"
+        xcode-version: "16.3.0"
 
     - name: Run unit tests
       if: ${{ inputs.use-swift-5 == 'false' }}

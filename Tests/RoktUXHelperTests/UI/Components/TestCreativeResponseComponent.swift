@@ -17,63 +17,7 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestCreativeResponseComponent: XCTestCase {
-#if compiler(>=6)
-    func test_creative_response() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
-        
-        let creativeResponse = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(CreativeResponseComponent.self)
-        
-        // test custom modifier class
-        let modifierContent = try creativeResponse
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
 
-        let paddingModifier = try modifierContent.modifier(PaddingModifier.self).actualView().padding
-        
-        XCTAssertEqual(paddingModifier, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
-        
-        // test the effect of custom modifier
-        XCTAssertEqual(try modifierContent.padding(), EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
-
-        // background
-        let backgroundModifier = try modifierContent.modifier(BackgroundModifier.self)
-        let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
-        
-        XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#000000", dark: nil))
-    }
-    
-    func test_creativeResponse_computedProperties_usesModelProperties() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
-        
-        let sut = try view.inspect().find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)
-            .find(LayoutSchemaComponent.self)
-            .find(CreativeResponseComponent.self)
-            .actualView()
-        
-        let defaultStyle = sut.model.defaultStyle?[0]
-        
-        XCTAssertEqual(sut.style, defaultStyle)
-        XCTAssertEqual(sut.containerStyle, defaultStyle?.container)
-        XCTAssertEqual(sut.dimensionStyle, defaultStyle?.dimension)
-        XCTAssertEqual(sut.flexStyle, defaultStyle?.flexChild)
-        XCTAssertEqual(sut.borderStyle, defaultStyle?.border)
-        XCTAssertEqual(sut.backgroundStyle, defaultStyle?.background)
-        XCTAssertEqual(sut.passableBackgroundStyle, defaultStyle?.background)
-        
-        XCTAssertEqual(sut.verticalAlignment, .top)
-        XCTAssertEqual(sut.horizontalAlignment, .center)
-        
-        XCTAssertEqual(sut.verticalAlignmentOverride, .center)
-        XCTAssertEqual(sut.horizontalAlignment, .center)
-    }
-#else
     func test_creative_response() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
         
@@ -127,14 +71,15 @@ final class TestCreativeResponseComponent: XCTestCase {
         XCTAssertEqual(sut.verticalAlignmentOverride, .center)
         XCTAssertEqual(sut.horizontalAlignment, .center)
     }
-#endif
+    
     func get_model() throws -> CreativeResponseViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let creativeResponse = ModelTestData.CreativeResponseData.positive()
         return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
                                                           openLinks: nil,
                                                           styles: creativeResponse?.styles,
-                                                          children: transformer.transformChildren(creativeResponse?.children, context: .outer([])),
+                                                          children: transformer.transformChildren(creativeResponse?.children,
+                                                                                                  context: .outer([])),
                                                           offer: .mock())
     }
 }

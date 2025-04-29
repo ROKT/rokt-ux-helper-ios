@@ -16,32 +16,7 @@ import ViewInspector
 
 @available(iOS 15.0, *)
 final class TestOffsetModifier: XCTestCase {
-#if compiler(>=6)
-    func test_column_with_offset() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
-        
-        let sut = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(ColumnComponent.self)
-        
-        // test offset modifier
-        let modifier = try sut
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-        let offsetModifier = try modifier.modifier(OffsetModifier.self).actualView()
-        XCTAssertEqual(offsetModifier.offset?.x, 30)
-        XCTAssertEqual(offsetModifier.offset?.y, 20)
-        
-        // test offset
-        let offset = try modifier.offset()
-        XCTAssertEqual(offset.width, 30)
-        XCTAssertEqual(offset.height, 20)
-        
-    }
-#else
+
     func test_column_with_offset() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
@@ -65,11 +40,14 @@ final class TestOffsetModifier: XCTestCase {
         XCTAssertEqual(offset.height, 20)
         
     }
-#endif
+    
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithOffset()
-        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, context: .outer([])))
+        return try transformer.getColumn(
+            column.styles,
+            children: transformer.transformChildren(column.children, context: .outer([]))
+        )
     }
     
 }

@@ -17,29 +17,7 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestBorderModifier: XCTestCase {
-#if compiler(>=6)
-    func test_column_with_multi_dimension_border() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
-        
-        let target = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(ColumnComponent.self)
-        
-        // test border modifier
-        let borderModifier = try target
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-            .modifier(BorderModifier.self)
-            .actualView()
-        XCTAssertEqual(borderModifier.borderWidth, FrameAlignmentProperty(top: 2, right: 1, bottom: 2, left: 1))
-        XCTAssertEqual(borderModifier.borderColor, ThemeColor(light: "#000000", dark: "#000000"))
-        XCTAssertEqual(borderModifier.borderRadius, 10)
-        XCTAssertEqual(borderModifier.borderWidth.defaultWidth(), 1)
-    }
-#else
+
     func test_column_with_multi_dimension_border() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
         
@@ -59,11 +37,14 @@ final class TestBorderModifier: XCTestCase {
         XCTAssertEqual(borderModifier.borderRadius, 10)
         XCTAssertEqual(borderModifier.borderWidth.defaultWidth(), 1)
     }
-#endif
+
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithOffset()
-        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, context: .outer([])))
+        return try transformer.getColumn(
+            column.styles,
+            children: transformer.transformChildren(column.children, context: .outer([]))
+        )
     }
 
 }

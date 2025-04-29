@@ -18,74 +18,6 @@ import SnapshotTesting
 
 @available(iOS 15.0, *)
 final class TestOneByOneComponent: XCTestCase {
-#if compiler(>=6)
-    func test_one_by_one() throws {
-        var closeActionCalled = false
-        let view = try TestPlaceHolder.make(
-            eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-                    closeActionCalled = true
-                }
-            },
-            layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
-        )
-        let oneByOneComponent = try view.inspect().find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(OneByOneComponent.self)
-        
-        let group = try oneByOneComponent
-            .ignoreAny(ViewType.Group.self)
-        
-        let modifierContent = try group[0].modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
-        
-        let padding = try modifierContent.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
-
-        XCTAssertEqual(try group.accessibilityLabel().string(), "Offer 1 of 1")
-        
-        try oneByOneComponent.actualView().goToNextOffer()
-        XCTAssertTrue(closeActionCalled)
-    }
-
-    func test_goToNextOffer_with_closeOnComplete_false() throws {
-        var closeActionCalled = false
-        var SignalResponseCalled = false
-
-        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
-
-        let view = try TestPlaceHolder.make(
-            layoutSettings: closeOnCompleteSettings,
-            eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-                    closeActionCalled = true
-                } else if event.eventType == .SignalResponse {
-                    SignalResponseCalled = true
-                }
-            },
-            layoutMaker: LayoutSchemaViewModel.makeOneByOne(layoutState:eventService:)
-        )
-
-        let oneByOneComponent = try view.inspect().find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(OneByOneComponent.self)
-            .actualView()
-
-        XCTAssertFalse(SignalResponseCalled)
-        
-        oneByOneComponent.goToNextOffer()
-        XCTAssertFalse(closeActionCalled)
-        XCTAssertFalse(SignalResponseCalled)
-        
-    }
-
-#else
 
     func test_one_by_one() throws {
         var closeActionCalled = false
@@ -156,8 +88,6 @@ final class TestOneByOneComponent: XCTestCase {
         XCTAssertFalse(SignalResponseCalled)
     }
 
-#endif
-    
     func testEmbeddedOneByOne() {
         // Create a RoktLayoutUIView with TestViewController
         // TODO: investigate perceptual precision usage.

@@ -17,55 +17,7 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestScrollableColumn: XCTestCase {
-#if compiler(>=6)
-    func test_column() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
-        
-        let sut = try view.inspect()
-            .find(TestPlaceHolder.self)
-            .find(EmbeddedComponent.self)
-            .find(ViewType.VStack.self)[0]
-            .find(LayoutSchemaComponent.self)
-            .find(ScrollableColumnComponent.self)
-            .find(ViewType.ScrollView.self)
-            .find(ColumnComponent.self)
-        
-        let modifierContent = try sut
-            .modifierIgnoreAny(LayoutSchemaModifier.self)
-            .ignoreAny(ViewType.ViewModifierContent.self)
-        
-        // test custom modifier class
-        let paddingModifier = try modifierContent.modifier(PaddingModifier.self)
-        XCTAssertEqual(
-            try paddingModifier.actualView().padding,
-            FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24)
-        )
-        
-        // test the effect of custom modifier
-        let padding = try modifierContent.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
-        
-        // Test weight = 1 add maxHeight .infinity
-        let flexFrame = try modifierContent.flexFrame()
-        XCTAssertEqual(flexFrame.maxHeight, .infinity)
-        
-        // background
-        let backgroundModifier = try modifierContent.modifier(BackgroundModifier.self)
-        let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
-        
-        XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#F5C1C4", dark: "#F5C1C4"))
-        
-        // border
-        let borderModifier = try modifierContent.modifier(BorderModifier.self)
-        let borderStyle = try borderModifier.actualView().borderStyle
-        
-        XCTAssertNil(borderStyle)
-        
-        // alignment
-        let alignment = try sut.find(ViewType.VStack.self).alignment()
-        XCTAssertEqual(alignment, .center)
-    }
-#else
+
     func test_column() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
         
@@ -108,11 +60,14 @@ final class TestScrollableColumn: XCTestCase {
         let alignment = try vstack.alignment()
         XCTAssertEqual(alignment, .center)
     }
-#endif
+
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithBasicText()
-        return try transformer.getColumn(column.styles, children: transformer.transformChildren(column.children, context: .outer([])))
+        return try transformer.getColumn(
+            column.styles,
+            children: transformer.transformChildren(column.children, context: .outer([]))
+        )
     }
     
 }
