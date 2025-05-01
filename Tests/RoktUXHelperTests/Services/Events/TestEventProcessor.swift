@@ -148,29 +148,189 @@ final class TestEventProcessor: XCTestCase {
             expectation.fulfill()
         }
         let date = Date()
-        sut.handle(event: mockEvent(eventType: .SignalViewed, date: date))
-        sut.handle(event: mockEvent(eventType: .SignalViewed, date: date))
-        sut.handle(event: mockEvent(eventType: .SignalViewed, date: date + 10))
         
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key": "value"]))
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key": "value"]))
-        sut.handle(event: mockEvent(eventType: .SignalActivation, date: date, eventData: ["key2": "value2"]))
+        // Test case 1: Exact duplicate events (all properties identical)
+        // Should be deduplicated
+        let event1 = mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1"
+        )
+        sut.handle(event: event1)
+        sut.handle(event: event1) // Exact duplicate
         
-        sut.handle(event: mockEvent(eventType: .SignalResponse, date: date, extraMetadata: [.init(name: "name", value: "value")]))
+        // Test case 2: Same event but different sessionId
+        // Should NOT be deduplicated
+        sut.handle(event: mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session2", // Different sessionId
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1"
+        ))
+        
+        // Test case 3: Same event but different parentGuid
+        // Should NOT be deduplicated
+        sut.handle(event: mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent2", // Different parentGuid
+            pageInstanceGuid: "page1"
+        ))
+        
+        // Test case 4: Same event but different pageInstanceGuid
+        // Should NOT be deduplicated
+        sut.handle(event: mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page2" // Different pageInstanceGuid
+        ))
+        
+        // Test case 5: Different event type
+        // Should NOT be deduplicated
+        sut.handle(event: mockEvent(
+            eventType: .SignalImpression, // Different event type
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1"
+        ))
+        
+        // Test case 6: Same event but different data
+        // Should NOT be deduplicated
+        sut.handle(event: mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value1"] // Has event data
+        ))
+        sut.handle(event: mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value2"] // Different event data
+        ))
+        
+        // Test case 7: Same event, same data
+        // Should be deduplicated
+        let event7 = mockEvent(
+            eventType: .SignalActivation,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value"]
+        )
+        sut.handle(event: event7)
+        sut.handle(event: event7) // Duplicate
+        
+        // Test case 8: Same event but different metadata (extraMetadata)
+        // Metadata should NOT affect deduplication
         sut.handle(event: mockEvent(
             eventType: .SignalResponse,
             date: date,
-            extraMetadata: [.init(name: "name2", value: "value2")]
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            extraMetadata: [.init(name: "meta1", value: "value1")]
+        ))
+        sut.handle(event: mockEvent(
+            eventType: .SignalResponse,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            extraMetadata: [.init(name: "meta2", value: "value2")] // Different metadata
         ))
         
         wait(for: [expectation], timeout: 1)
-        XCTAssertEqual(receivedPayload?.count, 4)
-        XCTAssertEqual(receivedPayload?[0].eventType, .SignalViewed)
-        XCTAssertEqual(receivedPayload?[1].eventType, .SignalActivation)
-        XCTAssertEqual(receivedPayload?[2].eventType, .SignalActivation)
-        XCTAssertEqual(receivedPayload?[2].eventData, [.init(name: "key2", value: "value2")])
         
-        XCTAssertEqual(receivedPayload?[3].eventType, .SignalResponse)
+        // Verify the correct deduplication
+        XCTAssertNotNil(receivedPayload, "Payload should not be nil")
+        
+        // Count total events after deduplication
+        // We sent 11 events, but only 9 should remain after deduplication
+        XCTAssertEqual(receivedPayload?.count, 9, "Should have 9 unique events after deduplication")
+        
+        // Count events by type for verification
+        let viewedEvents = receivedPayload?.filter { $0.eventType == .SignalViewed }
+        XCTAssertEqual(viewedEvents?.count, 6, "Should have 6 SignalViewed events")
+        
+        let impressionEvents = receivedPayload?.filter { $0.eventType == .SignalImpression }
+        XCTAssertEqual(impressionEvents?.count, 1, "Should have 1 SignalImpression event")
+        
+        let activationEvents = receivedPayload?.filter { $0.eventType == .SignalActivation }
+        XCTAssertEqual(activationEvents?.count, 1, "Should have 1 SignalActivation event after deduplication")
+        
+        let responseEvents = receivedPayload?.filter { $0.eventType == .SignalResponse }
+        // Note: If metadata doesn't affect deduplication, this should be 1
+        // If metadata does affect deduplication, this should be 2
+        // The current implementation suggests metadata should not affect deduplication
+        // but we're seeing in the tests it does - so we need to validate this behavior
+        XCTAssertEqual(responseEvents?.count, 1, "Should have 1 SignalResponse event")
+    }
+    
+    func testEventDeduplicationDetails() {
+        // This test focuses on validating the exact behavior of the ProcessedEvent equality
+        // to ensure our understanding matches the implementation
+        
+        let expectation = expectation(description: "test detailed deduplication")
+        var receivedPayload: [RoktEventRequest]?
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            guard let self else {
+                XCTFail("Fail self")
+                return
+            }
+            receivedPayload = deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        
+        // Create an event
+        let baseEvent = mockEvent(
+            eventType: .SignalViewed,
+            date: Date(),
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value"]
+        )
+        
+        // Send the base event
+        sut.handle(event: baseEvent)
+        
+        // Test that changing metadata does NOT affect deduplication
+        // This is to verify our understanding of the implementation
+        sut.handle(event: mockEventWithModification(
+            baseEvent: baseEvent,
+            modifyMetadata: [.init(name: "differentMeta", value: "value")]
+        ))
+        
+        // Test that changing the time does NOT affect deduplication
+        sut.handle(event: mockEventWithModification(
+            baseEvent: baseEvent,
+            modifyDate: Date(timeIntervalSinceNow: 100)
+        ))
+        
+        // Test that changing the JWT token does NOT affect deduplication
+        sut.handle(event: mockEventWithModification(
+            baseEvent: baseEvent,
+            modifyJwtToken: "differentToken"
+        ))
+        
+        wait(for: [expectation], timeout: 1)
+        
+        // Since the ProcessedEvent equality is based on sessionId, parentGuid, eventType, pageInstanceGuid, and eventData,
+        // changing metadata, date or JWT token should not create new events
+        XCTAssertEqual(receivedPayload?.count, 1, "All events should be considered duplicates except for the first one")
     }
 
     func testDelayProcessorDeallocation() {
@@ -209,18 +369,39 @@ final class TestEventProcessor: XCTestCase {
     private func mockEvent(
         eventType: RoktUXEventType,
         date: Date,
+        sessionId: String = "sessionId",
+        parentGuid: String = "parentGuid",
+        pageInstanceGuid: String = "pageInstanceGuid",
         extraMetadata: [RoktEventNameValue] = [],
         eventData: [String: String] = [:]
     ) -> RoktEventRequest {
         .init(
-            sessionId: "sessionId",
+            sessionId: sessionId,
             eventType: eventType,
-            parentGuid: "parentGuid",
+            parentGuid: parentGuid,
             eventTime: date,
             extraMetadata: extraMetadata,
             eventData: eventData,
-            pageInstanceGuid: "pageInstanceGuid",
+            pageInstanceGuid: pageInstanceGuid,
             jwtToken: "token"
+        )
+    }
+    
+    private func mockEventWithModification(
+        baseEvent: RoktEventRequest,
+        modifyDate: Date? = nil,
+        modifyMetadata: [RoktEventNameValue]? = nil, 
+        modifyJwtToken: String? = nil
+    ) -> RoktEventRequest {
+        .init(
+            sessionId: baseEvent.sessionId,
+            eventType: baseEvent.eventType,
+            parentGuid: baseEvent.parentGuid,
+            eventTime: modifyDate ?? EventDateFormatter.dateFormatter.date(from: baseEvent.eventTime)!,
+            extraMetadata: modifyMetadata ?? baseEvent.metadata,
+            eventData: baseEvent.eventData.reduce(into: [String: String]()) { $0[$1.name] = $1.value },
+            pageInstanceGuid: baseEvent.pageInstanceGuid,
+            jwtToken: modifyJwtToken ?? baseEvent.jwtToken
         )
     }
 }
