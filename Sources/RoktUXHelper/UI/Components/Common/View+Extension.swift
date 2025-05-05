@@ -73,38 +73,54 @@ extension View {
     // When timer is over and view is still inside this area, execute closure.
     func onBecomingViewed(
         currentOffer: Int? = nil,
-        execute: (() -> Void)?
+        execute: ((_ visibilityInfo: ComponentVisibilityInfo) -> Void)?
     ) -> some View {
         background(
             GeometryReader { geometryProxy in
                 let intersectPercent = UIScreen.main.bounds.intersectPercent(geometryProxy)
+                let isVisible = intersectPercent > kSignalViewedIntersectThreshold
+                let isObscured = intersectPercent < 1.0
+                let incorrectlySized = geometryProxy.size.width <= 0 || geometryProxy.size.height <= 0
+
                 Color.clear
                     .onAppear {
-                        if intersectPercent > kSignalViewedIntersectThreshold {
-
+                        if isVisible {
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute?()
+                                    let visibilityInfo = ComponentVisibilityInfo(
+                                        isVisible: isVisible,
+                                        isObscured: isObscured,
+                                        incorrectlySized: incorrectlySized
+                                    )
+                                    execute?(visibilityInfo)
                                 }
                             }
                         }
                     }
                     .onChange(of: intersectPercent) { value in
                         if value > kSignalViewedIntersectThreshold {
-
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute?()
+                                    let visibilityInfo = ComponentVisibilityInfo(
+                                        isVisible: isVisible,
+                                        isObscured: isObscured,
+                                        incorrectlySized: incorrectlySized
+                                    )
+                                    execute?(visibilityInfo)
                                 }
                             }
                         }
                     }
                     .onChange(of: currentOffer) { _ in
                         if intersectPercent > kSignalViewedIntersectThreshold {
-
                             Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
                                 if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    execute?()
+                                    let visibilityInfo = ComponentVisibilityInfo(
+                                        isVisible: isVisible,
+                                        isObscured: isObscured,
+                                        incorrectlySized: incorrectlySized
+                                    )
+                                    execute?(visibilityInfo)
                                 }
                             }
                         }
@@ -135,4 +151,16 @@ struct CGSizeWithMax {
     let size: CGSize
     var maxWidth: CGFloat?
     var maxHeight: CGFloat?
+}
+
+class ComponentVisibilityInfo {
+    let isVisible: Bool
+    let isObscured: Bool
+    let incorrectlySized: Bool
+
+    init(isVisible: Bool = false, isObscured: Bool = false, incorrectlySized: Bool = false) {
+        self.isVisible = isVisible
+        self.isObscured = isObscured
+        self.incorrectlySized = incorrectlySized
+    }
 }
