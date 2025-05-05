@@ -32,12 +32,12 @@ public class RoktUXExperienceResponse: RoktUXPlacementResponse, PluginResponse {
         guard let outerLayer = getOuterLayoutSchema(plugins: plugins),
               outerLayer.layout != nil && getAllInnerlayoutSchema(plugins: plugins) != nil
         else { return nil }
-
         return RoktUXPageModel(
             pageId: page?.pageId,
             sessionId: sessionId,
             pageInstanceGuid: placementContext.pageInstanceGuid,
             layoutPlugins: getPlugins(plugins: plugins),
+            eventData: eventData,
             token: placementContext.placementContextJWTToken,
             options: .some([.useDiagnosticEvents])
         )

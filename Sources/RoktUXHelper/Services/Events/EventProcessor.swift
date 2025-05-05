@@ -12,7 +12,7 @@
 import Foundation
 import Combine
 
-private let defaultEventBufferDuration: Double = 0.025
+private let defaultEventBufferDuration: TimeInterval = 0.025
 
 @available(iOS 13.0, *)
 protocol EventProcessing {
@@ -23,8 +23,8 @@ protocol EventProcessing {
 
 @available(iOS 13.0, *)
 class EventProcessor: EventProcessing {
-    private var cancellables: Set<AnyCancellable> = .init()
-    private var processedEvents: Set<ProcessedEvent> = .init()
+    private var cancellables: Set<AnyCancellable> = []
+    private var processedEvents: Set<ProcessedEvent> = []
     private var onRoktPlatformEvent: (([String: Any]) -> Void)?
     // EventProcessor is being passed in so that the publisher will always finish publishing before the Processor class gets deallocated.
     private(set) var publisher: PassthroughSubject<(RoktEventRequest, EventProcessor?), Never> = .init()
@@ -36,32 +36,33 @@ class EventProcessor: EventProcessing {
         onRoktPlatformEvent: (([String: Any]) -> Void)?
     ) {
         self.onRoktPlatformEvent = onRoktPlatformEvent
+
         publisher
-            .filter { (event, _) in
-                if integrationType == .s2s &&
-                    (event.eventType == .SignalLoadStart ||
-                     event.eventType == .SignalLoadComplete) {
-                    return false
-                }
-                return true
+            // Skip specific event types for S2S integration
+            .filter { event, _ in
+                guard integrationType == .s2s else { return true }
+                return ![.SignalLoadStart, .SignalLoadComplete].contains(event.eventType)
             }
-            .filter { (event, processor) in
+            // Deduplicate events
+            .filter { event, processor in
                 processor?.processedEvents.insert(.init(event)).inserted == true
             }
-            .collect(.byTime(queue, .seconds(delay)), options: nil)
-            .map {
-                (RoktUXEventsPayload.init(events: $0.map(\.0)), $0.first?.1)
+            .collect(.byTime(queue, .seconds(delay)))
+            // Transform to payload
+            .map { events -> (RoktUXEventsPayload, EventProcessor?) in
+                return (RoktUXEventsPayload(events: events.map(\.0)), events.first?.1)
             }
-            .compactMap { (events, processor) in
-                guard let payload = processor?.serializeData(payload: events) else { return nil }
-                return (payload, processor)
-            }
-            .sink(
-                receiveCompletion: {_ in },
-                receiveValue: { (event: [String: Any], processor: EventProcessor?) in
-                    processor?.onRoktPlatformEvent?(event)
+            // Serialize payload
+            .compactMap { payload, processor in
+                guard let serializedData = processor?.serialize(payload: payload) else {
+                    return nil
                 }
-            )
+                return (serializedData, processor)
+            }
+            // Send to platform handler
+            .sink { _ in } receiveValue: { (event: [String: Any], processor: EventProcessor?) in
+                processor?.onRoktPlatformEvent?(event)
+            }
             .store(in: &cancellables)
     }
 
@@ -69,8 +70,15 @@ class EventProcessor: EventProcessing {
         publisher.send((event, self))
     }
 
-    private func serializeData(payload: RoktUXEventsPayload) -> [String: Any]? {
-        guard let data = try? JSONEncoder().encode(payload) else { return nil }
-        return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
+    private func serialize(payload: RoktUXEventsPayload) -> [String: Any]? {
+        do {
+            let data = try JSONEncoder().encode(payload)
+            guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return nil
+            }
+            return jsonObject
+        } catch {
+            return nil
+        }
     }
 }
