@@ -267,7 +267,7 @@ internal extension View {
     func onFirstTouch(perform action: (() -> Void)? = nil) -> some View {
         modifier(FirstTouchModifier(perform: action))
     }
-    
+
     func onUserInteraction(perform action: (() -> Void)? = nil) -> some View {
         modifier(UserInteractionModifier(perform: action))
     }
@@ -668,13 +668,13 @@ struct FirstTouchModifier: ViewModifier {
 
 @available(iOS 15, *)
 struct UserInteractionModifier: ViewModifier {
-    
+
     private let action: (() -> Void)?
-    
+
     init(perform action: (() -> Void)? = nil) {
         self.action = action
     }
-    
+
     func body(content: Content) -> some View {
         content.simultaneousGesture(
             TapGesture().onEnded({

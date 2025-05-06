@@ -146,8 +146,10 @@ struct OneByOneComponent: View {
                         frameChangeIndex += 1
                     }
                 }
-                .onBecomingViewed(currentOffer: currentOffer) {
-                    model.sendCreativeViewedEvent(currentOffer: currentOffer)
+                .onBecomingViewed(currentOffer: currentOffer) { visibilityInfo in
+                    if visibilityInfo.isInViewAndCorrectSize {
+                        model.sendCreativeViewedEvent(currentOffer: currentOffer)
+                    }
                 }
                 .onUserInteraction {
                     model.sendCreativeViewedEvent(currentOffer: currentOffer)
