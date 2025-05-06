@@ -163,4 +163,8 @@ class ComponentVisibilityInfo {
         self.isObscured = isObscured
         self.incorrectlySized = incorrectlySized
     }
+
+    var isInViewAndCorrectSize: Bool {
+        return isVisible && !isObscured && !incorrectlySized
+    }
 }

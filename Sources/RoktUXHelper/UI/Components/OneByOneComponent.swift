@@ -147,7 +147,7 @@ struct OneByOneComponent: View {
                     }
                 }
                 .onBecomingViewed(currentOffer: currentOffer) { visibilityInfo in
-                    if visibilityInfo.isVisible && !visibilityInfo.isObscured && !visibilityInfo.incorrectlySized {
+                    if visibilityInfo.isInViewAndCorrectSize {
                         model.sendCreativeViewedEvent(currentOffer: currentOffer)
                     }
                 }
