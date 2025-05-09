@@ -11,14 +11,28 @@
 
 import Foundation
 
-public struct RoktUXRealTimeEvent: Codable, Hashable {
-    public let instanceGuid: String?
+public struct RoktUXRealTimeEventResponse: Codable, Hashable {
+    public let triggerGuid: String?
+    public let triggerEvent: String?
     public let eventType: String?
     public let payload: String?
 
-    public init(instanceGuid: String?, eventType: String?, payload: String?) {
-        self.instanceGuid = instanceGuid
+    public init(
+        triggerGuid: String?,
+        triggerEvent: String?,
+        eventType: String?,
+        payload: String?
+    ) {
+        self.triggerGuid = triggerGuid
+        self.triggerEvent = triggerEvent
         self.eventType = eventType
         self.payload = payload
+    }
+
+    public func isValid() -> Bool {
+        if triggerGuid == nil || triggerEvent == nil || eventType == nil || payload == nil {
+            return false
+        }
+        return true
     }
 }

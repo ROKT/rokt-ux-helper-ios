@@ -19,7 +19,7 @@ public class RoktUXPlacementResponse: Decodable {
     public let placements: [RoktUXPlacement]
     // outermost `token`
     public let responseJWTToken: String
-    public let eventData: [String: RoktUXEventData]?
+    public let eventData: [RoktUXRealTimeEventResponse]
 
     enum CodingKeys: String, CodingKey {
         case eventData
@@ -38,6 +38,38 @@ public class RoktUXPlacementResponse: Decodable {
         placementContext = try container.decode(RoktUXPlacementContext.self, forKey: .placementContext)
         placements = try container.decode([RoktUXPlacement].self, forKey: .placements)
         responseJWTToken = try container.decode(String.self, forKey: .responseJWTToken)
-        eventData = try? container.decode([String: RoktUXEventData].self, forKey: .eventData)
+
+        // Custom decode eventData
+        var eventData: [RoktUXRealTimeEventResponse] = []
+        let rawEventDataMap = try? container.decode([String: RawEventData].self, forKey: .eventData)
+        if let rawMap = rawEventDataMap {
+
+            for (parentGuid, individualRawData) in rawMap {
+                if let actualEvents = individualRawData.events, !actualEvents.isEmpty {
+                    var eventMapForInstance: [String: RoktUXRealTimeEventResponse] = [:]
+                    for (signalKey, rawSignalEvent) in actualEvents {
+                        let event = RoktUXRealTimeEventResponse(
+                            triggerGuid: parentGuid,
+                            triggerEvent: signalKey,
+                            eventType: rawSignalEvent.eventType,
+                            payload: rawSignalEvent.payload
+                        )
+                        if event.isValid() {
+                            eventData.append(event)
+                        }
+                    }
+                }
+            }
+        }
+        self.eventData = eventData
     }
+}
+
+private struct RawEventData: Decodable {
+    let events: [String: RawEvent]?
+}
+
+private struct RawEvent: Decodable {
+    let eventType: String?
+    let payload: String?
 }
