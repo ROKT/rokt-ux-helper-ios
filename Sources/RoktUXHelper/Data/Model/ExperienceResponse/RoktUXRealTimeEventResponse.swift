@@ -1,5 +1,5 @@
 //
-//  RoktUXRealTimeEvent.swift
+//  RoktUXRealTimeEventResponse.swift
 //
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
