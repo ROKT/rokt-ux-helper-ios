@@ -45,7 +45,6 @@ public class RoktUXS2SExperienceResponse: Decodable, PluginResponse {
             sessionId: sessionId,
             pageInstanceGuid: pageContext.pageInstanceGuid,
             layoutPlugins: getPlugins(plugins: plugins),
-            eventData: [],
             token: pageContext.token,
             options: options
         )

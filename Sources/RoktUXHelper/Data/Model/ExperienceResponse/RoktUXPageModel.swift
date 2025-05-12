@@ -17,7 +17,6 @@ public struct RoktUXPageModel {
     public let sessionId: String
     public let pageInstanceGuid: String
     public let layoutPlugins: [LayoutPlugin]?
-    public let eventData: [RoktUXRealTimeEventResponse]
     var startDate: Date = Date()
     var responseReceivedDate: Date = Date()
     let token: String
