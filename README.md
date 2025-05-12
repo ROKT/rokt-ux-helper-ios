@@ -4,10 +4,8 @@ The RoktUXHelper enables partner applications to render tailored user experience
 
 ## Resident Experts
 
+- James Newman - <james.newman@rokt.com>
 - Thomson Thomas - <thomson.thomas@rokt.com>
-- Danial Motahari - <danial.motahari@rokt.com>
-- Miran Nakamura - <miran.nakamura@rokt.com>
-- Wei Yew - <wei.yew.teoh@rokt.com>
 
 | Environment | Build                                                                                                                                                                                     | Coverage                                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
