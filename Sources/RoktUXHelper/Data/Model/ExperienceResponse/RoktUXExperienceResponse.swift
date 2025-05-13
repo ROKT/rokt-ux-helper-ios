@@ -37,7 +37,6 @@ public class RoktUXExperienceResponse: RoktUXPlacementResponse, PluginResponse {
             sessionId: sessionId,
             pageInstanceGuid: placementContext.pageInstanceGuid,
             layoutPlugins: getPlugins(plugins: plugins),
-            eventData: eventData,
             token: placementContext.placementContextJWTToken,
             options: .some([.useDiagnosticEvents])
         )
