@@ -19,7 +19,6 @@ public class RoktUXPlacementResponse: Decodable {
     public let placements: [RoktUXPlacement]
     // outermost `token`
     public let responseJWTToken: String
-    public let eventData: [String: RoktUXEventData]?
 
     enum CodingKeys: String, CodingKey {
         case eventData
@@ -38,6 +37,5 @@ public class RoktUXPlacementResponse: Decodable {
         placementContext = try container.decode(RoktUXPlacementContext.self, forKey: .placementContext)
         placements = try container.decode([RoktUXPlacement].self, forKey: .placements)
         responseJWTToken = try container.decode(String.self, forKey: .responseJWTToken)
-        eventData = try? container.decode([String: RoktUXEventData].self, forKey: .eventData)
     }
 }
