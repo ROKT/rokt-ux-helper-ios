@@ -24,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Refactored BNF mapping logic to simplify logic
-- Enhanced offer viewed signals
 
 ## [0.3.1] - 2025-02-27
 
