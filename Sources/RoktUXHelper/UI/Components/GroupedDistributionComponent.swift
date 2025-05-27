@@ -204,7 +204,12 @@ struct GroupedDistributionComponent: View {
                     .onLoad {
                         toggleTransition = true
                     }
-                    .onBecomingViewed {
+                    .onBecomingViewed { visibilityInfo in
+                        if visibilityInfo.isInViewAndCorrectSize {
+                            model.sendCreativeViewedEvent(currentOffer: childIndex)
+                        }
+                    }
+                    .onUserInteraction {
                         model.sendCreativeViewedEvent(currentOffer: childIndex)
                     }
                 }

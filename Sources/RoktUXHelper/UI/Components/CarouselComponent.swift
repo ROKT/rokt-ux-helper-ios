@@ -253,7 +253,12 @@ struct CarouselComponent: View {
                 .accessibilityElement(children: .contain)
                 .accessibilityFocused($shouldFocusAccessibility)
                 .accessibilityLabel(accessibilityAnnouncement)
-                .onBecomingViewed {
+                .onBecomingViewed { visibilityInfo in
+                    if visibilityInfo.isInViewAndCorrectSize {
+                        model.sendCreativeViewedEvent(currentOffer: childIndex)
+                    }
+                }
+                .onUserInteraction {
                     model.sendCreativeViewedEvent(currentOffer: childIndex)
                 }
             }
