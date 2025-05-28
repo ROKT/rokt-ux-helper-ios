@@ -37,51 +37,29 @@ jobs:
 
       - name: Bump version
         id: bump-version
-        run: |
-          version="${{ steps.version-file.outputs.release-version }}"
-          bump="${{ github.event.inputs.bump-type }}"
-
-          IFS='.' read -r major minor patch <<< "$version"
-
-          if [ "$bump" = "major" ]; then
-              major=$((major + 1))
-              minor=0
-              patch=0
-          elif [ "$bump" = "minor" ]; then
-              minor=$((minor + 1))
-              patch=0
-          elif [ "$bump" = "patch" ]; then
-              patch=$((patch + 1))
-          else
-              echo "Invalid bump type: $bump"
-              exit 1
-          fi
-
-          new_version="${major}.${minor}.${patch}"
-          echo "New version: $new_version"
-
-          echo "new-version=$new_version" >> $GITHUB_OUTPUT
+        uses: actions-ecosystem/action-bump-semver@34e334551143a5301f38c830e44a22273c6ff5c5 # v1.0.0
+        with:
+          current_version: ${{ steps.version-file.outputs.release-version }}
+          level: ${{ github.event.inputs.bump-type || 'patch' }}
 
       - name: Save validated version to file
         run: |
-          echo "${{ steps.bump-version.outputs.new-version }}" > VERSION
+          echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
 
       - name: Update changelog
         uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
         with:
-          tag: ${{ steps.bump-version.outputs.new-version }}
+          tag: ${{ steps.bump-version.outputs.new_version }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
-          commit-message: Create ${{ steps.bump-version.outputs.new-version }}
-          branch: release/${{ steps.bump-version.outputs.new-version }}
-          title: Prepare release ${{ steps.bump-version.outputs.new-version }}
+          commit-message: Create ${{ steps.bump-version.outputs.new_version }}
+          branch: release/${{ steps.bump-version.outputs.new_version }}
+          title: Prepare release ${{ steps.bump-version.outputs.new_version }}
           base: main
           body: |
-            Preparing for release ${{ steps.bump-version.outputs.new-version }}
+            Preparing for release ${{ steps.bump-version.outputs.new_version }}
             - Bumped version
             - Updated changelog
-            - Generated release build ${{ steps.bump-version.outputs.new-version }}
-          labels: |
-            release
+            - Generated release build ${{ steps.bump-version.outputs.new_version }}
