@@ -89,6 +89,7 @@ struct ToggleButtonComponent: View {
 
     var body: some View {
         build()
+            .accessibilityAddTraits(.isButton)
             .onHover { isHovered in
                 self.isHovered = isHovered
                 updateStyleState()

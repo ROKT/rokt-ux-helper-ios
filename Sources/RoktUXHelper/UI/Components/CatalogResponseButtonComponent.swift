@@ -178,6 +178,7 @@ struct CatalogResponseButtonComponent: View {
 
     func build() -> some View {
         createContainer()
+            .accessibilityAddTraits(.isButton)
             .onChange(of: globalScreenSize.width) { newSize in
                 // run it in background thread for smooth transition
                 DispatchQueue.background.async {
