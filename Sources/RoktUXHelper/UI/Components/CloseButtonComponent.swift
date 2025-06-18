@@ -12,6 +12,8 @@
 import SwiftUI
 import DcuiSchema
 
+private let kCloseButtonAnnouncement = "Close"
+
 @available(iOS 15, *)
 struct CloseButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
@@ -171,6 +173,7 @@ struct CloseButtonComponent: View {
                 }
             }
             .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
             .accessibilityLabel(kCloseButtonAnnouncement)
     }
 

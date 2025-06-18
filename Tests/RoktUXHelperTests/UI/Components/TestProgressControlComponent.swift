@@ -38,7 +38,7 @@ final class TestProgressControlComponent: XCTestCase {
         let paddingMargin = try progressControl.padding()
         XCTAssertEqual(paddingMargin, EdgeInsets(top: 5.0, leading: 25.0, bottom: 13.0, trailing: 15.0))
         
-        XCTAssertEqual(try progressControl.accessibilityLabel().string(), "Next page button")
+        XCTAssertEqual(try progressControl.accessibilityLabel().string(), "Next page")
     }
 
     func get_model() throws -> ProgressControlViewModel {

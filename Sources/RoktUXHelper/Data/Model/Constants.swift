@@ -83,9 +83,6 @@ let kSignalViewedTimeThreshold = 1.0
 let kPageAnnouncement = "Page %d of %d"
 let kOneByOneAnnouncement = "Offer %d of %d"
 let kProgressIndicatorAnnouncement = "%d of %d"
-let kCloseButtonAnnouncement = "Close button"
-let kNextPageButtonAnnouncement = "Next page button"
-let kPreviousPageButtonAnnouncement = "Previous page button"
 
 // MARK: Cart Item Instant purchase constants
 

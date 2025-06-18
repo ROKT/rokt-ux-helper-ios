@@ -38,7 +38,7 @@ final class TestCloseButtonComponent: XCTestCase {
         let padding = try closeButton.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
         
-        XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close button")
+        XCTAssertEqual(try closeButton.accessibilityLabel().string(), "Close")
     }
 
     func test_send_close_event() throws {

@@ -160,6 +160,7 @@ struct StaticLinkComponent: View {
                 self.isPressed = isPressed
                 updateStyleState()
             })
+            .accessibilityAddTraits(.isLink)
     }
 
     func build() -> some View {

@@ -10,7 +10,10 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import SwiftUI
-    import DcuiSchema
+import DcuiSchema
+
+private let kNextPageButtonAnnouncement = "Next page"
+private let kPreviousPageButtonAnnouncement = "Previous page"
 
 @available(iOS 15, *)
 struct ProgressControlComponent: View {
@@ -172,6 +175,7 @@ struct ProgressControlComponent: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(model.direction == .backward ? kPreviousPageButtonAnnouncement : kNextPageButtonAnnouncement)
+            .accessibilityAddTraits(.isButton)
     }
 
     func createContainer() -> some View {
