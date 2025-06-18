@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-06-18
+
 ### Added
 
 - Added voiceover accessibility button trait to CloseButtonComponent, CatalogResponseButtonComponent, CreativeResponseComponent, ProgressControlComponent, & ToggleButtonComponent
@@ -71,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.1...HEAD
+[0.5.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/v0.4.0...0.5.0
 [0.4.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/v0.3.0...v0.3.1
