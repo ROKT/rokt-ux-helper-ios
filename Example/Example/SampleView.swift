@@ -20,6 +20,12 @@ struct SampleView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vm: SampleViewModel = .init()
 
+    let onLayoutFailure: (() -> Void)?
+
+    init(onLayoutFailure: (() -> Void)? = nil) {
+        self.onLayoutFailure = onLayoutFailure
+    }
+
     var body: some View {
         RoktLayoutView(
             experienceResponse: vm.experienceResponse,
@@ -27,6 +33,9 @@ struct SampleView: View {
             config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
         ) { uxEvent in
             if uxEvent is RoktUXEvent.LayoutCompleted {
+                dismiss()
+            } else if uxEvent is RoktUXEvent.LayoutFailure {
+                onLayoutFailure?()
                 dismiss()
             } else if let uxEvent = (uxEvent as? RoktUXEvent.OpenUrl) {
                 // Handle open URL event

@@ -16,6 +16,8 @@ struct HomeView: View {
 
     @State private var isShowingSwiftUIView = false
     @State private var isShowingUIKitView = false
+    @State private var showToast = false
+    @State private var toastMessage = ""
 
     var body: some View {
         NavigationView {
@@ -60,16 +62,51 @@ struct HomeView: View {
                         .padding(.top, 48)
                 }
                 .padding()
+
+                // Toast overlay
+                if showToast {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Text(toastMessage)
+                                .font(.defaultFont(.subtitle1))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.black.opacity(0.8))
+                                .cornerRadius(10)
+                                .onAppear {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                        withAnimation(.easeOut(duration: 0.5)) {
+                                            showToast = false
+                                        }
+                                    }
+                                }
+                            Spacer()
+                        }
+                        .padding(.bottom, 100)
+                    }
+                    .transition(.opacity)
+                }
             }
 
         }
         .background(Color.white)
         .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $isShowingSwiftUIView) {
-            SampleView()
+            SampleView(onLayoutFailure: {
+                showToastMessage("Layout failed to load")
+            })
         }
         .sheet(isPresented: $isShowingUIKitView) {
             SampleVCRepresentable()
+        }
+    }
+
+    private func showToastMessage(_ message: String) {
+        toastMessage = message
+        withAnimation(.easeIn(duration: 0.3)) {
+            showToast = true
         }
     }
 }
