@@ -17,7 +17,6 @@ struct HomeView: View {
     @State private var isShowingSwiftUIView = false
     @State private var isShowingUIKitView = false
     @State private var showToast = false
-    @State private var toastMessage = ""
 
     var body: some View {
         NavigationView {
@@ -65,28 +64,7 @@ struct HomeView: View {
 
                 // Toast overlay
                 if showToast {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Text(toastMessage)
-                                .font(.defaultFont(.subtitle1))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.black.opacity(0.8))
-                                .cornerRadius(10)
-                                .onAppear {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                                        withAnimation(.easeOut(duration: 0.5)) {
-                                            showToast = false
-                                        }
-                                    }
-                                }
-                            Spacer()
-                        }
-                        .padding(.bottom, 100)
-                    }
-                    .transition(.opacity)
+                    LayoutFailureToastView(showToast: $showToast)
                 }
             }
 
@@ -95,7 +73,7 @@ struct HomeView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $isShowingSwiftUIView) {
             SampleView(onLayoutFailure: {
-                showToastMessage("Layout failed to load")
+                showToastMessage()
             })
         }
         .sheet(isPresented: $isShowingUIKitView) {
@@ -103,8 +81,7 @@ struct HomeView: View {
         }
     }
 
-    private func showToastMessage(_ message: String) {
-        toastMessage = message
+    private func showToastMessage() {
         withAnimation(.easeIn(duration: 0.3)) {
             showToast = true
         }
@@ -114,5 +91,33 @@ struct HomeView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
+    }
+}
+
+struct LayoutFailureToastView: View {
+    @Binding var showToast: Bool
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Text("Layout failed to load")
+                    .font(.defaultFont(.subtitle1))
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.8))
+                    .cornerRadius(10)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showToast = false
+                            }
+                        }
+                    }
+                Spacer()
+            }
+            .padding(.bottom, 100)
+        }
+        .transition(.opacity)
     }
 }
