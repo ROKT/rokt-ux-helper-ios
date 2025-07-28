@@ -56,13 +56,11 @@ class EmbeddedComponentViewModel: ObservableObject {
     }
 
     func updateHeight(_ newHeight: CGFloat) {
-        let roundedHeight = round(newHeight)
-        let roundedLastUpdatedHeight = round(lastUpdatedHeight)
+        let roundedHeight = newHeight.rounded(.up)
+        let roundedLastUpdatedHeight = lastUpdatedHeight.rounded(.up)
         if roundedLastUpdatedHeight != roundedHeight {
             onSizeChange?(newHeight)
             lastUpdatedHeight = newHeight
-        } else {
-            layoutState?.config?.debugLog("Rokt: Embedded view size update ignored due to subpixel precision.")
         }
     }
 }
