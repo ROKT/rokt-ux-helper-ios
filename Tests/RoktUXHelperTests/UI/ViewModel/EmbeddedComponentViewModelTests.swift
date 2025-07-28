@@ -54,11 +54,11 @@ final class EmbeddedComponentViewModelTests: XCTestCase {
         onSizeChange: @escaping (CGFloat) -> Void
     ) -> EmbeddedComponentViewModel {
         EmbeddedComponentViewModel(
-            layout:         .empty,
-            layoutState:    layoutState,
-            eventService:   eventService,
-            onLoad:         nil,
-            onSizeChange:   onSizeChange
+            layout: .empty,
+            layoutState: layoutState,
+            eventService: eventService,
+            onLoad: nil,
+            onSizeChange: onSizeChange
         )
     }
 }
