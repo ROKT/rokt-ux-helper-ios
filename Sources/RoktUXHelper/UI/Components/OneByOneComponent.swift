@@ -162,6 +162,7 @@ struct OneByOneComponent: View {
     }
 
     func registerActions() {
+        model.layoutState?.actionCollection[.previousOffer] = goToPreviousOffer
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
         model.setupBindings(
@@ -183,6 +184,12 @@ struct OneByOneComponent: View {
             }
 
             exit()
+        }
+    }
+
+    func goToPreviousOffer(_: Any? = nil) {
+        if currentOffer != 0 {
+            transitionToPreviousOffer()
         }
     }
 
@@ -221,6 +228,26 @@ struct OneByOneComponent: View {
         default:
             self.customStateMap = RoktUXCustomStateMap()
             self.currentOffer = currentOffer + 1
+        }
+    }
+
+    func transitionToPreviousOffer() {
+        switch transition {
+        case .fadeInOut(let settings):
+            let duration = Double(settings.duration)/1000/2
+            withAnimation(.easeOut(duration: duration)) {
+                toggleTransition = false
+            }
+
+            // Wait to complete fade out of previous offer
+            // Must not run on `main` as that prevents `@State` from changing
+            DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
+                self.customStateMap = RoktUXCustomStateMap()
+                self.currentOffer = currentOffer - 1
+            }
+        default:
+            self.customStateMap = RoktUXCustomStateMap()
+            self.currentOffer = currentOffer - 1
         }
     }
 

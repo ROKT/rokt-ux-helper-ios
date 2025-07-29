@@ -292,6 +292,7 @@ struct CarouselComponent: View {
     }
 
     func registerActions() {
+        model.layoutState?.actionCollection[.previousOffer] = goToPreviousOffer
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
@@ -319,6 +320,16 @@ struct CarouselComponent: View {
                 model.sendDismissalNoMoreOfferEvent()
             }
             exit()
+        }
+    }
+
+    func goToPreviousOffer(_: Any? = nil) {
+        guard viewableItems == 1 else { return }
+        if currentPage != 0 {
+            withAnimation(.linear) {
+                self.currentPage = currentPage - 1
+                self.currentLeadingOffer = self.currentPage
+            }
         }
     }
 

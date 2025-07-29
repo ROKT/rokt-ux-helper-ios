@@ -12,8 +12,15 @@
 import SwiftUI
 import DcuiSchema
 
+private let kNextOfferButtonAnnouncement = "Next offer"
+private let kPreviousOfferButtonAnnouncement = "Previous offer"
 private let kNextPageButtonAnnouncement = "Next page"
 private let kPreviousPageButtonAnnouncement = "Previous page"
+
+enum ProgressionType {
+    case grouped
+    case offer
+}
 
 @available(iOS 15, *)
 struct ProgressControlComponent: View {
@@ -174,7 +181,7 @@ struct ProgressControlComponent: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(model.direction == .backward ? kPreviousPageButtonAnnouncement : kNextPageButtonAnnouncement)
+            .accessibilityLabel(getAccessibilityLabel())
             .accessibilityAddTraits(.isButton)
     }
 
@@ -205,10 +212,26 @@ struct ProgressControlComponent: View {
     }
 
     private func handleProgressControlAction() {
+        if model.progressionType == .grouped {
+            progressGrouped()
+        } else if model.progressionType == .offer {
+            progressOffer()
+        }
+    }
+
+    private func progressGrouped() {
         if model.direction == .backward {
             model.layoutState?.actionCollection[.previousGroup](nil)
         } else {
             model.layoutState?.actionCollection[.nextGroup](nil)
+        }
+    }
+
+    private func progressOffer() {
+        if model.direction == .backward {
+            model.layoutState?.actionCollection[.previousOffer](nil)
+        } else {
+            model.layoutState?.actionCollection[.nextOffer](nil)
         }
     }
 
@@ -223,6 +246,14 @@ struct ProgressControlComponent: View {
             return true
         default:
             return false
+        }
+    }
+
+    private func getAccessibilityLabel() -> String {
+        if model.progressionType == .grouped {
+            return model.direction == .backward ? kPreviousPageButtonAnnouncement : kNextPageButtonAnnouncement
+        } else {
+            return model.direction == .backward ? kPreviousOfferButtonAnnouncement : kNextOfferButtonAnnouncement
         }
     }
 

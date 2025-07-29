@@ -14,6 +14,7 @@ import Foundation
 enum RoktActionType: String {
     case close
     case nextOffer
+    case previousOffer
     case unload
     case positiveEngaged
     case nextGroup
