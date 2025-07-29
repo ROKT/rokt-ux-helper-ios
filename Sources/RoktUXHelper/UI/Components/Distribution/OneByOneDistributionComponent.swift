@@ -13,7 +13,7 @@ import SwiftUI
 import DcuiSchema
 
 @available(iOS 15, *)
-struct OneByOneComponent: View {
+struct OneByOneDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     var style: OneByOneDistributionStyles? {

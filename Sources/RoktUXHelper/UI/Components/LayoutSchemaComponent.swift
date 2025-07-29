@@ -123,19 +123,19 @@ struct LayoutSchemaComponent: View {
                                        parentHeight: $parentHeight,
                                        parentOverride: parentOverride)
         case .oneByOne(let oneByOneModel):
-            OneByOneComponent(config: config,
-                              model: oneByOneModel,
-                              parentWidth: $parentWidth,
-                              parentHeight: $parentHeight,
-                              styleState: $styleState,
-                              parentOverride: parentOverride)
+            OneByOneDistributionComponent(config: config,
+                                          model: oneByOneModel,
+                                          parentWidth: $parentWidth,
+                                          parentHeight: $parentHeight,
+                                          styleState: $styleState,
+                                          parentOverride: parentOverride)
         case .carousel(let carouselModel):
-            CarouselComponent(config: config,
-                              model: carouselModel,
-                              parentWidth: $parentWidth,
-                              parentHeight: $parentHeight,
-                              styleState: $styleState,
-                              parentOverride: parentOverride)
+            CarouselDistributionComponent(config: config,
+                                          model: carouselModel,
+                                          parentWidth: $parentWidth,
+                                          parentHeight: $parentHeight,
+                                          styleState: $styleState,
+                                          parentOverride: parentOverride)
         case .groupDistribution(let groupedDistributionModel):
             GroupedDistributionComponent(config: config,
                                          model: groupedDistributionModel,

@@ -13,7 +13,7 @@ import SwiftUI
 import DcuiSchema
 
 @available(iOS 15, *)
-struct CarouselComponent: View {
+struct CarouselDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     var style: CarouselDistributionStyles? {
