@@ -21,7 +21,6 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let hoveredStyle: [ProgressControlStyle]?
     let disabledStyle: [ProgressControlStyle]?
     let direction: ProgressionDirection
-    let progressionType: ProgressionType
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -33,8 +32,7 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [ProgressControlStyle]?,
          disabledStyle: [ProgressControlStyle]?,
          direction: ProgressionDirection,
-         layoutState: (any LayoutStateRepresenting)?,
-         progressionType: ProgressionType) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
@@ -42,6 +40,5 @@ class ProgressControlViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.disabledStyle = disabledStyle
         self.direction = direction
         self.layoutState = layoutState
-        self.progressionType = progressionType
     }
 }

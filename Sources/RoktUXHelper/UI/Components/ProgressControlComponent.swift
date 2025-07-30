@@ -12,15 +12,8 @@
 import SwiftUI
 import DcuiSchema
 
-private let kNextOfferButtonAnnouncement = "Next offer"
-private let kPreviousOfferButtonAnnouncement = "Previous offer"
-private let kNextPageButtonAnnouncement = "Next page"
-private let kPreviousPageButtonAnnouncement = "Previous page"
-
-enum ProgressionType {
-    case grouped
-    case offer
-}
+private let kNextButtonAnnouncement = "Next"
+private let kPreviousButtonAnnouncement = "Previous"
 
 @available(iOS 15, *)
 struct ProgressControlComponent: View {
@@ -234,11 +227,7 @@ struct ProgressControlComponent: View {
     }
 
     private func getAccessibilityLabel() -> String {
-        if model.progressionType == .grouped {
-            return model.direction == .backward ? kPreviousPageButtonAnnouncement : kNextPageButtonAnnouncement
-        } else {
-            return model.direction == .backward ? kPreviousOfferButtonAnnouncement : kNextOfferButtonAnnouncement
-        }
+        return model.direction == .backward ? kPreviousButtonAnnouncement : kNextButtonAnnouncement
     }
 
     private func updateStyleState() {

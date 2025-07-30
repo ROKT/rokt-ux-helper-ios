@@ -346,9 +346,6 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                                 ConditionalStyleTransition<ProgressControlTransitions, WhenPredicate>>?,
                             direction: ProgressionDirection,
                             children: [LayoutSchemaViewModel]?) throws -> ProgressControlViewModel {
-        // Get this from layoutState based on distribution type?
-        let progressionType = ProgressionType.offer
-
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return ProgressControlViewModel(children: children,
                                         defaultStyle: updateStyles.compactMap {$0.default},
@@ -356,8 +353,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                         hoveredStyle: updateStyles.compactMap {$0.hovered},
                                         disabledStyle: updateStyles.compactMap {$0.disabled},
                                         direction: direction,
-                                        layoutState: layoutState,
-                                        progressionType: progressionType)
+                                        layoutState: layoutState)
     }
 
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, context: Context) throws -> DataImageViewModel {
