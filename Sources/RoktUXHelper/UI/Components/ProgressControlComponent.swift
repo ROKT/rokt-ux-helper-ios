@@ -212,26 +212,10 @@ struct ProgressControlComponent: View {
     }
 
     private func handleProgressControlAction() {
-        if model.progressionType == .grouped {
-            progressGrouped()
-        } else if model.progressionType == .offer {
-            progressOffer()
-        }
-    }
-
-    private func progressGrouped() {
         if model.direction == .backward {
-            model.layoutState?.actionCollection[.previousGroup](nil)
+            model.layoutState?.actionCollection[.progressControlPrevious](nil)
         } else {
-            model.layoutState?.actionCollection[.nextGroup](nil)
-        }
-    }
-
-    private func progressOffer() {
-        if model.direction == .backward {
-            model.layoutState?.actionCollection[.previousOffer](nil)
-        } else {
-            model.layoutState?.actionCollection[.nextOffer](nil)
+            model.layoutState?.actionCollection[.progressControlNext](nil)
         }
     }
 

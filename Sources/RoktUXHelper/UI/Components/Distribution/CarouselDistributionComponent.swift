@@ -292,7 +292,8 @@ struct CarouselDistributionComponent: View {
     }
 
     func registerActions() {
-        model.layoutState?.actionCollection[.previousOffer] = goToPreviousOffer
+        model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousOffer
+        model.layoutState?.actionCollection[.progressControlNext] = goToPreviousOffer
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
