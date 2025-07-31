@@ -130,10 +130,10 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         } else {
             sendDismissalNoMoreOfferEvent()
         }
-        exit()
+        close()
     }
 
-    func exit() {
+    func close() {
         layoutState?.actionCollection[.close](nil)
     }
 
