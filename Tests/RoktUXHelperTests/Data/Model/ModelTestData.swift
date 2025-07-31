@@ -200,11 +200,19 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_data_image")
             return try! JSONDecoder().decode(DataImageModel.self, from: data)
         }
+        static func dataImageWithFallback() -> DataImageModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_data_image_fallback")
+            return try! JSONDecoder().decode(DataImageModel.self, from: data)
+        }
     }
     
     enum DataImageCarouselData {
         static func dataImageCarousel() -> DataImageCarouselModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_data_image_carousel")
+            return try! JSONDecoder().decode(DataImageCarouselModel.self, from: data)
+        }
+        static func dataImageCarouselWithFallback() -> DataImageCarouselModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_data_image_carousel_fallback")
             return try! JSONDecoder().decode(DataImageCarouselModel.self, from: data)
         }
     }

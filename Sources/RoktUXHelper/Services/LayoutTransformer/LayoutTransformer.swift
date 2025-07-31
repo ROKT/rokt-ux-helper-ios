@@ -362,9 +362,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         case .inner(.generic(.some(let offer))),
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
-            creativeImage = offer.creative.images?[imageModel.imageKey]
+            creativeImage = findImage(for: imageModel.imageKey, in: offer.creative.images)
         case let .inner(.addToCart(catalogItem)):
-            creativeImage = catalogItem.images[imageModel.imageKey]
+            creativeImage = findImage(for: imageModel.imageKey, in: catalogItem.images)
         default:
             throw LayoutTransformerError.missingData
         }
@@ -733,9 +733,16 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         case .inner(.generic(let offer?)),
                 .inner(.negative(let offer)),
                 .inner(.positive(let offer)):
-            carouselImages = offer.creative.images?.filter { $0.key.contains(dataImageCarouselModel.imageKey) }
-                .sorted(by: { $0.key < $1.key })
-                .compactMap { $0.value }
+            let imageKeys = dataImageCarouselModel.imageKey.split(separator: "|").map {
+                $0.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            carouselImages = offer.creative.images?.filter { image in
+                imageKeys.contains { key in
+                    image.key.contains(key)
+                }
+            }
+            .sorted(by: { $0.key < $1.key })
+            .compactMap { $0.value }
         default:
             throw LayoutTransformerError.InvalidMapping()
         }
@@ -773,6 +780,18 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         } catch {
             throw error
         }
+    }
+
+    private func findImage(for key: String, in images: [String: CreativeImage]?) -> CreativeImage? {
+        let imageKeys = key.split(separator: "|").map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        for imageKey in imageKeys {
+            if let image = images?[imageKey] {
+                return image
+            }
+        }
+        return nil
     }
 }
 

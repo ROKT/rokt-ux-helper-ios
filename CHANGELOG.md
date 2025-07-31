@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Fallback `imageKey` support in `DataImage` and `DataImageCarousel` nodes
+
 ## [0.5.1] - 2025-06-18
 
 ### Added
