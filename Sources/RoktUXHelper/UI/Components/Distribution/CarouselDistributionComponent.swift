@@ -50,7 +50,7 @@ struct CarouselDistributionComponent: View {
     var accessibilityAnnouncement: String {
         String(format: kPageAnnouncement,
                model.currentPage + 1,
-               totalPages)
+               model.totalPages)
     }
 
     let parentOverride: ComponentParentOverride?
@@ -107,28 +107,6 @@ struct CarouselDistributionComponent: View {
         }
     }
 
-    @State var viewableItems: Int = 1
-    var children: [LayoutSchemaViewModel] {
-        guard let children = model.children, !children.isEmpty else {
-            return []
-        }
-        return children
-    }
-
-    var totalOffers: Int {
-        children.count
-    }
-
-    var pages: [[LayoutSchemaViewModel]] {
-        stride(from: 0, to: totalOffers, by: viewableItems).map {
-            Array(children[$0..<$0.advanced(by: min(viewableItems, children.endIndex - $0))])
-        }
-    }
-
-    var totalPages: Int {
-        pages.count
-    }
-
     var gap: CGFloat {
         CGFloat(containerStyle?.gap ?? 0)
     }
@@ -138,24 +116,24 @@ struct CarouselDistributionComponent: View {
     }
 
     var body: some View {
-         if totalPages > 0 {
+        if model.totalPages > 0 {
             GeometryReader { containerProxy in
                 let peekThrough = getPeekThrough(containerProxy.size.width)
                 let pageWidth = getPageWidth(width: containerProxy.size.width,
                                              peekThrough: peekThrough)
 
                 let offerWidth = getOfferWidth(pageWidth: pageWidth,
-                                               totalOffers: totalOffers)
+                                               totalOffers: model.totalOffers)
 
                 let peekThroughOffset = getPeekThroughOffset(peekThrough: peekThrough,
-                                                             totalPages: totalPages)
+                                                             totalPages: model.totalPages)
 
                 let pageOffset = CGFloat(model.currentPage) * -pageWidth
                 let indexOffset = CGFloat(model.indexWithinPage) * -offerWidth
 
                 HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                        spacing: gap) {
-                    ForEach(pages, id: \.self) { page in
+                    ForEach(model.pages, id: \.self) { page in
                         HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                                spacing: gap) {
                             build(page: page,
@@ -174,10 +152,10 @@ struct CarouselDistributionComponent: View {
                             let progress = -value.translation.width/offerWidth
                             let roundProgress = Int(progress.rounded())
 
-                            updateStatesOnDragEnded(pages: pages,
+                            updateStatesOnDragEnded(pages: model.pages,
                                                     roundProgress: roundProgress,
-                                                    totalOffers: totalOffers,
-                                                    totalPages: totalPages)
+                                                    totalOffers: model.totalOffers,
+                                                    totalPages: model.totalPages)
                         })
                 )
             }
@@ -187,8 +165,7 @@ struct CarouselDistributionComponent: View {
             }
             .onChange(of: model.currentLeadingOfferIndex) { newValue in
                 model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
-                model.sendViewableImpressionEvents(viewableItems: viewableItems,
-                                                   currentLeadingOffer: newValue)
+                model.sendViewableImpressionEvents(currentLeadingOffer: newValue)
                 shouldFocusAccessibility = true
                 UIAccessibility.post(notification: .announcement,
                                      argument: accessibilityAnnouncement)
@@ -204,8 +181,7 @@ struct CarouselDistributionComponent: View {
                     setRecalculatedCurrentPage()
                     // set viewableItems first then send impressions for offers based on viewableItems
                     // duplicated events will be filtered out
-                    model.sendViewableImpressionEvents(viewableItems: viewableItems,
-                                                       currentLeadingOffer: model.currentLeadingOfferIndex)
+                    model.sendViewableImpressionEvents(currentLeadingOffer: model.currentLeadingOfferIndex)
                     frameChangeIndex += 1
                 }
             }
@@ -217,7 +193,7 @@ struct CarouselDistributionComponent: View {
     func build(page: [LayoutSchemaViewModel],
                offerWidth: CGFloat) -> some View {
         ForEach(page, id: \.self) { child in
-            if let childIndex = children.firstIndex(of: child) {
+            if let childIndex = model.children?.firstIndex(of: child) {
                 LayoutSchemaComponent(config: config.updatePosition(childIndex),
                                       layout: child,
                                       parentWidth: $parentWidth,
@@ -264,19 +240,19 @@ struct CarouselDistributionComponent: View {
                                  roundProgress: Int,
                                  totalOffers: Int,
                                  totalPages: Int) {
-        if viewableItems > 1 {
+        if model.viewableItems > 1 {
             let projectedLeadingOffer = model.currentLeadingOfferIndex + roundProgress
 
-            if projectedLeadingOffer + viewableItems > totalOffers - 1 {
+            if projectedLeadingOffer + model.viewableItems > totalOffers - 1 {
                 // if projected to go above totalOffers, update to last page
                 model.currentPage = totalPages - 1
-                model.indexWithinPage = pages[model.currentPage].count - viewableItems
-                model.currentLeadingOfferIndex = totalOffers - viewableItems
+                model.indexWithinPage = pages[model.currentPage].count - model.viewableItems
+                model.currentLeadingOfferIndex = totalOffers - model.viewableItems
             } else if projectedLeadingOffer >= 0,
                       model.currentPage <= totalPages - 1 {
                 // ensure projectedLeadingOffer above 0 and currentPage below totalPages
-                model.currentPage = Int(floor(Double(projectedLeadingOffer/viewableItems)))
-                model.indexWithinPage = projectedLeadingOffer % viewableItems
+                model.currentPage = Int(floor(Double(projectedLeadingOffer/model.viewableItems)))
+                model.indexWithinPage = projectedLeadingOffer % model.viewableItems
                 model.currentLeadingOfferIndex = projectedLeadingOffer
             }
         } else {
@@ -287,50 +263,21 @@ struct CarouselDistributionComponent: View {
     }
 
     private func registerActions() {
-        model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousPage
-        model.layoutState?.actionCollection[.progressControlNext] = goToNextPage
-        model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
+        model.registerActions()
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
             currentProgress: $model.currentPage,
             totalItems: model.children?.count ?? 0,
-            viewableItems: $viewableItems,
+            viewableItems: $model.viewableItems,
             customStateMap: $customStateMap
         )
-    }
-
-    // note this action only applies when viewableItems = 1
-    func goToNextOffer(_: Any? = nil) {
-        model.goToNextOffer()
-    }
-
-    private func goToNextPage(_: Any? = nil) {
-        model.goToNextPage()
-    }
-
-    private func goToPreviousPage(_: Any? = nil) {
-        model.goToPreviousPage()
-    }
-
-    private func closeOnComplete() {
-        // when on last offer AND closeOnComplete is true
-        if case .embeddedLayout = model.layoutState?.layoutType() {
-            model.sendDismissalCollapsedEvent()
-        } else {
-            model.sendDismissalNoMoreOfferEvent()
-        }
-        exit()
-    }
-
-    func exit() {
-        model.layoutState?.actionCollection[.close](nil)
     }
 
     func getGapOffset() -> CGFloat {
         // This calculates the gap offset to add on each drag end
         guard model.currentLeadingOfferIndex != 0, gap != 0 else { return 0 }
-        if model.currentPage == totalPages - 1 {
+        if model.currentPage == model.totalPages - 1 {
             return gap - gap * CGFloat(model.indexWithinPage)
         } else {
             return gap/2 - gap * CGFloat(model.indexWithinPage)
@@ -356,8 +303,8 @@ struct CarouselDistributionComponent: View {
 
     func getOfferWidth(pageWidth: CGFloat,
                        totalOffers: Int) -> CGFloat {
-        return viewableItems > 1 && totalOffers > 1
-            ? pageWidth/CGFloat(viewableItems) - gap
+        return model.viewableItems > 1 && totalOffers > 1
+        ? pageWidth/CGFloat(model.viewableItems) - gap
             : pageWidth - gap
     }
 
@@ -367,7 +314,7 @@ struct CarouselDistributionComponent: View {
         // 1. 1st offer has trailing peek through width=peekThrough*2
         // 2. Last offer has leading peek through width=peekThrough*2
         // 3. In-between offers have both leading and trailing peek through width=peekThrough
-        if viewableItems > 1 {
+        if model.viewableItems > 1 {
             return model.currentLeadingOfferIndex == 0 ? 0 : (model.currentPage == totalPages - 1 ? peekThrough * 2 : peekThrough)
         } else {
             return model.currentPage == 0 ? 0 : (model.currentPage == totalPages - 1 ? peekThrough * 2 : peekThrough)
@@ -385,19 +332,20 @@ struct CarouselDistributionComponent: View {
 
         let viewableItemsFromBreakpoints = Int(model.allBreakpointViewableItems[index])
         // ensure viewableItems doesn't exceed totalOffers
-        viewableItems = (viewableItemsFromBreakpoints < totalOffers) ? viewableItemsFromBreakpoints : totalOffers
+        model.viewableItems = (viewableItemsFromBreakpoints < model.totalOffers) ? viewableItemsFromBreakpoints : model
+            .totalOffers
     }
 
     func setRecalculatedCurrentPage() {
-        if model.currentLeadingOfferIndex + viewableItems > totalOffers - 1 {
+        if model.currentLeadingOfferIndex + model.viewableItems > model.totalOffers - 1 {
             // if projected to go above totalOffers, update to last page
-            model.currentPage = totalPages - 1
-            model.indexWithinPage = pages[model.currentPage].count - viewableItems
+            model.currentPage = model.totalPages - 1
+            model.indexWithinPage = model.pages[model.currentPage].count - model.viewableItems
         } else if model.currentLeadingOfferIndex >= 0,
-                  model.currentPage <= totalPages - 1 {
+                  model.currentPage <= model.totalPages - 1 {
             // ensure projectedLeadingOffer above 0 and currentPage below totalPages
-            model.currentPage = Int(floor(Double(model.currentLeadingOfferIndex/viewableItems)))
-            model.indexWithinPage = model.currentLeadingOfferIndex % viewableItems
+            model.currentPage = Int(floor(Double(model.currentLeadingOfferIndex/model.viewableItems)))
+            model.indexWithinPage = model.currentLeadingOfferIndex % model.viewableItems
         }
     }
 }

@@ -17,6 +17,24 @@ import DcuiSchema
 class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
+
+    var totalOffers: Int {
+        children?.count ?? 0
+    }
+
+    var totalPages: Int {
+        pages.count
+    }
+
+    var pages: [[LayoutSchemaViewModel]] {
+        guard let children else {
+            return []
+        }
+        return stride(from: 0, to: totalOffers, by: viewableItems).map {
+            Array(children[$0..<$0.advanced(by: min(viewableItems, children.endIndex - $0))])
+        }
+    }
+
     let defaultStyle: [CarouselDistributionStyles]?
     let allBreakpointViewableItems: [UInt8]
     let peekThroughSize: [PeekThroughSize]
@@ -38,7 +56,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
          eventService: EventServicing?,
          slots: [SlotModel],
          layoutState: any LayoutStateRepresenting) {
-        self.children = children
+        self.children = children ?? []
         self.defaultStyle = defaultStyle
         self.allBreakpointViewableItems = viewableItems
         self.peekThroughSize = peekThroughSize
@@ -60,7 +78,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         self.currentLeadingOfferIndex = initialCurrentIndex ?? 0
     }
 
-    func sendViewableImpressionEvents(viewableItems: Int, currentLeadingOffer: Int) {
+    func sendViewableImpressionEvents(currentLeadingOffer: Int) {
         for offer in currentLeadingOffer..<currentLeadingOffer + viewableItems {
             sendImpressionEvents(currentOffer: offer)
         }
@@ -68,6 +86,12 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
 
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         layoutState?.getGlobalBreakpointIndex(width) ?? 0
+    }
+
+    func registerActions() {
+        layoutState?.actionCollection[.progressControlPrevious] = goToPreviousPage
+        layoutState?.actionCollection[.progressControlNext] = goToNextPage
+        layoutState?.actionCollection[.nextOffer] = goToNextOffer
     }
 
     func setupBindings(
@@ -84,7 +108,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         self.viewableItems = viewableItems.wrappedValue
     }
 
-    func goToNextOffer() {
+    func goToNextOffer(_: Any?) {
         guard viewableItems == 1 else { return }
         if currentPage + 1 < children?.count ?? 0 {
             animateStateChange {
@@ -97,7 +121,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         }
     }
 
-    func goToNextPage() {
+    func goToNextPage(_: Any?) {
         let totalPages = calculateTotalPages()
         if currentPage < totalPages - 1 {
             animateStateChange {
@@ -110,7 +134,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         }
     }
 
-    func goToPreviousPage() {
+    func goToPreviousPage(_: Any?) {
         let newCurrentPage = if indexWithinPage == 0 && currentPage != 0 {
             currentPage - 1
         } else {
