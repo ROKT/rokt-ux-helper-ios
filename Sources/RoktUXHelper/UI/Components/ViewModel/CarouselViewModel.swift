@@ -41,6 +41,9 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     @Published var currentPage: Int = 0
     @Published var indexWithinPage: Int = 0
     @Published var viewableItems: Int = 1
+    @Published var breakpointIndex: Int = 0
+    @Published var frameChangeIndex: Int = 0
+    @Published var customStateMap: RoktUXCustomStateMap?
 
     /// The left most offer index in a RTL layout
     @Published var currentLeadingOfferIndex: Int = 0
@@ -76,6 +79,7 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         super.init(eventService: eventService, slots: slots, layoutState: layoutState)
 
         self.currentLeadingOfferIndex = initialCurrentIndex ?? 0
+        self.customStateMap = initialCustomStateMap ?? RoktUXCustomStateMap()
     }
 
     func sendViewableImpressionEvents(currentLeadingOffer: Int) {
@@ -88,24 +92,25 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         layoutState?.getGlobalBreakpointIndex(width) ?? 0
     }
 
-    func registerActions() {
+    func setupLayoutState() {
         layoutState?.actionCollection[.progressControlPrevious] = goToPreviousPage
         layoutState?.actionCollection[.progressControlNext] = goToNextPage
         layoutState?.actionCollection[.nextOffer] = goToNextOffer
+        layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
+
+        // Store the raw values instead of bindings
+        layoutState?.items[LayoutState.currentProgressKey] = currentPage
+        layoutState?.items[LayoutState.totalItemsKey] = children?.count ?? 0
+        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
+        layoutState?.items[LayoutState.customStateMap] = customStateMap
     }
 
-    func setupBindings(
-        currentProgress: Binding<Int>,
-        totalItems: Int,
-        viewableItems: Binding<Int>,
-        customStateMap: Binding<RoktUXCustomStateMap?>
-    ) {
-        // Store the raw values instead of bindings
-        layoutState?.items[LayoutState.currentProgressKey] = currentProgress.wrappedValue
-        layoutState?.items[LayoutState.totalItemsKey] = totalItems
-        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems.wrappedValue
-        layoutState?.items[LayoutState.customStateMap] = customStateMap.wrappedValue
-        self.viewableItems = viewableItems.wrappedValue
+    private func toggleCustomState(_ customStateId: Any?) {
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
+        self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
+    }
+
+    private func setupBindings() {
     }
 
     func goToNextOffer(_: Any?) {
@@ -147,6 +152,51 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         }
     }
 
+    func updateStatesOnDragEnded(_ roundProgress: Int) {
+        if viewableItems > 1 {
+            let projectedLeadingOffer = currentLeadingOfferIndex + roundProgress
+
+            if projectedLeadingOffer + viewableItems > totalOffers - 1 {
+                // if projected to go above totalOffers, update to last page
+                currentPage = totalPages - 1
+                indexWithinPage = pages[currentPage].count - viewableItems
+                currentLeadingOfferIndex = totalOffers - viewableItems
+            } else if projectedLeadingOffer >= 0, currentPage <= totalPages - 1 {
+                // ensure projectedLeadingOffer above 0 and currentPage below totalPages
+                currentPage = Int(floor(Double(projectedLeadingOffer/viewableItems)))
+                indexWithinPage = projectedLeadingOffer % viewableItems
+                currentLeadingOfferIndex = projectedLeadingOffer
+            }
+        } else {
+            // ensure currentPage is never below 0 or above totalPages for 1 viewable item
+            currentPage = max(min(currentPage + roundProgress, totalPages - 1), 0)
+            currentLeadingOfferIndex = currentPage
+        }
+    }
+
+    func setRecalculatedCurrentPage() {
+        if currentLeadingOfferIndex + viewableItems > totalOffers - 1 {
+            // if projected to go above totalOffers, update to last page
+            currentPage = totalPages - 1
+            indexWithinPage = pages[currentPage].count - viewableItems
+        } else if currentLeadingOfferIndex >= 0,
+                  currentPage <= totalPages - 1 {
+            // ensure projectedLeadingOffer above 0 and currentPage below totalPages
+            currentPage = Int(floor(Double(currentLeadingOfferIndex/viewableItems)))
+            indexWithinPage = currentLeadingOfferIndex % viewableItems
+        }
+    }
+
+    func globalScreenSizeUpdated(_ width: CGFloat?) {
+        breakpointIndex = getGlobalBreakpointIndex(width)
+        setViewableItemsForBreakpoint()
+        setRecalculatedCurrentPage()
+        // set viewableItems first then send impressions for offers based on viewableItems
+        // duplicated events will be filtered out
+        sendViewableImpressionEvents(currentLeadingOffer: currentLeadingOfferIndex)
+        frameChangeIndex += 1
+    }
+
     private func closeOnComplete() {
         // when on last offer AND closeOnComplete is true
         if case .embeddedLayout = layoutState?.layoutType() {
@@ -171,5 +221,14 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         withAnimation(.linear) {
             change()
         }
+    }
+
+    private func setViewableItemsForBreakpoint() {
+        let maxViewableItemsIndex = (allBreakpointViewableItems.count) - 1
+        let index = max(min(breakpointIndex, maxViewableItemsIndex), 0)
+
+        let viewableItemsFromBreakpoints = Int(allBreakpointViewableItems[index])
+        // ensure viewableItems doesn't exceed totalOffers
+        viewableItems = (viewableItemsFromBreakpoints < totalOffers) ? viewableItemsFromBreakpoints : totalOffers
     }
 }

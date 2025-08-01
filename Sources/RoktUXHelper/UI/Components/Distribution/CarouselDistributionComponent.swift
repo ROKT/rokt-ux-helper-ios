@@ -21,8 +21,6 @@ struct CarouselDistributionComponent: View {
     }
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
-    @State var breakpointIndex = 0
-    @State var frameChangeIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
@@ -44,8 +42,6 @@ struct CarouselDistributionComponent: View {
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
 
-    @State var customStateMap: RoktUXCustomStateMap?
-
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
         String(format: kPageAnnouncement,
@@ -61,12 +57,12 @@ struct CarouselDistributionComponent: View {
 
     var styleBreakpointIndex: Int {
         let maxStyleIndex = (model.defaultStyle?.count ?? 1) - 1
-        return max(min(breakpointIndex, maxStyleIndex), 0)
+        return max(min(model.breakpointIndex, maxStyleIndex), 0)
     }
 
     var peekThroughBreakpointIndex: Int {
         let maxPeekThroughIndex = (model.peekThroughSize.count) - 1
-        return max(min(breakpointIndex, maxPeekThroughIndex), 0)
+        return max(min(model.breakpointIndex, maxPeekThroughIndex), 0)
     }
 
     init(
@@ -84,7 +80,6 @@ struct CarouselDistributionComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
-        _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -152,15 +147,12 @@ struct CarouselDistributionComponent: View {
                             let progress = -value.translation.width/offerWidth
                             let roundProgress = Int(progress.rounded())
 
-                            updateStatesOnDragEnded(pages: model.pages,
-                                                    roundProgress: roundProgress,
-                                                    totalOffers: model.totalOffers,
-                                                    totalPages: model.totalPages)
+                            model.updateStatesOnDragEnded(roundProgress)
                         })
                 )
             }
             .onLoad {
-                registerActions()
+                model.setupLayoutState()
                 shouldFocusAccessibility = true
             }
             .onChange(of: model.currentLeadingOfferIndex) { newValue in
@@ -170,19 +162,12 @@ struct CarouselDistributionComponent: View {
                 UIAccessibility.post(notification: .announcement,
                                      argument: accessibilityAnnouncement)
             }
-            .onChange(of: customStateMap) { _ in
+            .onChange(of: model.customStateMap) { _ in
                 model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
             }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
-                    // update breakpoint indexes
-                    breakpointIndex = model.getGlobalBreakpointIndex(newSize)
-                    setViewableItemsForBreakpoint()
-                    setRecalculatedCurrentPage()
-                    // set viewableItems first then send impressions for offers based on viewableItems
-                    // duplicated events will be filtered out
-                    model.sendViewableImpressionEvents(currentLeadingOffer: model.currentLeadingOfferIndex)
-                    frameChangeIndex += 1
+                    model.globalScreenSizeUpdated(newSize)
                 }
             }
             // workaround to set dynamic height otherwise GeometryReader fills available space
@@ -215,7 +200,7 @@ struct CarouselDistributionComponent: View {
                                      defaultWidth: .wrapContent,
                                      isContainer: true,
                                      containerType: .row,
-                                     frameChangeIndex: $frameChangeIndex,
+                                     frameChangeIndex: $model.frameChangeIndex,
                                      imageLoader: model.imageLoader)
                 .frame(width: offerWidth)
                 .readSize { size in
@@ -234,44 +219,6 @@ struct CarouselDistributionComponent: View {
                 }
             }
         }
-    }
-
-    func updateStatesOnDragEnded(pages: [[LayoutSchemaViewModel]],
-                                 roundProgress: Int,
-                                 totalOffers: Int,
-                                 totalPages: Int) {
-        if model.viewableItems > 1 {
-            let projectedLeadingOffer = model.currentLeadingOfferIndex + roundProgress
-
-            if projectedLeadingOffer + model.viewableItems > totalOffers - 1 {
-                // if projected to go above totalOffers, update to last page
-                model.currentPage = totalPages - 1
-                model.indexWithinPage = pages[model.currentPage].count - model.viewableItems
-                model.currentLeadingOfferIndex = totalOffers - model.viewableItems
-            } else if projectedLeadingOffer >= 0,
-                      model.currentPage <= totalPages - 1 {
-                // ensure projectedLeadingOffer above 0 and currentPage below totalPages
-                model.currentPage = Int(floor(Double(projectedLeadingOffer/model.viewableItems)))
-                model.indexWithinPage = projectedLeadingOffer % model.viewableItems
-                model.currentLeadingOfferIndex = projectedLeadingOffer
-            }
-        } else {
-            // ensure currentPage is never below 0 or above totalPages for 1 viewable item
-            model.currentPage = max(min(model.currentPage + roundProgress, totalPages - 1), 0)
-            model.currentLeadingOfferIndex = model.currentPage
-        }
-    }
-
-    private func registerActions() {
-        model.registerActions()
-        model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
-
-        model.setupBindings(
-            currentProgress: $model.currentPage,
-            totalItems: model.children?.count ?? 0,
-            viewableItems: $model.viewableItems,
-            customStateMap: $customStateMap
-        )
     }
 
     func getGapOffset() -> CGFloat {
@@ -318,34 +265,6 @@ struct CarouselDistributionComponent: View {
             return model.currentLeadingOfferIndex == 0 ? 0 : (model.currentPage == totalPages - 1 ? peekThrough * 2 : peekThrough)
         } else {
             return model.currentPage == 0 ? 0 : (model.currentPage == totalPages - 1 ? peekThrough * 2 : peekThrough)
-        }
-    }
-
-    private func toggleCustomState(_ customStateId: Any?) {
-        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
-        self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
-    }
-
-    func setViewableItemsForBreakpoint() {
-        let maxViewableItemsIndex = (model.allBreakpointViewableItems.count) - 1
-        let index = max(min(breakpointIndex, maxViewableItemsIndex), 0)
-
-        let viewableItemsFromBreakpoints = Int(model.allBreakpointViewableItems[index])
-        // ensure viewableItems doesn't exceed totalOffers
-        model.viewableItems = (viewableItemsFromBreakpoints < model.totalOffers) ? viewableItemsFromBreakpoints : model
-            .totalOffers
-    }
-
-    func setRecalculatedCurrentPage() {
-        if model.currentLeadingOfferIndex + model.viewableItems > model.totalOffers - 1 {
-            // if projected to go above totalOffers, update to last page
-            model.currentPage = model.totalPages - 1
-            model.indexWithinPage = model.pages[model.currentPage].count - model.viewableItems
-        } else if model.currentLeadingOfferIndex >= 0,
-                  model.currentPage <= model.totalPages - 1 {
-            // ensure projectedLeadingOffer above 0 and currentPage below totalPages
-            model.currentPage = Int(floor(Double(model.currentLeadingOfferIndex/model.viewableItems)))
-            model.indexWithinPage = model.currentLeadingOfferIndex % model.viewableItems
         }
     }
 }
