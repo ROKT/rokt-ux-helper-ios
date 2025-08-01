@@ -220,8 +220,8 @@ struct GroupedDistributionComponent: View {
 
     func registerActions() {
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
-        model.layoutState?.actionCollection[.nextGroup] = goToNextGroup
-        model.layoutState?.actionCollection[.previousGroup] = goToPreviousGroup
+        model.layoutState?.actionCollection[.progressControlNext] = goToNextGroup
+        model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousGroup
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
