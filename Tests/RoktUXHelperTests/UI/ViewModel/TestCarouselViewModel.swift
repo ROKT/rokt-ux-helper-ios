@@ -59,7 +59,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 2 // Starting at second page (2 items per page)
 
         // When
-        sut.goToPreviousPage()
+        sut.goToPreviousPage(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 0, "Current page should decrement")
@@ -74,7 +74,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 0
 
         // When
-        sut.goToPreviousPage()
+        sut.goToPreviousPage(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 0, "Current page should remain at 0")
@@ -89,7 +89,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 2
 
         // When
-        sut.goToPreviousPage()
+        sut.goToPreviousPage(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 1, "Current page should not change")
@@ -106,7 +106,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 0
 
         // When
-        sut.goToNextPage()
+        sut.goToNextPage(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 1, "Current page should increment")
@@ -129,7 +129,7 @@ final class TestCarouselViewModel: XCTestCase {
         mockLayoutState.shouldCloseOnComplete = true
 
         // When
-        sut.goToNextPage()
+        sut.goToNextPage(nil)
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called")
@@ -153,7 +153,7 @@ final class TestCarouselViewModel: XCTestCase {
         mockLayoutState.shouldCloseOnComplete = false
 
         // When
-        sut.goToNextPage()
+        sut.goToNextPage(nil)
 
         // Then
         XCTAssertFalse(closeActionCalled, "Close action should not be called")
@@ -171,7 +171,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 0
 
         // When
-        sut.goToNextOffer()
+        sut.goToNextOffer(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 0, "Current page should remain unchanged")
@@ -185,7 +185,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 0
 
         // When
-        sut.goToNextOffer()
+        sut.goToNextOffer(nil)
 
         // Then
         XCTAssertEqual(sut.currentPage, 1, "Current page should increment")
@@ -207,7 +207,7 @@ final class TestCarouselViewModel: XCTestCase {
         mockLayoutState.shouldCloseOnComplete = true
 
         // When
-        sut.goToNextOffer()
+        sut.goToNextOffer(nil)
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called")
@@ -230,7 +230,7 @@ final class TestCarouselViewModel: XCTestCase {
         mockLayoutState.shouldCloseOnComplete = false
 
         // When
-        sut.goToNextOffer()
+        sut.goToNextOffer(nil)
 
         // Then
         XCTAssertFalse(closeActionCalled, "Close action should not be called")
@@ -253,7 +253,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 3
 
         // When
-        sut.goToNextOffer() // This will trigger closeOnComplete
+        sut.goToNextOffer(nil) // This will trigger closeOnComplete
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called")
@@ -275,7 +275,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.currentLeadingOfferIndex = 3
 
         // When
-        sut.goToNextOffer() // This will trigger closeOnComplete
+        sut.goToNextOffer(nil) // This will trigger closeOnComplete
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called")
@@ -305,7 +305,7 @@ final class TestCarouselViewModel: XCTestCase {
         sut.viewableItems = 1
 
         // When
-        sut.goToNextOffer()
+        sut.goToNextOffer(nil)
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called immediately since children is nil")
@@ -332,120 +332,10 @@ final class TestCarouselViewModel: XCTestCase {
         sut.viewableItems = 2
 
         // When
-        sut.goToNextPage()
+        sut.goToNextPage(nil)
 
         // Then
         XCTAssertTrue(closeActionCalled, "Close action should be called immediately since children is nil")
         XCTAssertEqual(mockEventService.dismissOption, .noMoreOffer)
-    }
-
-    // MARK: - Setup Bindings Tests
-
-    func testSetupBindings_ShouldStoreValuesInLayoutState() {
-        // Given
-        let currentProgress = Binding.constant(2)
-        let totalItems = 5
-        let viewableItems = Binding.constant(3)
-        let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(RoktUXCustomStateMap())
-
-        // When
-        sut.setupBindings(
-            currentProgress: currentProgress,
-            totalItems: totalItems,
-            viewableItems: viewableItems,
-            customStateMap: customStateMap
-        )
-
-        // Then
-        XCTAssertEqual(
-            mockLayoutState.items[LayoutState.currentProgressKey] as? Int,
-            2,
-            "Current progress should be stored in layout state"
-        )
-        XCTAssertEqual(
-            mockLayoutState.items[LayoutState.totalItemsKey] as? Int,
-            5,
-            "Total items should be stored in layout state"
-        )
-        XCTAssertEqual(
-            mockLayoutState.items[LayoutState.viewableItemsKey] as? Int,
-            3,
-            "Viewable items should be stored in layout state"
-        )
-        XCTAssertNotNil(mockLayoutState.items[LayoutState.customStateMap], "Custom state map should be stored in layout state")
-        XCTAssertEqual(sut.viewableItems, 3, "Viewable items should be updated in view model")
-    }
-
-    func testSetupBindings_WithDifferentLayoutState_ShouldUpdateCorrectState() {
-        // Given
-        let currentProgress = Binding.constant(2)
-        let totalItems = 5
-        let viewableItems = Binding.constant(3)
-        let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(RoktUXCustomStateMap())
-
-        // Create a different layout state
-        let differentLayoutState = MockLayoutState()
-
-        // Create CarouselViewModel with different layout state
-        sut = CarouselViewModel(
-            children: [],
-            defaultStyle: nil,
-            viewableItems: [2],
-            peekThroughSize: [],
-            eventService: mockEventService,
-            slots: [],
-            layoutState: differentLayoutState
-        )
-
-        // When
-        sut.setupBindings(
-            currentProgress: currentProgress,
-            totalItems: totalItems,
-            viewableItems: viewableItems,
-            customStateMap: customStateMap
-        )
-
-        // Then
-        XCTAssertEqual(
-            differentLayoutState.items[LayoutState.currentProgressKey] as? Int,
-            2,
-            "Current progress should be stored in the different layout state"
-        )
-        XCTAssertEqual(
-            differentLayoutState.items[LayoutState.totalItemsKey] as? Int,
-            5,
-            "Total items should be stored in the different layout state"
-        )
-        XCTAssertEqual(
-            differentLayoutState.items[LayoutState.viewableItemsKey] as? Int,
-            3,
-            "Viewable items should be stored in the different layout state"
-        )
-        XCTAssertNotNil(
-            differentLayoutState.items[LayoutState.customStateMap],
-            "Custom state map should be stored in the different layout state"
-        )
-        XCTAssertTrue(mockLayoutState.items.isEmpty, "Original layout state should remain empty")
-        XCTAssertEqual(sut.viewableItems, 3, "Viewable items should be updated in view model")
-    }
-
-    func testSetupBindings_WithNilCustomStateMap_ShouldStoreNilInLayoutState() {
-        // Given
-        let currentProgress = Binding.constant(2)
-        let totalItems = 5
-        let viewableItems = Binding.constant(3)
-        let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(nil)
-
-        // When
-        sut.setupBindings(
-            currentProgress: currentProgress,
-            totalItems: totalItems,
-            viewableItems: viewableItems,
-            customStateMap: customStateMap
-        )
-
-        // Then
-        XCTAssertNil(mockLayoutState.items[LayoutState.customStateMap], "Nil custom state map should be stored as nil")
-        XCTAssertEqual(sut.viewableItems, 3, "Viewable items should still be updated")
     }
 }

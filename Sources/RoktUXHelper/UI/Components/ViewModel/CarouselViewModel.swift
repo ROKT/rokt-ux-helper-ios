@@ -109,9 +109,6 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
     }
 
-    private func setupBindings() {
-    }
-
     func goToNextOffer(_: Any?) {
         guard viewableItems == 1 else { return }
         if currentPage + 1 < children?.count ?? 0 {
