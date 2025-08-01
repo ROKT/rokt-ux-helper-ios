@@ -340,14 +340,14 @@ final class TestCarouselViewModel: XCTestCase {
     }
 
     // MARK: - Setup Bindings Tests
-    
+
     func testSetupBindings_ShouldStoreValuesInLayoutState() {
         // Given
         let currentProgress = Binding.constant(2)
         let totalItems = 5
         let viewableItems = Binding.constant(3)
         let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(RoktUXCustomStateMap())
-        
+
         // When
         sut.setupBindings(
             currentProgress: currentProgress,
@@ -355,7 +355,7 @@ final class TestCarouselViewModel: XCTestCase {
             viewableItems: viewableItems,
             customStateMap: customStateMap
         )
-        
+
         // Then
         XCTAssertEqual(
             mockLayoutState.items[LayoutState.currentProgressKey] as? Int,
@@ -375,17 +375,17 @@ final class TestCarouselViewModel: XCTestCase {
         XCTAssertNotNil(mockLayoutState.items[LayoutState.customStateMap], "Custom state map should be stored in layout state")
         XCTAssertEqual(sut.viewableItems, 3, "Viewable items should be updated in view model")
     }
-    
+
     func testSetupBindings_WithDifferentLayoutState_ShouldUpdateCorrectState() {
         // Given
         let currentProgress = Binding.constant(2)
         let totalItems = 5
         let viewableItems = Binding.constant(3)
         let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(RoktUXCustomStateMap())
-        
+
         // Create a different layout state
         let differentLayoutState = MockLayoutState()
-        
+
         // Create CarouselViewModel with different layout state
         sut = CarouselViewModel(
             children: [],
@@ -396,7 +396,7 @@ final class TestCarouselViewModel: XCTestCase {
             slots: [],
             layoutState: differentLayoutState
         )
-        
+
         // When
         sut.setupBindings(
             currentProgress: currentProgress,
@@ -404,7 +404,7 @@ final class TestCarouselViewModel: XCTestCase {
             viewableItems: viewableItems,
             customStateMap: customStateMap
         )
-        
+
         // Then
         XCTAssertEqual(
             differentLayoutState.items[LayoutState.currentProgressKey] as? Int,
@@ -428,14 +428,14 @@ final class TestCarouselViewModel: XCTestCase {
         XCTAssertTrue(mockLayoutState.items.isEmpty, "Original layout state should remain empty")
         XCTAssertEqual(sut.viewableItems, 3, "Viewable items should be updated in view model")
     }
-    
+
     func testSetupBindings_WithNilCustomStateMap_ShouldStoreNilInLayoutState() {
         // Given
         let currentProgress = Binding.constant(2)
         let totalItems = 5
         let viewableItems = Binding.constant(3)
         let customStateMap: Binding<RoktUXCustomStateMap?> = Binding.constant(nil)
-        
+
         // When
         sut.setupBindings(
             currentProgress: currentProgress,
@@ -443,7 +443,7 @@ final class TestCarouselViewModel: XCTestCase {
             viewableItems: viewableItems,
             customStateMap: customStateMap
         )
-        
+
         // Then
         XCTAssertNil(mockLayoutState.items[LayoutState.customStateMap], "Nil custom state map should be stored as nil")
         XCTAssertEqual(sut.viewableItems, 3, "Viewable items should still be updated")
