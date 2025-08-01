@@ -56,7 +56,7 @@ final class TestDataImageComponent: XCTestCase {
     func test_data_image_with_fallback() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model(isValid: true, isFallback: true)))
 
-        try view.inspect().view(TestPlaceHolder.self)
+        _ = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
             .view(LayoutSchemaComponent.self)
