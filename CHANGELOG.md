@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support to all distributions for clickable progress
 
+### Fixed
+
+- Ignore sub-pixel height changes by rounding before size-change callback
+
 ## [0.5.1] - 2025-06-18
 
 ### Added

@@ -56,7 +56,9 @@ class EmbeddedComponentViewModel: ObservableObject {
     }
 
     func updateHeight(_ newHeight: CGFloat) {
-        if lastUpdatedHeight != newHeight {
+        let roundedHeight = newHeight.rounded(.up)
+        let roundedLastUpdatedHeight = lastUpdatedHeight.rounded(.up)
+        if roundedLastUpdatedHeight != roundedHeight {
             onSizeChange?(newHeight)
             lastUpdatedHeight = newHeight
         }
