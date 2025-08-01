@@ -12,8 +12,8 @@
 import SwiftUI
 import DcuiSchema
 
-private let kNextPageButtonAnnouncement = "Next page"
-private let kPreviousPageButtonAnnouncement = "Previous page"
+private let kNextButtonAnnouncement = "Next"
+private let kPreviousButtonAnnouncement = "Previous"
 
 @available(iOS 15, *)
 struct ProgressControlComponent: View {
@@ -174,7 +174,7 @@ struct ProgressControlComponent: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(model.direction == .backward ? kPreviousPageButtonAnnouncement : kNextPageButtonAnnouncement)
+            .accessibilityLabel(getAccessibilityLabel())
             .accessibilityAddTraits(.isButton)
     }
 
@@ -206,9 +206,9 @@ struct ProgressControlComponent: View {
 
     private func handleProgressControlAction() {
         if model.direction == .backward {
-            model.layoutState?.actionCollection[.previousGroup](nil)
+            model.layoutState?.actionCollection[.progressControlPrevious](nil)
         } else {
-            model.layoutState?.actionCollection[.nextGroup](nil)
+            model.layoutState?.actionCollection[.progressControlNext](nil)
         }
     }
 
@@ -224,6 +224,10 @@ struct ProgressControlComponent: View {
         default:
             return false
         }
+    }
+
+    private func getAccessibilityLabel() -> String {
+        return model.direction == .backward ? kPreviousButtonAnnouncement : kNextButtonAnnouncement
     }
 
     private func updateStyleState() {

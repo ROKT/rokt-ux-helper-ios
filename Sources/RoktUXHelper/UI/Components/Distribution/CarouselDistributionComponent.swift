@@ -42,7 +42,10 @@ struct CarouselDistributionComponent: View {
 
     // states to track paging when we have multiple viewable items
     @State private var currentPage = 0
+
+    /// The left most offer index in a RTL layout
     @State private var currentLeadingOffer: Int
+
     @State private var indexWithinPage = 0
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
@@ -291,7 +294,9 @@ struct CarouselDistributionComponent: View {
         }
     }
 
-    func registerActions() {
+    private func registerActions() {
+        model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousPage
+        model.layoutState?.actionCollection[.progressControlNext] = goToNextPage
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
@@ -320,6 +325,41 @@ struct CarouselDistributionComponent: View {
             }
             exit()
         }
+    }
+
+    private func goToNextPage(_: Any? = nil) {
+        if currentPage < totalPages - 1 {
+            withAnimation(.linear) {
+                self.currentPage = currentPage + 1
+                self.currentLeadingOffer = (self.currentPage * viewableItems)
+                self.indexWithinPage = 0
+            }
+        } else if model.layoutState?.closeOnComplete() == true {
+            closeOnComplete()
+        }
+    }
+
+    private func goToPreviousPage(_: Any? = nil) {
+        let newCurrentPage = if indexWithinPage == 0 && currentPage != 0 {
+            currentPage - 1
+        } else {
+            currentPage
+        }
+        withAnimation(.linear) {
+            self.currentPage = newCurrentPage
+            self.currentLeadingOffer = (self.currentPage * viewableItems)
+            self.indexWithinPage = 0
+        }
+    }
+
+    private func closeOnComplete() {
+        // when on last offer AND closeOnComplete is true
+        if case .embeddedLayout = model.layoutState?.layoutType() {
+            model.sendDismissalCollapsedEvent()
+        } else {
+            model.sendDismissalNoMoreOfferEvent()
+        }
+        exit()
     }
 
     func exit() {
