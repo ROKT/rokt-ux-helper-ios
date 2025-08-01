@@ -15,6 +15,7 @@ class MockLayoutState: LayoutStateRepresenting {
     var initialPluginViewState: RoktPluginViewState?
     private var currentLayoutType: RoktUXPlacementLayoutCode = .overlayLayout
     var shouldCloseOnComplete: Bool = false
+    var mockBreakpointIndex: Int = 0
 
     func setLayoutType(_ type: RoktUXPlacementLayoutCode) {
         currentLayoutType = type
@@ -29,7 +30,7 @@ class MockLayoutState: LayoutStateRepresenting {
     }
 
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
-        return 0
+        return mockBreakpointIndex
     }
 
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {

@@ -338,4 +338,256 @@ final class TestCarouselViewModel: XCTestCase {
         XCTAssertTrue(closeActionCalled, "Close action should be called immediately since children is nil")
         XCTAssertEqual(mockEventService.dismissOption, .noMoreOffer)
     }
+
+    // MARK: - UpdateStatesOnDragEnded Tests
+
+    func testUpdateStatesOnDragEnded_WhenViewableItemsGreaterThanOne_ShouldUpdateStatesCorrectly() {
+        // Given
+        sut.viewableItems = 2
+        sut.currentPage = 0
+        sut.indexWithinPage = 0
+        sut.currentLeadingOfferIndex = 0
+
+        // When
+        sut.updateStatesOnDragEnded(1) // Move forward by 1
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 0, "Current page should remain 0")
+        XCTAssertEqual(sut.indexWithinPage, 1, "Index within page should be 1")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 1, "Leading offer index should be 1")
+    }
+
+    func testUpdateStatesOnDragEnded_WhenDragExceedsTotalOffers_ShouldSnapToLastPage() {
+        // Given
+        sut.viewableItems = 2
+        sut.currentPage = 0
+        sut.indexWithinPage = 0
+        sut.currentLeadingOfferIndex = 0
+
+        // When
+        sut.updateStatesOnDragEnded(4) // Try to move beyond total offers (we have 4 items total)
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 1, "Should snap to last page")
+        XCTAssertEqual(sut.indexWithinPage, 0, "Index within page should be adjusted")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 2, "Leading offer index should be set to last valid position")
+    }
+
+    func testUpdateStatesOnDragEnded_WhenDragIsNegative_ShouldHandleBackwardsMovement() {
+        // Given
+        sut.viewableItems = 2
+        sut.currentPage = 1
+        sut.indexWithinPage = 0
+        sut.currentLeadingOfferIndex = 2
+
+        // When
+        sut.updateStatesOnDragEnded(-2) // Move backwards by 2
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 0, "Should move to first page")
+        XCTAssertEqual(sut.indexWithinPage, 0, "Index within page should be 0")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 0, "Leading offer index should be 0")
+    }
+
+    func testUpdateStatesOnDragEnded_WhenViewableItemsIsOne_ShouldUpdatePageOnly() {
+        // Given
+        sut.viewableItems = 1
+        sut.currentPage = 1
+        sut.currentLeadingOfferIndex = 1
+
+        // When
+        sut.updateStatesOnDragEnded(1) // Move forward by 1
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 2, "Current page should increment")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 2, "Leading offer index should match current page")
+    }
+
+    func testUpdateStatesOnDragEnded_WhenViewableItemsIsOne_ShouldClampToValidRange() {
+        // Given
+        sut.viewableItems = 1
+        sut.currentPage = 1
+        sut.currentLeadingOfferIndex = 1
+
+        // When - Try to move beyond total pages
+        sut.updateStatesOnDragEnded(10)
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 3, "Current page should be clamped to last valid page")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 3, "Leading offer index should match current page")
+
+        // When - Try to move before first page
+        sut.updateStatesOnDragEnded(-10)
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 0, "Current page should be clamped to first page")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 0, "Leading offer index should match current page")
+    }
+
+    // MARK: - SetViewableItemsForBreakpoint Tests
+
+    func testSetViewableItemsForBreakpoint_WhenBreakpointIndexInRange_ShouldSetCorrectViewableItems() {
+        // Given
+        sut = CarouselViewModel(
+            children: [LayoutSchemaViewModel]([
+                .basicText(BasicTextViewModel(
+                    value: "1",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                )),
+                .basicText(BasicTextViewModel(
+                    value: "2",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                )),
+                .basicText(BasicTextViewModel(
+                    value: "3",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                ))
+            ]),
+            defaultStyle: nil,
+            viewableItems: [1, 2, 3], // Different viewable items for different breakpoints
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        
+        // When
+        mockLayoutState.mockBreakpointIndex = 1 // Set mock to return breakpoint index 1
+        sut.globalScreenSizeUpdated(0)
+        
+        // Then
+        XCTAssertEqual(sut.viewableItems, 2, "Viewable items should be set to 2 for breakpoint index 1")
+    }
+    
+    func testSetViewableItemsForBreakpoint_WhenBreakpointIndexExceedsMaximum_ShouldUseLastBreakpoint() {
+        // Given
+        sut = CarouselViewModel(
+            children: [LayoutSchemaViewModel]([
+                .basicText(BasicTextViewModel(
+                    value: "1",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                )),
+                .basicText(BasicTextViewModel(
+                    value: "2",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                ))
+            ]),
+            defaultStyle: nil,
+            viewableItems: [1, 2], // Only two breakpoints defined
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        
+        // When
+        mockLayoutState.mockBreakpointIndex = 5 // Set mock to return breakpoint index 5
+        sut.globalScreenSizeUpdated(0)
+        
+        // Then
+        XCTAssertEqual(sut.viewableItems, 2, "Should use last available breakpoint value when index exceeds maximum")
+    }
+    
+    func testSetViewableItemsForBreakpoint_WhenBreakpointIndexNegative_ShouldUseFirstBreakpoint() {
+        // Given
+        sut = CarouselViewModel(
+            children: [LayoutSchemaViewModel]([
+                .basicText(BasicTextViewModel(
+                    value: "1",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                )),
+                .basicText(BasicTextViewModel(
+                    value: "2",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                ))
+            ]),
+            defaultStyle: nil,
+            viewableItems: [1, 2], // Two breakpoints defined
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        
+        // When
+        mockLayoutState.mockBreakpointIndex = -1 // Set mock to return breakpoint index -1
+        sut.globalScreenSizeUpdated(0)
+        
+        // Then
+        XCTAssertEqual(sut.viewableItems, 1, "Should use first breakpoint value when index is negative")
+    }
+    
+    func testSetViewableItemsForBreakpoint_WhenViewableItemsExceedTotalOffers_ShouldCapAtTotalOffers() {
+        // Given
+        sut = CarouselViewModel(
+            children: [LayoutSchemaViewModel]([
+                .basicText(BasicTextViewModel(
+                    value: "1",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                )),
+                .basicText(BasicTextViewModel(
+                    value: "2",
+                    defaultStyle: nil,
+                    pressedStyle: nil,
+                    hoveredStyle: nil,
+                    disabledStyle: nil,
+                    layoutState: mockLayoutState,
+                    diagnosticService: nil
+                ))
+            ]),
+            defaultStyle: nil,
+            viewableItems: [1, 4], // Second breakpoint tries to show more items than available
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        
+        // When
+        mockLayoutState.mockBreakpointIndex = 1 // Set mock to return breakpoint index 1
+        sut.globalScreenSizeUpdated(1000)
+        
+        // Then
+        XCTAssertEqual(sut.viewableItems, 2, "Should cap viewable items at total number of offers available")
+    }
 }
