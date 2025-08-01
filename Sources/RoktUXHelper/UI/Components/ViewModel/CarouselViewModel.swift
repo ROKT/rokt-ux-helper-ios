@@ -10,7 +10,6 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
-import SwiftUI
 import DcuiSchema
 
 @available(iOS 15, *)
@@ -116,10 +115,9 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     func goToNextOffer(_: Any?) {
         guard viewableItems == 1 else { return }
         if currentPage + 1 < children?.count ?? 0 {
-            animateStateChange {
-                self.currentPage += 1
-                self.currentLeadingOfferIndex = self.currentPage
-            }
+            self.currentPage += 1
+            self.currentLeadingOfferIndex = (self.currentPage * self.viewableItems)
+            self.indexWithinPage = 0
         } else if layoutState?.closeOnComplete() == true {
             // when on last offer AND closeOnComplete is true
             closeOnComplete()
@@ -129,11 +127,9 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     func goToNextPage(_: Any?) {
         let totalPages = calculateTotalPages()
         if currentPage < totalPages - 1 {
-            animateStateChange {
-                self.currentPage += 1
-                self.currentLeadingOfferIndex = (self.currentPage * self.viewableItems)
-                self.indexWithinPage = 0
-            }
+            self.currentPage += 1
+            self.currentLeadingOfferIndex = (self.currentPage * self.viewableItems)
+            self.indexWithinPage = 0
         } else if layoutState?.closeOnComplete() == true {
             closeOnComplete()
         }
@@ -145,11 +141,9 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         } else {
             currentPage
         }
-        animateStateChange {
-            self.currentPage = newCurrentPage
-            self.indexWithinPage = 0
-            self.currentLeadingOfferIndex = self.currentPage * self.viewableItems
-        }
+        self.currentPage = newCurrentPage
+        self.indexWithinPage = 0
+        self.currentLeadingOfferIndex = self.currentPage * self.viewableItems
     }
 
     func updateStatesOnDragEnded(_ roundProgress: Int) {
@@ -215,12 +209,6 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         guard let children = children, !children.isEmpty else { return 0 }
         let viewableItemCount = Int(allBreakpointViewableItems[getGlobalBreakpointIndex(nil)])
         return Int(ceil(Double(children.count)/Double(viewableItemCount)))
-    }
-
-    func animateStateChange(_ change: @escaping () -> Void) {
-        withAnimation(.linear) {
-            change()
-        }
     }
 
     private func setViewableItemsForBreakpoint() {

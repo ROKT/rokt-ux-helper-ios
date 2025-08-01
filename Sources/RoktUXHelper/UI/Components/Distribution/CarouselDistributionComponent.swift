@@ -170,6 +170,7 @@ struct CarouselDistributionComponent: View {
                     model.globalScreenSizeUpdated(newSize)
                 }
             }
+            .animation(.linear, value: model.currentLeadingOfferIndex)
             // workaround to set dynamic height otherwise GeometryReader fills available space
             .frame(height: carouselHeightMap.max(by: {$0.value < $1.value})?.value ?? 0)
         }
