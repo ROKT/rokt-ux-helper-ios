@@ -12,6 +12,11 @@
 import SwiftUI
 import DcuiSchema
 
+/// The CarouselDistributionComponent is a container component that enables cycling through
+/// offers in a carousel-like manner.
+///
+/// ## Usage Location
+/// This component is designed for use in outer layouts.
 @available(iOS 15, *)
 struct CarouselDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
@@ -43,6 +48,7 @@ struct CarouselDistributionComponent: View {
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
 
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
+
     var accessibilityAnnouncement: String {
         String(format: kPageAnnouncement,
                model.currentPage + 1,
@@ -159,8 +165,9 @@ struct CarouselDistributionComponent: View {
                 model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                 model.sendViewableImpressionEvents(currentLeadingOffer: newValue)
                 shouldFocusAccessibility = true
-                UIAccessibility.post(notification: .announcement,
-                                     argument: accessibilityAnnouncement)
+            }
+            .onChange(of: model.currentPage) { _ in
+                UIAccessibility.post(notification: .announcement, argument: accessibilityAnnouncement)
             }
             .onChange(of: model.customStateMap) { _ in
                 model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
