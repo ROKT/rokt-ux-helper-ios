@@ -33,13 +33,27 @@ final class TestImageCarouselComponent: XCTestCase {
         XCTAssertNotNil(image)
     }
 
-    func get_model() throws -> DataImageCarouselViewModel {
+    func test_data_image_carousel_with_fallback() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImageCarousel(try get_model(isFallback: true)))
+
+         let image = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(DataImageCarouselComponent.self)
+            .actualView()
+
+        XCTAssertNotNil(image)
+    }
+
+    func get_model(isFallback: Bool = false) throws -> DataImageCarouselViewModel {
 
         let transformer = LayoutTransformer(
             layoutPlugin: get_mock_layout_plugin(slots: [get_slot()])
         )
         return try transformer.getDataImageCarousel(
-            ModelTestData.DataImageCarouselData.dataImageCarousel(),
+            isFallback ? ModelTestData.DataImageCarouselData.dataImageCarouselWithFallback() : ModelTestData.DataImageCarouselData
+                .dataImageCarousel(),
             context: .inner(.generic(get_slot().offer!))
         )
     }

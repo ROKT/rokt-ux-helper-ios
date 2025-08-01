@@ -390,6 +390,179 @@ final class TestLayoutTransformer: XCTestCase {
         }
     }
 
+    // MARK: - GetDataImage
+
+    func test_getDataImage_withSingleKey_returnsImage() throws {
+        // Arrange
+        let image = CreativeImage(light: "https://rokt.com/image.png", dark: nil, alt: "alt", title: nil)
+        let offer = get_offer_with_images(["creativeImage": image])
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "creativeImage")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageViewModel.image, image)
+    }
+
+    func test_getDataImage_withSingleKey_and_addToCart_context_returnsImage() throws {
+        // Arrange
+        let image = CreativeImage(light: "https://rokt.com/image.png", dark: nil, alt: "alt", title: nil)
+        let catalogItem = get_catalog_item(image: image)
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "creativeImage")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.addToCart(catalogItem)))
+
+        // Assert
+        XCTAssertEqual(dataImageViewModel.image, image)
+    }
+
+    func test_getDataImage_withMultipleKeys_firstKeyValid_returnsImage() throws {
+        // Arrange
+        let image1 = CreativeImage(light: "https://rokt.com/image1.png", dark: nil, alt: "alt1", title: nil)
+        let image2 = CreativeImage(light: "https://rokt.com/image2.png", dark: nil, alt: "alt2", title: nil)
+        let offer = get_offer_with_images(["image1": image1, "image2": image2])
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "image1|image2")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageViewModel.image, image1)
+    }
+
+    func test_getDataImage_withMultipleKeys_secondKeyValid_returnsImage() throws {
+        // Arrange
+        let image2 = CreativeImage(light: "https://rokt.com/image2.png", dark: nil, alt: "alt2", title: nil)
+        let offer = get_offer_with_images(["image2": image2])
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "invalidKey|image2")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageViewModel.image, image2)
+    }
+
+    func test_getDataImage_withMultipleKeys_withSpaces_returnsImage() throws {
+        // Arrange
+        let image2 = CreativeImage(light: "https://rokt.com/image2.png", dark: nil, alt: "alt2", title: nil)
+        let offer = get_offer_with_images(["image2": image2])
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "invalidKey | image2")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageViewModel.image, image2)
+    }
+
+    func test_getDataImage_withNoValidKeys_returnsNil() throws {
+        // Arrange
+        let offer = get_offer_with_images([:])
+        let model = DataImageModel<WhenPredicate>(styles: nil, imageKey: "invalidKey|anotherInvalidKey")
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageViewModel = try layoutTransformer.getDataImage(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertNil(dataImageViewModel.image)
+    }
+
+    // MARK: - GetDataImageCarousel
+
+    func test_getDataImageCarousel_withSingleKey_returnsMatchingImages() throws {
+        // Arrange
+        let image1 = CreativeImage(light: "https://rokt.com/carousel_1.png", dark: nil, alt: "alt1", title: nil)
+        let image2 = CreativeImage(light: "https://rokt.com/carousel_2.png", dark: nil, alt: "alt2", title: nil)
+        let otherImage = CreativeImage(light: "https://rokt.com/other.png", dark: nil, alt: "alt other", title: nil)
+        let offer = get_offer_with_images([
+            "carousel.1": image1,
+            "carousel.2": image2,
+            "other_1": otherImage
+        ])
+        let model = DataImageCarouselModel<WhenPredicate>(styles: nil, imageKey: "carousel", duration: 5000, a11yLabel: nil)
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let viewModel = try layoutTransformer.getDataImageCarousel(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(viewModel.images.count, 2)
+        XCTAssertEqual(viewModel.images, [image1, image2])
+    }
+
+    func test_getDataImageCarousel_withMultipleKeys_returnsMatchingImages() throws {
+        // Arrange
+        let image1 = CreativeImage(light: "https://rokt.com/image1.png", dark: nil, alt: "alt1", title: nil)
+        let image2 = CreativeImage(light: "https://rokt.com/image2.png", dark: nil, alt: "alt2", title: nil)
+        let image3 = CreativeImage(light: "https://rokt.com/image3.png", dark: nil, alt: "alt3", title: nil)
+        let offer = get_offer_with_images(["carousel1.1": image1, "carousel2.1": image2, "carousel3.1": image3])
+        let model = DataImageCarouselModel<WhenPredicate>(
+            styles: nil,
+            imageKey: "invalidKey|carousel2",
+            duration: 5000,
+            a11yLabel: nil
+        )
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageCarouselViewModel = try layoutTransformer.getDataImageCarousel(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageCarouselViewModel.images.count, 1)
+        XCTAssertEqual(dataImageCarouselViewModel.images[0], image2)
+    }
+
+    func test_getDataImageCarousel_withMultipleKeysAndSpaces_returnsMatchingImages() throws {
+        // Arrange
+        let image1 = CreativeImage(light: "https://rokt.com/image1.png", dark: nil, alt: "alt1", title: nil)
+        let image2 = CreativeImage(light: "https://rokt.com/image2.png", dark: nil, alt: "alt2", title: nil)
+        let image3 = CreativeImage(light: "https://rokt.com/image3.png", dark: nil, alt: "alt3", title: nil)
+        let offer = get_offer_with_images(["carousel1.1": image1, "carousel1.2": image2, "carousel3.1": image3])
+        let model = DataImageCarouselModel<WhenPredicate>(
+            styles: nil,
+            imageKey: "invalidKey | carousel1",
+            duration: 5000,
+            a11yLabel: nil
+        )
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageCarouselViewModel = try layoutTransformer.getDataImageCarousel(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageCarouselViewModel.images.count, 2)
+        XCTAssertEqual(dataImageCarouselViewModel.images[0], image1)
+        XCTAssertEqual(dataImageCarouselViewModel.images[1], image2)
+    }
+
+    func test_getDataImageCarousel_withNoMatchingKeys_returnsEmptyArray() throws {
+        // Arrange
+        let image1 = CreativeImage(light: "https://rokt.com/image1.png", dark: nil, alt: "alt1", title: nil)
+        let offer = get_offer_with_images(["carousel1.1": image1])
+        let model = DataImageCarouselModel<WhenPredicate>(
+            styles: nil,
+            imageKey: "carousel2|carousel3",
+            duration: 5000,
+            a11yLabel: nil
+        )
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let dataImageCarouselViewModel = try layoutTransformer.getDataImageCarousel(model, context: .inner(.generic(offer)))
+
+        // Assert
+        XCTAssertEqual(dataImageCarouselViewModel.images.count, 0)
+    }
+
     //MARK: mock objects
 
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {
@@ -405,6 +578,43 @@ final class TestLayoutTransformer: XCTestCase {
                 layoutVariantSchema: .creativeResponse(layoutVariant!), moduleName: ""
             ),
             jwtToken: "slot-token"
+        )
+    }
+
+    func get_offer_with_images(_ images: [String: CreativeImage]?) -> OfferModel {
+        let creative = CreativeModel(
+            referralCreativeId: "referralCreativeId",
+            instanceGuid: "instanceGuid",
+            copy: [:],
+            images: images,
+            links: nil,
+            responseOptionsMap: nil,
+            jwtToken: "token"
+        )
+        return OfferModel(
+            campaignId: "campaignId",
+            creative: creative,
+            catalogItems: nil
+        )
+    }
+
+    func get_catalog_item(image: CreativeImage) -> CatalogItem {
+        return CatalogItem(
+            images: ["creativeImage": image],
+            catalogItemId: "catalogItemId",
+            cartItemId: "cartItemId",
+            instanceGuid: "instanceGuid",
+            title: "title",
+            description: "description",
+            price: nil,
+            originalPrice: nil,
+            originalPriceFormatted: nil,
+            currency: "USD",
+            linkedProductId: nil,
+            positiveResponseText: "Add to cart",
+            negativeResponseText: "No thanks",
+            providerData: "{}",
+            token: "token"
         )
     }
 }

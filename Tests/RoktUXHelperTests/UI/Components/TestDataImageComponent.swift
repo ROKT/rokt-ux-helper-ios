@@ -52,7 +52,20 @@ final class TestDataImageComponent: XCTestCase {
         // Invalid Image should be removed from view
         XCTAssertNil(try? image.find(AsyncImageView.self))
     }
-    
+
+    func test_data_image_with_fallback() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model(isValid: true, isFallback: true)))
+
+        _ = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(DataImageViewComponent.self)
+            .actualView()
+            .inspect()
+            .find(AsyncImageView.self)
+    }
+
     func test_dataImage_computedProperties_usesModelProperties() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model()))
         
@@ -82,14 +95,14 @@ final class TestDataImageComponent: XCTestCase {
                        ))
     }
 
-    func get_model(isValid: Bool = true) throws -> DataImageViewModel {
+    func get_model(isValid: Bool = true, isFallback: Bool = false) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""
         let transformer = LayoutTransformer(
             layoutPlugin: get_mock_layout_plugin(slots: [get_slot(image: isValid ? validImage : invalidImage)])
         )
         return try transformer.getDataImage(
-            ModelTestData.DataImageData.dataImage(),
+            isFallback ? ModelTestData.DataImageData.dataImageWithFallback() : ModelTestData.DataImageData.dataImage(),
             context: .inner(.generic(get_slot(image: isValid ? validImage : invalidImage).offer!))
         )
     }

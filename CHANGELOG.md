@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support to all distributions for clickable progress
+- Fallback `imageKey` support in `DataImage` and `DataImageCarousel` nodes
 
 ### Fixed
 
