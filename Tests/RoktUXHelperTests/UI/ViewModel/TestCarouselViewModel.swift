@@ -50,6 +50,112 @@ final class TestCarouselViewModel: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Initialization Tests
+
+    func testInitialization_WhenInitialIndexPlusViewableItemsExceedsTotalChildren_ShouldSetCorrectPage() {
+        // Given
+        let mockViewModels = (0...4).map { index in
+            BasicTextViewModel(
+                value: "Item \(index)",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: mockLayoutState,
+                diagnosticService: nil
+            )
+        }
+        let children = mockViewModels.map { LayoutSchemaViewModel.basicText($0) }
+
+        mockLayoutState.items[LayoutState.currentProgressKey] = 4
+
+        // When - Create with initialIndex that would exceed bounds
+        sut = CarouselViewModel(
+            children: children,
+            defaultStyle: nil,
+            viewableItems: [2], // Show 2 items at a time
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+
+        // Then
+        XCTAssertEqual(
+            sut.currentPage,
+            1,
+            "Current page should be set to last valid page (total items - viewable items)/viewable items"
+        )
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 1, "Leading offer index should be set to start of last page")
+    }
+
+    func testInitialization_WhenInitialIndexIsValidAndPositive_ShouldSetCorrectPage() {
+        // Given
+        let mockViewModels = (0...5).map { index in
+            BasicTextViewModel(
+                value: "Item \(index)",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: mockLayoutState,
+                diagnosticService: nil
+            )
+        }
+        let children = mockViewModels.map { LayoutSchemaViewModel.basicText($0) }
+
+        mockLayoutState.items[LayoutState.currentProgressKey] = 2
+
+        // When - Create with valid initialIndex
+        sut = CarouselViewModel(
+            children: children,
+            defaultStyle: nil,
+            viewableItems: [2], // Show 2 items at a time
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 1, "Current page should be set to initialIndex/viewableItems")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 1, "Leading offer index should match initialIndex")
+    }
+
+    func testInitialization_WhenInitialIndexIsNegative_ShouldDefaultToZeroPage() {
+        // Given
+        let mockViewModels = (0...3).map { index in
+            BasicTextViewModel(
+                value: "Item \(index)",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: mockLayoutState,
+                diagnosticService: nil
+            )
+        }
+        let children = mockViewModels.map { LayoutSchemaViewModel.basicText($0) }
+
+        // Negative index should result in page 0
+        mockLayoutState.items[LayoutState.currentProgressKey] = -1
+
+        // When - Create with negative initialIndex
+        sut = CarouselViewModel(
+            children: children,
+            defaultStyle: nil,
+            viewableItems: [2], // Show 2 items at a time
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 0, "Current page should default to 0 for negative initialIndex")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 0, "Leading offer index should default to 0")
+    }
+
     // MARK: - goToPreviousPage Tests
 
     func testGoToPreviousPage_WhenIndexWithinPageIsZeroAndNotFirstPage_ShouldDecrementPage() {

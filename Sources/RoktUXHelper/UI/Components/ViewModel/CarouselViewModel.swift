@@ -77,7 +77,8 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
 
         super.init(eventService: eventService, slots: slots, layoutState: layoutState)
 
-        self.currentLeadingOfferIndex = initialCurrentIndex ?? 0
+        self.currentLeadingOfferIndex = (self.currentPage * self.viewableItems)
+        self.indexWithinPage = 0
         self.customStateMap = initialCustomStateMap ?? RoktUXCustomStateMap()
     }
 
