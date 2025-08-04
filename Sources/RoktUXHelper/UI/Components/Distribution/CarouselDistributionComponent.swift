@@ -43,7 +43,7 @@ struct CarouselDistributionComponent: View {
     @GestureState private var offset: CGFloat = 0
 
     // states to track paging when we have multiple viewable items
-    @ObservedObject private var model: CarouselViewModel
+    @ObservedObject var model: CarouselViewModel
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
 
