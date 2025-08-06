@@ -35,25 +35,25 @@ final class TestCarouselDistributionComponent: XCTestCase {
             .view(LayoutSchemaComponent.self)
             .view(CarouselDistributionComponent.self)
             .actualView()
-        
+
         let carousel = try carouselComponent
             .inspect()
             .find(LayoutSchemaComponent.self)
-        
+
         // test custom modifier class
         let paddingModifier = try carousel.modifier(PaddingModifier.self)
         XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 3, right: 4, bottom: 5, left: 6))
-        
+
         // test the effect of custom modifier
         let padding = try carousel.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
-        
+
         XCTAssertEqual(try carousel.accessibilityLabel().string(), "Page 1 of 1")
 
-        carouselComponent.goToNextOffer()
+        carouselComponent.model.goToNextOffer(nil)
         XCTAssertTrue(closeActionCalled)
     }
-    
+
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
         let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
@@ -66,7 +66,7 @@ final class TestCarouselDistributionComponent: XCTestCase {
             },
             layoutMaker: LayoutSchemaViewModel.makeCarousel(layoutState:eventService:)
         )
-        
+
         let carouselComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
@@ -74,7 +74,7 @@ final class TestCarouselDistributionComponent: XCTestCase {
             .view(CarouselDistributionComponent.self)
             .actualView()
 
-        carouselComponent.goToNextOffer()
+        carouselComponent.model.goToNextOffer(nil)
         XCTAssertFalse(closeActionCalled)
     }
 }

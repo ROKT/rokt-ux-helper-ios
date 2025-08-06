@@ -20,7 +20,7 @@ class DistributionViewModel: Hashable {
         layoutState?.config
     }
     var initialCurrentIndex: Int? {
-        layoutState?.initialPluginViewState?.offerIndex
+        layoutState?.initialPluginViewState?.offerIndex ?? 0
     }
     var initialCustomStateMap: RoktUXCustomStateMap? {
         layoutState?.initialPluginViewState?.customStateMap
