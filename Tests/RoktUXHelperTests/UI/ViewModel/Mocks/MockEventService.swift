@@ -1,6 +1,7 @@
-import Foundation
-@testable import RoktUXHelper
 import DcuiSchema
+import Foundation
+
+@testable import RoktUXHelper
 
 @available(iOS 15, *)
 class MockEventService: EventServicing {
@@ -21,6 +22,9 @@ class MockEventService: EventServicing {
     var cartItemInstantPurchaseCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
+    var cartItemStripePayCalled = false
+    var cartItemStripePaySuccessCalled = false
+    var cartItemStripePayFailureCalled = false
 
     // MARK: - Protocol Properties
 
@@ -81,6 +85,18 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
+    func cartItemStripePay(catalogItem: CatalogItem) {
+        cartItemStripePayCalled = true
+    }
+
+    func cartItemStripePaySuccess(itemId: String) {
+        cartItemStripePaySuccessCalled = true
+    }
+
+    func cartItemStripePayFailure(itemId: String) {
+        cartItemStripePayFailureCalled = true
+    }
+
     // MARK: - Additional Test Methods
 
     func sendImpressionEvents(currentOffer: Int) {
@@ -113,6 +129,9 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseCalled = false
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
+        cartItemStripePayCalled = false
+        cartItemStripePaySuccessCalled = false
+        cartItemStripePayFailureCalled = false
         dismissOption = nil
     }
 }

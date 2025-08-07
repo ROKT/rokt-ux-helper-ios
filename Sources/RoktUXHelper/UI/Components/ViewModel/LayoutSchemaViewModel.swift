@@ -39,6 +39,7 @@ enum LayoutSchemaViewModel: Hashable {
     case toggleButton(ToggleButtonViewModel)
     case dataImageCarousel(DataImageCarouselViewModel)
     case catalogStackedCollection(CatalogStackedCollectionViewModel)
+    case catalogDevicePayButton(CatalogDevicePayButtonViewModel)
     case catalogResponseButton(CatalogResponseButtonViewModel)
     case empty
 }
