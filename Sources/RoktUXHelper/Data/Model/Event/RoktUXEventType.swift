@@ -40,6 +40,12 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalCartItemInstantPurchase
     /// Triggered when instant purchase fails
     case SignalCartItemInstantPurchaseFailure
+    /// Triggered when the user clicks catalog device pay button.
+    case SignalCartItemStripePayInitiated
+    /// Triggered when device pay succeeds
+    case SignalCartItemStripePay
+    /// Triggered when device pay fails
+    case SignalCartItemStripePayFailure
     /// Not applicable
     case CaptureAttributes
 }

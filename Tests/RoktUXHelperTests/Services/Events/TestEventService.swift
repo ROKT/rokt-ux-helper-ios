@@ -34,18 +34,18 @@ final class TestEventService: XCTestCase {
         let eventService = get_mock_event_processor(uxEventDelegate: stubUXHelper, eventHandler: { event in
             self.events.append(event)
         })
-        
+
         // Act
         eventService.sendEventsOnTransformerSuccess()
 
         // Assert
         XCTAssertEqual(events.first?.eventType, .SignalLoadComplete)
-        
+
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementReady))
     }
-    
+
     func test_sendEventsOnLoad_interactiveEventsAndImpressionSignals_shouldSend() throws {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -53,10 +53,10 @@ final class TestEventService: XCTestCase {
                                                     eventHandler: { event in
             self.events.append(event)
         })
-        
+
         // Act
         eventService.sendEventsOnLoad()
-        
+
         // Assert
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalImpression)
@@ -65,7 +65,7 @@ final class TestEventService: XCTestCase {
         XCTAssertNotNil(event?.metadata.first{$0.value == EventDateFormatter.getDateString(startDate)})
         XCTAssertNotNil(event?.metadata.first{$0.name == BE_PAGE_RENDER_ENGINE})
         XCTAssertNotNil(event?.metadata.first{$0.value == BE_RENDER_ENGINE_LAYOUTS})
-        
+
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementInteractive))
@@ -93,7 +93,7 @@ final class TestEventService: XCTestCase {
                                                     eventHandler: { event in
             self.events.append(event)
         })
-        
+
         // Act
         eventService.sendSlotImpressionEvent(instanceGuid: "instanceGuid1", jwtToken: "jwt-token")
         eventService.sendSlotImpressionEvent(instanceGuid: "instanceGuid2", jwtToken: "jwt-token")
@@ -119,7 +119,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(events.first?.eventType, .SignalActivation)
         XCTAssertEqual(events.first?.pageInstanceGuid, mockPageInstanceGuid)
     }
-    
+
     func test_sendSignalResponse_onPositive_engagementEventsAndSignals_shouldSend() throws {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -127,7 +127,7 @@ final class TestEventService: XCTestCase {
                                                     eventHandler: { event in
             self.events.append(event)
         })
-        
+
         // Act
         eventService.sendSignalResponseEvent(instanceGuid: "instanceGuid", jwtToken: "plugin-token", isPositive: true)
 
@@ -163,12 +163,12 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         XCTAssertNotNil(event?.metadata.first{$0.name == kInitiator})
         XCTAssertNotNil(event?.metadata.first{$0.value == kNoMoreOfferToShow})
-        
+
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementCompleted))
     }
-    
+
     func test_sendDismissal_onCloseButton_dismissalEventsAndSignals_shouldSend() throws {
         // Arrange
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -176,7 +176,7 @@ final class TestEventService: XCTestCase {
                                                     eventHandler: { event in
             self.events.append(event)
         })
-        
+
         // Act
         eventService.dismissOption = .closeButton
         eventService.sendDismissalEvent()
@@ -187,7 +187,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         XCTAssertNotNil(event?.metadata.first{$0.name == kInitiator})
         XCTAssertNotNil(event?.metadata.first{$0.value == kCloseButton})
-        
+
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementClosed))
@@ -212,7 +212,7 @@ final class TestEventService: XCTestCase {
         XCTAssertNotNil(event?.metadata.first{$0.name == kInitiator})
         XCTAssertNotNil(event?.metadata.first{$0.value == kDismissed})
     }
-    
+
     func test_diagnostic_processing() {
         let expectation = expectation(description: "test diagnostics")
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -232,7 +232,7 @@ final class TestEventService: XCTestCase {
         eventService.sendDiagnostics(message: "error message", callStack: "stack", severity: .error)
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func test_font_diagnostic_processing() {
         let expectation = expectation(description: "test font diagnostics")
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -252,7 +252,7 @@ final class TestEventService: XCTestCase {
         eventService.sendFontDiagnostics("Arial")
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func test_diagnostic_processing_disabled() {
         let expectation = expectation(description: "test diagnostics")
         let eventService = get_mock_event_processor(startDate: startDate,
@@ -287,6 +287,117 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.layoutId, "pluginId")
         XCTAssertEqual(stubUXHelper.url, "https://www.rokt.com")
         XCTAssertEqual(stubUXHelper.openUrlType, .passthrough)
+    }
+
+    func test_send_stripe_pay_initiated() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemStripePay(catalogItem: .mock())
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemStripePayInitiated)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemStripePayInitiated))
+    }
+
+    func test_send_stripe_pay_succeeded() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemStripePaySuccess(itemId: "catalogItemId")
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemStripePay)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemStripePay))
+    }
+
+    func test_send_stripe_pay_failed() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.cartItemStripePayFailure(itemId: "catalogItemId")
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemStripePayFailure)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first{$0.name == kCartItemId}
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
+        let catalogItemId = event?.eventData.first{$0.name == kCatalogItemId}
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
+        let currency = event?.eventData.first{$0.name == kCurrency}
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first{$0.name == kDescription}
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first{$0.name == kLinkedProductId}
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first{$0.name == kTotalPrice}
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first{$0.name == kQuantity}
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first{$0.name == kUnitPrice}
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemStripePayFailure))
     }
 
     func test_send_instant_purchase_initiated() {
@@ -425,13 +536,13 @@ final class TestEventService: XCTestCase {
 }
 
 class MockUXHelper: UXEventsDelegate {
-    
+
     var roktEvents = [RoktEventListenerType]()
-    
+
     func onOfferEngagement(_ pluginId: String) {
         self.roktEvents.append(.OfferEngagement)
     }
-    
+
     var sessionId: String?
     var pluginInstanceGuid: String?
     var jwtToken: String?
@@ -445,39 +556,39 @@ class MockUXHelper: UXEventsDelegate {
         self.layoutId = layoutId
         self.roktEvents.append(.FirstPositiveEngagement)
     }
-    
+
     func onPositiveEngagement(_ pluginId: String) {
         self.roktEvents.append(.PositiveEngagement)
     }
-    
+
     func onShowLoadingIndicator(_ pluginId: String) {
         self.roktEvents.append(.ShowLoadingIndicator)
     }
-    
+
     func onHideLoadingIndicator(_ pluginId: String) {
         self.roktEvents.append(.HideLoadingIndicator)
     }
-    
+
     func onPlacementInteractive(_ pluginId: String) {
         self.roktEvents.append(.PlacementInteractive)
     }
-    
+
     func onPlacementReady(_ pluginId: String) {
         self.roktEvents.append(.PlacementReady)
     }
-    
+
     func onPlacementClosed(_ pluginId: String) {
         self.roktEvents.append(.PlacementClosed)
     }
-    
+
     func onPlacementCompleted(_ pluginId: String) {
         self.roktEvents.append(.PlacementCompleted)
     }
-    
+
     func onPlacementFailure(_ pluginId: String) {
         self.roktEvents.append(.PlacementFailure)
     }
-    
+
     func openURL(url: String,
                  id: String,
                  layoutId: String,
@@ -489,7 +600,7 @@ class MockUXHelper: UXEventsDelegate {
         self.url = url
         self.openUrlType = type
     }
-    
+
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
         self.roktEvents.append(.CartItemInstantPurchase)
     }

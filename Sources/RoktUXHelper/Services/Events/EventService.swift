@@ -187,6 +187,21 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
+    func cartItemStripePay(catalogItem: CatalogItem) {
+        sendCartItemEvent(eventType: .SignalCartItemStripePayInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemStripePay(pluginId, catalogItem: catalogItem)
+    }
+
+    func cartItemStripePaySuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemStripePay, catalogItem: catalogItem)
+    }
+
+    func cartItemStripePayFailure(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemStripePayFailure, catalogItem: catalogItem)
+    }
+
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
         sendEvent(
             eventType,

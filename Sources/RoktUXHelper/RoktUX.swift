@@ -28,7 +28,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration.
-     
+
      - Parameters:
        - experienceResponse: The response string containing the experience data.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
@@ -90,7 +90,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration with additional parameters.
-     
+
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
@@ -538,6 +538,22 @@ public class RoktUX: UXEventsDelegate {
 
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem) {
         onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice
+        ))
+    }
+
+    func onCartItemStripePay(_ layoutId: String, catalogItem: CatalogItem) {
+        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
             layoutId: layoutId,
             name: catalogItem.title,
             cartItemId: catalogItem.cartItemId,

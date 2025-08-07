@@ -1,6 +1,6 @@
 //
 //  EventServicing.swift
-//  
+//
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
 //  Version 2.0 (the "License");
@@ -26,4 +26,7 @@ protocol EventServicing: AnyObject {
     func cartItemInstantPurchase(catalogItem: CatalogItem)
     func cartItemInstantPurchaseSuccess(itemId: String)
     func cartItemInstantPurchaseFailure(itemId: String)
+    func cartItemStripePay(catalogItem: CatalogItem)
+    func cartItemStripePaySuccess(itemId: String)
+    func cartItemStripePayFailure(itemId: String)
 }
