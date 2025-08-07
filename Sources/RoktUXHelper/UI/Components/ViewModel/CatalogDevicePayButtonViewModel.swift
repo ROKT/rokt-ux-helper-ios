@@ -9,8 +9,8 @@
 //
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
-import Foundation
 import DcuiSchema
+import Foundation
 
 @available(iOS 15, *)
 class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
@@ -29,15 +29,17 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let hoveredStyle: [CatalogDevicePayButtonStyles]?
     let disabledStyle: [CatalogDevicePayButtonStyles]?
 
-    init(catalogItem: CatalogItem?,
-         children: [LayoutSchemaViewModel]?,
-         provider: PaymentProvider,
-         layoutState: (any LayoutStateRepresenting)?,
-         eventService: EventDiagnosticServicing?,
-         defaultStyle: [CatalogDevicePayButtonStyles]?,
-         pressedStyle: [CatalogDevicePayButtonStyles]?,
-         hoveredStyle: [CatalogDevicePayButtonStyles]?,
-         disabledStyle: [CatalogDevicePayButtonStyles]?) {
+    init(
+        catalogItem: CatalogItem?,
+        children: [LayoutSchemaViewModel]?,
+        provider: PaymentProvider,
+        layoutState: (any LayoutStateRepresenting)?,
+        eventService: EventDiagnosticServicing?,
+        defaultStyle: [CatalogDevicePayButtonStyles]?,
+        pressedStyle: [CatalogDevicePayButtonStyles]?,
+        hoveredStyle: [CatalogDevicePayButtonStyles]?,
+        disabledStyle: [CatalogDevicePayButtonStyles]?
+    ) {
         self.catalogItem = catalogItem
         self.children = children
         self.provider = provider
@@ -55,7 +57,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             case .stripe:
                 eventService?.cartItemStripePay(catalogItem: catalogItem)
             default:
-                // TODO: send unknown provider event
+                break
             }
         }
     }

@@ -46,14 +46,11 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
     }
 
     func test_send_ux_event() throws {
-        var closeEventCalled = false
         var signalCartItemInitiatedCalled = false
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventHandler: { event in
-                if event.eventType == .SignalDismissal {
-                    closeEventCalled = true
-                } else if event.eventType == .SignalCartItemInstantPurchaseInitiated {
+                if event.eventType == .SignalCartItemStripePayInitiated {
                     signalCartItemInitiatedCalled = true
                 }
             },
@@ -69,12 +66,10 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             .actualView()
 
         let sut = catalogDevicePayButton.model
-        sut.cartItemInstantPurchase()
+        sut.cartItemDevicePay()
 
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchase))
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))
+        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemStripePay))
         XCTAssertTrue(signalCartItemInitiatedCalled)
-        XCTAssertTrue(closeEventCalled)
         XCTAssertNotNil(sut.layoutState)
     }
 }
@@ -100,7 +95,10 @@ extension LayoutSchemaViewModel {
         return LayoutSchemaViewModel.catalogDevicePayButton(
             try transformer.getCatalogDevicePayButtonModel(
                 style: catalogDevicePayButton.styles,
-                children: transformer.transformChildren(catalogDevicePayButton.children, context: .inner(.addToCart(catalogItem))),
+                children: transformer.transformChildren(
+                    catalogDevicePayButton.children,
+                    context: .inner(.addToCart(catalogItem))
+                ),
                 provider: catalogDevicePayButton.provider,
                 context: .inner(.addToCart(catalogItem))
             )

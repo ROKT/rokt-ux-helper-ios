@@ -677,14 +677,14 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     }
 
      func getCatalogDevicePayButtonModel(
-        style: LayoutStyle<
-            CatalogDevicePayButtonElements,
-            ConditionalStyleTransition<CatalogDevicePayButtonTransitions, WhenPredicate>
-        >?,
-        children: [LayoutSchemaViewModel]?,
-        provider: PaymentProvider,
-        context: Context
-    ) throws -> CatalogDevicePayButtonViewModel {
+         style: LayoutStyle<
+             CatalogDevicePayButtonElements,
+             ConditionalStyleTransition<CatalogDevicePayButtonTransitions, WhenPredicate>
+         >?,
+         children: [LayoutSchemaViewModel]?,
+         provider: PaymentProvider,
+         context: Context
+     ) throws -> CatalogDevicePayButtonViewModel {
         guard case let .inner(.addToCart(catalogItem)) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }

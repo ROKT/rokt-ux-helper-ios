@@ -184,6 +184,22 @@ public class RoktUX: UXEventsDelegate {
         }
     }
 
+    /**
+     Call when stripe pay has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the purchase succeeded or failed.
+     */
+    public func stripePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        if success {
+            eventServices[layoutId]?.cartItemStripePaySuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemStripePayFailure(itemId: catalogItemId)
+        }
+    }
+
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
@@ -553,7 +569,7 @@ public class RoktUX: UXEventsDelegate {
     }
 
     func onCartItemStripePay(_ layoutId: String, catalogItem: CatalogItem) {
-        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
+        onRoktEvent?(RoktUXEvent.CartItemStripePay(
             layoutId: layoutId,
             name: catalogItem.title,
             cartItemId: catalogItem.cartItemId,
