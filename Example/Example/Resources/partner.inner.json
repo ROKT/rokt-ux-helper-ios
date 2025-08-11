@@ -1,0 +1,1942 @@
+{
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "border": {
+                "borderColor": { "dark": null, "light": "#EAECF0" },
+                "borderStyle": null,
+                "borderWidth": "1",
+                "borderRadius": 12
+              },
+              "spacing": { "margin": "24 0 16 0", "padding": "16 16 16 16" },
+              "container": { "overflow": "hidden" },
+              "dimension": {
+                "height": { "type": "fit", "value": "wrap-content" }
+              },
+              "background": {
+                "backgroundColor": { "dark": null, "light": "#F9FAFB" }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "border": {
+                            "borderColor": null,
+                            "borderStyle": null,
+                            "borderWidth": null,
+                            "borderRadius": null
+                          },
+                          "spacing": { "margin": null, "padding": null },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "wrap-content" },
+                            "height": {
+                              "type": "fit",
+                              "value": "wrap-content"
+                            },
+                            "maxWidth": 120,
+                            "maxHeight": 60
+                          },
+                          "flexChild": { "alignSelf": "center" }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "imageKey": "creativeImage"
+              },
+              "type": "DataImage"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": false, "condition": "is-true" }
+            },
+            {
+              "type": "Progression",
+              "predicate": { "value": "0", "condition": "is" }
+            },
+            {
+              "type": "StaticString",
+              "predicate": {
+                "input": "center",
+                "value": "center",
+                "condition": "is"
+              }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "border": {
+                            "borderColor": null,
+                            "borderStyle": null,
+                            "borderWidth": null,
+                            "borderRadius": null
+                          },
+                          "spacing": { "margin": null, "padding": null },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "wrap-content" },
+                            "height": {
+                              "type": "fit",
+                              "value": "wrap-content"
+                            },
+                            "maxWidth": 120,
+                            "maxHeight": 60
+                          },
+                          "flexChild": { "alignSelf": "center" }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "imageKey": "creativeImage"
+              },
+              "type": "DataImage"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticString",
+              "predicate": {
+                "input": "center",
+                "value": "center",
+                "condition": "is"
+              }
+            },
+            {
+              "type": "Progression",
+              "predicate": { "value": "0", "condition": "is-above" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "border": {
+                                  "borderColor": null,
+                                  "borderStyle": null,
+                                  "borderWidth": null,
+                                  "borderRadius": null
+                                },
+                                "spacing": { "margin": null, "padding": null },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "height": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "maxWidth": 120,
+                                  "maxHeight": 60
+                                },
+                                "flexChild": { "alignSelf": "center" }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "imageKey": "creativeImage"
+                    },
+                    "type": "DataImage"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticBoolean",
+                    "predicate": { "value": false, "condition": "is-true" }
+                  },
+                  {
+                    "type": "Progression",
+                    "predicate": { "value": "0", "condition": "is" }
+                  },
+                  {
+                    "type": "StaticString",
+                    "predicate": {
+                      "input": "center",
+                      "value": "left",
+                      "condition": "is"
+                    }
+                  }
+                ]
+              },
+              "type": "When"
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "border": {
+                                  "borderColor": null,
+                                  "borderStyle": null,
+                                  "borderWidth": null,
+                                  "borderRadius": null
+                                },
+                                "spacing": { "margin": null, "padding": null },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "height": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "maxWidth": 120,
+                                  "maxHeight": 60
+                                },
+                                "flexChild": { "alignSelf": "center" }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "imageKey": "creativeImage"
+                    },
+                    "type": "DataImage"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticString",
+                    "predicate": {
+                      "input": "center",
+                      "value": "left",
+                      "condition": "is"
+                    }
+                  },
+                  {
+                    "type": "Progression",
+                    "predicate": { "value": "0", "condition": "is-above" }
+                  }
+                ]
+              },
+              "type": "When"
+            },
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [{ "default": { "flexChild": { "weight": 1 } } }]
+                  }
+                },
+                "children": [
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "value": "%^DATA.creativeCopy.creative.title|^%",
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "text": {
+                                        "fontSize": 14,
+                                        "fontStyle": null,
+                                        "textColor": {
+                                          "dark": null,
+                                          "light": "#262626"
+                                        },
+                                        "fontFamily": null,
+                                        "fontWeight": "700",
+                                        "lineHeight": 20,
+                                        "textTransform": null,
+                                        "textDecoration": null,
+                                        "horizontalTextAlign": "center"
+                                      },
+                                      "spacing": {
+                                        "margin": "0 0 8 0",
+                                        "padding": "0 0 0 0"
+                                      },
+                                      "dimension": {
+                                        "width": {
+                                          "type": "fit",
+                                          "value": "fit-width"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          "type": "BasicText"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticBoolean",
+                          "predicate": {
+                            "value": false,
+                            "condition": "is-false"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  },
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^%\u003Cbr/\u003E%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": null,
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#262626"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": 20,
+                                              "textTransform": null,
+                                              "textDecoration": null,
+                                              "horizontalTextAlign": "center"
+                                            },
+                                            "spacing": {
+                                              "margin": "4 0 0 0",
+                                              "padding": "0 0 0 0"
+                                            },
+                                            "dimension": {
+                                              "width": {
+                                                "type": "fit",
+                                                "value": "fit-width"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ],
+                                      "link": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": null,
+                                              "fontStyle": null,
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#262626"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "textDecoration": "underline"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "openLinks": "externally"
+                                },
+                                "type": "RichText"
+                              }
+                            ],
+                            "predicates": [
+                              {
+                                "type": "StaticBoolean",
+                                "predicate": {
+                                  "value": false,
+                                  "condition": "is-true"
+                                }
+                              }
+                            ]
+                          },
+                          "type": "When"
+                        },
+                        {
+                          "node": {
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": null,
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#262626"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": 20,
+                                              "textTransform": null,
+                                              "textDecoration": null,
+                                              "horizontalTextAlign": "center"
+                                            },
+                                            "spacing": {
+                                              "margin": "4 0 0 0",
+                                              "padding": "0 0 0 0"
+                                            },
+                                            "dimension": {
+                                              "width": {
+                                                "type": "fit",
+                                                "value": "fit-width"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ],
+                                      "link": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": null,
+                                              "fontStyle": null,
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#262626"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "textDecoration": "underline"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "openLinks": "externally"
+                                },
+                                "type": "RichText"
+                              }
+                            ],
+                            "predicates": [
+                              {
+                                "type": "StaticBoolean",
+                                "predicate": {
+                                  "value": false,
+                                  "condition": "is-false"
+                                }
+                              }
+                            ]
+                          },
+                          "type": "When"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticBoolean",
+                          "predicate": {
+                            "value": false,
+                            "condition": "is-true"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  }
+                ]
+              },
+              "type": "Column"
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "border": {
+                                  "borderColor": null,
+                                  "borderStyle": null,
+                                  "borderWidth": null,
+                                  "borderRadius": null
+                                },
+                                "spacing": { "margin": null, "padding": null },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "height": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "maxWidth": 120,
+                                  "maxHeight": 60
+                                },
+                                "flexChild": { "alignSelf": "center" }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "imageKey": "creativeImage"
+                    },
+                    "type": "DataImage"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticBoolean",
+                    "predicate": { "value": false, "condition": "is-true" }
+                  },
+                  {
+                    "type": "Progression",
+                    "predicate": { "value": "0", "condition": "is" }
+                  },
+                  {
+                    "type": "StaticString",
+                    "predicate": {
+                      "input": "center",
+                      "value": "right",
+                      "condition": "is"
+                    }
+                  }
+                ]
+              },
+              "type": "When"
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "border": {
+                                  "borderColor": null,
+                                  "borderStyle": null,
+                                  "borderWidth": null,
+                                  "borderRadius": null
+                                },
+                                "spacing": { "margin": null, "padding": null },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "height": {
+                                    "type": "fit",
+                                    "value": "wrap-content"
+                                  },
+                                  "maxWidth": 120,
+                                  "maxHeight": 60
+                                },
+                                "flexChild": { "alignSelf": "center" }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "imageKey": "creativeImage"
+                    },
+                    "type": "DataImage"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticString",
+                    "predicate": {
+                      "input": "center",
+                      "value": "right",
+                      "condition": "is"
+                    }
+                  },
+                  {
+                    "type": "Progression",
+                    "predicate": { "value": "0", "condition": "is-above" }
+                  }
+                ]
+              },
+              "type": "When"
+            }
+          ]
+        },
+        "type": "Row"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "value": "%^DATA.creativeCopy.creative.copy|^%\u003Cbr/\u003E%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%",
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": 14,
+                                  "fontStyle": null,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#262626"
+                                  },
+                                  "fontFamily": null,
+                                  "fontWeight": null,
+                                  "lineHeight": 20,
+                                  "textTransform": null,
+                                  "textDecoration": null,
+                                  "horizontalTextAlign": "center"
+                                },
+                                "spacing": {
+                                  "margin": "4 0 0 0",
+                                  "padding": "0 0 0 0"
+                                },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "fit-width"
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "link": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": null,
+                                  "fontStyle": null,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#262626"
+                                  },
+                                  "fontFamily": null,
+                                  "fontWeight": null,
+                                  "textDecoration": "underline"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "openLinks": "externally"
+                    },
+                    "type": "RichText"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticBoolean",
+                    "predicate": { "value": false, "condition": "is-true" }
+                  }
+                ]
+              },
+              "type": "When"
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "node": {
+                      "value": "%^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%",
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": 14,
+                                  "fontStyle": null,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#262626"
+                                  },
+                                  "fontFamily": null,
+                                  "fontWeight": null,
+                                  "lineHeight": 20,
+                                  "textTransform": null,
+                                  "textDecoration": null,
+                                  "horizontalTextAlign": "center"
+                                },
+                                "spacing": {
+                                  "margin": "4 0 0 0",
+                                  "padding": "0 0 0 0"
+                                },
+                                "dimension": {
+                                  "width": {
+                                    "type": "fit",
+                                    "value": "fit-width"
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "link": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": null,
+                                  "fontStyle": null,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#262626"
+                                  },
+                                  "fontFamily": null,
+                                  "fontWeight": null,
+                                  "textDecoration": "underline"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "openLinks": "externally"
+                    },
+                    "type": "RichText"
+                  }
+                ],
+                "predicates": [
+                  {
+                    "type": "StaticBoolean",
+                    "predicate": { "value": false, "condition": "is-false" }
+                  }
+                ]
+              },
+              "type": "When"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": false, "condition": "is-false" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "value": "%^DATA.creativeCopy.creative.confirmation.message|^%",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "text": {
+                      "fontSize": 14,
+                      "fontStyle": null,
+                      "textColor": { "dark": null, "light": "#262626" },
+                      "fontFamily": null,
+                      "fontWeight": null,
+                      "lineHeight": 20,
+                      "textTransform": null,
+                      "textDecoration": null,
+                      "horizontalTextAlign": "center"
+                    },
+                    "spacing": { "margin": "4 0 0 0", "padding": "0 0 0 0" },
+                    "dimension": {
+                      "width": { "type": "fit", "value": "fit-width" }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "type": "BasicText"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "value": "%^DATA.creativeCopy.creative.disclaimer|^%",
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "text": {
+                            "fontSize": 12,
+                            "fontStyle": null,
+                            "textColor": { "dark": null, "light": "#999999" },
+                            "fontFamily": null,
+                            "fontWeight": null,
+                            "lineHeight": 12,
+                            "textTransform": null,
+                            "textDecoration": null,
+                            "horizontalTextAlign": "center"
+                          },
+                          "spacing": {
+                            "margin": "16 0 0 0",
+                            "padding": "0 0 0 0"
+                          },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "fit-width" }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "type": "RichText"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": false, "condition": "is-true" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "spacing": {
+                            "margin": "16 0 0 0",
+                            "padding": "0 0 0 0"
+                          },
+                          "container": {
+                            "gap": 8,
+                            "alignItems": "stretch",
+                            "justifyContent": "flex-start"
+                          },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "fit-width" }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "children": [
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": "0 0 0 0",
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": { "weight": 1 },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "openLinks": "externally",
+                            "responseKey": "positive"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticString",
+                          "predicate": {
+                            "input": "positive-first",
+                            "value": "positive-first",
+                            "condition": "is"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  },
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": null,
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": { "weight": 1 },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": "#00FFFFFF",
+                                          "light": "#00FFFFFF"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": { "backgroundColor": null }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#222222"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#222222"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "responseKey": "negative"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticBoolean",
+                          "predicate": {
+                            "value": false,
+                            "condition": "is-true"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  },
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": "0 0 0 0",
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": { "weight": 1 },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "openLinks": "externally",
+                            "responseKey": "positive"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticString",
+                          "predicate": {
+                            "input": "positive-first",
+                            "value": "positive-first",
+                            "condition": "is-not"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  }
+                ]
+              },
+              "type": "Row"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": true, "condition": "is-false" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "spacing": {
+                            "margin": "16 0 0 0",
+                            "padding": "0 0 0 0"
+                          },
+                          "container": {
+                            "gap": 8,
+                            "justifyContent": "flex-start"
+                          },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "fit-width" }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "children": [
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": "0 0 0 0",
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "width": {
+                                          "type": "fit",
+                                          "value": "fit-width"
+                                        },
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": {
+                                        "alignSelf": "flex-start"
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "openLinks": "externally",
+                            "responseKey": "positive"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticString",
+                          "predicate": {
+                            "input": "positive-first",
+                            "value": "positive-first",
+                            "condition": "is"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  },
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": null,
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "width": {
+                                          "type": "fit",
+                                          "value": "fit-width"
+                                        },
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": {
+                                        "alignSelf": "flex-start"
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": "#00FFFFFF",
+                                          "light": "#00FFFFFF"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": { "backgroundColor": null }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#222222"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#222222"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "responseKey": "negative"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticBoolean",
+                          "predicate": {
+                            "value": false,
+                            "condition": "is-true"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  },
+                  {
+                    "node": {
+                      "children": [
+                        {
+                          "node": {
+                            "styles": {
+                              "elements": {
+                                "own": [
+                                  {
+                                    "default": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        },
+                                        "borderStyle": "solid",
+                                        "borderWidth": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "spacing": {
+                                        "margin": "0 0 0 0",
+                                        "padding": "8 16"
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        },
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                      },
+                                      "dimension": {
+                                        "width": {
+                                          "type": "fit",
+                                          "value": "fit-width"
+                                        },
+                                        "minWidth": 190,
+                                        "minHeight": 32
+                                      },
+                                      "flexChild": {
+                                        "alignSelf": "flex-start"
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    },
+                                    "pressed": {
+                                      "border": {
+                                        "borderColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      },
+                                      "container": {
+                                        "shadow": {
+                                          "color": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          },
+                                          "offsetX": 0,
+                                          "offsetY": 0,
+                                          "blurRadius": 0,
+                                          "spreadRadius": 0
+                                        }
+                                      },
+                                      "background": {
+                                        "backgroundColor": {
+                                          "dark": null,
+                                          "light": "#222222"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "children": [
+                              {
+                                "node": {
+                                  "value": "%^DATA.creativeResponse.shortLabel^%",
+                                  "styles": {
+                                    "elements": {
+                                      "own": [
+                                        {
+                                          "default": {
+                                            "text": {
+                                              "fontSize": 14,
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontFamily": null,
+                                              "fontWeight": null,
+                                              "lineHeight": null,
+                                              "textTransform": "none",
+                                              "textDecoration": "none",
+                                              "horizontalTextAlign": "center"
+                                            }
+                                          },
+                                          "pressed": {
+                                            "text": {
+                                              "fontStyle": "normal",
+                                              "textColor": {
+                                                "dark": null,
+                                                "light": "#FFFFFF"
+                                              },
+                                              "fontWeight": null,
+                                              "textDecoration": "none"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "type": "BasicText"
+                              }
+                            ],
+                            "openLinks": "externally",
+                            "responseKey": "positive"
+                          },
+                          "type": "CreativeResponse"
+                        }
+                      ],
+                      "predicates": [
+                        {
+                          "type": "StaticString",
+                          "predicate": {
+                            "input": "positive-first",
+                            "value": "positive-first",
+                            "condition": "is-not"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "When"
+                  }
+                ]
+              },
+              "type": "Column"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": true, "condition": "is-true" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "border": {
+                            "borderColor": null,
+                            "borderStyle": null,
+                            "borderWidth": null,
+                            "borderRadius": null
+                          },
+                          "spacing": {
+                            "margin": "16 0 0 0",
+                            "padding": "0 0 0 0"
+                          },
+                          "container": {
+                            "alignItems": "center",
+                            "justifyContent": "center"
+                          },
+                          "dimension": { "maxWidth": null },
+                          "background": { "backgroundColor": null }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "children": [
+                  {
+                    "node": {
+                      "name": "Team",
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": 16,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#BD0B0B"
+                                  },
+                                  "fontFamily": "rokt-icons"
+                                },
+                                "spacing": {
+                                  "margin": "0 4 0 0",
+                                  "padding": "0 0 0 0"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": "StaticIcon"
+                  },
+                  {
+                    "node": {
+                      "value": "<strong>%^DATA.creativeCopy.creative.socialProof.number|Several^%</strong> people opened this offer last week",
+                      "styles": {
+                        "elements": {
+                          "own": [
+                            {
+                              "default": {
+                                "text": {
+                                  "fontSize": 14,
+                                  "fontStyle": null,
+                                  "textColor": {
+                                    "dark": null,
+                                    "light": "#BD0B0B"
+                                  },
+                                  "fontFamily": null,
+                                  "fontWeight": null,
+                                  "lineHeight": 20,
+                                  "textTransform": null,
+                                  "textDecoration": null,
+                                  "horizontalTextAlign": "center"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": "RichText"
+                  }
+                ]
+              },
+              "type": "Row"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "CreativeCopy",
+              "predicate": {
+                "value": "creative.socialProof.number",
+                "condition": "exists"
+              }
+            },
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": false, "condition": "is-true" }
+            }
+          ]
+        },
+        "type": "When"
+      },
+      {
+        "node": {
+          "children": [
+            {
+              "node": {
+                "value": "%^DATA.creativeCopy.creative.disclaimer|^%",
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "text": {
+                            "fontSize": 12,
+                            "fontStyle": null,
+                            "textColor": { "dark": null, "light": "#999999" },
+                            "fontFamily": null,
+                            "fontWeight": null,
+                            "lineHeight": 12,
+                            "textTransform": null,
+                            "textDecoration": null,
+                            "horizontalTextAlign": "center"
+                          },
+                          "spacing": {
+                            "margin": "16 0 0 0",
+                            "padding": "0 0 0 0"
+                          },
+                          "dimension": {
+                            "width": { "type": "fit", "value": "fit-width" }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "type": "RichText"
+            }
+          ],
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": { "value": false, "condition": "is-false" }
+            }
+          ]
+        },
+        "type": "When"
+      }
+    ]
+  },
+  "type": "Column"
+}

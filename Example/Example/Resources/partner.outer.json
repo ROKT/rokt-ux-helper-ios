@@ -1,0 +1,2373 @@
+{
+  "layout": {
+    "node": {
+      "styles": {
+        "elements": {
+          "own": [
+            {
+              "default": {
+                "border": {
+                  "borderColor": null,
+                  "borderStyle": null,
+                  "borderWidth": null,
+                  "borderRadius": 12
+                },
+                "spacing": { "margin": null, "padding": "16 16 16 16" },
+                "dimension": {
+                  "width": { "type": "fit", "value": "fit-width" },
+                  "height": { "type": "fit", "value": "wrap-content" }
+                },
+                "background": {
+                  "backgroundColor": { "dark": null, "light": "#FFFFFF" }
+                }
+              }
+            }
+          ],
+          "wrapper": [
+            {
+              "default": {
+                "background": {
+                  "backgroundColor": { "dark": null, "light": "#80000000" }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "node": {
+            "children": [
+              {
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "border": {
+                              "borderColor": null,
+                              "borderStyle": null,
+                              "borderWidth": null,
+                              "borderRadius": null
+                            },
+                            "spacing": {
+                              "margin": "0 0 0 0",
+                              "padding": "0 0 0 0"
+                            },
+                            "container": { "alignItems": "center" },
+                            "dimension": {
+                              "width": { "type": "fit", "value": "fit-width" },
+                              "height": {
+                                "type": "fit",
+                                "value": "wrap-content"
+                              }
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "dark": null,
+                                "light": "#FFFFFF"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "border": {
+                                          "borderColor": null,
+                                          "borderStyle": null,
+                                          "borderWidth": null,
+                                          "borderRadius": null
+                                        },
+                                        "spacing": {
+                                          "margin": null,
+                                          "padding": null
+                                        },
+                                        "flexChild": {
+                                          "alignSelf": "flex-start"
+                                        },
+                                        "background": {
+                                          "backgroundColor": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          }
+                                        }
+                                      },
+                                      "pressed": {
+                                        "border": { "borderColor": null },
+                                        "background": {
+                                          "backgroundColor": null
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "children": [
+                                {
+                                  "type": "StaticImage",
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "dimension": {
+                                                "minHeight": 12.0,
+                                                "maxHeight": 12.0
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "url": {
+                                      "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAF8SURBVHgB7ZhdasMwEAaHnmTufwkfpUdJE4gg0DTW30qy6IDxi3Z3vmDLduA33o/jeb4Kkun8WPB9P27P82nBAkim8+vCG9cIKZnO7xauHlIynT8tXDWkFDgfJwtXCynn4dJxlBbMDimVrtWFA5FGx+YGgUgnt26NOiKdnbo3bMAoF5kf0mgHmRfSUbNlfEhHz3TgQJl01ThgsEy+7w0UkPmbWphIRM8m7CjUs1dXpF2sR49QpF6wpXYoUi5aUzMVKRO+VLiE5ItfLlxC+oRcMlxC2kIuHS4hdSEvES4hZSHDwn3xTzGy8SUqG28ysvFjQjZ+0MvGr2qy8cu2bPy5JBt/8MrGf1kYIBTRswoDRWRySAcIyKSQDhwsg0PK+F/VUTNl3n1h9Gxh+s5mlIPMDxfm0r1hB6STU7dGAUijW3ODAUilY3XhBKTC9SgtmIzkhzxyC1YJl5BC508Fq4VLSKHzu4JVwyWk0Pm1YPVwCSl0fiw4uEa4hPzh/ANDrAqvUvLSOAAAAABJRU5ErkJggg==",
+                                      "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg=="
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "CloseButton"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "border": {
+                                          "borderColor": null,
+                                          "borderStyle": null,
+                                          "borderWidth": null,
+                                          "borderRadius": null
+                                        },
+                                        "spacing": {
+                                          "margin": null,
+                                          "padding": null
+                                        },
+                                        "flexChild": {
+                                          "alignSelf": "flex-end"
+                                        },
+                                        "background": {
+                                          "backgroundColor": {
+                                            "dark": null,
+                                            "light": "#00000000"
+                                          }
+                                        }
+                                      },
+                                      "pressed": {
+                                        "border": { "borderColor": null },
+                                        "background": {
+                                          "backgroundColor": null
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "children": [
+                                {
+                                  "type": "StaticImage",
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "dimension": {
+                                                "minHeight": 12.0,
+                                                "maxHeight": 12.0
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "url": {
+                                      "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAF8SURBVHgB7ZhdasMwEAaHnmTufwkfpUdJE4gg0DTW30qy6IDxi3Z3vmDLduA33o/jeb4Kkun8WPB9P27P82nBAkim8+vCG9cIKZnO7xauHlIynT8tXDWkFDgfJwtXCynn4dJxlBbMDimVrtWFA5FGx+YGgUgnt26NOiKdnbo3bMAoF5kf0mgHmRfSUbNlfEhHz3TgQJl01ThgsEy+7w0UkPmbWphIRM8m7CjUs1dXpF2sR49QpF6wpXYoUi5aUzMVKRO+VLiE5ItfLlxC+oRcMlxC2kIuHS4hdSEvES4hZSHDwn3xTzGy8SUqG28ysvFjQjZ+0MvGr2qy8cu2bPy5JBt/8MrGf1kYIBTRswoDRWRySAcIyKSQDhwsg0PK+F/VUTNl3n1h9Gxh+s5mlIPMDxfm0r1hB6STU7dGAUijW3ODAUilY3XhBKTC9SgtmIzkhzxyC1YJl5BC508Fq4VLSKHzu4JVwyWk0Pm1YPVwCSl0fiw4uEa4hPzh/ANDrAqvUvLSOAAAAABJRU5ErkJggg==",
+                                      "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg=="
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "CloseButton"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "url": {
+                                "dark": "data:image/svg\u002Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMjguMjMzIDEyLjg1M2MtLjQ3Mi0uNDkzLS45Ni0xLTEuMTQzLTEuNDQ3LS4xNy0uNDA5LS4xOC0xLjA4Ni0uMTktMS43NDItLjAxOS0xLjIyLS4wMzktMi42MDMtMS0zLjU2NHMtMi4zNDQtLjk4MS0zLjU2NC0xYy0uNjU2LS4wMS0xLjMzMy0uMDItMS43NDItLjE5LS40NDUtLjE4NC0uOTU0LS42NzEtMS40NDctMS4xNDJDMTguMjg2IDIuOTM4IDE3LjMwNiAyIDE2IDJzLTIuMjg0LjkzOS0zLjE0OCAxLjc2OGMtLjQ5Mi40Ny0xIC45NTgtMS40NDYgMS4xNDItLjQwNi4xNy0xLjA4Ni4xOC0xLjc0Mi4xOS0xLjIyLjAxOS0yLjYwMy4wMzktMy41NjQgMXMtLjk3NSAyLjM0NC0xIDMuNTY0Yy0uMDEuNjU2LS4wMiAxLjMzNC0uMTkgMS43NDItLjE4NC40NDUtLjY3MS45NTQtMS4xNDIgMS40NDZDMi45MzggMTMuNzE1IDIgMTQuNjk2IDIgMTZzLjkzOSAyLjI4NCAxLjc2OCAzLjE0OGMuNDcuNDkyLjk1OCAxIDEuMTQyIDEuNDQ2LjE3LjQwOS4xOCAxLjA4Ni4xOSAxLjc0Mi4wMTkgMS4yMi4wMzkgMi42MDMgMSAzLjU2NHMyLjM0NC45ODEgMy41NjQgMWMuNjU2LjAxIDEuMzM0LjAyIDEuNzQyLjE5LjQ0NS4xODQuOTU0LjY3MSAxLjQ0NiAxLjE0M0MxMy43MTUgMjkuMDYgMTQuNjk2IDMwIDE2IDMwczIuMjg0LS45MzkgMy4xNDgtMS43NjdjLjQ5Mi0uNDcyIDEtLjk2IDEuNDQ2LTEuMTQzLjQwOS0uMTcgMS4wODYtLjE4IDEuNzQyLS4xOSAxLjIyLS4wMTkgMi42MDMtLjAzOSAzLjU2NC0xcy45ODEtMi4zNDQgMS0zLjU2NGMuMDEtLjY1Ni4wMi0xLjMzMy4xOS0xLjc0Mi4xODQtLjQ0NS42NzEtLjk1NCAxLjE0My0xLjQ0N0MyOS4wNiAxOC4yODYgMzAgMTcuMzA2IDMwIDE2cy0uOTM5LTIuMjg0LTEuNzY3LTMuMTQ4bS02LjUyNi44NTQtNyA3YTEgMSAwIDAgMS0xLjQxNSAwbC0zLTNhMSAxIDAgMCAxIDEuNDE1LTEuNDE1TDE0IDE4LjU4N2w2LjI5My02LjI5M2ExIDEgMCAwIDEgMS40MTUgMS40MTUiIGZpbGw9IiMwNzk0NTUiLz48L3N2Zz4=",
+                                "light": "data:image/svg\u002Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMjguMjMzIDEyLjg1M2MtLjQ3Mi0uNDkzLS45Ni0xLTEuMTQzLTEuNDQ3LS4xNy0uNDA5LS4xOC0xLjA4Ni0uMTktMS43NDItLjAxOS0xLjIyLS4wMzktMi42MDMtMS0zLjU2NHMtMi4zNDQtLjk4MS0zLjU2NC0xYy0uNjU2LS4wMS0xLjMzMy0uMDItMS43NDItLjE5LS40NDUtLjE4NC0uOTU0LS42NzEtMS40NDctMS4xNDJDMTguMjg2IDIuOTM4IDE3LjMwNiAyIDE2IDJzLTIuMjg0LjkzOS0zLjE0OCAxLjc2OGMtLjQ5Mi40Ny0xIC45NTgtMS40NDYgMS4xNDItLjQwNi4xNy0xLjA4Ni4xOC0xLjc0Mi4xOS0xLjIyLjAxOS0yLjYwMy4wMzktMy41NjQgMXMtLjk3NSAyLjM0NC0xIDMuNTY0Yy0uMDEuNjU2LS4wMiAxLjMzNC0uMTkgMS43NDItLjE4NC40NDUtLjY3MS45NTQtMS4xNDIgMS40NDZDMi45MzggMTMuNzE1IDIgMTQuNjk2IDIgMTZzLjkzOSAyLjI4NCAxLjc2OCAzLjE0OGMuNDcuNDkyLjk1OCAxIDEuMTQyIDEuNDQ2LjE3LjQwOS4xOCAxLjA4Ni4xOSAxLjc0Mi4wMTkgMS4yMi4wMzkgMi42MDMgMSAzLjU2NHMyLjM0NC45ODEgMy41NjQgMWMuNjU2LjAxIDEuMzM0LjAyIDEuNzQyLjE5LjQ0NS4xODQuOTU0LjY3MSAxLjQ0NiAxLjE0M0MxMy43MTUgMjkuMDYgMTQuNjk2IDMwIDE2IDMwczIuMjg0LS45MzkgMy4xNDgtMS43NjdjLjQ5Mi0uNDcyIDEtLjk2IDEuNDQ2LTEuMTQzLjQwOS0uMTcgMS4wODYtLjE4IDEuNzQyLS4xOSAxLjIyLS4wMTkgMi42MDMtLjAzOSAzLjU2NC0xcy45ODEtMi4zNDQgMS0zLjU2NGMuMDEtLjY1Ni4wMi0xLjMzMy4xOS0xLjc0Mi4xODQtLjQ0NS42NzEtLjk1NCAxLjE0My0xLjQ0N0MyOS4wNiAxOC4yODYgMzAgMTcuMzA2IDMwIDE2cy0uOTM5LTIuMjg0LTEuNzY3LTMuMTQ4bS02LjUyNi44NTQtNyA3YTEgMSAwIDAgMS0xLjQxNSAwbC0zLTNhMSAxIDAgMCAxIDEuNDE1LTEuNDE1TDE0IDE4LjU4N2w2LjI5My02LjI5M2ExIDEgMCAwIDEgMS40MTUgMS40MTUiIGZpbGw9IiMwNzk0NTUiLz48L3N2Zz4="
+                              },
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "border": {
+                                          "borderColor": null,
+                                          "borderStyle": null,
+                                          "borderWidth": null,
+                                          "borderRadius": null
+                                        },
+                                        "spacing": {
+                                          "margin": "0 0 16 0",
+                                          "padding": "0 0 0 0"
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fixed",
+                                            "value": 32
+                                          },
+                                          "height": {
+                                            "type": "fixed",
+                                            "value": 32
+                                          }
+                                        },
+                                        "flexChild": { "alignSelf": "center" }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "StaticImage"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "value": "Thank you for your order",
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "text": {
+                                    "fontSize": 24,
+                                    "fontStyle": null,
+                                    "textColor": {
+                                      "dark": null,
+                                      "light": "#262626"
+                                    },
+                                    "fontFamily": null,
+                                    "fontWeight": "700",
+                                    "lineHeight": null,
+                                    "textDecoration": null,
+                                    "horizontalTextAlign": "center"
+                                  },
+                                  "spacing": {
+                                    "margin": null,
+                                    "padding": null
+                                  },
+                                  "dimension": {
+                                    "width": {
+                                      "type": "fit",
+                                      "value": "fit-width"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "type": "RichText"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "value": "Order #: ",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 14,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#262626"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "lineHeight": 20,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "center"
+                                        },
+                                        "spacing": {
+                                          "margin": "0 0 0 0",
+                                          "padding": "0 0 0 0"
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-false"
+                            }
+                          },
+                          {
+                            "type": "Progression",
+                            "predicate": { "value": "0", "condition": "is" }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "value": "Order #: ",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 14,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#262626"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "lineHeight": 20,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "center"
+                                        },
+                                        "spacing": {
+                                          "margin": "0 0 0 0",
+                                          "padding": "0 0 0 0"
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "flexChild": { "alignSelf": "center" },
+                                        "background": {
+                                          "backgroundColor": {
+                                            "dark": null,
+                                            "light": "#FFFFFF"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "children": [
+                                {
+                                  "node": {
+                                    "value": "View order",
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 18,
+                                                "fontStyle": null,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#262626"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "500",
+                                                "lineHeight": 28,
+                                                "textDecoration": "underline"
+                                              },
+                                              "spacing": {
+                                                "margin": "10 0 0 0",
+                                                "padding": "0 0 0 0"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "type": "BasicText"
+                                }
+                              ]
+                            },
+                            "type": "CloseButton"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": "%^STATE.IndicatorPosition^%",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "numbered-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "filled-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 0 },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 22
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 6
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "dashes",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": "%^STATE.IndicatorPosition^%",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "numbered-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "filled-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 0 },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 22
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 6
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "dashes",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          },
+                          {
+                            "type": "Progression",
+                            "predicate": {
+                              "value": "0",
+                              "condition": "is-above"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    }
+                  ]
+                },
+                "type": "Column"
+              },
+              {
+                "node": {
+                  "children": [
+                    {
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "spacing": {
+                                    "margin": "24 0 16 0",
+                                    "padding": "16 16 16 16"
+                                  },
+                                  "container": {
+                                    "gap": 25,
+                                    "overflow": "hidden"
+                                  },
+                                  "dimension": {
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "fit-height"
+                                    }
+                                  },
+                                  "border": {
+                                    "borderColor": {
+                                      "dark": null,
+                                      "light": "#EAECF0"
+                                    },
+                                    "borderStyle": null,
+                                    "borderWidth": "1",
+                                    "borderRadius": 12
+                                  },
+                                  "background": {
+                                    "backgroundColor": {
+                                      "dark": null,
+                                      "light": "#F9FAFB"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "viewableItems": [1],
+                        "peekThroughSize": [
+                          { "type": "Percentage", "value": 4 }
+                        ]
+                      },
+                      "type": "CarouselDistribution"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "value": "",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 12,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#999999"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "lineHeight": 12,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "center"
+                                        },
+                                        "spacing": {
+                                          "margin": "0 0 16 0",
+                                          "padding": "0 0 0 0"
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "Progression",
+                            "predicate": { "value": "0", "condition": "is" }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "value": "",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 12,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#999999"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "lineHeight": 12,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "center"
+                                        },
+                                        "spacing": {
+                                          "margin": "0 0 16 0",
+                                          "padding": "0 0 0 0"
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": "%^STATE.IndicatorPosition^%",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "numbered-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "filled-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 0 },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 22
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 6
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "dashes",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-true"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "children": [
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": "%^STATE.IndicatorPosition^%",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "numbered-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 10 },
+                                              "container": {
+                                                "alignItems": "center",
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 10
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "filled-circles",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          },
+                          {
+                            "node": {
+                              "children": [
+                                {
+                                  "node": {
+                                    "styles": {
+                                      "elements": {
+                                        "own": [
+                                          {
+                                            "default": {
+                                              "spacing": {
+                                                "margin": "0 0 16 0",
+                                                "padding": "0 0 0 0"
+                                              },
+                                              "container": {
+                                                "gap": 5,
+                                                "justifyContent": "center"
+                                              },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fit",
+                                                  "value": "fit-width"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "indicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "fontSize": 11,
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                },
+                                                "fontFamily": null,
+                                                "fontWeight": "700",
+                                                "textDecoration": null
+                                              },
+                                              "border": { "borderRadius": 0 },
+                                              "dimension": {
+                                                "width": {
+                                                  "type": "fixed",
+                                                  "value": 22
+                                                },
+                                                "height": {
+                                                  "type": "fixed",
+                                                  "value": 6
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "seenIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#D7D7D7"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "activeIndicator": [
+                                          {
+                                            "default": {
+                                              "text": {
+                                                "textColor": {
+                                                  "dark": null,
+                                                  "light": "#FFFFFF"
+                                                }
+                                              },
+                                              "background": {
+                                                "backgroundColor": {
+                                                  "dark": null,
+                                                  "light": "#222222"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "indicator": " ",
+                                    "startPosition": 2
+                                  },
+                                  "type": "ProgressIndicator"
+                                }
+                              ],
+                              "predicates": [
+                                {
+                                  "type": "StaticString",
+                                  "predicate": {
+                                    "input": "filled-circles",
+                                    "value": "dashes",
+                                    "condition": "is"
+                                  }
+                                }
+                              ]
+                            },
+                            "type": "When"
+                          }
+                        ],
+                        "predicates": [
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          },
+                          {
+                            "type": "Progression",
+                            "predicate": {
+                              "value": "0",
+                              "condition": "is-above"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": false,
+                              "condition": "is-false"
+                            }
+                          },
+                          {
+                            "type": "StaticBoolean",
+                            "predicate": {
+                              "value": true,
+                              "condition": "is-true"
+                            }
+                          }
+                        ]
+                      },
+                      "type": "When"
+                    },
+                    {
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "border": {
+                                    "borderColor": {
+                                      "dark": null,
+                                      "light": "#D7D7D7"
+                                    },
+                                    "borderStyle": null,
+                                    "borderWidth": "0 0 0 0",
+                                    "borderRadius": null
+                                  },
+                                  "spacing": {
+                                    "margin": "0 0 0 0",
+                                    "padding": "0 0 0 0"
+                                  },
+                                  "container": { "alignItems": "center" },
+                                  "dimension": {
+                                    "width": {
+                                      "type": "fit",
+                                      "value": "fit-width"
+                                    },
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "wrap-content"
+                                    }
+                                  },
+                                  "background": { "backgroundColor": null }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "children": [
+                          {
+                            "node": {
+                              "value": "Powered by <a target=\"_blank\" href=\"https://rokt.com\">Rokt</a> - <a target=\"_blank\" href=\"https://rokt.com/privacy-policy/\">Privacy Policy</a>",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 11,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#999999"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "lineHeight": null,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "center"
+                                        },
+                                        "spacing": {
+                                          "margin": null,
+                                          "padding": null
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "link": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": null,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "dark": null,
+                                            "light": "#999999"
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": null,
+                                          "textDecoration": "underline"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ]
+                      },
+                      "type": "Column"
+                    }
+                  ]
+                },
+                "type": "ScrollableColumn"
+              }
+            ]
+          },
+          "type": "Column"
+        }
+      ],
+      "allowBackdropToClose": false
+    },
+    "type": "BottomSheet"
+  },
+  "display": "BOTTOMSHEET",
+  "breakpoints": {}
+}
