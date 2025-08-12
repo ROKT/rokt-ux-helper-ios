@@ -152,15 +152,15 @@ private struct BecomingViewedModifier: ViewModifier {
     }
 
     private func handleVisibilityChange(intersectPercent: CGFloat, proxy: GeometryProxy) {
-        let aboveThreshold = intersectPercent > kSignalViewedIntersectThreshold
+        let aboveThreshold = intersectPercent > 0.5
 
         if aboveThreshold {
             guard shouldTriggerForCurrentOffer() else { return }
 
             if visibilityTimer == nil {
-                visibilityTimer = Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
+                visibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
                     let currentIntersect = UIScreen.main.bounds.intersectPercent(proxy)
-                    if currentIntersect > kSignalViewedIntersectThreshold {
+                    if currentIntersect > 0.5 {
                         let info = ComponentVisibilityInfo(
                             isVisible: true,
                             isObscured: currentIntersect < 1.0,
@@ -184,6 +184,7 @@ private struct BecomingViewedModifier: ViewModifier {
         visibilityTimer = nil
     }
 
+    // To skip multiple executions for the same offer in OneByOne distribution
     private func shouldTriggerForCurrentOffer() -> Bool {
         guard let offer = currentOffer else { return true }
         return lastTriggeredOffer != offer

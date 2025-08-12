@@ -73,11 +73,6 @@ let kErrorSeverity = "severity"
 
 let kSharedDataItemsQueueLabel = "com.rokt.shareddata.items.queue"
 
-// MARK: - SignalViewed constants
-
-let kSignalViewedIntersectThreshold = 0.5
-let kSignalViewedTimeThreshold = 1.0
-
 // MARK: - Accessibility
 
 let kPageAnnouncement = "Page %d of %d"
