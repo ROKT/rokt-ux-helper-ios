@@ -588,6 +588,24 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             responseOption = offer.creative.responseOptionsMap?.negative
             creativeResponseKey = .negative
         }
+        
+        if responseKey == BNFNamespace.CreativeResponseKey.external.rawValue {
+            let externalResponseOption = RoktUXResponseOption(
+                id: "",
+                action: .external,
+                instanceGuid: "",
+                signalType: .signalGatedResponse,
+                shortLabel: "Yes please",
+                longLabel: "Yes please",
+                shortSuccessLabel: "",
+                isPositive: true,
+                url: "",
+                responseJWTToken: "response-jwt"
+            )
+            responseOption = offer.creative.responseOptionsMap?.negative
+            creativeResponseKey = .external
+        }
+        
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return CreativeResponseViewModel(children: children,
                                          responseKey: creativeResponseKey,

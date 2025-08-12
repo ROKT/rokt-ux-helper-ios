@@ -29,6 +29,8 @@ enum BNFNamespace: String, CaseIterable {
     enum CreativeResponseKey: String {
         case positive
         case negative
+        case neutral
+        case external
     }
 
     // MARK: Catalog Item
