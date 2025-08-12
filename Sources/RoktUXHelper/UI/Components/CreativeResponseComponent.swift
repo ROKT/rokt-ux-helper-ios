@@ -102,7 +102,7 @@ struct CreativeResponseComponent: View {
             return .start
         }
     }
-    
+
     var isExternalResponseOption: Bool {
         model.responseOptions?.action == .external
     }

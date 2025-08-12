@@ -75,32 +75,23 @@ final class TestCreativeResponseComponent: XCTestCase {
     func test_creative_response_external_response_action() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model_with_external_response_action()))
         
-        let creativeResponse = try view.inspect().view(TestPlaceHolder.self)
+        let creativeResponseComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
             .view(LayoutSchemaComponent.self)
             .view(CreativeResponseComponent.self)
             .actualView()
-            .inspect()
-            .hStack()
         
-        // test custom modifier class
-        let paddingModifier = try creativeResponse.modifier(PaddingModifier.self)
-        XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 10, right: 10, bottom: 10, left: 10))
+        // Verify that external response action returns EmptyView
+        let emptyView = try creativeResponseComponent.inspect().emptyView()
+        XCTAssertNotNil(emptyView)
         
-        // test another custom modifier class
-        let marginModifier = try creativeResponse.modifier(MarginModifier.self)
-        XCTAssertEqual(try marginModifier.actualView().getMargin(), FrameAlignmentProperty(top: 10, right: 0, bottom: 0, left: 0))
+        // Test that the component correctly identifies as external response option
+        XCTAssertTrue(creativeResponseComponent.isExternalResponseOption)
         
-        // test the effect of custom modifiers
-        let padding = try creativeResponse.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 20.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
-                
-        // background
-        let backgroundModifier = try creativeResponse.modifier(BackgroundModifier.self)
-        let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
-        
-        XCTAssertNil(backgroundStyle?.backgroundColor)
+        // Test that the model has the correct external response option
+        XCTAssertEqual(creativeResponseComponent.model.responseOptions?.action, .external)
+        XCTAssertEqual(creativeResponseComponent.model.responseOptions?.shortLabel, "Yes please")
     }
     
     func test_creative_response_external_response_action_computedProperties_usesModelProperties() throws {
