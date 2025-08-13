@@ -94,13 +94,6 @@ class ModelTestData: NSObject {
             guard case .creativeResponse(let model) = layout else { return nil }
             return model
         }
-        
-        static func external() -> CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? {
-            let data = toData(jsonFilename: "node_creative_response_external")
-            let layout = try! JSONDecoder().decode(LayoutSchemaModel.self, from: data)
-            guard case .creativeResponse(let model) = layout else { return nil }
-            return model
-        }
     }
     
     enum CloseButtonData {

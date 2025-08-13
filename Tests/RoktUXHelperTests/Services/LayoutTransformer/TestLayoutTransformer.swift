@@ -52,6 +52,42 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
     }
     
+    func test_creative_response_includes_positive_response_option_with_external_action() throws {
+        // Arrange
+        guard let model = ModelTestData.CreativeResponseData.positive() else {
+            XCTFail("Could not load the json")
+            return
+        }
+        let responseOption = RoktUXResponseOption(
+            id: "",
+            action: .external,
+            instanceGuid: "",
+            signalType: .signalGatedResponse,
+            shortLabel: "Yes please",
+            longLabel: "Yes please",
+            shortSuccessLabel: "",
+            isPositive: true,
+            url: "",
+            responseJWTToken: "response-jwt"
+        )
+        let slot = get_slot(responseOptionList: ResponseOptionList(positive: responseOption,
+                                                                   negative: nil))
+        
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
+        
+        // Act
+        let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
+            responseKey: model.responseKey,
+            openLinks: nil,
+            styles: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.positive(slot.offer!))),
+            offer: slot.offer!
+        )
+        
+        // Assert
+        XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
+    }
+    
     func test_creative_response_includes_negative_response_option() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.negative() else {
@@ -61,6 +97,42 @@ final class TestLayoutTransformer: XCTestCase {
         let responseOption = RoktUXResponseOption(
             id: "",
             action: .url,
+            instanceGuid: "",
+            signalType: .signalResponse,
+            shortLabel: "No Thanks",
+            longLabel: "No Thanks",
+            shortSuccessLabel: "",
+            isPositive: false,
+            url: "",
+            responseJWTToken: "response-token"
+        )
+        let slot = get_slot(responseOptionList: ResponseOptionList(positive: nil,
+                                                                   negative: responseOption))
+        
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
+        
+        // Act
+        let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
+            responseKey: model.responseKey,
+            openLinks: nil,
+            styles: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.negative(slot.offer!))),
+            offer: slot.offer!
+        )
+        
+        // Assert
+        XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
+    }
+    
+    func test_creative_response_includes_negative_response_option_with_external_action() throws {
+        // Arrange
+        guard let model = ModelTestData.CreativeResponseData.negative() else {
+            XCTFail("Could not load the json")
+            return
+        }
+        let responseOption = RoktUXResponseOption(
+            id: "",
+            action: .external,
             instanceGuid: "",
             signalType: .signalResponse,
             shortLabel: "No Thanks",

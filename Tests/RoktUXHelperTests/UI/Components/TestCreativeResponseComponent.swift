@@ -72,69 +72,9 @@ final class TestCreativeResponseComponent: XCTestCase {
         XCTAssertEqual(sut.horizontalAlignment, .center)
     }
     
-    func test_creative_response_external_response_action() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model_with_external_response_action()))
-        
-        let creativeResponseComponent = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CreativeResponseComponent.self)
-            .actualView()
-        
-        // Verify that external response action returns EmptyView
-        let emptyView = try creativeResponseComponent.inspect().emptyView()
-        XCTAssertNotNil(emptyView)
-        
-        // Test that the component correctly identifies as external response option
-        XCTAssertTrue(creativeResponseComponent.isExternalResponseOption)
-        
-        // Test that the model has the correct external response option
-        XCTAssertEqual(creativeResponseComponent.model.responseOptions?.action, .external)
-        XCTAssertEqual(creativeResponseComponent.model.responseOptions?.shortLabel, "Yes please")
-    }
-    
-    func test_creative_response_external_response_action_computedProperties_usesModelProperties() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model_with_external_response_action()))
-        
-        let creativeResponse = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CreativeResponseComponent.self)
-            .actualView()
-        
-        let defaultStyle = creativeResponse.model.defaultStyle?[0]
-        
-        XCTAssertEqual(creativeResponse.style, defaultStyle)
-        XCTAssertEqual(creativeResponse.containerStyle, defaultStyle?.container)
-        XCTAssertEqual(creativeResponse.dimensionStyle, defaultStyle?.dimension)
-        XCTAssertEqual(creativeResponse.flexStyle, defaultStyle?.flexChild)
-        XCTAssertEqual(creativeResponse.borderStyle, defaultStyle?.border)
-        XCTAssertEqual(creativeResponse.backgroundStyle, defaultStyle?.background)
-        XCTAssertEqual(creativeResponse.passableBackgroundStyle, defaultStyle?.background)
-        
-        XCTAssertEqual(creativeResponse.verticalAlignment, .top)
-        XCTAssertEqual(creativeResponse.horizontalAlignment, .center)
-        
-        XCTAssertEqual(creativeResponse.verticalAlignmentOverride, .center)
-        XCTAssertEqual(creativeResponse.horizontalAlignment, .center)
-    }
-    
     func get_model() throws -> CreativeResponseViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let creativeResponse = ModelTestData.CreativeResponseData.positive()
-        return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
-                                                          openLinks: nil,
-                                                          styles: creativeResponse?.styles,
-                                                          children: transformer.transformChildren(creativeResponse?.children,
-                                                                                                  context: .outer([])),
-                                                          offer: .mock())
-    }
-    
-    func get_model_with_external_response_action() throws -> CreativeResponseViewModel {
-        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let creativeResponse = ModelTestData.CreativeResponseData.external()
         return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
                                                           openLinks: nil,
                                                           styles: creativeResponse?.styles,
