@@ -52,9 +52,12 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     func cartItemDevicePay() {
+        print("before cartItemDevicePay in view model")
         if let catalogItem {
+            print("before provider switch in view model")
             switch provider {
             case .stripe:
+                print("before cartItemStripePay in view model")
                 eventService?.cartItemStripePay(catalogItem: catalogItem)
             default:
                 break
