@@ -69,64 +69,13 @@ extension View {
         }
     }
 
-    // When the view moves inside the SignalViewed area, start timer.
-    // When timer is over and view is still inside this area, execute closure.
+    // Ensure continuous visibility above threshold for the full time window,
+    // cancel when dropping below threshold, and trigger once per offer.
     func onBecomingViewed(
         currentOffer: Int? = nil,
         execute: ((_ visibilityInfo: ComponentVisibilityInfo) -> Void)?
     ) -> some View {
-        background(
-            GeometryReader { geometryProxy in
-                let intersectPercent = UIScreen.main.bounds.intersectPercent(geometryProxy)
-                let isVisible = intersectPercent > kSignalViewedIntersectThreshold
-                let isObscured = intersectPercent < 1.0
-                let incorrectlySized = geometryProxy.size.width <= 0 || geometryProxy.size.height <= 0
-
-                Color.clear
-                    .onAppear {
-                        if isVisible {
-                            Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
-                                if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    let visibilityInfo = ComponentVisibilityInfo(
-                                        isVisible: isVisible,
-                                        isObscured: isObscured,
-                                        incorrectlySized: incorrectlySized
-                                    )
-                                    execute?(visibilityInfo)
-                                }
-                            }
-                        }
-                    }
-                    .onChange(of: intersectPercent) { value in
-                        if value > kSignalViewedIntersectThreshold {
-                            Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
-                                if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    let visibilityInfo = ComponentVisibilityInfo(
-                                        isVisible: isVisible,
-                                        isObscured: isObscured,
-                                        incorrectlySized: incorrectlySized
-                                    )
-                                    execute?(visibilityInfo)
-                                }
-                            }
-                        }
-                    }
-                    .onChange(of: currentOffer) { _ in
-                        if intersectPercent > kSignalViewedIntersectThreshold {
-                            Timer.scheduledTimer(withTimeInterval: kSignalViewedTimeThreshold, repeats: false) { _ in
-                                if UIScreen.main.bounds.intersectPercent(geometryProxy) > kSignalViewedIntersectThreshold {
-                                    let visibilityInfo = ComponentVisibilityInfo(
-                                        isVisible: isVisible,
-                                        isObscured: isObscured,
-                                        incorrectlySized: incorrectlySized
-                                    )
-                                    execute?(visibilityInfo)
-                                }
-                            }
-                        }
-                    }
-            }
-        )
+        modifier(BecomingViewedModifier(currentOffer: currentOffer, execute: execute))
     }
 
     @ViewBuilder func `ifLet`<Content: View, T>(
@@ -166,5 +115,78 @@ class ComponentVisibilityInfo {
 
     var isInViewAndCorrectSize: Bool {
         return isVisible && !isObscured && !incorrectlySized
+    }
+}
+
+// MARK: - Internal visibility tracking
+
+@available(iOS 15, *)
+private struct BecomingViewedModifier: ViewModifier {
+    let currentOffer: Int?
+    let execute: ((_ visibilityInfo: ComponentVisibilityInfo) -> Void)?
+
+    @State private var visibilityTimer: Timer?
+    @State private var lastTriggeredOffer: Int?
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                GeometryReader { proxy in
+                    let intersectPercent = UIScreen.main.bounds.intersectPercent(proxy)
+                    Color.clear
+                        .onAppear {
+                            handleVisibilityChange(intersectPercent: intersectPercent, proxy: proxy)
+                        }
+                        .onChange(of: intersectPercent) { newValue in
+                            handleVisibilityChange(intersectPercent: newValue, proxy: proxy)
+                        }
+                        .onChange(of: currentOffer) { _ in
+                            // Reset once per offer gate and cancel any pending timer when the offer changes
+                            cancelTimer()
+                            lastTriggeredOffer = nil
+                            handleVisibilityChange(intersectPercent: intersectPercent, proxy: proxy)
+                        }
+                        .onDisappear { cancelTimer() }
+                }
+            )
+    }
+
+    private func handleVisibilityChange(intersectPercent: CGFloat, proxy: GeometryProxy) {
+        let aboveThreshold = intersectPercent > 0.5
+
+        if aboveThreshold {
+            guard shouldTriggerForCurrentOffer() else { return }
+
+            if visibilityTimer == nil {
+                visibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
+                    let currentIntersect = UIScreen.main.bounds.intersectPercent(proxy)
+                    if currentIntersect > 0.5 {
+                        let info = ComponentVisibilityInfo(
+                            isVisible: true,
+                            isObscured: currentIntersect < 1.0,
+                            incorrectlySized: proxy.size.width <= 0 || proxy.size.height <= 0
+                        )
+                        execute?(info)
+                        if info.isInViewAndCorrectSize {
+                            lastTriggeredOffer = currentOffer
+                        }
+                    }
+                    cancelTimer()
+                }
+            }
+        } else {
+            cancelTimer()
+        }
+    }
+
+    private func cancelTimer() {
+        visibilityTimer?.invalidate()
+        visibilityTimer = nil
+    }
+
+    // To skip multiple executions for the same offer in OneByOne distribution
+    private func shouldTriggerForCurrentOffer() -> Bool {
+        guard let offer = currentOffer else { return true }
+        return lastTriggeredOffer != offer
     }
 }
