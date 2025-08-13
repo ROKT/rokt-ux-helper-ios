@@ -150,9 +150,7 @@ struct CatalogDevicePayButtonComponent: View {
                 availableHeight = size.height
             }
             .onTapGesture {
-                print("before onTapGesture")
                 handleButtonTapped()
-                print("after onTapGesture")
             }
             // consecutive gestures to track when long press is held vs released
             .gesture(LongPressGesture()
@@ -168,9 +166,7 @@ struct CatalogDevicePayButtonComponent: View {
             .onChange(of: isPressingDown) { value in
                 if !value {
                     // handle link when long press is released
-                    print("before handleButtonTapped long press")
                     handleButtonTapped()
-                    print("after handleButtonTapped long press")
                 }
             }
             .onLongPressGesture(perform: {
@@ -233,10 +229,7 @@ struct CatalogDevicePayButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        print("before cartItemDevicePay")
         model.cartItemDevicePay()
-        model.layoutState?.actionCollection[.close](nil)
-        print("after cartItemDevicePay")
     }
 
     private func updateStyleState() {
