@@ -72,6 +72,53 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertTrue(signalCartItemInitiatedCalled)
         XCTAssertNotNil(sut.layoutState)
     }
+
+    func test_tapGesture_shouldTriggerCartItemDevicePay() throws {
+        let eventDelegate = MockUXHelper()
+        let view = try TestPlaceHolder.make(
+            eventDelegate: eventDelegate,
+            layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:)
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        XCTAssertFalse(eventDelegate.roktEvents.contains(.CartItemStripePay))
+
+        try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
+
+        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemStripePay))
+    }
+
+    func test_catalogDevicePayButton_computedProperties_usesModelProperties() throws {
+        let view = try TestPlaceHolder.make(
+            eventDelegate: MockUXHelper(),
+            layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:)
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        let model = sut.model
+
+        XCTAssertEqual(sut.style, model.defaultStyle?[0])
+        XCTAssertEqual(sut.dimensionStyle, model.defaultStyle?[0].dimension)
+        XCTAssertEqual(sut.flexStyle, model.defaultStyle?[0].flexChild)
+        XCTAssertEqual(sut.backgroundStyle, model.defaultStyle?[0].background)
+        XCTAssertEqual(sut.spacingStyle, model.defaultStyle?[0].spacing)
+
+        XCTAssertEqual(sut.verticalAlignment, .top)
+        XCTAssertEqual(sut.horizontalAlignment, .center)
+        XCTAssertNotNil(model.layoutState)
+    }
 }
 
 @available(iOS 15.0, *)

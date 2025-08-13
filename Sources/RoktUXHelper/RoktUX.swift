@@ -1,5 +1,5 @@
 //
-//  OverlayComponent.swift
+//  RoktUX.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use

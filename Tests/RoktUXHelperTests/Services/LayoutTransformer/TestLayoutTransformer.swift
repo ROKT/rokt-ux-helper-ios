@@ -15,7 +15,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 final class TestLayoutTransformer: XCTestCase {
-    
+
     func test_creative_response_includes_positive_response_option() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.positive() else {
@@ -36,9 +36,9 @@ final class TestLayoutTransformer: XCTestCase {
         )
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: responseOption,
                                                                    negative: nil))
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
-        
+
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
             responseKey: model.responseKey,
@@ -47,11 +47,11 @@ final class TestLayoutTransformer: XCTestCase {
             children: layoutTransformer.transformChildren(model.children, context: .inner(.positive(slot.offer!))),
             offer: slot.offer!
         )
-        
+
         // Assert
         XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
     }
-    
+
     func test_creative_response_includes_negative_response_option() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.negative() else {
@@ -72,9 +72,9 @@ final class TestLayoutTransformer: XCTestCase {
         )
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: nil,
                                                                    negative: responseOption))
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
-        
+
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
             responseKey: model.responseKey,
@@ -83,11 +83,11 @@ final class TestLayoutTransformer: XCTestCase {
             children: layoutTransformer.transformChildren(model.children, context: .inner(.negative(slot.offer!))),
             offer: slot.offer!
         )
-        
+
         // Assert
         XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
     }
-    
+
     func test_creative_response_includes_negative_response_option_with_breakpoint() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.negative() else {
@@ -108,9 +108,9 @@ final class TestLayoutTransformer: XCTestCase {
         )
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: nil,
                                                                    negative: responseOption))
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
-        
+
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
             responseKey: model.responseKey,
@@ -119,9 +119,9 @@ final class TestLayoutTransformer: XCTestCase {
             children: layoutTransformer.transformChildren(model.children, context: .inner(.negative(slot.offer!))),
             offer: slot.offer!
         )
-        
+
         // Assert
-        
+
         // first breakpoint default
         XCTAssertEqual(transformedCreativeResponse.defaultStyle?[0].spacing?.margin, "10 0 0 0")
         XCTAssertEqual(transformedCreativeResponse.defaultStyle?[0].spacing?.padding, "10 10 10 10")
@@ -153,9 +153,9 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedCreativeResponse.pressedStyle?[1].container?.justifyContent, .center)
         XCTAssertEqual(transformedCreativeResponse.pressedStyle?[1].border?.borderRadius, 10)
         XCTAssertEqual(transformedCreativeResponse.pressedStyle?[1].border?.borderWidth, "4")
-        
+
     }
-    
+
     func test_creative_response_negative_not_presented() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.negative() else {
@@ -163,19 +163,19 @@ final class TestLayoutTransformer: XCTestCase {
             return
         }
         let slot = get_slot(responseOptionList: nil)
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
-        
+
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponse(
             model: model,
             context: .inner(.generic(slot.offer!))
         )
-        
+
         // Assert
         XCTAssertEqual(transformedCreativeResponse, .empty)
     }
-    
+
     func test_creative_response_neutral_not_presented() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.neutral() else {
@@ -208,25 +208,25 @@ final class TestLayoutTransformer: XCTestCase {
         )
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: positiveResponseOption,
                                                                    negative: negativeResponseOption))
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
-        
+
         // Act
         let transformedCreativeResponse = try layoutTransformer.getCreativeResponse(
             model: model,
             context: .inner(.generic(slot.offer!))
         )
-        
+
         // Assert
         XCTAssertEqual(transformedCreativeResponse, .empty)
     }
-    
+
     // MARK: - ProgressIndicatorTests
 
     func test_progressIndicator_withSingleDataExpansion_parsesUnexpandedData() throws {
         let model = ModelTestData.ProgressIndicatorData.progressIndicator()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-        
+
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
         guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
@@ -252,7 +252,7 @@ final class TestLayoutTransformer: XCTestCase {
     func test_progressIndicator_withValidChainOfDataExpansion_parsesUnexpandedData() throws {
         let model = ModelTestData.ProgressIndicatorData.chainOfvaluesDataExpansion()
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-        
+
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(model, context: .inner(.generic(nil)))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.InitialWrongValue | STATE.IndicatorPosition^%")
     }
@@ -290,17 +290,17 @@ final class TestLayoutTransformer: XCTestCase {
         let slot = get_slot(responseOptionList: ResponseOptionList(positive: nil,
                                                                    negative: responseOption),
                             layoutVariant: response)
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(
             layout: .oneByOneDistribution(model),
             slots: [slot]
         ))
-        
+
         // Act
         let transformedOneByOne = try layoutTransformer.getOneByOne(oneByOneModel: model, context: .outer([slot.offer]))
-        
+
         // Assert
-        
+
         // oneByOne loaded with children from slot
         XCTAssertEqual(transformedOneByOne.children?.count, 1)
         // loaded styles in the breakpoint
@@ -315,38 +315,38 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedOneByOne.defaultStyle?[1].dimension?.width, .fit(.fitWidth))
         XCTAssertEqual(transformedOneByOne.defaultStyle?[1].container?.justifyContent, .center)
     }
-    
+
     //MARK: Column
 
     func test_column_breakpoint() throws {
         // Arrange
         let model = ModelTestData.ColumnData.columnWithBasicText()
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-        
+
         // Act
         let transformedColumn = try layoutTransformer.getColumn(model.styles, children: nil)
-        
+
         // Assert
         XCTAssertEqual(transformedColumn.defaultStyle?[0].background?.backgroundColor?.light, "#F5C1C4")
         XCTAssertEqual(transformedColumn.defaultStyle?[1].background?.backgroundColor?.light, "#999999")
     }
-    
+
     //MARK: ToggleButtonStateTrigger
 
     func test_toggleButton_transformed() throws {
         // Arrange
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
-        
+
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
-        
+
         // Act
         let transformedToggleButton = try layoutTransformer.getToggleButton(
             customStateKey: model.customStateKey,
             styles: model.styles,
             children: nil
         )
-        
+
         // Assert
         XCTAssertEqual(transformedToggleButton.customStateKey, "stateKey")
         XCTAssertEqual(transformedToggleButton.defaultStyle?[0].background?.backgroundColor?.light, "#FFFFFF")
@@ -563,12 +563,144 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(dataImageCarouselViewModel.images.count, 0)
     }
 
+    func test_getCatalogDevicePayButtonModel_basicTransformation() throws {
+        // Arrange
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        let catalogItem = get_catalog_item(image: CreativeImage(
+            light: "https://rokt.com/image.png",
+            dark: nil,
+            alt: "alt",
+            title: nil
+        ))
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let transformedModel = try layoutTransformer.getCatalogDevicePayButtonModel(
+            style: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.addToCart(catalogItem))),
+            provider: model.provider,
+            context: .inner(.addToCart(catalogItem))
+        )
+
+        // Assert
+        XCTAssertEqual(transformedModel.provider, .stripe)
+        XCTAssertNotNil(transformedModel.catalogItem)
+        XCTAssertEqual(transformedModel.catalogItem?.catalogItemId, catalogItem.catalogItemId)
+        XCTAssertNotNil(transformedModel.children)
+        XCTAssertEqual(transformedModel.children?.count, 1) // Should have one BasicText child
+    }
+
+    func test_getCatalogDevicePayButtonModel_providerMapping() throws {
+        // Arrange
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        let catalogItem = get_catalog_item(image: CreativeImage(
+            light: "https://rokt.com/image.png",
+            dark: nil,
+            alt: "alt",
+            title: nil
+        ))
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Test different providers
+        let providers: [PaymentProvider] = [.stripe, .applePay, .googlePay]
+
+        for provider in providers {
+            // Act
+            let transformedModel = try layoutTransformer.getCatalogDevicePayButtonModel(
+                style: model.styles,
+                children: layoutTransformer.transformChildren(model.children, context: .inner(.addToCart(catalogItem))),
+                provider: provider,
+                context: .inner(.addToCart(catalogItem))
+            )
+
+            // Assert
+            XCTAssertEqual(transformedModel.provider, provider)
+        }
+    }
+
+    func test_getCatalogDevicePayButtonModel_styleTransformation() throws {
+        // Arrange
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        let catalogItem = get_catalog_item(image: CreativeImage(
+            light: "https://rokt.com/image.png",
+            dark: nil,
+            alt: "alt",
+            title: nil
+        ))
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let transformedModel = try layoutTransformer.getCatalogDevicePayButtonModel(
+            style: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.addToCart(catalogItem))),
+            provider: model.provider,
+            context: .inner(.addToCart(catalogItem))
+        )
+
+        // Assert - Check that styles are properly transformed
+        XCTAssertNotNil(transformedModel.defaultStyle)
+        XCTAssertEqual(transformedModel.defaultStyle?.count, 1) // Should have one breakpoint
+        XCTAssertEqual(transformedModel.defaultStyle?[0].spacing?.padding, "5")
+        XCTAssertEqual(transformedModel.defaultStyle?[0].spacing?.margin, "24 0")
+        XCTAssertEqual(transformedModel.defaultStyle?[0].container?.alignItems, .flexStart)
+        XCTAssertEqual(transformedModel.defaultStyle?[0].container?.justifyContent, .center)
+        XCTAssertEqual(transformedModel.defaultStyle?[0].border?.borderRadius, 4)
+        XCTAssertEqual(transformedModel.defaultStyle?[0].background?.backgroundColor?.light, "#CC0000")
+    }
+
+    func test_getCatalogDevicePayButtonModel_invalidContext_throwsError() throws {
+        // Arrange
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act & Assert - Should throw error when context doesn't have catalog item
+        XCTAssertThrowsError(try layoutTransformer.getCatalogDevicePayButtonModel(
+            style: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.generic(nil))),
+            provider: model.provider,
+            context: .inner(.generic(nil))
+        )) { error in
+            XCTAssertTrue(error is LayoutTransformerError)
+        }
+    }
+
+    func test_getCatalogDevicePayButtonModel_childrenTransformation() throws {
+        // Arrange
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        let catalogItem = get_catalog_item(image: CreativeImage(
+            light: "https://rokt.com/image.png",
+            dark: nil,
+            alt: "alt",
+            title: nil
+        ))
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+
+        // Act
+        let transformedModel = try layoutTransformer.getCatalogDevicePayButtonModel(
+            style: model.styles,
+            children: layoutTransformer.transformChildren(model.children, context: .inner(.addToCart(catalogItem))),
+            provider: model.provider,
+            context: .inner(.addToCart(catalogItem))
+        )
+
+        // Assert - Check that children are properly transformed
+        XCTAssertNotNil(transformedModel.children)
+        XCTAssertEqual(transformedModel.children?.count, 1)
+
+        // Check that the child is a BasicText component
+        if case .basicText(let textModel) = transformedModel.children?[0] {
+            XCTAssertEqual(textModel.boundValue, "Add to order")
+        } else {
+            XCTFail("Expected BasicText child")
+        }
+    }
+
     //MARK: mock objects
 
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {
         return get_mock_layout_plugin(layout: layout, slots: slots)
     }
-    
+
     func get_slot(responseOptionList: ResponseOptionList?,
                   layoutVariant: CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? = nil) -> SlotModel {
         SlotModel(
