@@ -1,5 +1,5 @@
 //
-//  OverlayComponent.swift
+//  RoktUX.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -28,7 +28,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration.
-     
+
      - Parameters:
        - experienceResponse: The response string containing the experience data.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
@@ -90,7 +90,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration with additional parameters.
-     
+
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
@@ -181,6 +181,22 @@ public class RoktUX: UXEventsDelegate {
             eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId)
         } else {
             eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
+        }
+    }
+
+    /**
+     Call when stripe pay has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the purchase succeeded or failed.
+     */
+    public func stripePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        if success {
+            eventServices[layoutId]?.cartItemStripePaySuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemStripePayFailure(itemId: catalogItemId)
         }
     }
 
@@ -538,6 +554,22 @@ public class RoktUX: UXEventsDelegate {
 
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem) {
         onRoktEvent?(RoktUXEvent.CartItemInstantPurchase(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice
+        ))
+    }
+
+    func onCartItemStripePay(_ layoutId: String, catalogItem: CatalogItem) {
+        onRoktEvent?(RoktUXEvent.CartItemStripePay(
             layoutId: layoutId,
             name: catalogItem.title,
             cartItemId: catalogItem.cartItemId,
