@@ -46,6 +46,7 @@ struct CarouselDistributionComponent: View {
     @ObservedObject var model: CarouselViewModel
 
     @State private var carouselHeightMap: [Int: CGFloat] = [:]
+    @State private var maxHeight: CGFloat = 0
 
     @AccessibilityFocusState private var shouldFocusAccessibility: Bool
 
@@ -156,7 +157,25 @@ struct CarouselDistributionComponent: View {
                             model.updateStatesOnDragEnded(roundProgress)
                         })
                 )
+                .clipped()
             }
+            .applyLayoutModifier(verticalAlignmentProperty: verticalAlignment,
+                                 horizontalAlignmentProperty: horizontalAlignment,
+                                 spacing: spacingStyle,
+                                 dimension: dimensionStyle,
+                                 flex: flexStyle,
+                                 border: borderStyle,
+                                 background: backgroundStyle,
+                                 parent: config.parent,
+                                 parentWidth: $parentWidth,
+                                 parentHeight: $parentHeight,
+                                 parentOverride: nil,
+                                 defaultHeight: .wrapContent,
+                                 defaultWidth: .wrapContent,
+                                 isContainer: true,
+                                 containerType: .row,
+                                 frameChangeIndex: $model.frameChangeIndex,
+                                 imageLoader: model.imageLoader)
             .onLoad {
                 model.setupLayoutState()
                 shouldFocusAccessibility = true
@@ -179,7 +198,7 @@ struct CarouselDistributionComponent: View {
             }
             .animation(.linear, value: model.currentLeadingOfferIndex)
             // workaround to set dynamic height otherwise GeometryReader fills available space
-            .frame(height: carouselHeightMap.max(by: {$0.value < $1.value})?.value ?? 0)
+            .frame(height: getContentHeight())
         }
     }
 
@@ -191,28 +210,20 @@ struct CarouselDistributionComponent: View {
                                       layout: child,
                                       parentWidth: $parentWidth,
                                       parentHeight: $carouselHeightMap[childIndex],
-                                      styleState: $styleState,
-                                      parentOverride: parentOverride?.updateBackground(passableBackgroundStyle))
-                .applyLayoutModifier(verticalAlignmentProperty: verticalAlignment,
-                                     horizontalAlignmentProperty: horizontalAlignment,
-                                     spacing: spacingStyle,
-                                     dimension: dimensionStyle,
-                                     flex: flexStyle,
-                                     border: borderStyle,
-                                     background: backgroundStyle,
-                                     parent: config.parent,
-                                     parentWidth: $parentWidth,
-                                     parentHeight: $parentHeight,
-                                     parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
-                                     defaultHeight: .wrapContent,
-                                     defaultWidth: .wrapContent,
-                                     isContainer: true,
-                                     containerType: .row,
-                                     frameChangeIndex: $model.frameChangeIndex,
-                                     imageLoader: model.imageLoader)
+                                      styleState: $styleState)
                 .frame(width: offerWidth)
                 .readSize { size in
-                    carouselHeightMap[childIndex] = size.height
+                    let newHeight = size.height
+                    if carouselHeightMap[childIndex] != newHeight {
+                        carouselHeightMap[childIndex] = newHeight
+                        // Update maxHeight only if it's different to prevent infinite loops
+                        let newMaxHeight = carouselHeightMap.values.max() ?? 0
+                        if abs(maxHeight - newMaxHeight) > 1.0 {
+                            DispatchQueue.main.async {
+                                maxHeight = newMaxHeight
+                            }
+                        }
+                    }
                 }
                 .accessibilityElement(children: .contain)
                 .accessibilityFocused($shouldFocusAccessibility)
@@ -274,5 +285,12 @@ struct CarouselDistributionComponent: View {
         } else {
             return model.currentPage == 0 ? 0 : (model.currentPage == totalPages - 1 ? peekThrough * 2 : peekThrough)
         }
+    }
+
+    private func getContentHeight() -> CGFloat {
+        let modifier = MarginModifier(spacing: spacingStyle, applyMargin: false)
+        let margin = modifier.getMargin()
+        let padding = modifier.getPadding()
+        return maxHeight + margin.top + margin.bottom + padding.top + padding.bottom
     }
 }
