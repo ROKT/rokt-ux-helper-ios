@@ -144,23 +144,6 @@ struct CarouselDistributionComponent: View {
                         .offset(x: (containerProxy.size.width - pageWidth)/2 - peekThrough)
                     }
                 }
-                .applyLayoutModifier(verticalAlignmentProperty: verticalAlignment,
-                                     horizontalAlignmentProperty: horizontalAlignment,
-                                     spacing: spacingStyle,
-                                     dimension: dimensionStyle,
-                                     flex: flexStyle,
-                                     border: borderStyle,
-                                     background: backgroundStyle,
-                                     parent: config.parent,
-                                     parentWidth: $parentWidth,
-                                     parentHeight: $parentHeight,
-                                     parentOverride: nil,
-                                     defaultHeight: .wrapContent,
-                                     defaultWidth: .wrapContent,
-                                     isContainer: true,
-                                     containerType: .row,
-                                     frameChangeIndex: $model.frameChangeIndex,
-                                     imageLoader: model.imageLoader)
                 .offset(x: pageOffset + indexOffset + offset + peekThroughOffset + gapOffset)
                 .gesture(
                     DragGesture()
@@ -174,7 +157,25 @@ struct CarouselDistributionComponent: View {
                             model.updateStatesOnDragEnded(roundProgress)
                         })
                 )
+                .clipped()
             }
+            .applyLayoutModifier(verticalAlignmentProperty: verticalAlignment,
+                                 horizontalAlignmentProperty: horizontalAlignment,
+                                 spacing: spacingStyle,
+                                 dimension: dimensionStyle,
+                                 flex: flexStyle,
+                                 border: borderStyle,
+                                 background: backgroundStyle,
+                                 parent: config.parent,
+                                 parentWidth: $parentWidth,
+                                 parentHeight: $parentHeight,
+                                 parentOverride: nil,
+                                 defaultHeight: .wrapContent,
+                                 defaultWidth: .wrapContent,
+                                 isContainer: true,
+                                 containerType: .row,
+                                 frameChangeIndex: $model.frameChangeIndex,
+                                 imageLoader: model.imageLoader)
             .onLoad {
                 model.setupLayoutState()
                 shouldFocusAccessibility = true
@@ -215,9 +216,9 @@ struct CarouselDistributionComponent: View {
                     let newHeight = size.height
                     if carouselHeightMap[childIndex] != newHeight {
                         carouselHeightMap[childIndex] = newHeight
-                        // Update maxHeight only if it's significantly different to prevent infinite loops
+                        // Update maxHeight only if it's different to prevent infinite loops
                         let newMaxHeight = carouselHeightMap.values.max() ?? 0
-                        if abs(maxHeight - newMaxHeight) > 1.0 { // 1pt threshold
+                        if abs(maxHeight - newMaxHeight) > 1.0 {
                             DispatchQueue.main.async {
                                 maxHeight = newMaxHeight
                             }
@@ -290,7 +291,6 @@ struct CarouselDistributionComponent: View {
         let modifier = MarginModifier(spacing: spacingStyle, applyMargin: false)
         let margin = modifier.getMargin()
         let padding = modifier.getPadding()
-        // Use cached maxHeight instead of recalculating to prevent infinite loops
         return maxHeight + margin.top + margin.bottom + padding.top + padding.bottom
     }
 }

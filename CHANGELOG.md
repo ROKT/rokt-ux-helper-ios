@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - SignalViewed reporting for offers
 
+### Changed
+
+- `CarouselDistribution` styling behavior and dynamic page height
+
 ## [0.6.0] - 2025-08-05
 
 ### Added
