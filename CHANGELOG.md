@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `CatalogDevicePayButton` node supported
 - `CartItemStripePay` UX event supported
+- Hide the Creative Response Component when the actionType is external
 
 ### Fixed
 

@@ -103,77 +103,85 @@ struct CreativeResponseComponent: View {
         }
     }
 
+    var isExternalResponseOption: Bool {
+        model.responseOptions?.action == .external
+    }
+
     var body: some View {
-        build()
-            .onHover { isHovered in
-                self.isHovered = isHovered
-                updateStyleState()
-            }
-            .applyLayoutModifier(
-                verticalAlignmentProperty: verticalAlignment,
-                horizontalAlignmentProperty: horizontalAlignment,
-                spacing: spacingStyle,
-                dimension: dimensionStyle,
-                flex: flexStyle,
-                border: borderStyle,
-                background: backgroundStyle,
-                container: containerStyle,
-                parent: config.parent,
-                parentWidth: $parentWidth,
-                parentHeight: $parentHeight,
-                parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
-                verticalAlignmentOverride: verticalAlignmentOverride,
-                horizontalAlignmentOverride: horizontalAlignmentOverride,
-                defaultHeight: .wrapContent,
-                defaultWidth: .wrapContent,
-                isContainer: true,
-                containerType: .row,
-                applyAlignSelf: false,
-                applyMargin: false,
-                frameChangeIndex: $frameChangeIndex,
-                imageLoader: model.imageLoader
-            )
+        if !isExternalResponseOption {
+            build()
+                .onHover { isHovered in
+                    self.isHovered = isHovered
+                    updateStyleState()
+                }
+                .applyLayoutModifier(
+                    verticalAlignmentProperty: verticalAlignment,
+                    horizontalAlignmentProperty: horizontalAlignment,
+                    spacing: spacingStyle,
+                    dimension: dimensionStyle,
+                    flex: flexStyle,
+                    border: borderStyle,
+                    background: backgroundStyle,
+                    container: containerStyle,
+                    parent: config.parent,
+                    parentWidth: $parentWidth,
+                    parentHeight: $parentHeight,
+                    parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
+                    verticalAlignmentOverride: verticalAlignmentOverride,
+                    horizontalAlignmentOverride: horizontalAlignmentOverride,
+                    defaultHeight: .wrapContent,
+                    defaultWidth: .wrapContent,
+                    isContainer: true,
+                    containerType: .row,
+                    applyAlignSelf: false,
+                    applyMargin: false,
+                    frameChangeIndex: $frameChangeIndex,
+                    imageLoader: model.imageLoader
+                )
             // contentShape extends tappable area outside of children
-            .contentShape(Rectangle())
+                .contentShape(Rectangle())
             // alignSelf must apply after the touchable area and before margin
-            .alignSelf(alignSelf: flexStyle?.alignSelf,
-                       parent: config.parent,
-                       parentHeight: parentHeight,
-                       parentWidth: parentWidth,
-                       parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
-                       parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
-                       applyAlignSelf: true)
+                .alignSelf(alignSelf: flexStyle?.alignSelf,
+                           parent: config.parent,
+                           parentHeight: parentHeight,
+                           parentWidth: parentWidth,
+                           parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
+                           parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
+                           applyAlignSelf: true)
             // margin must apply after the touchable area and before readSize
-            .margin(spacing: spacingStyle, applyMargin: true)
-            .readSize(spacing: spacingStyle) { size in
-                availableWidth = size.width
-                availableHeight = size.height
-            }
-            .onTapGesture {
-                handleLink()
-            }
-            // consecutive gestures to track when long press is held vs released
-            .gesture(LongPressGesture()
-                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
-                .updating($isPressingDown) { value, state, _ in
-                    switch value {
-                    case .second(true, nil):
-                        state = true
-                    default:
-                        break
-                    }
-                })
-            .onChange(of: isPressingDown) { value in
-                if !value {
-                    // handle link when long press is released
+                .margin(spacing: spacingStyle, applyMargin: true)
+                .readSize(spacing: spacingStyle) { size in
+                    availableWidth = size.width
+                    availableHeight = size.height
+                }
+                .onTapGesture {
                     handleLink()
                 }
-            }
-            .onLongPressGesture(perform: {
-            }, onPressingChanged: { isPressed in
-                self.isPressed = isPressed
-                updateStyleState()
-            })
+            // consecutive gestures to track when long press is held vs released
+                .gesture(LongPressGesture()
+                    .sequenced(before: LongPressGesture(minimumDuration: .infinity))
+                    .updating($isPressingDown) { value, state, _ in
+                        switch value {
+                        case .second(true, nil):
+                            state = true
+                        default:
+                            break
+                        }
+                    })
+                .onChange(of: isPressingDown) { value in
+                    if !value {
+                        // handle link when long press is released
+                        handleLink()
+                    }
+                }
+                .onLongPressGesture(perform: {
+                }, onPressingChanged: { isPressed in
+                    self.isPressed = isPressed
+                    updateStyleState()
+                })
+        } else {
+            EmptyView()
+        }
     }
 
     func build() -> some View {
