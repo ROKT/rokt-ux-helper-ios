@@ -47,5 +47,6 @@ public enum RoktUXSignalType: String, Codable, RoktUXCaseIterableDefaultLast {
 public enum Action: String, Codable, RoktUXCaseIterableDefaultLast {
     case url = "Url"
     case captureOnly = "CaptureOnly"
+    case external = "ExternalPaymentTrigger"
     case unknown
 }

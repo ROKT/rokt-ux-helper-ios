@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Hide the Creative Response Component when the actionType is external
+
 ### Fixed
 
 - SignalViewed reporting for offers
