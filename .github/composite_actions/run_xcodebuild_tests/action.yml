@@ -39,7 +39,7 @@ runs:
       if: ${{ inputs.use-swift-5 == 'false' }}
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.1' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
 
