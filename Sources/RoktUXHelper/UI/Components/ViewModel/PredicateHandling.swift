@@ -130,15 +130,19 @@ extension PredicateHandling {
 
         progressionPredicates.forEach { predicate in
             if let value = Int(predicate.value) {
+                // If the predicate value is negative, the value should be calculated from last
+                // Eg: Total items = 4, Predicate value = -1 then the result should be 3(last position)
+                //     Total items = 4, Predicate value = -2 then the result should be 2(second last position)
+                let progression = value >= 0 ? value : totalItems + value
                 switch predicate.condition {
                 case .is:
-                    matched = matched && currentProgress == value
+                    matched = matched && currentProgress == progression
                 case .isNot:
-                    matched = matched && currentProgress != value
+                    matched = matched && currentProgress != progression
                 case .isAbove:
-                    matched = matched && currentProgress > value
+                    matched = matched && currentProgress > progression
                 case .isBelow:
-                    matched = matched && currentProgress < value
+                    matched = matched && currentProgress < progression
                 }
             }
         }

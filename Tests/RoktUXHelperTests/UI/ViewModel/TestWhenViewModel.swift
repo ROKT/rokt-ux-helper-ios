@@ -126,6 +126,54 @@ final class TestWhenViewModel: XCTestCase {
         XCTAssertFalse(shouldApply)
     }
     
+    func test_should_apply_progression_negative_is_valid() {
+        // Arrange
+        let predicate = WhenPredicate.progression(
+            ProgressionPredicate(condition: .is, value: "-1"))
+        let whenVM = get_when_view_model(predicates: [predicate])
+        // Act - totalOffers: 3, currentProgress: 2, expecting progression "-1" to match position 2 (3 + (-1) = 2)
+        let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 2, totalOffers: 3))
+
+        // Assert
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_should_apply_progression_negative_is_invalid() {
+        // Arrange
+        let predicate = WhenPredicate.progression(
+            ProgressionPredicate(condition: .is, value: "-1"))
+        let whenVM = get_when_view_model(predicates: [predicate])
+        // Act - totalOffers: 3, currentProgress: 1, expecting progression "-1" to match position 2 (3 + (-1) = 2), but current is 1
+        let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 1, totalOffers: 3))
+
+        // Assert
+        XCTAssertFalse(shouldApply)
+    }
+
+    func test_should_apply_progression_negative_above_valid() {
+        // Arrange
+        let predicate = WhenPredicate.progression(
+            ProgressionPredicate(condition: .isAbove, value: "-2"))
+        let whenVM = get_when_view_model(predicates: [predicate])
+        // Act - totalOffers: 4, progression "-2" equals 2 (4 + (-2) = 2), currentProgress: 3 should be above 2
+        let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 4))
+
+        // Assert
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_should_apply_progression_negative_below_valid() {
+        // Arrange
+        let predicate = WhenPredicate.progression(
+            ProgressionPredicate(condition: .isBelow, value: "-1"))
+        let whenVM = get_when_view_model(predicates: [predicate])
+        // Act - totalOffers: 5, progression "-1" equals 4 (5 + (-1) = 4), currentProgress: 3 should be below 4
+        let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 5))
+
+        // Assert
+        XCTAssertTrue(shouldApply)
+    }
+
     // MARK: position
 
     func test_should_apply_position_is_valid() {
