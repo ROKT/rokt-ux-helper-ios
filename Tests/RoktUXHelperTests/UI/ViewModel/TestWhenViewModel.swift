@@ -176,7 +176,6 @@ final class TestWhenViewModel: XCTestCase {
         let layoutState = LayoutState()
         layoutState.items[LayoutState.totalItemsKey] = 5
         let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
-        whenVM.layoutState?.items[LayoutState.totalItemsKey] = 5
         // Act - totalOffers: 5, progression "-1" equals 4 (5 + (-1) = 4), currentProgress: 3 should be below 4
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 5))
 
