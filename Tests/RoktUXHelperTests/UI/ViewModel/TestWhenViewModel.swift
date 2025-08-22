@@ -21,13 +21,14 @@ final class TestWhenViewModel: XCTestCase {
                              predicates: [WhenPredicate]? = [],
                              transition: WhenTransition? = nil,
                              copy: [String: String] = [String: String](),
-                             breakPoint: BreakPoint? = nil) -> WhenViewModel {
+                             breakPoint: BreakPoint? = nil,
+                             layoutState: LayoutState = LayoutState()) -> WhenViewModel {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
                              offers: [get_slot_offer(copy: copy)],
                              globalBreakPoints: breakPoint,
-                             layoutState: LayoutState())
+                             layoutState: layoutState)
     }
     
     func test_should_apply_progression_is_valid() {
@@ -130,7 +131,9 @@ final class TestWhenViewModel: XCTestCase {
         // Arrange
         let predicate = WhenPredicate.progression(
             ProgressionPredicate(condition: .is, value: "-1"))
-        let whenVM = get_when_view_model(predicates: [predicate])
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.totalItemsKey] = 3
+        let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
         // Act - totalOffers: 3, currentProgress: 2, expecting progression "-1" to match position 2 (3 + (-1) = 2)
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 2, totalOffers: 3))
 
@@ -142,7 +145,9 @@ final class TestWhenViewModel: XCTestCase {
         // Arrange
         let predicate = WhenPredicate.progression(
             ProgressionPredicate(condition: .is, value: "-1"))
-        let whenVM = get_when_view_model(predicates: [predicate])
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.totalItemsKey] = 3
+        let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
         // Act - totalOffers: 3, currentProgress: 1, expecting progression "-1" to match position 2 (3 + (-1) = 2), but current is 1
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 1, totalOffers: 3))
 
@@ -154,7 +159,9 @@ final class TestWhenViewModel: XCTestCase {
         // Arrange
         let predicate = WhenPredicate.progression(
             ProgressionPredicate(condition: .isAbove, value: "-2"))
-        let whenVM = get_when_view_model(predicates: [predicate])
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.totalItemsKey] = 4
+        let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
         // Act - totalOffers: 4, progression "-2" equals 2 (4 + (-2) = 2), currentProgress: 3 should be above 2
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 4))
 
@@ -166,7 +173,10 @@ final class TestWhenViewModel: XCTestCase {
         // Arrange
         let predicate = WhenPredicate.progression(
             ProgressionPredicate(condition: .isBelow, value: "-1"))
-        let whenVM = get_when_view_model(predicates: [predicate])
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.totalItemsKey] = 5
+        let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
+        whenVM.layoutState?.items[LayoutState.totalItemsKey] = 5
         // Act - totalOffers: 5, progression "-1" equals 4 (5 + (-1) = 4), currentProgress: 3 should be below 4
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 5))
 
