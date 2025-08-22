@@ -39,6 +39,10 @@ extension PredicateHandling {
         layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
     }
 
+    var viewableItems: Binding<Int> {
+        layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+    }
+
     var totalItems: Int {
         layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 0
     }
@@ -133,7 +137,8 @@ extension PredicateHandling {
                 // If the predicate value is negative, the value should be calculated from last
                 // Eg: Total items = 4, Predicate value = -1 then the result should be 3(last position)
                 //     Total items = 4, Predicate value = -2 then the result should be 2(second last position)
-                let progression = value >= 0 ? value : totalItems + value
+                let totalPages = Int(ceil(Double(totalItems))/Double(viewableItems.wrappedValue))
+                let progression = value >= 0 ? value : totalPages + value
                 switch predicate.condition {
                 case .is:
                     matched = matched && currentProgress == progression
