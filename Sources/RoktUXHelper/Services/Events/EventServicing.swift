@@ -10,6 +10,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
+import DcuiSchema
 
 protocol EventServicing: AnyObject {
     var dismissOption: LayoutDismissOptions? { get set }
@@ -26,7 +27,7 @@ protocol EventServicing: AnyObject {
     func cartItemInstantPurchase(catalogItem: CatalogItem)
     func cartItemInstantPurchaseSuccess(itemId: String)
     func cartItemInstantPurchaseFailure(itemId: String)
-    func cartItemStripePay(catalogItem: CatalogItem)
-    func cartItemStripePaySuccess(itemId: String)
-    func cartItemStripePayFailure(itemId: String)
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider)
+    func cartItemDevicePaySuccess(itemId: String)
+    func cartItemDevicePayFailure(itemId: String)
 }

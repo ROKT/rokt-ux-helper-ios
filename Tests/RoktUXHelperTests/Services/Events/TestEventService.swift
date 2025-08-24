@@ -12,6 +12,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import XCTest
+import DcuiSchema
 
 @testable import RoktUXHelper
 
@@ -317,7 +318,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.openUrlType, .passthrough)
     }
 
-    func test_send_stripe_pay_initiated() {
+    func test_send_device_pay_initiated() {
         // Arrange
         let eventService = get_mock_event_processor(
             startDate: startDate,
@@ -327,11 +328,11 @@ final class TestEventService: XCTestCase {
             })
 
         // Act
-        eventService.cartItemStripePay(catalogItem: .mock())
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay)
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemStripePayInitiated)
+        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePayInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
@@ -354,7 +355,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
     }
 
-    func test_send_stripe_pay_succeeded() {
+    func test_send_device_pay_succeeded() {
         // Arrange
         let eventService = get_mock_event_processor(
             startDate: startDate,
@@ -365,11 +366,11 @@ final class TestEventService: XCTestCase {
             })
 
         // Act
-        eventService.cartItemStripePaySuccess(itemId: "catalogItemId")
+        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemStripePay)
+        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePay)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
@@ -392,7 +393,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
     }
 
-    func test_send_stripe_pay_failed() {
+    func test_send_device_pay_failed() {
         // Arrange
         let eventService = get_mock_event_processor(
             startDate: startDate,
@@ -403,11 +404,11 @@ final class TestEventService: XCTestCase {
             })
 
         // Act
-        eventService.cartItemStripePayFailure(itemId: "catalogItemId")
+        eventService.cartItemDevicePayFailure(itemId: "catalogItemId")
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemStripePayFailure)
+        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePayFailure)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
@@ -643,7 +644,7 @@ class MockUXHelper: UXEventsDelegate {
         self.roktEvents.append(.CartItemInstantPurchase)
     }
 
-    func onCartItemStripePay(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
-        self.roktEvents.append(.CartItemStripePay)
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem, paymentProvider: PaymentProvider) {
+        self.roktEvents.append(.CartItemDevicePay)
     }
 }

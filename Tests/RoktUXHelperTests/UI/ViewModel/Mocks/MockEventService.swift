@@ -22,9 +22,9 @@ class MockEventService: EventServicing {
     var cartItemInstantPurchaseCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
-    var cartItemStripePayCalled = false
-    var cartItemStripePaySuccessCalled = false
-    var cartItemStripePayFailureCalled = false
+    var cartItemDevicePayCalled = false
+    var cartItemDevicePaySuccessCalled = false
+    var cartItemDevicePayFailureCalled = false
 
     // MARK: - Protocol Properties
 
@@ -85,16 +85,16 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
-    func cartItemStripePay(catalogItem: CatalogItem) {
-        cartItemStripePayCalled = true
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        cartItemDevicePayCalled = true
     }
 
-    func cartItemStripePaySuccess(itemId: String) {
-        cartItemStripePaySuccessCalled = true
+    func cartItemDevicePaySuccess(itemId: String) {
+        cartItemDevicePaySuccessCalled = true
     }
 
-    func cartItemStripePayFailure(itemId: String) {
-        cartItemStripePayFailureCalled = true
+    func cartItemDevicePayFailure(itemId: String) {
+        cartItemDevicePayFailureCalled = true
     }
 
     // MARK: - Additional Test Methods
@@ -129,9 +129,9 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseCalled = false
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
-        cartItemStripePayCalled = false
-        cartItemStripePaySuccessCalled = false
-        cartItemStripePayFailureCalled = false
+        cartItemDevicePayCalled = false
+        cartItemDevicePaySuccessCalled = false
+        cartItemDevicePayFailureCalled = false
         dismissOption = nil
     }
 }

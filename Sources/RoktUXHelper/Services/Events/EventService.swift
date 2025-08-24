@@ -12,6 +12,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import DcuiSchema
 
 enum LayoutDismissOptions {
     case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered
@@ -187,19 +188,19 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
-    func cartItemStripePay(catalogItem: CatalogItem) {
-        sendCartItemEvent(eventType: .SignalCartItemStripePayInitiated, catalogItem: catalogItem)
-        uxEventDelegate?.onCartItemStripePay(pluginId, catalogItem: catalogItem)
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        sendCartItemEvent(eventType: .SignalCartItemDevicePayInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
     }
 
-    func cartItemStripePaySuccess(itemId: String) {
+    func cartItemDevicePaySuccess(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemStripePay, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemDevicePay, catalogItem: catalogItem)
     }
 
-    func cartItemStripePayFailure(itemId: String) {
+    func cartItemDevicePayFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemStripePayFailure, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemDevicePayFailure, catalogItem: catalogItem)
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {

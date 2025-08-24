@@ -53,12 +53,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
 
     func cartItemDevicePay() {
         if let catalogItem {
-            switch provider {
-            case .stripe:
-                eventService?.cartItemStripePay(catalogItem: catalogItem)
-            default:
-                break
-            }
+            eventService?.cartItemDevicePay(catalogItem: catalogItem, paymentProvider: provider)
         }
     }
 }

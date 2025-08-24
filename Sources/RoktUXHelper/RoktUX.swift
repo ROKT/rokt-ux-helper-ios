@@ -12,6 +12,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
 @available(iOS 15, *)
@@ -185,18 +186,18 @@ public class RoktUX: UXEventsDelegate {
     }
 
     /**
-     Call when stripe pay has succeeded or failed.
+     Call when device pay has succeeded or failed.
 
      - Parameters:
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the purchase succeeded or failed.
      */
-    public func stripePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
         if success {
-            eventServices[layoutId]?.cartItemStripePaySuccess(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
         } else {
-            eventServices[layoutId]?.cartItemStripePayFailure(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
         }
     }
 
@@ -568,8 +569,8 @@ public class RoktUX: UXEventsDelegate {
         ))
     }
 
-    func onCartItemStripePay(_ layoutId: String, catalogItem: CatalogItem) {
-        onRoktEvent?(RoktUXEvent.CartItemStripePay(
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
             layoutId: layoutId,
             name: catalogItem.title,
             cartItemId: catalogItem.cartItemId,
@@ -580,7 +581,8 @@ public class RoktUX: UXEventsDelegate {
             providerData: catalogItem.providerData,
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice
+            unitPrice: catalogItem.originalPrice,
+            paymentProvider: paymentProvider
         ))
     }
 }
