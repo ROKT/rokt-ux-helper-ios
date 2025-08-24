@@ -50,12 +50,12 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_text_subscript")
             return try! JSONDecoder().decode(RichTextModel.self, from: data)
         }
-        
+
         static func basicText() -> BasicTextModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_text_none")
             return try! JSONDecoder().decode(BasicTextModel.self, from: data)
-        }     
-        
+        }
+
         static func richTextOuterLayer() -> LayoutSchemaModel {
             let data = toData(jsonFilename: "node_text_none")
             let richText = try! JSONDecoder().decode(RichTextModel<WhenPredicate>.self, from: data)
@@ -66,13 +66,13 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_richtext_html")
             return try! JSONDecoder().decode(RichTextModel.self, from: data)
         }
-        
+
         static func richTextState() -> RichTextModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_richtext_state")
             return try! JSONDecoder().decode(RichTextModel.self, from: data)
         }
     }
-    
+
     enum CreativeResponseData {
         static func positive() -> CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? {
             let data = toData(jsonFilename: "node_creative_response_positive")
@@ -80,14 +80,14 @@ class ModelTestData: NSObject {
             guard case .creativeResponse(let model) = layout else { return nil }
             return model
         }
-        
+
         static func negative() -> CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? {
             let data = toData(jsonFilename: "node_creative_response_negative")
             let layout = try! JSONDecoder().decode(LayoutSchemaModel.self, from: data)
             guard case .creativeResponse(let model) = layout else { return nil }
             return model
         }
-                
+
         static func neutral() -> CreativeResponseModel<LayoutSchemaModel, WhenPredicate>? {
             let data = toData(jsonFilename: "node_creative_response_neutral")
             let layout = try! JSONDecoder().decode(LayoutSchemaModel.self, from: data)
@@ -95,21 +95,21 @@ class ModelTestData: NSObject {
             return model
         }
     }
-    
+
     enum CloseButtonData {
         static func closeButton() -> CloseButtonModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_close_button")
             return try! JSONDecoder().decode(CloseButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
-    }    
-    
+    }
+
     enum ProgressControlData {
         static func progressControl() -> ProgressControlModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_progress_control")
             return try! JSONDecoder().decode(ProgressControlModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
-    
+
     enum RowData {
         static func rowWithBasicText() -> RowModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_row_with_basic_text")
@@ -142,19 +142,19 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
-    
+
     enum ZStackData {
         static func zStackWithStyles() -> ZStackModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_zstack_with_styles")
             return try! JSONDecoder().decode(ZStackModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
-        
+
         static func accessibilityGroupedZStack() -> AccessibilityGroupedModel<AccessibilityGroupedLayoutChildren> {
             let data = toData(jsonFilename: "node_accessibility_grouped_zstack")
             return try! JSONDecoder().decode(AccessibilityGroupedModel<AccessibilityGroupedLayoutChildren>.self, from: data)
         }
     }
-    
+
     enum OneByOneData {
         static func oneByOne() -> OneByOneDistributionModel<WhenPredicate>? {
             let data = toData(jsonFilename: "node_onebyone")
@@ -165,7 +165,7 @@ class ModelTestData: NSObject {
             return nil
         }
     }
-    
+
     enum CarouselData {
         static func carousel() -> CarouselDistributionModel<WhenPredicate>? {
             let data = toData(jsonFilename: "node_carousel")
@@ -175,8 +175,8 @@ class ModelTestData: NSObject {
             }
             return nil
         }
-    } 
-    
+    }
+
     enum GroupedDistributionData {
         static func groupedDistribution() -> GroupedDistributionModel<WhenPredicate>? {
             let data = toData(jsonFilename: "node_grouped_distribution")
@@ -187,14 +187,14 @@ class ModelTestData: NSObject {
             return nil
         }
     }
-    
+
     enum StaticLinkData {
         static func staticLink() -> StaticLinkModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_static_link")
             return try! JSONDecoder().decode(StaticLinkModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
-    
+
     enum DataImageData {
         static func dataImage() -> DataImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_data_image")
@@ -205,7 +205,7 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(DataImageModel.self, from: data)
         }
     }
-    
+
     enum DataImageCarouselData {
         static func dataImageCarousel() -> DataImageCarouselModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_data_image_carousel")
@@ -221,18 +221,18 @@ class ModelTestData: NSObject {
         static func staticImage() -> StaticImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_static_image")
             return try! JSONDecoder().decode(StaticImageModel.self, from: data)
-        }        
+        }
         static func emptyURLImage() -> StaticImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_static_image_empty_url")
             return try! JSONDecoder().decode(StaticImageModel.self, from: data)
         }
-        
+
         static func withAlt() -> StaticImageModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_static_image_with_alt")
             return try! JSONDecoder().decode(StaticImageModel.self, from: data)
         }
     }
-    
+
     enum ProgressIndicatorData {
         static func progressIndicator() -> ProgressIndicatorModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_progress_indicator")
@@ -253,12 +253,12 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_data_expansion_chain")
             return try! JSONDecoder().decode(ProgressIndicatorModel.self, from: data)
         }
-        
+
         static func startPosition() -> ProgressIndicatorModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_start_position_progress_indicator")
             return try! JSONDecoder().decode(ProgressIndicatorModel.self, from: data)
         }
-        
+
         static func accessibilityHidden() -> ProgressIndicatorModel<WhenPredicate> {
             let data = toData(jsonFilename: "node_accessibilityHidden_progress_indicator")
             return try! JSONDecoder().decode(ProgressIndicatorModel.self, from: data)
@@ -269,7 +269,7 @@ class ModelTestData: NSObject {
         static func singleTextOverlay() -> OverlayModel<RichTextModel<WhenPredicate>, WhenPredicate> {
             let data = toData(jsonFilename: "overlay_test")
             return try! JSONDecoder().decode(OverlayModel.self, from: data)
-        }       
+        }
         static func alignWrapperCenterOverlay() -> OverlayModel<RichTextModel<WhenPredicate>, WhenPredicate> {
             let data = toData(jsonFilename: "overlay_wrapper_center")
             return try! JSONDecoder().decode(OverlayModel.self, from: data)
@@ -279,14 +279,21 @@ class ModelTestData: NSObject {
             return try! JSONDecoder().decode(OverlayModel.self, from: data)
         }
     }
-    
+
     enum ToggleButtonData {
         static func basicToggleButton() -> ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_toggle_button")
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
-    
+
+    enum CatalogDevicePayButtonData {
+        static func catalogDevicePayButton() -> CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_device_pay")
+            return try! JSONDecoder().decode(CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
+
     enum CatalogResponseButtonData {
         static func catalogResponseButton() -> CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_catalog_response")

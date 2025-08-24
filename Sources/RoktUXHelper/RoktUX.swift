@@ -1,5 +1,5 @@
 //
-//  OverlayComponent.swift
+//  RoktUX.swift
 //  RoktUXHelper
 //
 //  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
@@ -12,6 +12,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
 @available(iOS 15, *)
@@ -28,7 +29,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration.
-     
+
      - Parameters:
        - experienceResponse: The response string containing the experience data.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
@@ -90,7 +91,7 @@ public class RoktUX: UXEventsDelegate {
 
     /**
      Loads and displays the layout based on the given experience response and configuration with additional parameters.
-     
+
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - experienceResponse: The response string containing the experience data.
@@ -181,6 +182,22 @@ public class RoktUX: UXEventsDelegate {
             eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId)
         } else {
             eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
+        }
+    }
+
+    /**
+     Call when device pay has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the purchase succeeded or failed.
+     */
+    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        if success {
+            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
         }
     }
 
@@ -549,6 +566,23 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice
+        ))
+    }
+
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice,
+            paymentProvider: paymentProvider
         ))
     }
 }
