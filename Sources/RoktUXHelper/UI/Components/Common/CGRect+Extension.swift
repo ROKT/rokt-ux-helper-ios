@@ -19,4 +19,10 @@ extension CGRect {
         let intersection = intersection(geometrySpace)
         return (intersection.width * intersection.height)/(geometrySpace.width * geometrySpace.height)
     }
+
+    func intersectPercentWithFrame(_ frame: CGRect) -> CGFloat {
+        guard intersects(frame) else { return 0 }
+        let intersection = intersection(frame)
+        return (intersection.width * intersection.height)/(frame.width * frame.height)
+    }
 }
