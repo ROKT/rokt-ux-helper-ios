@@ -57,6 +57,30 @@ class TestCGRectExtension: XCTestCase {
         XCTAssertEqual(result, 0.0, "Should return 0 when rect2 has zero size")
     }
 
+    func testIntersectPercentWithFrame_EdgeCase_SelfZeroSize() {
+        let rect1 = CGRect(x: 0, y: 0, width: 0, height: 0)
+        let rect2 = CGRect(x: 0, y: 0, width: 100, height: 100)
+
+        let result = rect1.intersectPercentWithFrame(rect2)
+        XCTAssertEqual(result, 0.0, "Should return 0 when self has zero size to prevent divide by zero")
+    }
+
+    func testIntersectPercentWithFrame_EdgeCase_SelfZeroWidth() {
+        let rect1 = CGRect(x: 0, y: 0, width: 0, height: 100)
+        let rect2 = CGRect(x: 0, y: 0, width: 100, height: 100)
+
+        let result = rect1.intersectPercentWithFrame(rect2)
+        XCTAssertEqual(result, 0.0, "Should return 0 when self has zero width to prevent divide by zero")
+    }
+
+    func testIntersectPercentWithFrame_EdgeCase_SelfZeroHeight() {
+        let rect1 = CGRect(x: 0, y: 0, width: 100, height: 0)
+        let rect2 = CGRect(x: 0, y: 0, width: 100, height: 100)
+
+        let result = rect1.intersectPercentWithFrame(rect2)
+        XCTAssertEqual(result, 0.0, "Should return 0 when self has zero height to prevent divide by zero")
+    }
+
     func testIntersectPercentWithFrame_EdgeCase_NegativeCoordinates() {
         let rect1 = CGRect(x: 0, y: 0, width: 100, height: 100)
         let rect2 = CGRect(x: -50, y: -50, width: 100, height: 100)
