@@ -23,6 +23,6 @@ extension CGRect {
     func intersectPercentWithFrame(_ frame: CGRect) -> CGFloat {
         guard intersects(frame) else { return 0 }
         let intersection = intersection(frame)
-        return (intersection.width * intersection.height)/(frame.width * frame.height)
+        return (intersection.width * intersection.height)/(self.width * self.height)
     }
 }
