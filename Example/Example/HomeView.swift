@@ -14,8 +14,6 @@ import RoktUXHelper
 
 struct HomeView: View {
 
-    @State private var isShowingSwiftUIView = false
-    @State private var isShowingUIKitView = false
     @State private var showToast = false
 
     var body: some View {
@@ -36,17 +34,15 @@ struct HomeView: View {
                         .padding()
                     Spacer()
 
-                    Button {
-                        isShowingSwiftUIView = true
-                    } label: {
+                    NavigationLink(destination: SampleView(onLayoutFailure: {
+                        showToastMessage()
+                    })) {
                         Text("Load SwiftUI")
                     }
                     .padding(.top)
                     .buttonStyle(ButtonDefaultOutlined())
 
-                    Button {
-                        isShowingUIKitView = true
-                    } label: {
+                    NavigationLink(destination: SampleVCRepresentable()) {
                         Text("Load UIKit")
                     }
                     .padding(.top)
@@ -71,14 +67,6 @@ struct HomeView: View {
         }
         .background(Color.white)
         .navigationViewStyle(StackNavigationViewStyle())
-        .sheet(isPresented: $isShowingSwiftUIView) {
-            SampleView(onLayoutFailure: {
-                showToastMessage()
-            })
-        }
-        .sheet(isPresented: $isShowingUIKitView) {
-            SampleVCRepresentable()
-        }
     }
 
     private func showToastMessage() {
