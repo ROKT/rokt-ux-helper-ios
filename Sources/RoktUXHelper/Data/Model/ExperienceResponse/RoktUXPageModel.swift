@@ -41,8 +41,23 @@ enum PlacementType: Codable, Hashable {
     case unSupported
 }
 
+/// Defines the behavior type for bottom sheet components
+///
+/// This enum specifies how a bottom sheet should behave in terms of its height and resizing capabilities.
+/// The type determines whether the bottom sheet maintains a fixed height or allows dynamic resizing.
 enum BottomSheetType: Codable, Hashable {
+    /// A bottom sheet with a fixed, predetermined height.
+    ///
+    /// The sheet will be sized based on it's content.
     case fixed
+
+    /// A bottom sheet that can dynamically resize e.g. stretch.
+    ///
+    /// Dynamic requires iOS 16 due to the usage of [custom detents](https://developer.apple.com/documentation/swiftui/custompresentationdetent)
+    ///
+    /// This type allows the sheet to expand or contract vertically to fit its content.
+    /// Users can typically resize the sheet by dragging its edges or through other
+    /// interactive controls.
     case dynamic
 }
 

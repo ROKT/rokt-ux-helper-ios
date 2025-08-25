@@ -12,6 +12,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
 @available(iOS 15, *)
@@ -288,33 +289,7 @@ public class RoktUX: UXEventsDelegate {
                             .customColorMode(colorMode: config?.colorMode)
                     }
                 case .bottomSheet(let model):
-                    layoutState.setLayoutType(.bottomSheetLayout)
-
-                    let bottomSheetHeightDimension = model.defaultStyle?.first?.dimension?.height
-
-                    if bottomSheetHeightDimension == nil || bottomSheetHeightDimension == .fit(.wrapContent),
-                       #available(iOS 16.0, *) {
-                        showOverlay(placementType: .BottomSheet(.dynamic),
-                                    bottomSheetUIModel: model,
-                                    layoutState: layoutState,
-                                    eventService: eventService,
-                                    onLoad: onLoad,
-                                    onUnload: onUnload) { onSizeChange in
-                            ResizableBottomSheetComponent(model: model,
-                                                          onSizeChange: onSizeChange)
-                            .customColorMode(colorMode: config?.colorMode)
-                        }
-                    } else {
-                        showOverlay(placementType: .BottomSheet(.fixed),
-                                    bottomSheetUIModel: model,
-                                    layoutState: layoutState,
-                                    eventService: eventService,
-                                    onLoad: onLoad,
-                                    onUnload: onUnload) { _ in
-                            BottomSheetComponent(model: model)
-                                .customColorMode(colorMode: config?.colorMode)
-                        }
-                    }
+                    setupBottomSheet(layoutState, model, eventService, onLoad, onUnload, config)
                 default:
                     layoutState.setLayoutType(.embeddedLayout)
 
@@ -346,6 +321,50 @@ public class RoktUX: UXEventsDelegate {
             config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
+    }
+
+    fileprivate func setupBottomSheet(
+        _ layoutState: LayoutState,
+        _ model: BottomSheetViewModel,
+        _ eventService: EventService,
+        _ onLoad: @escaping (() -> Void),
+        _ onUnload: @escaping (() -> Void),
+        _ config: RoktUXConfig?
+    ) {
+        layoutState.setLayoutType(.bottomSheetLayout)
+
+        let bottomSheetHeightDimension = model.defaultStyle?.first?.dimension?.height
+
+        if canShowResizableBottomSheet(bottomSheetHeightDimension) {
+            showOverlay(placementType: .BottomSheet(.dynamic),
+                        bottomSheetUIModel: model,
+                        layoutState: layoutState,
+                        eventService: eventService,
+                        onLoad: onLoad,
+                        onUnload: onUnload) { onSizeChange in
+                ResizableBottomSheetComponent(model: model,
+                                              onSizeChange: onSizeChange)
+                .customColorMode(colorMode: config?.colorMode)
+            }
+        } else {
+            showOverlay(placementType: .BottomSheet(.fixed),
+                        bottomSheetUIModel: model,
+                        layoutState: layoutState,
+                        eventService: eventService,
+                        onLoad: onLoad,
+                        onUnload: onUnload) { _ in
+                BottomSheetComponent(model: model)
+                    .customColorMode(colorMode: config?.colorMode)
+            }
+        }
+    }
+
+    /// Resizable bottom sheet requires iOS 16 due to the usage of [custom detents](https://developer.apple.com/documentation/swiftui/custompresentationdetent)
+    private func canShowResizableBottomSheet(_ bottomSheetHeightDimension: DimensionHeightValue?) -> Bool {
+        if #available(iOS 16.0, *) {
+            return bottomSheetHeightDimension == nil || bottomSheetHeightDimension == .fit(.wrapContent)
+        }
+        return false
     }
 
     private func showEmbedded(
