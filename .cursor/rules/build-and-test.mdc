@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: "Build, test, and development workflow commands for RoktUXHelper iOS project"
+globs: ["**/*.swift", "**/*.xcodeproj", "**/*.xcodeproj/**"]
+alwaysApply: false
 ---
 
 # Build, Test, and Lint Commands
