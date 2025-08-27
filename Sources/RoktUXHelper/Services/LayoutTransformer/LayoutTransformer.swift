@@ -133,6 +133,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                     try getBottomSheet(
                         bottomSheetModel.styles,
                         allowBackdropToClose: bottomSheetModel.allowBackdropToClose,
+                        minimizable: bottomSheetModel.minimizable,
+                        startMinimized: bottomSheetModel.startMinimized,
                         children: transformChildren(bottomSheetModel.children, context: context)
                     )
                 )
@@ -536,10 +538,14 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     func getBottomSheet(_ styles: LayoutStyle<BottomSheetElements,
                                               ConditionalStyleTransition<BottomSheetTransitions, WhenPredicate>>?,
                         allowBackdropToClose: Bool?,
+                        minimizable: Bool?,
+                        startMinimized: Bool?,
                         children: [LayoutSchemaViewModel]?) throws -> BottomSheetViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return BottomSheetViewModel(children: children,
                                     allowBackdropToClose: allowBackdropToClose,
+                                    minimizable: minimizable,
+                                    startMinimized: startMinimized,
                                     defaultStyle: updateStyles.compactMap {$0.default},
                                     eventService: eventService,
                                     layoutState: layoutState)
