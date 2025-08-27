@@ -17,6 +17,8 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let allowBackdropToClose: Bool?
+    let minimizable: Bool
+    let startMinimized: Bool
     let defaultStyle: [BottomSheetStyles]?
     weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
@@ -26,11 +28,15 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     init(children: [LayoutSchemaViewModel]?,
          allowBackdropToClose: Bool?,
+         minimizable: Bool?,
+         startMinimized: Bool?,
          defaultStyle: [BottomSheetStyles]?,
          eventService: EventServicing?,
          layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.allowBackdropToClose = allowBackdropToClose
+        self.minimizable = minimizable ?? false
+        self.startMinimized = startMinimized ?? false
         self.defaultStyle = defaultStyle
         self.eventService = eventService
         self.layoutState = layoutState
