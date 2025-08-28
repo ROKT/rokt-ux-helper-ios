@@ -27,6 +27,124 @@ struct ViewControllerHolder {
 
 @available(iOS 15, *)
 extension UIViewController {
+    private func displayMinimizableBottomSheet<Content: View>(
+        modal: RoktUXSwiftUIViewController,
+        bottomSheetUIModel: BottomSheetViewModel,
+        layoutState: LayoutState,
+        onLoad: @escaping (() -> Void),
+        @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content
+    ) {
+        var isOnLoadCalled = false
+        var heightConstraint: NSLayoutConstraint!
+        var bottomConstraint: NSLayoutConstraint!
+
+        let onSizeChange = { [weak self] (size: CGFloat) in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                if !isOnLoadCalled {
+                    heightConstraint.constant = size + 140
+                    bottomConstraint.constant = size
+                    self.view.layoutIfNeeded()
+
+                    UIView.animate(withDuration: 0.3) {
+                        bottomConstraint.constant = 140
+                        self.view.layoutIfNeeded()
+                    } completion: { _ in
+                        isOnLoadCalled = true
+                        onLoad()
+                    }
+                } else {
+                    UIView.animate(withDuration: 0.3) {
+                        heightConstraint.constant = size
+                        self.view.layoutIfNeeded()
+                    }
+                }
+            }
+        }
+
+        modal.rootView = AnyView(
+            builder(onSizeChange)
+                .background(Color.clear)
+        )
+
+        self.addChild(modal)
+        let contentView = modal.view!
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(contentView)
+
+        heightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
+        heightConstraint.isActive = true
+        bottomConstraint = contentView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
+        bottomConstraint.isActive = true
+        contentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+        if let defaultStyle = bottomSheetUIModel.defaultStyle,
+           !defaultStyle.isEmpty,
+           let borderRadius = defaultStyle[0].border?.borderRadius {
+            contentView.layer.cornerRadius = CGFloat(borderRadius)
+            contentView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            contentView.clipsToBounds = true
+        }
+        contentView.backgroundColor = .white
+
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleBottomSheetPan(_:)))
+        contentView.addGestureRecognizer(panGesture)
+
+        layoutState.actionCollection[.close] = { [weak self, weak modal, weak layoutState] _ in
+            guard let self = self, let contentView = modal?.view else { return }
+            UIView.animate(withDuration: 0.3) {
+                bottomConstraint.constant = heightConstraint.constant
+                self.view.layoutIfNeeded()
+            } completion: { _ in
+                contentView.removeFromSuperview()
+                modal?.willMove(toParent: nil)
+                modal?.removeFromParent()
+                layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
+            }
+        }
+    }
+
+    @available(iOS 16.0, *)
+    private func displayExistingBottomSheetImplementation<Content: View>(
+        modal: RoktUXSwiftUIViewController,
+        bottomSheetUIModel: BottomSheetViewModel,
+        layoutState: LayoutState,
+        onLoad: @escaping (() -> Void),
+        @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content
+    ) {
+        var isOnLoadCalled = false
+        let onSizeChange = { [weak modal] size in
+            DispatchQueue.main.async {
+                if let sheet = modal?.sheetPresentationController {
+                    sheet.animateChanges {
+                        sheet.detents = [.custom { _ in
+                            return size
+                        }]
+                    }
+                    if !isOnLoadCalled {
+                        isOnLoadCalled = true
+                        onLoad()
+                    }
+                }
+            }
+        }
+        modal.rootView = AnyView(
+            builder(onSizeChange)
+                .background(Color.clear)
+        )
+
+        applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
+        applyInitialDynamicBottomSheetHeight(modal: modal)
+        modal.sheetPresentationController?.prefersGrabberVisible = true
+
+        layoutState.actionCollection[.close] = { [weak modal, weak layoutState] _ in
+            modal?.dismiss(animated: true, completion: nil)
+            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
+        }
+        self.present(modal, animated: true)
+    }
+
     func present<Content: View>(placementType: PlacementType?,
                                 bottomSheetUIModel: BottomSheetViewModel?,
                                 layoutState: LayoutState,
@@ -43,32 +161,24 @@ extension UIViewController {
            let type = placementType,
            type == .BottomSheet(.dynamic),
            let bottomSheetUIModel = bottomSheetUIModel {
-            // Only for iOS 16+ dynamic bottomsheet
-            var isOnLoadCalled = false
-            let onSizeChange = { [weak modal] size in
-                DispatchQueue.main.async {
-                    if let sheet = modal?.sheetPresentationController {
-                        sheet.animateChanges {
-                            sheet.detents = [.custom { _ in
-                                return size
-                            }]
-                        }
-                        if !isOnLoadCalled {
-                            isOnLoadCalled = true
-                            onLoad()
-                        }
-                    }
-                }
+
+            if bottomSheetUIModel.minimizable {
+                displayMinimizableBottomSheet(
+                    modal: modal,
+                    bottomSheetUIModel: bottomSheetUIModel,
+                    layoutState: layoutState,
+                    onLoad: onLoad,
+                    builder: builder
+                )
+            } else {
+                displayExistingBottomSheetImplementation(
+                    modal: modal,
+                    bottomSheetUIModel: bottomSheetUIModel,
+                    layoutState: layoutState,
+                    onLoad: onLoad,
+                    builder: builder
+                )
             }
-            modal.rootView = AnyView(
-                builder(onSizeChange)
-                    .background(Color.clear)
-            )
-
-            applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
-            applyInitialDynamicBottomSheetHeight(modal: modal)
-            self.present(modal, animated: true)
-
         } else {
             modal.rootView = AnyView(
                 builder(nil)
@@ -92,13 +202,14 @@ extension UIViewController {
             self.present(modal, animated: true, completion: {
                 onLoad()
             })
+
+            layoutState.actionCollection[.close] = { [weak modal, weak layoutState] _ in
+                modal?.dismiss(animated: true, completion: nil)
+                layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
+            }
         }
 
         modal.view.isOpaque = false
-        layoutState.actionCollection[.close] = { [weak modal, weak layoutState] _ in
-            modal?.dismiss(animated: true, completion: nil)
-            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
-        }
     }
 
     private func applyBottomSheetStyles(modal: UIHostingController<AnyView>,
@@ -151,6 +262,22 @@ extension UIViewController {
                 return [.large()]
             } else {
                 return nil
+            }
+        }
+    }
+
+    @objc private func handleBottomSheetPan(_ gesture: UIPanGestureRecognizer) {
+        guard let view = gesture.view else { return }
+        let translation = gesture.translation(in: view.superview)
+        let velocity = gesture.velocity(in: view.superview)
+
+        if gesture.state == .changed {
+            if translation.y >= -100 {
+                view.transform = CGAffineTransform(translationX: 0, y: translation.y)
+            }
+        } else if gesture.state == .ended {
+            UIView.animate(withDuration: 0.3) {
+                view.transform = .identity
             }
         }
     }
