@@ -36,6 +36,10 @@ struct ResizableBottomSheetComponent: View {
     @State private var isDragging = false
     @State private var dragOffset: CGFloat = 0
 
+    @State private var isClosing = false
+    @State private var closeAnimationOffset: CGFloat = 0
+    @State private var backgroundAlpha: Double = 0.4
+
     init(model: BottomSheetViewModel, onSizeChange: ((CGFloat) -> Void)?) {
         self.model = model
         self.onSizeChange = onSizeChange
@@ -53,11 +57,13 @@ struct ResizableBottomSheetComponent: View {
         ZStack {
             // iOS modal background layer - only show when not minimized
             if !minimized {
-                Color.black.opacity(0.4)
+                Color.black.opacity(backgroundAlpha)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        // Intercept touch events on the background
-                        // This prevents touches from passing through to underlying views
+                        print("close")
+                        if model.allowBackdropToClose ?? false {
+                            close()
+                        }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -109,6 +115,23 @@ struct ResizableBottomSheetComponent: View {
             )
             .clipped()
             .frame(alignment: .bottom)
+            .offset(y: closeAnimationOffset)
+        }
+        .onLoad {
+            model.onClose = close
+            model.setupLayoutState()
+        }
+    }
+
+    private func close() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isClosing = true
+            closeAnimationOffset = availableHeight ?? UIScreen.main.bounds.height
+            backgroundAlpha = 0.0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.model.onCleanup?()
         }
     }
 

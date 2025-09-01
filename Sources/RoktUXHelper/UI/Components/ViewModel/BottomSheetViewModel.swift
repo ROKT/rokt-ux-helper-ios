@@ -41,4 +41,14 @@ class BottomSheetViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.eventService = eventService
         self.layoutState = layoutState
     }
+
+    var onClose: (() -> Void)?
+    var onCleanup: (() -> Void)?
+
+    func setupLayoutState() {
+        layoutState?.actionCollection[.close] = { [weak self] _ in
+            self?.onClose?()
+            self?.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
+        }
+    }
 }

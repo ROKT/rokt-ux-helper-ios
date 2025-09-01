@@ -83,18 +83,13 @@ extension UIViewController {
                 .background(Color.clear)
         )
 
-        // We need to migrate the animation to ResizableBottomSheetComponent due to the faded background
-        layoutState.actionCollection[.close] = { [weak self, weak modal, weak layoutState] _ in
+        bottomSheetUIModel.onCleanup = { [weak self, weak modal, weak layoutState] in
             guard let self = self, let contentView = modal?.view else { return }
-            UIView.animate(withDuration: 0.3) {
-                bottomConstraint.constant = heightConstraint.constant
-                self.view.layoutIfNeeded()
-            } completion: { _ in
-                contentView.removeFromSuperview()
-                modal?.willMove(toParent: nil)
-                modal?.removeFromParent()
-                layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
-            }
+            // Clean up the child view controller
+            contentView.removeFromSuperview()
+            modal?.willMove(toParent: nil)
+            modal?.removeFromParent()
+            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: true)
         }
     }
 
