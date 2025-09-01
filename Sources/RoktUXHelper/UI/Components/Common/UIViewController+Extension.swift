@@ -35,19 +35,35 @@ extension UIViewController {
         @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content
     ) {
         var isOnLoadCalled = false
-        var heightConstraint: NSLayoutConstraint!
-        var bottomConstraint: NSLayoutConstraint!
+
+        self.addChild(modal)
+        let contentView = modal.view!
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(contentView)
+
+        // Set up constraints first
+        let heightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
+        heightConstraint.isActive = true
+        let bottomConstraint = contentView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0)
+        bottomConstraint.isActive = true
+        contentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+        contentView.backgroundColor = .clear
 
         let onSizeChange = { [weak self] (size: CGFloat) in
             guard let self = self else { return }
             DispatchQueue.main.async {
+                self.view.backgroundColor = .red
+
+                let window = UIApplication.shared.keyWindow
+
                 if !isOnLoadCalled {
-                    heightConstraint.constant = size + 140
-                    bottomConstraint.constant = size
+                    heightConstraint.constant = size
                     self.view.layoutIfNeeded()
 
+                    // We need to migrate the animation to ResizableBottomSheetComponent due to the faded background
                     UIView.animate(withDuration: 0.3) {
-                        bottomConstraint.constant = 140
                         self.view.layoutIfNeeded()
                     } completion: { _ in
                         isOnLoadCalled = true
@@ -67,30 +83,7 @@ extension UIViewController {
                 .background(Color.clear)
         )
 
-        self.addChild(modal)
-        let contentView = modal.view!
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(contentView)
-
-        heightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
-        heightConstraint.isActive = true
-        bottomConstraint = contentView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
-        bottomConstraint.isActive = true
-        contentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-
-        if let defaultStyle = bottomSheetUIModel.defaultStyle,
-           !defaultStyle.isEmpty,
-           let borderRadius = defaultStyle[0].border?.borderRadius {
-            contentView.layer.cornerRadius = CGFloat(borderRadius)
-            contentView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            contentView.clipsToBounds = true
-        }
-        contentView.backgroundColor = .white
-
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleBottomSheetPan(_:)))
-        contentView.addGestureRecognizer(panGesture)
-
+        // We need to migrate the animation to ResizableBottomSheetComponent due to the faded background
         layoutState.actionCollection[.close] = { [weak self, weak modal, weak layoutState] _ in
             guard let self = self, let contentView = modal?.view else { return }
             UIView.animate(withDuration: 0.3) {
@@ -265,23 +258,6 @@ extension UIViewController {
             }
         }
     }
-
-    @objc private func handleBottomSheetPan(_ gesture: UIPanGestureRecognizer) {
-        guard let view = gesture.view else { return }
-        let translation = gesture.translation(in: view.superview)
-        let velocity = gesture.velocity(in: view.superview)
-
-        if gesture.state == .changed {
-            if translation.y >= -100 {
-                view.transform = CGAffineTransform(translationX: 0, y: translation.y)
-            }
-        } else if gesture.state == .ended {
-            UIView.animate(withDuration: 0.3) {
-                view.transform = .identity
-            }
-        }
-    }
-
 }
 
 @available(iOS 15.0, *)

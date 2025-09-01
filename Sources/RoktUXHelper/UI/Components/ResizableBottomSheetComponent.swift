@@ -28,56 +28,100 @@ struct ResizableBottomSheetComponent: View {
     @State private var availableHeight: CGFloat?
 
     @StateObject var globalScreenSize = GlobalScreenSize()
-    var body: some View {
-        ScrollView {
-            OuterLayerComponent(layouts: model.children,
-                                style: StylingPropertiesModel(
-                                    container: style?.container,
-                                    background: style?.background,
-                                    dimension: updateBottomSheetHeight(dimension: style?.dimension),
-                                    flexChild: style?.flexChild,
-                                    spacing: style?.spacing,
-                                    border: style?.border),
-                                layoutState: model.layoutState,
-                                eventService: model.eventService,
-                                parentWidth: $availableWidth,
-                                parentHeight: $availableHeight,
-                                onSizeChange: onBottomSheetSizeChange)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-            .background(backgroundStyle: style?.background, imageLoader: model.imageLoader)
-            .readSize(spacing: style?.spacing) { size in
-                availableWidth = size.width
-                availableHeight = size.height
 
-                // 0 at the start
-                globalScreenSize.width = size.width
-                globalScreenSize.height = size.height
-            }
-            .environmentObject(globalScreenSize)
-            .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
-                DispatchQueue.background.async {
-                    breakpointIndex = model.updateBreakpointIndex(for: newSize)
-                }
-            }
+    @State var minimized: Bool
+
+    // New state variables for styling and movement
+    @State private var cornerRadius: CGFloat = 0
+    @State private var isDragging = false
+    @State private var dragOffset: CGFloat = 0
+
+    init(model: BottomSheetViewModel, onSizeChange: ((CGFloat) -> Void)?) {
+        self.model = model
+        self.onSizeChange = onSizeChange
+        self.minimized = model.startMinimized
+
+        // Initialize corner radius from model
+        if let defaultStyle = model.defaultStyle,
+           !defaultStyle.isEmpty,
+           let borderRadius = defaultStyle[0].border?.borderRadius {
+            self._cornerRadius = State(initialValue: CGFloat(borderRadius))
         }
-        .bounceBasedOnSize()
-        .background(backgroundStyle: style?.background, imageLoader: model.imageLoader)
+    }
+
+    var body: some View {
+        ZStack {
+            // iOS modal background layer - only show when not minimized
+            if !minimized {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        // Intercept touch events on the background
+                        // This prevents touches from passing through to underlying views
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+
+            VStack(spacing: 0) {
+                OuterLayerComponent(layouts: model.children,
+                                    style: StylingPropertiesModel(
+                                        container: style?.container,
+                                        background: style?.background,
+                                        dimension: updateBottomSheetHeight(dimension: style?.dimension),
+                                        flexChild: style?.flexChild,
+                                        spacing: style?.spacing,
+                                        border: style?.border
+                                    ),
+                                    layoutState: model.layoutState,
+                                    eventService: model.eventService,
+                                    parentWidth: $availableWidth,
+                                    parentHeight: $availableHeight,
+                                    onSizeChange: onBottomSheetSizeChange)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .readSize(spacing: style?.spacing) { size in
+                    availableWidth = size.width
+                    availableHeight = size.height
+
+                    // 0 at the start
+                    globalScreenSize.width = size.width
+                    globalScreenSize.height = size.height
+                }
+                .environmentObject(globalScreenSize)
+                .onChange(of: globalScreenSize.width) { newSize in
+                    // run it in background thread for smooth transition
+                    DispatchQueue.background.async {
+                        breakpointIndex = model.updateBreakpointIndex(for: newSize)
+                    }
+                }
+
+                // Bottom padding view with matching background
+                let window = UIApplication.shared.keyWindow
+                let bottomPadding = window?.safeAreaInsets.bottom ?? 0
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: bottomPadding)
+            }
+            .ignoresSafeArea(.all, edges: .bottom)
+            .bounceBasedOnSize()
+            .background(backgroundStyle: style?.background, imageLoader: model.imageLoader)
+            .clipShape(
+                RoundedCorner(radius: cornerRadius, corners: [.topLeft, .topRight])
+            )
+            .clipped()
+            .frame(alignment: .bottom)
+        }
     }
 
     func onBottomSheetSizeChange(newHeight: CGFloat) {
+        // When minimized, emit the adjusted height as before
         var adjustedHeight = newHeight
-        if let padding = style?.spacing?.padding {
-            let paddingFrame = FrameAlignmentProperty.getFrameAlignment(padding)
-            adjustedHeight += paddingFrame.top + paddingFrame.bottom
-        }
 
-        if let margin = style?.spacing?.margin {
-            let marginFrame = FrameAlignmentProperty.getFrameAlignment(margin)
-            adjustedHeight += marginFrame.top + marginFrame.bottom
-        }
-
-        onSizeChange?(adjustedHeight)
+         if !minimized {
+             // When not minimized, emit the full screen height
+             onSizeChange?(UIScreen.main.bounds.height)
+         } else {
+            onSizeChange?(adjustedHeight)
+         }
     }
 
     // BottomSheet height has to be wrapContent
@@ -91,6 +135,22 @@ struct ResizableBottomSheetComponent: View {
                                               maxHeight: dimension.maxHeight,
                                               height: .fit(.wrapContent),
                                               rotateZ: dimension.rotateZ)
+    }
+}
 
+// MARK: - Custom Shapes
+
+@available(iOS 15, *)
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
