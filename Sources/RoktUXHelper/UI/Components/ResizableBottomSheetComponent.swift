@@ -14,7 +14,22 @@ import DcuiSchema
 
 @available(iOS 15, *)
 struct ResizableBottomSheetComponent: View {
+    private let maximumOverDrag = 200.0
+
+    private var topSafeArea: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .first?.safeAreaInsets.top ?? 0
+    }
+
+    private var bottomSafeArea: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .first?.safeAreaInsets.bottom ?? 0
+    }
+
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+
     let model: BottomSheetViewModel
     let onSizeChange: ((CGFloat) -> Void)?
     var style: BottomSheetStyles? {
@@ -33,12 +48,14 @@ struct ResizableBottomSheetComponent: View {
 
     // New state variables for styling and movement
     @State private var cornerRadius: CGFloat = 0
-    @State private var isDragging = false
-    @State private var dragOffset: CGFloat = 0
 
     @State private var isClosing = false
-    @State private var closeAnimationOffset: CGFloat = 0
     @State private var backgroundAlpha: Double = 0.4
+
+    @State private var isDragging = false
+    @State private var defaultVerticalOffset: CGFloat = 0
+    @State private var dragOffset: CGFloat = 0
+    @State private var bottomSheetTopYPos: CGFloat = 0
 
     init(model: BottomSheetViewModel, onSizeChange: ((CGFloat) -> Void)?) {
         self.model = model
@@ -60,7 +77,6 @@ struct ResizableBottomSheetComponent: View {
                 Color.black.opacity(backgroundAlpha)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        print("close")
                         if model.allowBackdropToClose ?? false {
                             close()
                         }
@@ -69,10 +85,40 @@ struct ResizableBottomSheetComponent: View {
             }
 
             VStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 30)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(Color.gray.opacity(0.6))
+                            .frame(width: 40, height: 4)
+                    )
+                    .gesture(
+                        DragGesture(coordinateSpace: .global)
+                            .onChanged { value in
+                                isDragging = true
+                                dragOffset = value.translation.height
+
+                                if dragOffset < -(maximumOverDrag - bottomSafeArea) {
+                                    bottomSheetTopYPos = defaultVerticalOffset - (maximumOverDrag - bottomSafeArea)
+                                } else {
+                                    bottomSheetTopYPos = defaultVerticalOffset + dragOffset
+                                }
+                            }
+                            .onEnded { _ in
+                                isDragging = false
+
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    bottomSheetTopYPos = defaultVerticalOffset
+                                    dragOffset = 0
+                                }
+                            }
+                    )
+
                 OuterLayerComponent(layouts: model.children,
                                     style: StylingPropertiesModel(
                                         container: style?.container,
-                                        background: style?.background,
+                                        background: nil,
                                         dimension: updateBottomSheetHeight(dimension: style?.dimension),
                                         flexChild: style?.flexChild,
                                         spacing: style?.spacing,
@@ -100,22 +146,19 @@ struct ResizableBottomSheetComponent: View {
                     }
                 }
 
-                // Bottom padding view with matching background
-                let window = UIApplication.shared.keyWindow
-                let bottomPadding = window?.safeAreaInsets.bottom ?? 0
                 Rectangle()
                     .fill(Color.clear)
-                    .frame(height: bottomPadding)
+                    .frame(height: maximumOverDrag)
             }
-            .ignoresSafeArea(.all, edges: .bottom)
+            .ignoresSafeArea(.all, edges: [.top, .bottom])
             .bounceBasedOnSize()
             .background(backgroundStyle: style?.background, imageLoader: model.imageLoader)
             .clipShape(
                 RoundedCorner(radius: cornerRadius, corners: [.topLeft, .topRight])
             )
             .clipped()
-            .frame(alignment: .bottom)
-            .offset(y: closeAnimationOffset)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .offset(y: bottomSheetTopYPos)
         }
         .onLoad {
             model.onClose = close
@@ -126,7 +169,7 @@ struct ResizableBottomSheetComponent: View {
     private func close() {
         withAnimation(.easeInOut(duration: 0.3)) {
             isClosing = true
-            closeAnimationOffset = availableHeight ?? UIScreen.main.bounds.height
+            bottomSheetTopYPos += (availableHeight ?? UIScreen.main.bounds.height)
             backgroundAlpha = 0.0
         }
 
@@ -136,15 +179,15 @@ struct ResizableBottomSheetComponent: View {
     }
 
     func onBottomSheetSizeChange(newHeight: CGFloat) {
-        // When minimized, emit the adjusted height as before
-        var adjustedHeight = newHeight
+        lastUpdatedHeight = newHeight
 
-         if !minimized {
-             // When not minimized, emit the full screen height
-             onSizeChange?(UIScreen.main.bounds.height)
-         } else {
-            onSizeChange?(adjustedHeight)
-         }
+        let screenHeight = UIScreen.main.bounds.height - topSafeArea - bottomSafeArea - 30
+
+        defaultVerticalOffset = screenHeight - lastUpdatedHeight
+        bottomSheetTopYPos = defaultVerticalOffset
+
+        // Update this to emit the size required by the overlay - may be best to emit y offset
+        onSizeChange?(UIScreen.main.bounds.height)
     }
 
     // BottomSheet height has to be wrapContent

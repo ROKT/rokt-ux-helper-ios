@@ -54,26 +54,16 @@ extension UIViewController {
         let onSizeChange = { [weak self] (size: CGFloat) in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                self.view.backgroundColor = .red
-
-                let window = UIApplication.shared.keyWindow
-
                 if !isOnLoadCalled {
                     heightConstraint.constant = size
                     self.view.layoutIfNeeded()
 
-                    // We need to migrate the animation to ResizableBottomSheetComponent due to the faded background
-                    UIView.animate(withDuration: 0.3) {
                         self.view.layoutIfNeeded()
-                    } completion: { _ in
                         isOnLoadCalled = true
                         onLoad()
-                    }
                 } else {
-                    UIView.animate(withDuration: 0.3) {
                         heightConstraint.constant = size
                         self.view.layoutIfNeeded()
-                    }
                 }
             }
         }
@@ -83,8 +73,8 @@ extension UIViewController {
                 .background(Color.clear)
         )
 
-        bottomSheetUIModel.onCleanup = { [weak self, weak modal, weak layoutState] in
-            guard let self = self, let contentView = modal?.view else { return }
+        bottomSheetUIModel.onCleanup = { [weak modal, weak layoutState] in
+            guard let contentView = modal?.view else { return }
             // Clean up the child view controller
             contentView.removeFromSuperview()
             modal?.willMove(toParent: nil)
