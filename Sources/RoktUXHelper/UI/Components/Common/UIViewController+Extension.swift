@@ -44,8 +44,9 @@ extension UIViewController {
         // Set up constraints first
         let heightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
         heightConstraint.isActive = true
-        let bottomConstraint = contentView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0)
-        bottomConstraint.isActive = true
+        heightConstraint.constant = UIScreen.main.bounds.height * 2
+        let topConstraint = contentView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0)
+        topConstraint.isActive = true
         contentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
 
@@ -55,15 +56,13 @@ extension UIViewController {
             guard let self = self else { return }
             DispatchQueue.main.async {
                 if !isOnLoadCalled {
-                    heightConstraint.constant = size
+                    topConstraint.constant = size
+                    isOnLoadCalled = true
+                    onLoad()
                     self.view.layoutIfNeeded()
-
-                        self.view.layoutIfNeeded()
-                        isOnLoadCalled = true
-                        onLoad()
                 } else {
-                        heightConstraint.constant = size
-                        self.view.layoutIfNeeded()
+                    topConstraint.constant = size
+                    self.view.layoutIfNeeded()
                 }
             }
         }

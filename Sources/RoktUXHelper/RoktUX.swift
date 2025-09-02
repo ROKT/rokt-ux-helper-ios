@@ -343,7 +343,7 @@ public class RoktUX: UXEventsDelegate {
                         onLoad: onLoad,
                         onUnload: onUnload) { onSizeChange in
                 ResizableBottomSheetComponent(model: model,
-                                              onSizeChange: onSizeChange)
+                                              onTopYPosChanged: onSizeChange)
                 .customColorMode(colorMode: config?.colorMode)
             }
         } else {

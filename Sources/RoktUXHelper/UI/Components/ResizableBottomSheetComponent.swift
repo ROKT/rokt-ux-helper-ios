@@ -17,21 +17,37 @@ struct ResizableBottomSheetComponent: View {
     private let maximumOverDrag = 200.0
 
     private var topSafeArea: CGFloat {
-        UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
-            .first?.safeAreaInsets.top ?? 0
+        if Thread.isMainThread {
+            return UIApplication.shared.connectedScenes
+                .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+                .first?.safeAreaInsets.top ?? 0
+        } else {
+            return DispatchQueue.main.sync {
+                UIApplication.shared.connectedScenes
+                    .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+                    .first?.safeAreaInsets.top ?? 0
+            }
+        }
     }
 
     private var bottomSafeArea: CGFloat {
-        UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
-            .first?.safeAreaInsets.bottom ?? 0
+        if Thread.isMainThread {
+            return UIApplication.shared.connectedScenes
+                .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+                .first?.safeAreaInsets.bottom ?? 0
+        } else {
+            return DispatchQueue.main.sync {
+                UIApplication.shared.connectedScenes
+                    .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+                    .first?.safeAreaInsets.bottom ?? 0
+            }
+        }
     }
 
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     let model: BottomSheetViewModel
-    let onSizeChange: ((CGFloat) -> Void)?
+    let onTopYPosChanged: ((CGFloat) -> Void)?
     var style: BottomSheetStyles? {
         model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
     }
@@ -57,10 +73,10 @@ struct ResizableBottomSheetComponent: View {
     @State private var dragOffset: CGFloat = 0
     @State private var bottomSheetTopYPos: CGFloat = 0
 
-    init(model: BottomSheetViewModel, onSizeChange: ((CGFloat) -> Void)?) {
+    init(model: BottomSheetViewModel, onTopYPosChanged: ((CGFloat) -> Void)?) {
         self.model = model
-        self.onSizeChange = onSizeChange
-        self.minimized = model.startMinimized
+        self.onTopYPosChanged = onTopYPosChanged
+        self.minimized = false
 
         // Initialize corner radius from model
         if let defaultStyle = model.defaultStyle,
@@ -91,7 +107,7 @@ struct ResizableBottomSheetComponent: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 2)
                             .fill(Color.gray.opacity(0.6))
-                            .frame(width: 40, height: 4)
+                            .frame(width: 50, height: 4)
                     )
                     .gesture(
                         DragGesture(coordinateSpace: .global)
@@ -158,7 +174,14 @@ struct ResizableBottomSheetComponent: View {
             )
             .clipped()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .offset(y: bottomSheetTopYPos)
+            .offset(y: minimized ? 0 : bottomSheetTopYPos - topSafeArea)
+            .onChange(of: bottomSheetTopYPos) { newValue in
+                if minimized {
+                    onTopYPosChanged?(newValue)
+                } else {
+                    onTopYPosChanged?(0)
+                }
+            }
         }
         .onLoad {
             model.onClose = close
@@ -169,7 +192,7 @@ struct ResizableBottomSheetComponent: View {
     private func close() {
         withAnimation(.easeInOut(duration: 0.3)) {
             isClosing = true
-            bottomSheetTopYPos += (availableHeight ?? UIScreen.main.bounds.height)
+            bottomSheetTopYPos += (availableHeight ?? UIScreen.main.bounds.height) + bottomSafeArea + 30
             backgroundAlpha = 0.0
         }
 
@@ -179,15 +202,15 @@ struct ResizableBottomSheetComponent: View {
     }
 
     func onBottomSheetSizeChange(newHeight: CGFloat) {
-        lastUpdatedHeight = newHeight
+        // Ensure UI updates happen on main thread
+        DispatchQueue.main.async {
+            self.lastUpdatedHeight = newHeight
 
-        let screenHeight = UIScreen.main.bounds.height - topSafeArea - bottomSafeArea - 30
+            let screenHeight = UIScreen.main.bounds.height - self.bottomSafeArea - 30
 
-        defaultVerticalOffset = screenHeight - lastUpdatedHeight
-        bottomSheetTopYPos = defaultVerticalOffset
-
-        // Update this to emit the size required by the overlay - may be best to emit y offset
-        onSizeChange?(UIScreen.main.bounds.height)
+            self.defaultVerticalOffset = screenHeight - self.lastUpdatedHeight
+            self.bottomSheetTopYPos = self.defaultVerticalOffset
+        }
     }
 
     // BottomSheet height has to be wrapContent
