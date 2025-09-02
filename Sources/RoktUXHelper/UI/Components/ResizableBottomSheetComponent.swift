@@ -76,7 +76,7 @@ struct ResizableBottomSheetComponent: View {
     init(model: BottomSheetViewModel, onTopYPosChanged: ((CGFloat) -> Void)?) {
         self.model = model
         self.onTopYPosChanged = onTopYPosChanged
-        self.minimized = false
+        self.minimized = model.startMinimized
 
         // Initialize corner radius from model
         if let defaultStyle = model.defaultStyle,
