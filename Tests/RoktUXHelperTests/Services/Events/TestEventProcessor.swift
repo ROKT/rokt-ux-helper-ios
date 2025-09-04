@@ -18,28 +18,28 @@ import XCTest
 
 @available(iOS 13.0, *)
 final class TestEventProcessor: XCTestCase {
-    
+
     func testEvents() {
         let expectation = expectation(description: "test event types")
         let allEventTypes = RoktUXEventType.allCases
         let date = Date()
-        
+
         let sut = EventProcessor(queue: .userInitiated, integrationType: .sdk) { [weak self] payload in
             guard let self,
             let processedPayload: RoktUXEventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
                 return
             }
-            
+
             XCTAssertEqual(processedPayload.integration.name, "UX Helper iOS")
             XCTAssertEqual(processedPayload.integration.framework, "Swift")
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
-            
+
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 14)
+            XCTAssertEqual(processedRequests.count, 17)
 
             allEventTypes.forEach { eventType in
-                
+
                 guard let request = try? XCTUnwrap(processedRequests.first(where: { $0.eventType == eventType })) else {
                     XCTFail("fail with unwrapping EventRequest")
                     return
@@ -57,7 +57,7 @@ final class TestEventProcessor: XCTestCase {
             }
             expectation.fulfill()
         }
-        
+
         allEventTypes.forEach {
             sut.handle(
                 event: mockEvent(
@@ -68,28 +68,28 @@ final class TestEventProcessor: XCTestCase {
                 )
             )
         }
-        
+
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func testS2SEvents() {
         let expectation = expectation(description: "test s2s event types")
         let allEventTypes = RoktUXEventType.allCases
         let date = Date()
-        
+
         let sut = EventProcessor(queue: .userInitiated, integrationType: .s2s) { [weak self] payload in
             guard let self,
                   let processedPayload: RoktUXEventsPayload = deserialize(payload) else {
                 XCTFail("fail unwrapping")
                 return
             }
-            
+
             XCTAssertEqual(processedPayload.integration.name, "UX Helper iOS")
             XCTAssertEqual(processedPayload.integration.framework, "Swift")
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
-            
+
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 12)
+            XCTAssertEqual(processedRequests.count, 15)
             expectation.fulfill()
         }
         allEventTypes.forEach {
@@ -102,10 +102,10 @@ final class TestEventProcessor: XCTestCase {
                 )
             )
         }
-        
+
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func testEventDelayProcessing() {
         var expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
@@ -117,12 +117,12 @@ final class TestEventProcessor: XCTestCase {
             receivedPayload = deserialize(payload)?.events
             expectation.fulfill()
         }
-        
+
         sut.handle(event: mockEvent(eventType: .SignalActivation, date: Date()))
         wait(for: [expectation], timeout: 1)
         XCTAssertEqual(receivedPayload?.count, 1)
         XCTAssertEqual(receivedPayload?.first?.eventType, .SignalActivation)
-        
+
         expectation = XCTestExpectation(description: "wait again")
         sut.handle(event: mockEvent(eventType: .SignalViewed, date: Date()))
         microSleep(0.1)
@@ -148,7 +148,7 @@ final class TestEventProcessor: XCTestCase {
             expectation.fulfill()
         }
         let date = Date()
-        
+
         // Test case 1: Exact duplicate events (all properties identical)
         // Should be deduplicated
         let event1 = mockEvent(
@@ -160,7 +160,7 @@ final class TestEventProcessor: XCTestCase {
         )
         sut.handle(event: event1)
         sut.handle(event: event1) // Exact duplicate
-        
+
         // Test case 2: Same event but different sessionId
         // Should NOT be deduplicated
         sut.handle(event: mockEvent(
@@ -170,7 +170,7 @@ final class TestEventProcessor: XCTestCase {
             parentGuid: "parent1",
             pageInstanceGuid: "page1"
         ))
-        
+
         // Test case 3: Same event but different parentGuid
         // Should NOT be deduplicated
         sut.handle(event: mockEvent(
@@ -180,7 +180,7 @@ final class TestEventProcessor: XCTestCase {
             parentGuid: "parent2", // Different parentGuid
             pageInstanceGuid: "page1"
         ))
-        
+
         // Test case 4: Same event but different pageInstanceGuid
         // Should NOT be deduplicated
         sut.handle(event: mockEvent(
@@ -190,7 +190,7 @@ final class TestEventProcessor: XCTestCase {
             parentGuid: "parent1",
             pageInstanceGuid: "page2" // Different pageInstanceGuid
         ))
-        
+
         // Test case 5: Different event type
         // Should NOT be deduplicated
         sut.handle(event: mockEvent(
@@ -200,7 +200,7 @@ final class TestEventProcessor: XCTestCase {
             parentGuid: "parent1",
             pageInstanceGuid: "page1"
         ))
-        
+
         // Test case 6: Same event but different data
         // Should NOT be deduplicated
         sut.handle(event: mockEvent(
@@ -219,7 +219,7 @@ final class TestEventProcessor: XCTestCase {
             pageInstanceGuid: "page1",
             eventData: ["key": "value2"] // Different event data
         ))
-        
+
         // Test case 7: Same event, same data
         // Should be deduplicated
         let event7 = mockEvent(
@@ -232,7 +232,7 @@ final class TestEventProcessor: XCTestCase {
         )
         sut.handle(event: event7)
         sut.handle(event: event7) // Duplicate
-        
+
         // Test case 8: Same event but different metadata (extraMetadata)
         // Metadata should NOT affect deduplication
         sut.handle(event: mockEvent(
@@ -251,26 +251,26 @@ final class TestEventProcessor: XCTestCase {
             pageInstanceGuid: "page1",
             extraMetadata: [.init(name: "meta2", value: "value2")] // Different metadata
         ))
-        
+
         wait(for: [expectation], timeout: 1)
-        
+
         // Verify the correct deduplication
         XCTAssertNotNil(receivedPayload, "Payload should not be nil")
-        
+
         // Count total events after deduplication
         // We sent 11 events, but only 9 should remain after deduplication
         XCTAssertEqual(receivedPayload?.count, 9, "Should have 9 unique events after deduplication")
-        
+
         // Count events by type for verification
         let viewedEvents = receivedPayload?.filter { $0.eventType == .SignalViewed }
         XCTAssertEqual(viewedEvents?.count, 6, "Should have 6 SignalViewed events")
-        
+
         let impressionEvents = receivedPayload?.filter { $0.eventType == .SignalImpression }
         XCTAssertEqual(impressionEvents?.count, 1, "Should have 1 SignalImpression event")
-        
+
         let activationEvents = receivedPayload?.filter { $0.eventType == .SignalActivation }
         XCTAssertEqual(activationEvents?.count, 1, "Should have 1 SignalActivation event after deduplication")
-        
+
         let responseEvents = receivedPayload?.filter { $0.eventType == .SignalResponse }
         // Note: If metadata doesn't affect deduplication, this should be 1
         // If metadata does affect deduplication, this should be 2
@@ -278,11 +278,11 @@ final class TestEventProcessor: XCTestCase {
         // but we're seeing in the tests it does - so we need to validate this behavior
         XCTAssertEqual(responseEvents?.count, 1, "Should have 1 SignalResponse event")
     }
-    
+
     func testEventDeduplicationDetails() {
         // This test focuses on validating the exact behavior of the ProcessedEvent equality
         // to ensure our understanding matches the implementation
-        
+
         let expectation = expectation(description: "test detailed deduplication")
         var receivedPayload: [RoktEventRequest]?
         let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
@@ -293,7 +293,7 @@ final class TestEventProcessor: XCTestCase {
             receivedPayload = deserialize(payload)?.events
             expectation.fulfill()
         }
-        
+
         // Create an event
         let baseEvent = mockEvent(
             eventType: .SignalViewed,
@@ -303,31 +303,31 @@ final class TestEventProcessor: XCTestCase {
             pageInstanceGuid: "page1",
             eventData: ["key": "value"]
         )
-        
+
         // Send the base event
         sut.handle(event: baseEvent)
-        
+
         // Test that changing metadata does NOT affect deduplication
         // This is to verify our understanding of the implementation
         sut.handle(event: mockEventWithModification(
             baseEvent: baseEvent,
             modifyMetadata: [.init(name: "differentMeta", value: "value")]
         ))
-        
+
         // Test that changing the time does NOT affect deduplication
         sut.handle(event: mockEventWithModification(
             baseEvent: baseEvent,
             modifyDate: Date(timeIntervalSinceNow: 100)
         ))
-        
+
         // Test that changing the JWT token does NOT affect deduplication
         sut.handle(event: mockEventWithModification(
             baseEvent: baseEvent,
             modifyJwtToken: "differentToken"
         ))
-        
+
         wait(for: [expectation], timeout: 1)
-        
+
         // Since the ProcessedEvent equality is based on sessionId, parentGuid, eventType, pageInstanceGuid, and eventData,
         // changing metadata, date or JWT token should not create new events
         XCTAssertEqual(receivedPayload?.count, 1, "All events should be considered duplicates except for the first one")
@@ -360,12 +360,12 @@ final class TestEventProcessor: XCTestCase {
     private func microSleep(_ seconds: Double) {
         usleep(useconds_t(Int32(seconds * 1000000)))
     }
-    
+
     private func deserialize(_ events: [String: Any]) -> RoktUXEventsPayload? {
         let data = try? JSONSerialization.data(withJSONObject: events, options: [])
         return data.flatMap { try? JSONDecoder().decode(RoktUXEventsPayload.self, from: $0) }
     }
-    
+
     private func mockEvent(
         eventType: RoktUXEventType,
         date: Date,
@@ -386,11 +386,11 @@ final class TestEventProcessor: XCTestCase {
             jwtToken: "token"
         )
     }
-    
+
     private func mockEventWithModification(
         baseEvent: RoktEventRequest,
         modifyDate: Date? = nil,
-        modifyMetadata: [RoktEventNameValue]? = nil, 
+        modifyMetadata: [RoktEventNameValue]? = nil,
         modifyJwtToken: String? = nil
     ) -> RoktEventRequest {
         .init(
