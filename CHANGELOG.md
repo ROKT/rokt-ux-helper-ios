@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2025-08-22
+
+### Fixed
+
+- Handle negative values in `Progression` predicate of `When` component
+
 ## [0.7.0] - 2025-08-19
 
 ### Added
@@ -100,7 +106,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...HEAD
+[0.7.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.1...0.6.0
 [0.5.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.0...0.5.1

@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "2.3.0-alpha2"),
-        .package(url: "https://github.com/nalexn/ViewInspector.git", exact: "0.10.0"),
+        .package(url: "https://github.com/nalexn/ViewInspector.git", exact: "0.10.2"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.18.1")
     ],
     targets: [
