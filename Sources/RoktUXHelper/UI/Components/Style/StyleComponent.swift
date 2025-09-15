@@ -205,6 +205,10 @@ internal extension View {
     func blur(blur: Float?) -> some View {
         modifier(BlurModifier(blur: blur))
     }
+    
+    func opacity(_ opacity: Float?) -> some View {
+        modifier(OpacityModifier(opacity: opacity))
+    }
 
     func bounceBasedOnSize() -> some View {
         modifier(ScrollBounceBasedOnSize())
@@ -471,6 +475,15 @@ struct BlurModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .blur(radius: CGFloat(blur ?? 0))
+    }
+}
+
+@available(iOS 15, *)
+struct OpacityModifier: ViewModifier {
+    let opacity: Float?
+
+    func body(content: Content) -> some View {
+        content.opacity(Double(opacity ?? 1.0))
     }
 }
 
