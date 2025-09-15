@@ -141,6 +141,10 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_column_with_offset")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
+        static func columnWithOpacity() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_column_with_opacity")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
     }
     
     enum ZStackData {
