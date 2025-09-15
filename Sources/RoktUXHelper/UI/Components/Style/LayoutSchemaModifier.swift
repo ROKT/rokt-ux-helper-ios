@@ -62,6 +62,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
                    parentOverride: parentOverride,
                    margin: getMargin())
             .background(backgroundStyle: background, imageLoader: imageLoader)
+            .opacity(Double(container?.opacity ?? 1.0))
             .border(
                 borderRadius: border?.borderRadius,
                 borderColor: border?.borderColor,

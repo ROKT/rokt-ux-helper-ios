@@ -221,6 +221,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .timerStateTrigger(let model):
+                .empty
         }
     }
 

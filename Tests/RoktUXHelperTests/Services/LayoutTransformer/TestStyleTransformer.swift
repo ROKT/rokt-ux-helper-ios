@@ -26,7 +26,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        spreadRadius: 0,
                                                                                                        color: ThemeColor(light: "#111111",
                                                                                                                          dark: nil)),
-                                                                                        overflow: .visible, gap: nil, blur: 0),
+                                                                                        overflow: .visible, gap: nil, blur: 0, opacity: 1.0),
                                                   background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "#111111",
                                                                                                        dark: nil),
@@ -68,7 +68,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                         spreadRadius: 0,
                                                                                                         color: ThemeColor(light: "#111111",
                                                                                                                           dark: nil)),
-                                                                                         overflow: .visible, gap: nil, blur: 0),
+                                                                                         overflow: .visible, gap: nil, blur: 0, opacity: 1.0),
                                                    background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "#111112",
                                                                                                        dark: nil),
@@ -525,7 +525,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        color: ThemeColor(light: "#333333",
                                                                                                                          dark: nil)),
                                                                                         overflow: .visible, gap: nil,
-                                                                                        blur: nil),
+                                                                                        blur: nil, opacity: 1.0),
                                                   background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "", dark: nil),
                                                                                           backgroundImage: nil),
@@ -563,7 +563,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        spreadRadius: 0,
                                                                                                        color: ThemeColor(light: "color",
                                                                                                                          dark: nil)),
-                                                                                        overflow: .visible, gap: nil, blur: nil),
+                                                                                        overflow: .visible, gap: nil, blur: nil, opacity: 1.0),
                                                   background: nil,
                                                   dimension: DimensionStylingProperties(minWidth: 0,
                                                                                         maxWidth: 0,
