@@ -205,7 +205,7 @@ internal extension View {
     func blur(blur: Float?) -> some View {
         modifier(BlurModifier(blur: blur))
     }
-    
+
     func opacity(_ opacity: Float?) -> some View {
         modifier(OpacityModifier(opacity: opacity))
     }
