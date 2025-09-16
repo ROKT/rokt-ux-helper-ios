@@ -16,7 +16,8 @@
                         },
                         "container": {
                             "justifyContent": "center",
-                            "alignItems": "center"
+                            "alignItems": "center",
+                            "opacity": 0.1
                         },
                         "flexChild": {
                             "alignSelf": "center",
