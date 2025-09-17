@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2025-09-17
+
 ### Fixed
 
 - Fixed thread safety crash in DistributionComponents when transitioning between offers
@@ -108,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.2...HEAD
+[0.7.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...0.7.2
 [0.7.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.5.1...0.6.0
