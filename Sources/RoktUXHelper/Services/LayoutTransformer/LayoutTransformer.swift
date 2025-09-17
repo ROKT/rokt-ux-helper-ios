@@ -213,6 +213,15 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .catalogDevicePayButton(let model):
+                .catalogDevicePayButton(
+                    try getCatalogDevicePayButtonModel(
+                        style: model.styles,
+                        children: transformChildren(model.children, context: context),
+                        provider: model.provider,
+                        context: context
+                    )
+                )
         case .catalogResponseButton(let model):
                 .catalogResponseButton(
                     try getCatalogResponseButtonModel(
@@ -664,6 +673,32 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             pressedStyle: updateStyles.compactMap { $0.pressed },
             hoveredStyle: updateStyles.compactMap { $0.hovered },
             disabledStyle: updateStyles.compactMap { $0.disabled }
+        )
+    }
+
+     func getCatalogDevicePayButtonModel(
+         style: LayoutStyle<
+             CatalogDevicePayButtonElements,
+             ConditionalStyleTransition<CatalogDevicePayButtonTransitions, WhenPredicate>
+         >?,
+         children: [LayoutSchemaViewModel]?,
+         provider: PaymentProvider,
+         context: Context
+     ) throws -> CatalogDevicePayButtonViewModel {
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+        let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
+        return CatalogDevicePayButtonViewModel(
+            catalogItem: catalogItem,
+            children: children,
+            provider: provider,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: updateStyles.compactMap {$0.default},
+            pressedStyle: updateStyles.compactMap {$0.pressed},
+            hoveredStyle: updateStyles.compactMap {$0.hovered},
+            disabledStyle: updateStyles.compactMap {$0.disabled}
         )
     }
 
