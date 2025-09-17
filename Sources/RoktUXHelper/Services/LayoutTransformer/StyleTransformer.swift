@@ -599,7 +599,8 @@ struct StyleTransformer {
                                           shadow: try updatedShadow(defaultStyle?.shadow, newStyle: newStyle?.shadow),
                                           overflow: newStyle?.overflow ?? defaultStyle?.overflow,
                                           gap: newStyle?.gap ?? defaultStyle?.gap,
-                                          blur: newStyle?.blur ?? defaultStyle?.blur)
+                                          blur: newStyle?.blur ?? defaultStyle?.blur,
+                                          opacity: newStyle?.opacity ?? defaultStyle?.opacity)
     }
 
     static func updatedZStackContainer(_ defaultStyle: ZStackContainerStylingProperties?,
@@ -609,7 +610,8 @@ struct StyleTransformer {
                                                 alignItems: newStyle?.alignItems ?? defaultStyle?.alignItems,
                                                 shadow: try updatedShadow(defaultStyle?.shadow, newStyle: newStyle?.shadow),
                                                 overflow: newStyle?.overflow ?? defaultStyle?.overflow,
-                                                blur: newStyle?.blur ?? defaultStyle?.blur)
+                                                blur: newStyle?.blur ?? defaultStyle?.blur,
+                                                opacity: newStyle?.opacity ?? defaultStyle?.opacity)
     }
 
     static func updatedBackground(_ defaultStyle: BackgroundStylingProperties?,

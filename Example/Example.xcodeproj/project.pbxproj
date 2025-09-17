@@ -3,11 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		253E5E7E2CF02CA40071583B /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 253E5E7D2CF02CA40071583B /* RoktUXHelper */; };
+		351779592E74B6F3004BF05E /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 351779582E74B6F3004BF05E /* RoktUXHelper */; };
 		B81DDBF92CC9B28C00B3D090 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBF82CC9B28C00B3D090 /* HomeView.swift */; };
 		B81DDBFB2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFA2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift */; };
 		B81DDBFD2CC9B2C800B3D090 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFC2CC9B2C800B3D090 /* Font+Extensions.swift */; };
@@ -15,14 +15,12 @@
 		B8B9FFBF2CBF32F300C61F88 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B9FFBE2CBF32F300C61F88 /* ExampleApp.swift */; };
 		B8B9FFC82CBF32F400C61F88 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B8B9FFC72CBF32F400C61F88 /* Assets.xcassets */; };
 		B8B9FFD62CBF3A3C00C61F88 /* experience.json in Resources */ = {isa = PBXBuildFile; fileRef = B8B9FFD52CBF3A3C00C61F88 /* experience.json */; };
-		B8B9FFD92CBF3CA000C61F88 /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = B8B9FFD82CBF3CA000C61F88 /* RoktUXHelper */; };
 		B8C1F5B12CBF860E004EEF06 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B02CBF860E004EEF06 /* String+Extensions.swift */; };
 		B8C1F5B42CC07944004EEF06 /* SampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B32CC07944004EEF06 /* SampleViewController.swift */; };
 		B8C1F5B62CC07976004EEF06 /* SampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B52CC07976004EEF06 /* SampleView.swift */; };
 		B8C1F5B82CC0916F004EEF06 /* SampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B72CC0916F004EEF06 /* SampleViewModel.swift */; };
 		B8E574E32CC0BB040055F798 /* SafariWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E574E22CC0BB040055F798 /* SafariWebView.swift */; };
 		B8E574E52CC0BB4D0055F798 /* URL+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E574E42CC0BB4D0055F798 /* URL+Extensions.swift */; };
-		B8F4FEDA2CBF577300287DA0 /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = B8F4FED92CBF577300287DA0 /* RoktUXHelper */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,9 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				253E5E7E2CF02CA40071583B /* RoktUXHelper in Frameworks */,
-				B8B9FFD92CBF3CA000C61F88 /* RoktUXHelper in Frameworks */,
-				B8F4FEDA2CBF577300287DA0 /* RoktUXHelper in Frameworks */,
+				351779592E74B6F3004BF05E /* RoktUXHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,9 +131,7 @@
 			);
 			name = Example;
 			packageProductDependencies = (
-				B8B9FFD82CBF3CA000C61F88 /* RoktUXHelper */,
-				B8F4FED92CBF577300287DA0 /* RoktUXHelper */,
-				253E5E7D2CF02CA40071583B /* RoktUXHelper */,
+				351779582E74B6F3004BF05E /* RoktUXHelper */,
 			);
 			productName = Example;
 			productReference = B8B9FFBB2CBF32F300C61F88 /* Example.app */;
@@ -168,7 +162,7 @@
 			);
 			mainGroup = B8B9FFB22CBF32F300C61F88;
 			packageReferences = (
-				253E5E7C2CF02CA40071583B /* XCRemoteSwiftPackageReference "rokt-ux-helper-ios" */,
+				351779572E74B6F3004BF05E /* XCLocalSwiftPackageReference "../../rokt-ux-helper-ios" */,
 			);
 			productRefGroup = B8B9FFBC2CBF32F300C61F88 /* Products */;
 			projectDirPath = "";
@@ -413,28 +407,15 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		253E5E7C2CF02CA40071583B /* XCRemoteSwiftPackageReference "rokt-ux-helper-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ROKT/rokt-ux-helper-ios";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		351779572E74B6F3004BF05E /* XCLocalSwiftPackageReference "../../rokt-ux-helper-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../rokt-ux-helper-ios";
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		253E5E7D2CF02CA40071583B /* RoktUXHelper */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 253E5E7C2CF02CA40071583B /* XCRemoteSwiftPackageReference "rokt-ux-helper-ios" */;
-			productName = RoktUXHelper;
-		};
-		B8B9FFD82CBF3CA000C61F88 /* RoktUXHelper */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = RoktUXHelper;
-		};
-		B8F4FED92CBF577300287DA0 /* RoktUXHelper */ = {
+		351779582E74B6F3004BF05E /* RoktUXHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RoktUXHelper;
 		};

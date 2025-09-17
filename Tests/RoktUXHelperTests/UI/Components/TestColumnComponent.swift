@@ -49,6 +49,10 @@ final class TestColumnComponent: XCTestCase {
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#F5C1C4", dark: "#F5C1C4"))
         
+        let opacityModifier = try vstack.modifier(OpacityModifier.self)
+        let opacity = try opacityModifier.actualView().opacity
+        XCTAssertEqual(opacity, 0.1)
+        
         // border
         let borderModifier = try vstack.modifier(BorderModifier.self)
         let borderStyle = try borderModifier.actualView().borderStyle
