@@ -98,9 +98,10 @@ struct OneByOneDistributionComponent: View {
 
     var body: some View {
         if let children = model.children, !children.isEmpty {
+            let safeCurrentOffer = min(max(currentOffer, 0), children.count - 1)
             Group {
-                LayoutSchemaComponent(config: config.updatePosition(currentOffer),
-                                      layout: children[currentOffer],
+                LayoutSchemaComponent(config: config.updatePosition(safeCurrentOffer),
+                                      layout: children[safeCurrentOffer],
                                       parentWidth: $parentWidth,
                                       parentHeight: $parentHeight,
                                       styleState: $styleState,
@@ -223,12 +224,12 @@ struct OneByOneDistributionComponent: View {
             // Wait to complete fade out of previous offer
             // Must not run on `main` as that prevents `@State` from changing
             DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                self.customStateMap = RoktUXCustomStateMap()
-                self.currentOffer = currentOffer + 1
+                DispatchQueue.main.async {
+                    incrementCurrentOffer()
+                }
             }
         default:
-            self.customStateMap = RoktUXCustomStateMap()
-            self.currentOffer = currentOffer + 1
+            incrementCurrentOffer()
         }
     }
 
@@ -243,13 +244,23 @@ struct OneByOneDistributionComponent: View {
             // Wait to complete fade out of previous offer
             // Must not run on `main` as that prevents `@State` from changing
             DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                self.customStateMap = RoktUXCustomStateMap()
-                self.currentOffer = currentOffer - 1
+                DispatchQueue.main.async {
+                    decrementCurrentOffer()
+                }
             }
         default:
-            self.customStateMap = RoktUXCustomStateMap()
-            self.currentOffer = currentOffer - 1
+            decrementCurrentOffer()
         }
+    }
+
+    private func incrementCurrentOffer() {
+        customStateMap = RoktUXCustomStateMap()
+        currentOffer += 1
+    }
+
+    private func decrementCurrentOffer() {
+        customStateMap = RoktUXCustomStateMap()
+        currentOffer -= 1
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

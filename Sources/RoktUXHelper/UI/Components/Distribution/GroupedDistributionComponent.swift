@@ -299,12 +299,12 @@ struct GroupedDistributionComponent: View {
             // Wait to complete fade out of previous offer
             // Must not run on `main` as that prevents `@State` from changing
             DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                self.currentGroup = currentGroup + 1
-                self.currentLeadingOffer = currentGroup * viewableItems
+                DispatchQueue.main.async {
+                    incrementCurrentGroup()
+                }
             }
         default:
-            self.currentGroup = currentGroup + 1
-            self.currentLeadingOffer = currentGroup * viewableItems
+            incrementCurrentGroup()
         }
     }
 
@@ -319,12 +319,12 @@ struct GroupedDistributionComponent: View {
             // Wait to complete fade out of previous offer
             // Must not run on `main` as that prevents `@State` from changing
             DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                self.currentGroup = currentGroup - 1
-                self.currentLeadingOffer = currentGroup * viewableItems
+                DispatchQueue.main.async {
+                    decrementCurrentGroup()
+                }
             }
         default:
-            self.currentGroup = currentGroup - 1
-            self.currentLeadingOffer = currentGroup * viewableItems
+            decrementCurrentGroup()
         }
     }
 
@@ -372,5 +372,15 @@ struct GroupedDistributionComponent: View {
         if currentLeadingOffer >= 0 {
             self.currentGroup = Int(floor(Double(currentLeadingOffer + 1/viewableItems)))
         }
+    }
+
+    private func incrementCurrentGroup() {
+        currentGroup += 1
+        currentLeadingOffer = currentGroup * viewableItems
+    }
+
+    private func decrementCurrentGroup() {
+        currentGroup -= 1
+        currentLeadingOffer = currentGroup * viewableItems
     }
 }

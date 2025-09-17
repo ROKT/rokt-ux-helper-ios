@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed thread safety crash in DistributionComponents when transitioning between offers
+
 ## [0.7.1] - 2025-08-22
 
 ### Fixed
