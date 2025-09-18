@@ -40,6 +40,7 @@ enum LayoutSchemaViewModel: Hashable {
     case dataImageCarousel(DataImageCarouselViewModel)
     case catalogStackedCollection(CatalogStackedCollectionViewModel)
     case catalogResponseButton(CatalogResponseButtonViewModel)
+    case timerStateTrigger(TimerStateTriggerViewModel)
     case empty
 }
 
@@ -91,6 +92,8 @@ extension LayoutSchemaViewModel: Hashable {
         case (.toggleButton(let lhsModel), .toggleButton(let rhsModel)):
             return lhsModel == rhsModel
         case (.dataImageCarousel(let lhsModel), .dataImageCarousel(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.timerStateTrigger(let lhsModel), .timerStateTrigger(let rhsModel)):
             return lhsModel == rhsModel
         case (.empty, .empty):
             return true
