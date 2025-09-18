@@ -21,7 +21,7 @@ struct TimerStateTriggerComponent: View {
     }
 
     var body: some View {
-        EmptyView()
+        Color.clear
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + model.delay) {
                     model.layoutState?.actionCollection[.toggleCustomState](
