@@ -24,8 +24,8 @@ class TimerStateTriggerViewModel: Identifiable, Hashable {
 
     init(model: TimerStateTriggerModel, layoutState: (any LayoutStateRepresenting)?) {
         customStateKey = model.customStateKey
-        delay = Double(model.delay ?? 0)/1000
-        value = (model.value == nil ? Int(model.value!) : nil)
+        delay = Double(model.delay ?? 0.0)/1000.0
+        value = Int(model.value ?? 0.0)
         self.layoutState = layoutState
     }
 }
