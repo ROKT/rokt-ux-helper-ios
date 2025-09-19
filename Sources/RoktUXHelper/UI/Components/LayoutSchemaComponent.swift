@@ -169,7 +169,7 @@ struct LayoutSchemaComponent: View {
                                      parentHeight: $parentHeight,
                                      parentOverride: parentOverride)
         case .timerStateTrigger(let timerStateTriggerModel):
-            TimerStateTriggerComponent(model: timerStateTriggerModel)
+            TimerStateTriggerComponent(config: config, model: timerStateTriggerModel)
         case .toggleButton(let toggleButtonModel):
             ToggleButtonComponent(config: config,
                                   model: toggleButtonModel,

@@ -14,19 +14,23 @@ import DcuiSchema
 
 @available(iOS 15, *)
 struct TimerStateTriggerComponent: View {
-    var model: TimerStateTriggerViewModel
+    let config: ComponentConfig
+    let model: TimerStateTriggerViewModel
 
-    init(model: TimerStateTriggerViewModel) {
+    init(config: ComponentConfig, model: TimerStateTriggerViewModel) {
+        self.config = config
         self.model = model
     }
 
     var body: some View {
         Color.clear
+            .frame(width: 0, height: 0)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + model.delay) {
-                    model.layoutState?.actionCollection[.toggleCustomState](
+                    model.layoutState?.actionCollection[.setValue](
                         CustomStateIdentifiable(
-                            position: model.value,
+                            position: config.position,
+                            value: model.value,
                             key: model.customStateKey
                         )
                     )
