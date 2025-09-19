@@ -1,27 +1,28 @@
 <!-- markdownlint-disable MD041 -->
 
-### Background
+## Background
 
-Provide a summary of why you are making this pull request and the issue it is fixing. Also include relevant motivation and context that a reviewer should know. List any dependencies that are required for this change.
+- {Explain the context of the change, including the problem it addresses or relevant background information}
 
-Fixes [(issue)]
+## What Has Changed
 
-### What Has Changed
+- {Describe the changes introduced by this PR}
 
-List out what has changed as a result of this PR.
+## Screenshots/Video
 
-### How Has This Been Tested?
+- {Include any screenshots or video demonstrating the new feature or fix, if applicable}
 
-Describe the tests that you ran to verify your changes.
-
-### Notes
-
-Add any notes or extra information here that might be useful to the reviewer if applicable i.e. links to documentation/blogs or dashboards.
-
-### Checklist
+## Checklist
 
 - [ ] I have performed a self-review of my own code.
 - [ ] I have made corresponding changes to the documentation.
 - [ ] I have added tests that prove my fix is effective or that my feature works.
-- [ ] New and existing unit tests pass locally with my changes.
-- [ ] I have updated CHANGELOG.md relevant notes.
+- [ ] I have tested this locally.
+
+## Additional Notes
+
+- {Any additional information or context relevant to this PR}
+
+## Reference Issue (For employees only. Ignore if you are an outside contributor)
+
+- Closes [ticket](https://go/j/[ticket-number])
