@@ -97,12 +97,18 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         layoutState?.actionCollection[.progressControlNext] = goToNextPage
         layoutState?.actionCollection[.nextOffer] = goToNextOffer
         layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
+        layoutState?.actionCollection[.triggerTimer] = processTimerEvent
 
         // Store the raw values instead of bindings
         layoutState?.items[LayoutState.currentProgressKey] = currentPage
         layoutState?.items[LayoutState.totalItemsKey] = children?.count ?? 0
         layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
         layoutState?.items[LayoutState.customStateMap] = customStateMap
+    }
+
+    private func processTimerEvent(_ timerEvent: Any?) {
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
+        self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

@@ -223,6 +223,7 @@ struct GroupedDistributionComponent: View {
         model.layoutState?.actionCollection[.progressControlNext] = goToNextGroup
         model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousGroup
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.triggerTimer] = processTimerEvent
 
         model.setupBindings(
             currentProgress: $currentGroup,
@@ -326,6 +327,11 @@ struct GroupedDistributionComponent: View {
             self.currentGroup = currentGroup - 1
             self.currentLeadingOffer = currentGroup * viewableItems
         }
+    }
+
+    private func processTimerEvent(_ timerEvent: Any?) {
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
+        self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
     }
 
     private func toggleCustomState(_ customStateId: Any?) {
