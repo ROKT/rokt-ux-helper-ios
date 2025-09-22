@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `opacity` styling property support in container nodes
+- Added `TimerStateTrigger` node support
+
 ## [0.7.1] - 2025-08-22
 
 ### Fixed
