@@ -1,0 +1,30 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+
+ignore:
+  - Example/**
+  - Tests/**
+  - fastlane/**
+  - .github/**
+  - DerivedData/**
+  - .swiftpm/**
+  - "*.md"
+  - "*.yml"
+  - "*.yaml"
+  - "*.lock"
+  - Gemfile*
+  - Package.resolved
+  - VERSION
+  - LICENSE.md
+  - SECURITY.md
+  - MIGRATING.md
+  - README.md
+  - CHANGELOG.md
