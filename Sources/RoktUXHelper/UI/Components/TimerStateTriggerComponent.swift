@@ -27,8 +27,8 @@ struct TimerStateTriggerComponent: View {
             .frame(width: 0, height: 0)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + model.delay) {
-                    model.layoutState?.actionCollection[.setValue](
-                        CustomStateIdentifiable(
+                    model.layoutState?.actionCollection[.triggerTimer](
+                        TimerEvent(
                             position: config.position,
                             value: model.value,
                             key: model.customStateKey

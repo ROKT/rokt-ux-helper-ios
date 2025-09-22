@@ -21,6 +21,20 @@ extension RoktUXCustomStateMap {
         self.updateValue((self[customStateId] ?? 0 == 1) ? 0 : 1, forKey: customStateId)
         return self
     }
+
+    mutating func processTimerEvent(_ timerEvent: Any?) -> RoktUXCustomStateMap {
+        guard let timerEvent = timerEvent as? TimerEvent else {
+            return self
+        }
+
+        let customStateId = CustomStateIdentifiable(
+            position: timerEvent.position,
+            key: timerEvent.key
+        )
+
+        self.updateValue(timerEvent.value ?? 0, forKey: customStateId)
+        return self
+    }
 }
 
 public typealias RoktUXCustomStateMap = [CustomStateIdentifiable: Int]
@@ -33,6 +47,12 @@ public struct CustomStateIdentifiable: Hashable, Codable {
         self.position = position
         self.key = key
     }
+}
+
+public struct TimerEvent {
+    let position: Int?
+    let value: Int?
+    let key: String
 }
 
 extension CustomStateIdentifiable {
