@@ -28,4 +28,16 @@ class TimerStateTriggerViewModel: Identifiable, Hashable {
         value = Int(model.value ?? 0.0)
         self.layoutState = layoutState
     }
+
+    func triggerEvent(for position: Int?) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.sendEvent(for: position)
+        }
+    }
+
+    func sendEvent(for position: Int?) {
+        layoutState?.actionCollection[.triggerTimer](
+            TimerEvent(position: position, value: value, key: customStateKey)
+        )
+    }
 }

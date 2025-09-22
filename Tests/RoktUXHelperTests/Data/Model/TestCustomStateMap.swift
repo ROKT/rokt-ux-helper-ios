@@ -41,4 +41,43 @@ class CustomStateMapTests: XCTestCase {
         
         XCTAssertEqual(customStateMap[CustomStateIdentifiable(position: 1, key: "testKey")], 1)
     }
+    
+    func testProcessTimerEvent_existingKey() {
+        let key = CustomStateIdentifiable(position: 1, key: "testKey")
+        var customStateMap: RoktUXCustomStateMap = [key: 0]
+        
+        let event = TimerEvent(position: 1, value: 1, key: "testKey")
+        customStateMap = customStateMap.processTimerEvent(event)
+        
+        XCTAssertEqual(customStateMap[key], 1)
+    }
+    
+    func testProcessTimerEvent_nonExistingKey() {
+        let key = CustomStateIdentifiable(position: 1, key: "testKey")
+        var customStateMap: RoktUXCustomStateMap = [key: 0]
+        
+        let event = TimerEvent(position: 1, value: 1, key: "testKey1")
+        customStateMap = customStateMap.processTimerEvent(event)
+        
+        XCTAssertEqual(customStateMap[key], 0)
+    }
+    
+    func testProcessTimerEvent_notTimerEvent() {
+        let key = CustomStateIdentifiable(position: 1, key: "testKey")
+        var customStateMap: RoktUXCustomStateMap = [key: 0]
+        
+        customStateMap = customStateMap.processTimerEvent("event")
+        
+        XCTAssertEqual(customStateMap[key], 0)
+    }
+    
+    func testProcessTimerEvent_timerEventHasNoValue() {
+        let key = CustomStateIdentifiable(position: 1, key: "testKey")
+        var customStateMap: RoktUXCustomStateMap = [key: 1]
+        
+        let event = TimerEvent(position: 1, value: nil, key: "testKey")
+        customStateMap = customStateMap.processTimerEvent(event)
+        
+        XCTAssertEqual(customStateMap[key], 0)
+    }
 }
