@@ -158,13 +158,15 @@ private struct BecomingViewedModifier: ViewModifier {
             guard shouldTriggerForCurrentOffer() else { return }
 
             if visibilityTimer == nil {
+                let proxySize = proxy.size
+                let proxyFrame = proxy.frame(in: .global)
                 visibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-                    let currentIntersect = UIScreen.main.bounds.intersectPercent(proxy)
+                    let currentIntersect = UIScreen.main.bounds.intersectPercentWithFrame(proxyFrame)
                     if currentIntersect > 0.5 {
                         let info = ComponentVisibilityInfo(
                             isVisible: true,
                             isObscured: currentIntersect < 1.0,
-                            incorrectlySized: proxy.size.width <= 0 || proxy.size.height <= 0
+                            incorrectlySized: proxySize.width <= 0 || proxySize.height <= 0
                         )
                         execute?(info)
                         if info.isInViewAndCorrectSize {
