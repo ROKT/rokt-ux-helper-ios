@@ -14,7 +14,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 class TimerStateTriggerViewModel: Identifiable, Hashable {
-    var layoutState: (any LayoutStateRepresenting)?
+    var actionCollection: ActionCollecting?
 
     let id: UUID = UUID()
 
@@ -22,11 +22,11 @@ class TimerStateTriggerViewModel: Identifiable, Hashable {
     let delay: Double
     let value: Int?
 
-    init(model: TimerStateTriggerModel, layoutState: (any LayoutStateRepresenting)?) {
+    init(model: TimerStateTriggerModel, actionCollection: ActionCollecting?) {
         customStateKey = model.customStateKey
         delay = Double(model.delay ?? 0.0)/1000.0
         value = Int(model.value ?? 0.0)
-        self.layoutState = layoutState
+        self.actionCollection = actionCollection
     }
 
     func triggerEvent(for position: Int?) {
@@ -36,7 +36,7 @@ class TimerStateTriggerViewModel: Identifiable, Hashable {
     }
 
     func sendEvent(for position: Int?) {
-        layoutState?.actionCollection[.triggerTimer](
+        actionCollection?[.triggerTimer](
             TimerEvent(position: position, value: value, key: customStateKey)
         )
     }

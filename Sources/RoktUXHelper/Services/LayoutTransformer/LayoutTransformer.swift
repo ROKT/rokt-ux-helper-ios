@@ -222,7 +222,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                     )
                 )
         case .timerStateTrigger(let model):
-                .timerStateTrigger(TimerStateTriggerViewModel(model: model, layoutState: layoutState))
+                .timerStateTrigger(TimerStateTriggerViewModel(model: model, actionCollection: layoutState.actionCollection))
         }
     }
 
