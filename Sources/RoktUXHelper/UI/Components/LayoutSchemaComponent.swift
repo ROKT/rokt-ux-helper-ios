@@ -190,6 +190,15 @@ struct LayoutSchemaComponent: View {
                 styleState: $styleState,
                 parentOverride: parentOverride
             )
+        case .catalogCombinedCollection(let model):
+            CatalogCombinedCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
         case .catalogResponseButton(let model):
             CatalogResponseButtonComponent(
                 config: config,

@@ -213,6 +213,13 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .catalogCombinedCollection(let model):
+                .catalogCombinedCollection(
+                    try getCatalogCombinedCollectionModel(
+                        model: model,
+                        context: context
+                    )
+                )
         case .catalogResponseButton(let model):
                 .catalogResponseButton(
                     try getCatalogResponseButtonModel(
@@ -636,6 +643,47 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             }
         }
         return CatalogStackedCollectionViewModel(
+            children: children,
+            defaultStyle: updateStyles.compactMap {$0.default},
+            layoutState: layoutState
+        )
+    }
+
+    private func getCatalogCombinedCollectionModel(
+        model: CatalogCombinedCollectionModel<CatalogCombinedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
+        context: Context,
+        accessibilityGrouped: Bool = false
+    ) throws -> CatalogCombinedCollectionViewModel {
+        guard case let .inner(.generic(.some(offer))) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        let children: [LayoutSchemaViewModel]? = try offer.catalogItems?.map { catalogItem in
+            switch model.template {
+            case .column(let model):
+                return .column(
+                    try getColumn(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
+            case .row(let model):
+                return .row(
+                    try getRow(
+                        model.styles,
+                        children: transformChildren(
+                            model.children,
+                            context: .inner(.addToCart(catalogItem))
+                        )
+                    )
+                )
+            }
+        }
+        return CatalogCombinedCollectionViewModel(
             children: children,
             defaultStyle: updateStyles.compactMap {$0.default},
             layoutState: layoutState
