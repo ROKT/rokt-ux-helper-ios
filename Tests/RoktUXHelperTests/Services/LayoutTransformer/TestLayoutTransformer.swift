@@ -904,14 +904,24 @@ final class TestLayoutTransformer: XCTestCase {
             instanceGuid: "instanceGuid",
             title: "title",
             description: "description",
-            price: nil,
-            originalPrice: nil,
-            originalPriceFormatted: nil,
+                        price: 14.99,
+            priceFormatted: "$14.99",
+            originalPrice: 14.99,
+            originalPriceFormatted: "$14.99",
             currency: "USD",
-            linkedProductId: nil,
-            positiveResponseText: "Add to cart",
-            negativeResponseText: "No thanks",
-            providerData: "{}",
-            token: "token")
+            signalType: "mockSignalType",
+            url: "https://www.example.com",
+            minItemCount: 1,
+            maxItemCount: 10,
+            preSelectedQuantity: 1,
+            providerData: "861425",
+            urlBehavior: "mockUrlBehavior",
+            positiveResponseText: "Add to order",
+            negativeResponseText: "Dismiss",
+            addOns: ["addon1", "addon2"],
+            copy: ["key1": "value1", "key2": "value2"],
+            linkedProductId: "linked",
+            token: "catalog1Token"
+        )
     }
 }
