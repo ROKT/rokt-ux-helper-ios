@@ -42,6 +42,8 @@ struct CatalogCombinedCollectionComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
+    // State to trigger re-rendering when active catalog item changes
+    @State private var activeCatalogItemId: String = ""
 
     let parentOverride: ComponentParentOverride?
 
@@ -68,6 +70,17 @@ struct CatalogCombinedCollectionComponent: View {
             return .start
         }
     }
+
+    // Example: Access the active catalog item from LayoutState
+    private var activeCatalogItem: CatalogItem? {
+        model.layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
+    }
+
+    // Access the full offer for dropdown options
+    private var fullOffer: OfferModel? {
+        model.layoutState?.items["fullOffer"] as? OfferModel
+    }
+
 
     var body: some View {
         build()
@@ -102,9 +115,28 @@ struct CatalogCombinedCollectionComponent: View {
                     frameChangeIndex += 1
                 }
             }
+            .onChange(of: activeCatalogItem?.catalogItemId) { newCatalogItemId in
+                // Trigger re-render when active catalog item changes
+                if let newId = newCatalogItemId, newId != activeCatalogItemId {
+                    activeCatalogItemId = newId
+                    frameChangeIndex += 1
+                }
+            }
+            .onAppear {
+                // Initialize the active catalog item ID
+                activeCatalogItemId = activeCatalogItem?.catalogItemId ?? ""
+            }
     }
 
     private func build() -> some View {
+        // Example: You can access the active catalog item here
+        let catalogItem = activeCatalogItem
+        print("Active catalog item title: \(catalogItem?.title ?? "No title")")
+
+        // Example: Access all catalog items for dropdown
+        let allCatalogItems = fullOffer?.catalogItems ?? []
+        print("Total catalog items available: \(allCatalogItems.count)")
+
         VStack(
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)

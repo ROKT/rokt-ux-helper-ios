@@ -658,31 +658,44 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             throw LayoutTransformerError.InvalidMapping()
         }
 
-        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        let children: [LayoutSchemaViewModel]? = try offer.catalogItems?.map { catalogItem in
-            switch model.template {
-            case .column(let model):
-                return .column(
-                    try getColumn(
-                        model.styles,
-                        children: transformChildren(
-                            model.children,
-                            context: .inner(.addToCart(catalogItem))
-                        )
-                    )
-                )
-            case .row(let model):
-                return .row(
-                    try getRow(
-                        model.styles,
-                        children: transformChildren(
-                            model.children,
-                            context: .inner(.addToCart(catalogItem))
-                        )
-                    )
-                )
-            }
+        // Set the first catalog item as active
+        if let firstCatalogItem = offer.catalogItems?.first {
+            layoutState.items[LayoutState.activeCatalogItemKey] = firstCatalogItem
         }
+
+        // Store the full offer for dropdown access
+        layoutState.items["fullOffer"] = offer
+
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+
+        // Create a single template instance with the first catalog item as addToCart context
+        let children: [LayoutSchemaViewModel]? = try {
+            guard let firstCatalogItem = offer.catalogItems?.first else { return [] }
+
+            switch model.template {
+            case .column(let templateModel):
+                return [.column(
+                    try getColumn(
+                        templateModel.styles,
+                        children: transformChildren(
+                            templateModel.children,
+                            context: .inner(.addToCart(firstCatalogItem))
+                        )
+                    )
+                )]
+            case .row(let templateModel):
+                return [.row(
+                    try getRow(
+                        templateModel.styles,
+                        children: transformChildren(
+                            templateModel.children,
+                            context: .inner(.addToCart(firstCatalogItem))
+                        )
+                    )
+                )]
+            }
+        }()
+
         return CatalogCombinedCollectionViewModel(
             children: children,
             defaultStyle: updateStyles.compactMap {$0.default},

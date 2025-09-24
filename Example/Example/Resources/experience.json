@@ -26,6 +26,78 @@
                                 "accountId": "3190863162773654563",
                                 "maxTotalItemsQtyInOffer": 1,
                                 "creative": {
+                                "referralCreativeId": "3357838791195164752",
+                                "instanceGuid": "30441ef1-8223-4b5f-abac-dc92dae7cedb",
+                                "responseOptionsMap": {
+                                    "positive": {
+                                    "id": "3357840785583243266",
+                                    "action": "Url",
+                                    "instanceGuid": "99ce00e8-8803-4112-9aa4-beed46deeaed",
+                                    "signalType": "SignalResponse",
+                                    "shortLabel": "Yes please",
+                                    "longLabel": "Yes please",
+                                    "shortSuccessLabel": "Email Sent",
+                                    "isPositive": true,
+                                    "url": "https://www.rokt.com",
+                                    "ignoreBranch": false,
+                                    "urlBehavior": "newTab",
+                                    "token": ""
+                                    },
+                                    "negative": {
+                                    "id": "3357840785583243267",
+                                    "action": "CaptureOnly",
+                                    "instanceGuid": "a7616afb-fd9b-4949-9926-2dc30d3ffb47",
+                                    "signalType": "SignalResponse",
+                                    "shortLabel": "No thanks",
+                                    "longLabel": "No thanks",
+                                    "isPositive": false,
+                                    "ignoreBranch": false,
+                                    "urlBehavior": "newTab",
+                                    "token": ""
+                                    }
+                                },
+                                "links": {},
+                                "images": {
+                                    "creativeImage": {
+                                    "light": "",
+                                    "dark": "",
+                                    "alt": "",
+                                    "title": ""
+                                    }
+                                },
+                                "icons": {},
+                                "token": "",
+                                "advertiser": {
+                                    "name": "Test",
+                                    "brand": "Test"
+                                },
+                                "copy": {
+                                    "creative.title": "Congrats!",
+                                    "creative.copy": "Successful test",
+                                    "creative.tag": "Auto",
+                                    "creative.success.title": "Success",
+                                    "creative.success.copy": "We have sent a confirmation to test@rokt.com.",
+                                    "creative.image.src": ""
+                                }
+                                },
+                                "metadata": {}
+                            },
+                            "layoutVariant": {
+                                "layoutVariantId": "3353172846080032865",
+                                "moduleName": "standard-marketing",
+                                "layoutVariantSchema": {
+                                "layoutVariantSchemaStringified": "{\"type\":\"CatalogCombinedCollection\",\"node\":{\"template\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"justifyContent\":\"center\",\"gap\":32}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.priceFormatted^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":31.2}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.originalPriceFormatted^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#A6A6A6\"},\"textDecoration\":\"strike-through\",\"lineHeight\":31.2}}}]}}}}]}}]}}}"
+                                }
+                            },
+                            "token": ""
+                        },
+                        {
+                            "instanceGuid": "e17a5b55-6af3-457b-b931-80b0311d511d",
+                            "offer": {
+                                "campaignId": "3357838645166342229",
+                                "accountId": "3190863162773654563",
+                                "maxTotalItemsQtyInOffer": 1,
+                                "creative": {
                                     "referralCreativeId": "3357838791195164752",
                                     "instanceGuid": "30441ef1-8223-4b5f-abac-dc92dae7cedb",
                                     "responseOptionsMap": {
