@@ -12,6 +12,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import DcuiSchema
 
 enum LayoutDismissOptions {
     case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered
@@ -185,6 +186,21 @@ class EventService: Hashable, EventDiagnosticServicing {
     func cartItemInstantPurchaseFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
+    }
+
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        sendCartItemEvent(eventType: .SignalCartItemDevicePayInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
+    }
+
+    func cartItemDevicePaySuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemDevicePay, catalogItem: catalogItem)
+    }
+
+    func cartItemDevicePayFailure(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemDevicePayFailure, catalogItem: catalogItem)
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
