@@ -166,6 +166,7 @@ struct OneByOneDistributionComponent: View {
         model.layoutState?.actionCollection[.progressControlNext] = goToNextOffer
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.triggerTimer] = processTimerEvent
         model.setupBindings(
             currentProgess: $currentOffer,
             customStateMap: $customStateMap,
@@ -250,6 +251,12 @@ struct OneByOneDistributionComponent: View {
             self.customStateMap = RoktUXCustomStateMap()
             self.currentOffer = currentOffer - 1
         }
+    }
+
+    private func processTimerEvent(_ timerEvent: Any?) {
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
+        self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
+        model.publishStateChange()
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

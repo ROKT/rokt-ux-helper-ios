@@ -64,4 +64,8 @@ class GroupedDistributionViewModel: DistributionViewModel, Identifiable, ScreenS
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         layoutState?.getGlobalBreakpointIndex(width) ?? 0
     }
+
+    func publishLayoutState() {
+        layoutState?.publishStateChange()
+    }
 }

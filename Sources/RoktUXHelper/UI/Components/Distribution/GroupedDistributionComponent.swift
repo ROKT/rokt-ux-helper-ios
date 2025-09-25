@@ -223,6 +223,7 @@ struct GroupedDistributionComponent: View {
         model.layoutState?.actionCollection[.progressControlNext] = goToNextGroup
         model.layoutState?.actionCollection[.progressControlPrevious] = goToPreviousGroup
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
+        model.layoutState?.actionCollection[.triggerTimer] = processTimerEvent
 
         model.setupBindings(
             currentProgress: $currentGroup,
@@ -328,9 +329,16 @@ struct GroupedDistributionComponent: View {
         }
     }
 
+    private func processTimerEvent(_ timerEvent: Any?) {
+        var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
+        self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
+        model.publishLayoutState()
+    }
+
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
+        model.publishLayoutState()
     }
 
     func getOpacity() -> Double {

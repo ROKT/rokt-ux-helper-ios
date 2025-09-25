@@ -35,6 +35,7 @@ enum RoktActionType: String {
     case checkBoundingBox
     case checkBoundingBoxMissized
     case toggleCustomState
+    case triggerTimer
 }
 
 protocol ActionCollecting {
