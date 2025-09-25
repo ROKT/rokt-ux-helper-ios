@@ -32,7 +32,7 @@ extension RoktUXCustomStateMap {
             key: timerEvent.key
         )
 
-        self.updateValue(timerEvent.value ?? 0, forKey: customStateId)
+        self.updateValue(timerEvent.value, forKey: customStateId)
         return self
     }
 }
@@ -51,7 +51,7 @@ public struct CustomStateIdentifiable: Hashable, Codable {
 
 public struct TimerEvent {
     let position: Int?
-    let value: Int?
+    let value: Int
     let key: String
 }
 

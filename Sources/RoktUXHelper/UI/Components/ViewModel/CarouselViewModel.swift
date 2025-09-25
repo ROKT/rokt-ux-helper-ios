@@ -109,11 +109,13 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     private func processTimerEvent(_ timerEvent: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
+        layoutState?.publishStateChange()
     }
 
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
+        layoutState?.publishStateChange()
     }
 
     func goToNextOffer(_: Any?) {

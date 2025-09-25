@@ -20,7 +20,7 @@ class TimerStateTriggerViewModel: Identifiable, Hashable {
 
     let customStateKey: String
     let delay: Double
-    let value: Int?
+    let value: Int
 
     init(model: TimerStateTriggerModel, actionCollection: ActionCollecting?) {
         customStateKey = model.customStateKey

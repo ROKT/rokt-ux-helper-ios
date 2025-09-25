@@ -70,14 +70,4 @@ class CustomStateMapTests: XCTestCase {
         
         XCTAssertEqual(customStateMap[key], 0)
     }
-    
-    func testProcessTimerEvent_timerEventHasNoValue() {
-        let key = CustomStateIdentifiable(position: 1, key: "testKey")
-        var customStateMap: RoktUXCustomStateMap = [key: 1]
-        
-        let event = TimerEvent(position: 1, value: nil, key: "testKey")
-        customStateMap = customStateMap.processTimerEvent(event)
-        
-        XCTAssertEqual(customStateMap[key], 0)
-    }
 }

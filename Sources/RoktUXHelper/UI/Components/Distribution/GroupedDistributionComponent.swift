@@ -332,11 +332,13 @@ struct GroupedDistributionComponent: View {
     private func processTimerEvent(_ timerEvent: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.processTimerEvent(timerEvent)
+        model.publishLayoutState()
     }
 
     private func toggleCustomState(_ customStateId: Any?) {
         var mutatingCustomStateMap: RoktUXCustomStateMap = customStateMap ?? RoktUXCustomStateMap()
         self.customStateMap = mutatingCustomStateMap.toggleValueFor(customStateId)
+        model.publishLayoutState()
     }
 
     func getOpacity() -> Double {
