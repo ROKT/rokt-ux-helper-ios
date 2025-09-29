@@ -10,6 +10,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
+import DcuiSchema
 
 public class RoktUXEvent {
 
@@ -178,6 +179,47 @@ public class RoktUXEvent {
             self.quantity = quantity
             self.totalPrice = totalPrice
             self.unitPrice = unitPrice
+        }
+    }
+
+    public class CartItemDevicePay: RoktUXEvent {
+        public let layoutId: String
+        public let name: String
+        public let cartItemId: String
+        public let catalogItemId: String
+        public let currency: String
+        public let description: String
+        public let linkedProductId: String?
+        public let providerData: String
+        public let quantity: Decimal
+        public let totalPrice: Decimal?
+        public let unitPrice: Decimal?
+        public let paymentProvider: PaymentProvider
+
+        init(layoutId: String,
+             name: String,
+             cartItemId: String,
+             catalogItemId: String,
+             currency: String,
+             description: String,
+             linkedProductId: String?,
+             providerData: String,
+             quantity: Decimal,
+             totalPrice: Decimal?,
+             unitPrice: Decimal?,
+             paymentProvider: PaymentProvider) {
+            self.layoutId = layoutId
+            self.name = name
+            self.cartItemId = cartItemId
+            self.catalogItemId = catalogItemId
+            self.currency = currency
+            self.description = description
+            self.linkedProductId = linkedProductId
+            self.providerData = providerData
+            self.quantity = quantity
+            self.totalPrice = totalPrice
+            self.unitPrice = unitPrice
+            self.paymentProvider = paymentProvider
         }
     }
 }

@@ -198,6 +198,14 @@ struct LayoutSchemaComponent: View {
                 parentHeight: $parentHeight,
                 parentOverride: parentOverride
             )
+        case .catalogDevicePayButton(let model):
+            CatalogDevicePayButtonComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
         default:
             EmptyView()
         }
