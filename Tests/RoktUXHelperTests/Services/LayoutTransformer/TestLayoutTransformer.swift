@@ -904,7 +904,7 @@ final class TestLayoutTransformer: XCTestCase {
             instanceGuid: "instanceGuid",
             title: "title",
             description: "description",
-                        price: 14.99,
+            price: 14.99,
             priceFormatted: "$14.99",
             originalPrice: 14.99,
             originalPriceFormatted: "$14.99",
@@ -921,7 +921,6 @@ final class TestLayoutTransformer: XCTestCase {
             addOns: ["addon1", "addon2"],
             copy: ["key1": "value1", "key2": "value2"],
             linkedProductId: "linked",
-            token: "catalog1Token"
-        )
+            token: "catalog1Token")
     }
 }

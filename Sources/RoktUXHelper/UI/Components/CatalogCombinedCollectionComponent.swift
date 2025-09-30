@@ -79,7 +79,6 @@ struct CatalogCombinedCollectionComponent: View {
         model.layoutState?.items["fullOffer"] as? OfferModel
     }
 
-
     var body: some View {
         build()
             .applyLayoutModifier(
