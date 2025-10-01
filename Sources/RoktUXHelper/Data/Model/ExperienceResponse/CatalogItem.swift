@@ -19,12 +19,21 @@ struct CatalogItem: Codable {
     let title: String
     let description: String
     let price: Decimal?
+    let priceFormatted: String?
     let originalPrice: Decimal?
     let originalPriceFormatted: String?
     let currency: String
-    let linkedProductId: String?
+    let signalType: String?
+    let url: String?
+    let minItemCount: Int?
+    let maxItemCount: Int?
+    let preSelectedQuantity: Int?
+    let providerData: String
+    let urlBehavior: String?
     let positiveResponseText: String
     let negativeResponseText: String
-    let providerData: String
+    let addOns: [String]?
+    let copy: [String: String]?
+    let linkedProductId: String?
     let token: String
 }

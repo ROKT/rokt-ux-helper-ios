@@ -26,6 +26,8 @@ class LayoutState: LayoutStateRepresenting {
     static let viewableItemsKey = "viewableItems" // Binding<Int>
     static let layoutSettingsKey = "layoutSettings" // LayoutSettings
     static let customStateMap = "customStateMap" // CustomStateMap
+    static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
+    static let fullOfferKey = "fullOffer" // OfferModel
 
     private var _items = [String: Any]()
     private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
