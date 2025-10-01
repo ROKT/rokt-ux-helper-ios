@@ -673,7 +673,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         }
 
         // Store the full offer for dropdown access
-        layoutState.items["fullOffer"] = offer
+        layoutState.items[LayoutState.fullOfferKey] = offer
 
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
 
