@@ -215,6 +215,15 @@ struct LayoutSchemaComponent: View {
                 parentHeight: $parentHeight,
                 parentOverride: parentOverride
             )
+        case .catalogDropdown(let model):
+            CatalogDropdownComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
         default:
             EmptyView()
         }
