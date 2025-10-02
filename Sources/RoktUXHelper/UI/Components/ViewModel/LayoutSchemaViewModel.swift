@@ -42,6 +42,7 @@ enum LayoutSchemaViewModel: Hashable {
     case catalogDevicePayButton(CatalogDevicePayButtonViewModel)
     case catalogCombinedCollection(CatalogCombinedCollectionViewModel)
     case catalogResponseButton(CatalogResponseButtonViewModel)
+    case catalogDropdown(CatalogDropdownViewModel)
     case empty
 }
 
@@ -59,6 +60,8 @@ extension LayoutSchemaViewModel: Hashable {
         case (.catalogStackedCollection(let lhs), .catalogStackedCollection(let rhs)):
             return lhs == rhs
         case (.catalogCombinedCollection(let lhs), .catalogCombinedCollection(let rhs)):
+            return lhs == rhs
+        case (.catalogDropdown(let lhs), .catalogDropdown(let rhs)):
             return lhs == rhs
         case (.column(let lhsModel), .column(let rhsModel)):
             return lhsModel == rhsModel

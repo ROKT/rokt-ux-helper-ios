@@ -237,6 +237,13 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .catalogDropdown(let model):
+                .catalogDropdown(
+                    try getCatalogDropdownModel(
+                        model: model,
+                        context: context
+                    )
+                )
         }
     }
 
@@ -761,6 +768,31 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             hoveredStyle: updateStyles.compactMap {$0.hovered},
             disabledStyle: updateStyles.compactMap {$0.disabled}
         )
+    }
+
+    func getCatalogDropdownModel(
+        model: CatalogDropdownModel<LayoutSchemaModel, WhenPredicate>,
+        context: Context
+    ) throws -> CatalogDropdownViewModel {
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+        let closedTemplate = try transform(model.closedTemplate, context: context)
+        let closedDefaultTemplate = try transform(model.closedDefaultTemplate, context: context)
+        let openTemplate = try transform(model.openTemplate, context: context)
+        let requiredSelectionErrorTemplate = try transform(model.requiredSelectionErrorTemplate, context: context)
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        return CatalogDropdownViewModel(layoutState: layoutState,
+                                        defaultStyle: updateStyles.compactMap {$0.default},
+                                        pressedStyle: updateStyles.compactMap {$0.pressed},
+                                        hoveredStyle: updateStyles.compactMap {$0.hovered},
+                                        disabledStyle: updateStyles.compactMap {$0.disabled},
+                                        a11yLabel: model.a11yLabel,
+                                        openTemplate: openTemplate,
+                                        closedTemplate: closedTemplate,
+                                        closedDefaultTemplate: closedDefaultTemplate,
+                                        requiredSelectionErrorTemplate: requiredSelectionErrorTemplate,
+                                        eventService: eventService)
     }
 
     func getProgressIndicatorUIModel(
