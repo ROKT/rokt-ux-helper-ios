@@ -777,10 +777,20 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         guard case let .inner(.addToCart(catalogItem)) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }
+
+        // Get the full offer from layoutState to access all catalog items
+        guard let fullOffer = layoutState.items[LayoutState.fullOfferKey] as? OfferModel else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
         let closedTemplate = try transform(model.closedTemplate, context: context)
         let closedDefaultTemplate = try transform(model.closedDefaultTemplate, context: context)
-        let openTemplate = try transform(model.openTemplate, context: context)
         let requiredSelectionErrorTemplate = try transform(model.requiredSelectionErrorTemplate, context: context)
+
+        // Create openDropdownChildren array - one template per catalog item from the full offer
+        let openDropdownChildren: [LayoutSchemaViewModel] = try fullOffer.catalogItems?.map { catalogItemFromOffer in
+            try transform(model.openTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
+        } ?? []
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
         return CatalogDropdownViewModel(layoutState: layoutState,
                                         defaultStyle: updateStyles.compactMap {$0.default},
@@ -788,7 +798,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                         hoveredStyle: updateStyles.compactMap {$0.hovered},
                                         disabledStyle: updateStyles.compactMap {$0.disabled},
                                         a11yLabel: model.a11yLabel,
-                                        openTemplate: openTemplate,
+                                        openDropdownChildren: openDropdownChildren,
                                         closedTemplate: closedTemplate,
                                         closedDefaultTemplate: closedDefaultTemplate,
                                         requiredSelectionErrorTemplate: requiredSelectionErrorTemplate,

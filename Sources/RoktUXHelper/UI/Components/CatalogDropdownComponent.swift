@@ -137,9 +137,6 @@ struct CatalogDropdownComponent: View {
                 availableWidth = size.width
                 availableHeight = size.height
             }
-            .onTapGesture {
-                // TODO: implement dropdown
-            }
     }
 
     private func build() -> some View {
@@ -147,8 +144,69 @@ struct CatalogDropdownComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            Text("TODO: Dropdown")
+            // Always show closed default template as toggle button
+            if let closedDefaultTemplate = model.closedDefaultTemplate {
+                LayoutSchemaComponent(
+                    config: config,
+                    layout: closedDefaultTemplate,
+                    parentWidth: $parentWidth,
+                    parentHeight: $parentHeight,
+                    styleState: $styleState,
+                    parentOverride: parentOverride
+                )
+                .onTapGesture {
+                    print("🔄 Dropdown button tapped!")
+                    print("🔄 Current isExpanded: \(isExpanded)")
+                    print("🔄 Children count: \(model.openDropdownChildren.count)")
+                    isExpanded.toggle()
+                    print("🔄 New isExpanded: \(isExpanded)")
+                }
+            }
         }
+        .overlay(
+            Group {
+                if isExpanded {
+                    VStack(spacing: 0) {
+                        if !model.openDropdownChildren.isEmpty {
+                            ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
+                                LayoutSchemaComponent(
+                                    config: config,
+                                    layout: model.openDropdownChildren[index],
+                                    parentWidth: $parentWidth,
+                                    parentHeight: $parentHeight,
+                                    styleState: $styleState,
+                                    parentOverride: parentOverride
+                                )
+                            }
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+                    .frame(minWidth: max(availableWidth ?? 200, 200))
+                    .offset(y: -120) // TEST: Position ABOVE button to test clipping
+                    .zIndex(1000)
+                }
+            },
+            alignment: .topLeading
+        )
+        // Add background tap detection outside the main overlay
+        .background(
+            Group {
+                if isExpanded {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onTapGesture {
+                            isExpanded = false
+                        }
+                }
+            }
+        )
     }
 
     private func updateStyleState() {

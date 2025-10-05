@@ -24,7 +24,7 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     weak var layoutState: (any LayoutStateRepresenting)?
     weak var eventService: EventDiagnosticServicing?
     let a11yLabel: String?
-    let openTemplate: LayoutSchemaViewModel?
+    let openDropdownChildren: [LayoutSchemaViewModel]
     let closedTemplate: LayoutSchemaViewModel?
     let closedDefaultTemplate: LayoutSchemaViewModel?
     let requiredSelectionErrorTemplate: LayoutSchemaViewModel?
@@ -33,13 +33,20 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         layoutState?.imageLoader
     }
 
+    var catalogItems: [CatalogItem] {
+        guard let fullOffer = layoutState?.items[LayoutState.fullOfferKey] as? OfferModel else {
+            return []
+        }
+        return fullOffer.catalogItems ?? []
+    }
+
     init(layoutState: any LayoutStateRepresenting,
          defaultStyle: [CatalogDropdownStyles]?,
          pressedStyle: [CatalogDropdownStyles]?,
          hoveredStyle: [CatalogDropdownStyles]?,
          disabledStyle: [CatalogDropdownStyles]?,
          a11yLabel: String?,
-         openTemplate: LayoutSchemaViewModel?,
+         openDropdownChildren: [LayoutSchemaViewModel],
          closedTemplate: LayoutSchemaViewModel?,
          closedDefaultTemplate: LayoutSchemaViewModel?,
          requiredSelectionErrorTemplate: LayoutSchemaViewModel?,
@@ -51,7 +58,7 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.layoutState = layoutState
         self.eventService = eventService
         self.a11yLabel = a11yLabel
-        self.openTemplate = openTemplate
+        self.openDropdownChildren = openDropdownChildren
         self.closedTemplate = closedTemplate
         self.closedDefaultTemplate = closedDefaultTemplate
         self.requiredSelectionErrorTemplate = requiredSelectionErrorTemplate
