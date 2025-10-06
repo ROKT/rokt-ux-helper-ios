@@ -46,12 +46,7 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
             switch keyAndNamespace.namespace {
             case .dataCatalogItem:
                 guard let data else { continue }
-                mappedData = Mirror.init(reflecting: data)
-                    .children
-                    .first {
-                        $0.label == keyAndNamespace.key
-                    }
-                    .map(\.value) as? String
+                mappedData = catalogItemValue(for: keyAndNamespace, in: data)
                 if mappedData.isNil == true, keyAndNamespace.isMandatory {
                     throw BNFPlaceholderError.mandatoryKeyEmpty
                 }
@@ -86,5 +81,31 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         } else {
             return .value(mappedData as! U)
         }
+    }
+
+    private func catalogItemValue(for keyAndNamespace: BNFKeyAndNamespace, in data: CatalogItem) -> String? {
+        let keys = keyAndNamespace.key.split(separator: ".").map(String.init)
+        guard let firstKey = keys.first else { return nil }
+
+        if keys.count > 1 {
+            if firstKey == "copy" {
+                guard let copy = data.copy else { return nil }
+                let copyKey = keys.dropFirst().joined(separator: ".")
+                guard !copyKey.isEmpty else { return nil }
+                return copy[copyKey]
+            }
+
+            let reflectedValue = dataReflector.getReflectedValue(
+                data: Mirror(reflecting: data),
+                keys: keys
+            )
+
+            return reflectedValue as? String
+        }
+
+        return Mirror(reflecting: data)
+            .children
+            .first { $0.label == firstKey }
+            .map(\.value) as? String
     }
 }

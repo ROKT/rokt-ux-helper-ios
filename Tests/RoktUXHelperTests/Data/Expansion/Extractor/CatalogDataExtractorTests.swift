@@ -79,4 +79,36 @@ final class CatalogDataExtractorTests: XCTestCase {
             .value("$14.99")
         )
     }
+
+    func test_extractDataRepresentedBy_usingCatalogCopyKey_returnsCopyValue() {
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.copy.provider.variationTitle",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("Burnt Clay")
+        )
+
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.copy.provider.discountLabel",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("Save 20%")
+        )
+
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.copy.provider.pricing.shippingFees",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("4.90")
+        )
+    }
 }
