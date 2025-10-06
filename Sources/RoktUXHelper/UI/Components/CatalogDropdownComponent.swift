@@ -51,6 +51,7 @@ struct CatalogDropdownComponent: View {
     @State private var availableHeight: CGFloat?
     @State private var isExpanded: Bool = false
     @State private var showError: Bool = false
+    @State private var buttonHeight: CGFloat = 0
 
     @State var isPressed: Bool = false
     @State var isDisabled: Bool = false
@@ -90,26 +91,6 @@ struct CatalogDropdownComponent: View {
                 self.isHovered = isHovered
                 updateStyleState()
             }
-            .applyLayoutModifier(
-                verticalAlignmentProperty: verticalAlignment,
-                horizontalAlignmentProperty: horizontalAlignment,
-                spacing: spacingStyle,
-                dimension: dimensionStyle,
-                flex: flexStyle,
-                border: borderStyle,
-                background: backgroundStyle,
-                container: containerStyle,
-                parent: config.parent,
-                parentWidth: $parentWidth,
-                parentHeight: $parentHeight,
-                parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
-                defaultHeight: .wrapContent,
-                defaultWidth: .wrapContent,
-                isContainer: true,
-                containerType: .column,
-                frameChangeIndex: $frameChangeIndex,
-                imageLoader: model.imageLoader
-            )
             .readSize(spacing: spacingStyle) { size in
                 availableWidth = size.width
                 availableHeight = size.height
@@ -154,6 +135,17 @@ struct CatalogDropdownComponent: View {
                     styleState: $styleState,
                     parentOverride: parentOverride
                 )
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                buttonHeight = geometry.size.height
+                            }
+                            .onChange(of: geometry.size.height) { newHeight in
+                                buttonHeight = newHeight
+                            }
+                    }
+                )
                 .onTapGesture {
                     print("🔄 Dropdown button tapped!")
                     print("🔄 Current isExpanded: \(isExpanded)")
@@ -187,8 +179,7 @@ struct CatalogDropdownComponent: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
-                    .frame(minWidth: max(availableWidth ?? 200, 200))
-                    .offset(y: -120) // TEST: Position ABOVE button to test clipping
+                    .offset(y: buttonHeight)
                     .zIndex(1000)
                 }
             },
