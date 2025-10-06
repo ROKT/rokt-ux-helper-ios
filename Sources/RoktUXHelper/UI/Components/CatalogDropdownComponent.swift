@@ -50,13 +50,10 @@ struct CatalogDropdownComponent: View {
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
     @State private var isExpanded: Bool = false
-    @State private var showError: Bool = false
     @State private var buttonHeight: CGFloat = 0
-
-    @State var isPressed: Bool = false
-    @State var isDisabled: Bool = false
-
-    @GestureState private var isPressingDown: Bool = false
+    @State private var selectedItemIndex: Int?
+    @State private var isPressed: Bool = false
+    @State private var isDisabled: Bool = false
 
     let parentOverride: ComponentParentOverride?
 
@@ -85,119 +82,153 @@ struct CatalogDropdownComponent: View {
     }
 
     var body: some View {
-        build()
-            .accessibilityAddTraits(.isButton)
-            .onHover { isHovered in
-                self.isHovered = isHovered
-                updateStyleState()
+        ZStack(alignment: .topLeading) {
+            dropdownButton()
+                .zIndex(1)
+
+            if isExpanded {
+                expandedBackground()
+                    .zIndex(0)
+
+                expandedDropdown()
+                    .zIndex(2)
             }
-            .readSize(spacing: spacingStyle) { size in
-                availableWidth = size.width
-                availableHeight = size.height
+        }
+        .accessibilityAddTraits(.isButton)
+        .onHover { isHovered in
+            self.isHovered = isHovered
+            updateStyleState()
+        }
+        .applyLayoutModifier(
+            verticalAlignmentProperty: verticalAlignment,
+            horizontalAlignmentProperty: horizontalAlignment,
+            spacing: spacingStyle,
+            dimension: dimensionStyle,
+            flex: flexStyle,
+            border: borderStyle,
+            background: backgroundStyle,
+            container: containerStyle,
+            parent: config.parent,
+            parentWidth: $parentWidth,
+            parentHeight: $parentHeight,
+            parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
+            defaultHeight: .wrapContent,
+            defaultWidth: .wrapContent,
+            isContainer: true,
+            containerType: .column,
+            frameChangeIndex: $frameChangeIndex,
+            imageLoader: model.imageLoader
+        )
+        .readSize(spacing: spacingStyle) { size in
+            availableWidth = size.width
+            availableHeight = size.height
+        }
+        .onChange(of: globalScreenSize.width) { newSize in
+            // run it in background thread for smooth transition
+            DispatchQueue.background.async {
+                breakpointIndex = model.updateBreakpointIndex(for: newSize)
+                frameChangeIndex += 1
             }
-            .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
-                DispatchQueue.background.async {
-                    breakpointIndex = model.updateBreakpointIndex(for: newSize)
-                    frameChangeIndex += 1
-                }
-            }
-            // contentShape extends tappable area outside of children
-            .contentShape(Rectangle())
-            // alignSelf must apply after the touchable area
-            .alignSelf(alignSelf: flexStyle?.alignSelf,
-                       parent: config.parent,
-                       parentHeight: parentHeight,
-                       parentWidth: parentWidth,
-                       parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
-                       parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
-                       applyAlignSelf: true)
-            // margin must apply after the touchable area and before readSize
-            .margin(spacing: spacingStyle, applyMargin: true)
-            .readSize(spacing: spacingStyle) { size in
-                availableWidth = size.width
-                availableHeight = size.height
-            }
+        }
+        .contentShape(Rectangle())
+        .alignSelf(alignSelf: flexStyle?.alignSelf,
+                   parent: config.parent,
+                   parentHeight: parentHeight,
+                   parentWidth: parentWidth,
+                   parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
+                   parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
+                   applyAlignSelf: true)
+        .margin(spacing: spacingStyle, applyMargin: true)
+        .readSize(spacing: spacingStyle) { size in
+            availableWidth = size.width
+            availableHeight = size.height
+        }
     }
 
-    private func build() -> some View {
+    private func dropdownButton() -> some View {
         VStack(
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            // Always show closed default template as toggle button
-            if let closedDefaultTemplate = model.closedDefaultTemplate {
-                LayoutSchemaComponent(
-                    config: config,
+            if let selectedIndex = selectedItemIndex, let closedTemplate = model.closedTemplate {
+                dropdownButtonContent(
+                    layout: closedTemplate,
+                    tapHandler: { toggleDropdownExpansion() }
+                )
+            } else if let closedDefaultTemplate = model.closedDefaultTemplate {
+                dropdownButtonContent(
                     layout: closedDefaultTemplate,
-                    parentWidth: $parentWidth,
-                    parentHeight: $parentHeight,
-                    styleState: $styleState,
-                    parentOverride: parentOverride
+                    tapHandler: { toggleDropdownExpansion() }
                 )
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                buttonHeight = geometry.size.height
-                            }
-                            .onChange(of: geometry.size.height) { newHeight in
-                                buttonHeight = newHeight
-                            }
+            }
+        }
+        .onAppear(perform: syncSelectedItemFromLayoutState)
+    }
+
+    private func dropdownButtonContent(
+        layout: LayoutSchemaViewModel,
+        tapHandler: @escaping () -> Void
+    ) -> some View {
+        LayoutSchemaComponent(
+            config: config,
+            layout: layout,
+            parentWidth: $parentWidth,
+            parentHeight: $parentHeight,
+            styleState: $styleState,
+            parentOverride: parentOverride
+        )
+        .background(
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear { updateButtonHeight(with: geometry.size.height) }
+                    .onChange(of: geometry.size.height) { updateButtonHeight(with: $0) }
+            }
+        )
+        .onTapGesture(perform: tapHandler)
+    }
+
+    @ViewBuilder
+    private func expandedDropdown() -> some View {
+        VStack(spacing: 0) {
+            if !model.openDropdownChildren.isEmpty {
+                ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
+                    Button {
+                        selectItem(at: index)
+                    } label: {
+                        LayoutSchemaComponent(
+                            config: config,
+                            layout: model.openDropdownChildren[index],
+                            parentWidth: $parentWidth,
+                            parentHeight: $parentHeight,
+                            styleState: $styleState,
+                            parentOverride: parentOverride
+                        )
+                        .contentShape(Rectangle())
                     }
-                )
-                .onTapGesture {
-                    print("🔄 Dropdown button tapped!")
-                    print("🔄 Current isExpanded: \(isExpanded)")
-                    print("🔄 Children count: \(model.openDropdownChildren.count)")
-                    isExpanded.toggle()
-                    print("🔄 New isExpanded: \(isExpanded)")
+                    .buttonStyle(.plain)
                 }
             }
         }
+        .background(Color.white)
+        .cornerRadius(8)
+        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
         .overlay(
-            Group {
-                if isExpanded {
-                    VStack(spacing: 0) {
-                        if !model.openDropdownChildren.isEmpty {
-                            ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
-                                LayoutSchemaComponent(
-                                    config: config,
-                                    layout: model.openDropdownChildren[index],
-                                    parentWidth: $parentWidth,
-                                    parentHeight: $parentHeight,
-                                    styleState: $styleState,
-                                    parentOverride: parentOverride
-                                )
-                            }
-                        }
-                    }
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-                    .offset(y: buttonHeight)
-                    .zIndex(1000)
-                }
-            },
-            alignment: .topLeading
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
-        // Add background tap detection outside the main overlay
-        .background(
-            Group {
-                if isExpanded {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .onTapGesture {
-                            isExpanded = false
-                        }
-                }
+        .frame(minWidth: max(availableWidth ?? 200, 200), alignment: .leading)
+        .offset(y: buttonHeight)
+    }
+
+    @ViewBuilder
+    private func expandedBackground() -> some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(.all)
+            .onTapGesture {
+                isExpanded = false
             }
-        )
     }
 
     private func updateStyleState() {
@@ -212,5 +243,43 @@ struct CatalogDropdownComponent: View {
               styleState = .default
           }
       }
+    }
+
+    private func toggleDropdownExpansion() {
+        isExpanded.toggle()
+    }
+
+    private func updateButtonHeight(with height: CGFloat) {
+        guard buttonHeight != height else { return }
+        buttonHeight = height
+    }
+
+    private func selectItem(at index: Int) {
+        guard index >= 0,
+              index < model.openDropdownChildren.count else { return }
+
+        selectedItemIndex = index
+        isExpanded = false
+
+        guard index < model.catalogItems.count else { return }
+        let selectedItem = model.catalogItems[index]
+        model.layoutState?.items[LayoutState.activeCatalogItemKey] = selectedItem
+        print("Selected item with ID: \(selectedItem.catalogItemId) and title: \(selectedItem.title)")
+    }
+
+    private func syncSelectedItemFromLayoutState() {
+        guard let activeItem = model.layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem else {
+            return
+        }
+
+        if let currentIndex = selectedItemIndex,
+           currentIndex < model.catalogItems.count,
+           model.catalogItems[currentIndex].catalogItemId == activeItem.catalogItemId {
+            return
+        }
+
+        if let index = model.catalogItems.firstIndex(where: { $0.catalogItemId == activeItem.catalogItemId }) {
+            selectedItemIndex = index
+        }
     }
 }
