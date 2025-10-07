@@ -28,6 +28,7 @@ struct ImageCarouselIndicator: View {
     @State var frameChangeIndex: Int = 0
 
     let parentOverride: ComponentParentOverride?
+    @Binding var customStateMap: RoktUXCustomStateMap?
 
     var style: BaseStyles? {
         model.defaultStyle?[safe: model.breakpointIndex]
@@ -105,10 +106,10 @@ struct ImageCarouselIndicator: View {
     func createContainer() -> some View {
         HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                spacing: CGFloat(containerStyle?.gap ?? 0)) {
-            ForEach(model.rowViewModels) {
+            ForEach(model.rowViewModels) { viewModel in
                 RowComponent(
                     config: config,
-                    model: $0,
+                    model: viewModel,
                     parentWidth: $model.availableWidth,
                     parentHeight: $model.availableHeight,
                     styleState: $model.styleState,
@@ -116,7 +117,7 @@ struct ImageCarouselIndicator: View {
                 )
             }
         }
-               .accessibilityElement(children: .ignore)
-               .accessibilityHidden(true)
+        .accessibilityElement(children: .ignore)
+        .accessibilityHidden(true)
     }
 }

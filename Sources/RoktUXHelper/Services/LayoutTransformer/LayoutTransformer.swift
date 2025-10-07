@@ -749,27 +749,111 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         guard let carouselImages else { throw LayoutTransformerError.missingData }
 
         let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
-        let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.indicator)
+
+        let indicator = dataImageCarouselModel.styles?.elements?.indicator ?? [
+            .init(
+                default: .init(
+                    container: .init(justifyContent: nil, alignItems: nil, shadow: nil, overflow: .hidden, gap: nil, blur: nil),
+                    background: .init(backgroundColor: .init(light: "#66FFFFFF", dark: nil), backgroundImage: nil),
+                    border: .init(BorderStylingProperties(borderRadius: 4, borderColor: nil, borderWidth: nil, borderStyle: nil)),
+                    dimension: .init(
+                        minWidth: nil,
+                        maxWidth: 75,
+                        width: .fixed(8),
+                        minHeight: nil,
+                        maxHeight: nil,
+                        height: .fixed(8),
+                        rotateZ: nil
+                    ),
+                    flexChild: nil,
+                    spacing: nil
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+        let indicatorStyle = try StyleTransformer.updatedStyles(indicator)
         let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             indicatorStyle,
             newStyles: dataImageCarouselModel.styles?.elements?.seenIndicator
         )
+
+        let activeIndicator = dataImageCarouselModel.styles?.elements?.activeIndicator ?? [
+            .init(
+                default: .init(
+                    container: nil,
+                    background: .init(backgroundColor: .init(light: "#FFFFFF", dark: nil), backgroundImage: nil),
+                    border: nil,
+                    dimension: nil,
+                    flexChild: nil,
+                    spacing: nil
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
         // active falls back to seen (which then falls back to indicator)
         let activeIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             seenIndicatorStyle,
-            newStyles: dataImageCarouselModel.styles?.elements?.activeIndicator
+            newStyles: activeIndicator
         )
+
+        let progressIndicatorContainer = dataImageCarouselModel.styles?.elements?.progressIndicatorContainer ?? [
+            .init(
+                default: .init(
+                    container: .init(justifyContent: .center, alignItems: .center, shadow: nil, overflow: nil, gap: 2, blur: nil),
+                    background: nil,
+                    border: nil,
+                    dimension: .init(
+                        minWidth: nil,
+                        maxWidth: nil,
+                        width: .percentage(100),
+                        minHeight: nil,
+                        maxHeight: nil,
+                        height: nil,
+                        rotateZ: nil
+                    ),
+                    flexChild: nil,
+                    spacing: .init(padding: nil, margin: nil, offset: "0 -10")
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
         let indicatorContainerStyle = try StyleTransformer
-            .updatedStyles(dataImageCarouselModel.styles?.elements?.progressIndicatorContainer)
+            .updatedStyles(progressIndicatorContainer)
+
+        let transition = dataImageCarouselModel.transition ?? .fadeInOut(.init(speed: .medium))
+        let indicators = dataImageCarouselModel.indicators ?? .init(show: true, activeIndicatorMode: .timer)
+
+        let indicatorViewModel: ImageCarouselIndicatorViewModel?
+        if indicators.show ?? true {
+            indicatorViewModel = ImageCarouselIndicatorViewModel(
+                positions: carouselImages.count,
+                duration: dataImageCarouselModel.duration,
+                stylingProperties: indicatorContainerStyle,
+                indicatorStyle: indicatorStyle,
+                seenIndicatorStyle: seenIndicatorStyle,
+                activeIndicatorStyle: activeIndicatorStyle,
+                layoutState: layoutState,
+                shouldDisplayProgress: dataImageCarouselModel.indicators?.shouldShowProgress ?? true
+            )
+        } else {
+            indicatorViewModel = nil
+        }
+
         return DataImageCarouselViewModel(key: dataImageCarouselModel.imageKey,
                                           images: carouselImages,
                                           duration: dataImageCarouselModel.duration,
                                           ownStyle: ownStyle,
-                                          indicatorStyle: indicatorStyle,
-                                          seenIndicatorStyle: seenIndicatorStyle,
-                                          activeIndicatorStyle: activeIndicatorStyle,
-                                          indicatorContainer: indicatorContainerStyle,
-                                          layoutState: layoutState)
+                                          indicatorViewModel: indicatorViewModel,
+                                          layoutState: layoutState,
+                                          transition: transition.transtion)
     }
 
     private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) throws -> LayoutSchemaViewModel {
@@ -812,6 +896,59 @@ private extension LayoutTransformer.Context {
             case .addToCart:
                 nil
             }
+        }
+    }
+}
+
+private extension DataImageCarouselIndicators {
+    var shouldShowProgress: Bool {
+        guard let activeIndicatorMode else {
+            return true
+        }
+
+        switch activeIndicatorMode {
+        case .normal:
+            return false
+        case .timer:
+            return true
+        }
+    }
+}
+
+private extension CarouselFadeInOutTransitionSettings {
+    var doubleValue: Double {
+        switch self.speed ?? .medium {
+        case .fast:
+            return 200
+        case .medium:
+            return 400
+        case .slow:
+            return 1000
+        }
+    }
+}
+
+private extension CarouselSlideInOutTransitionSettings {
+    var doubleValue: Double {
+        switch self.speed ?? .medium {
+        case .fast:
+            return 200
+        case .medium:
+            return 1000
+        case .slow:
+            return 2000
+        }
+    }
+}
+
+@available(iOS 15, *)
+private extension CarouselTransition {
+    var transtion: DataImageCarouselViewModel.Transition {
+        switch self {
+        case let .fadeInOut(settings):
+            return .fadeInOut(settings.doubleValue)
+        case let .slideInOut(settings):
+            return .slideInOut(settings.doubleValue)
         }
     }
 }

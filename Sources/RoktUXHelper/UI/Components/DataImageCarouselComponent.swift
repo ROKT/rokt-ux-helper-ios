@@ -16,6 +16,36 @@ import Combine
 import DcuiSchema
 
 @available(iOS 15, *)
+struct HSPageView<Content: View>: View {
+    @Binding var page: Int
+    let content: Content
+
+    init(page: Binding<Int>, @ViewBuilder content: () -> Content) {
+        self._page = page
+        self.content = content()
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            _VariadicView.Tree(HSStackPager(width: geo.size.width, page: page), content: { content })
+        }
+    }
+
+    struct HSStackPager: _VariadicView_UnaryViewRoot {
+        let width: CGFloat
+        let page: Int
+        func body(children: _VariadicView.Children) -> some View {
+            HStack(spacing: 0) {
+                ForEach(Array(children.enumerated()), id: \.offset) { _, child in
+                    child.frame(width: width)
+                }
+            }
+            .offset(x: -CGFloat(page) * width)
+        }
+    }
+}
+
+@available(iOS 15, *)
 struct DataImageCarouselComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
@@ -73,6 +103,7 @@ struct DataImageCarouselComponent: View {
 
     // Carousel specific states
     @State private var currentImage = 0
+    @State private var page = 0
     @State private var isAutoScrolling = true
     @State private var opacities: [Double] = []
     @State private var availableWidth: CGFloat?
@@ -108,30 +139,66 @@ struct DataImageCarouselComponent: View {
                     vertical: verticalAlignment.getVerticalAlignment()
                 )
             ) {
-                ForEach(0..<model.images.count, id: \.self) { index in
-                    imageView(for: model.images[index])
-                        .opacity(index < opacities.count ? opacities[index] : 0)
-                }
+                switch model.transition {
+                case let .slideInOut(duration):
+                    imageView(for: model.images[0]).opacity(0.0)
+                    HSPageView(page: $page) {
+                        ForEach(0..<model.images.count, id: \.self) { index in
+                            imageView(for: model.images[index]).tag(index)
+                        }
+                        imageView(for: model.images[0]).tag(model.images.count)
+                    }
+                    .disabled(true)
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .onReceive(model.$pageIndex.dropFirst()) { pageIndex in
+                        DispatchQueue.main.async {
+                            var realPageIndex = 0
+                            if pageIndex == 0 {
+                                realPageIndex = model.images.count
+                            } else if pageIndex == 1 {
+                                page = 0
+                                realPageIndex = pageIndex
+                            } else {
+                                realPageIndex = pageIndex
+                            }
 
-                if model.requiresIndicator(colorScheme) {
-                    ImageCarouselIndicator(
-                        config: config,
-                        model: model.indicatorViewModel,
-                        styleState: $styleState,
-                        parentWidth: $availableWidth,
-                        parentHeight: $availableHeight,
-                        parentOverride: parentOverride
-                    )
+                            withAnimation(.easeInOut(duration: duration/1000.0)) {
+                                page = realPageIndex
+                            }
+                        }
+                    }
+                case let .fadeInOut(duration):
+                    ForEach(0..<model.images.count, id: \.self) { index in
+                        imageView(for: model.images[index])
+                            .opacity(index < opacities.count ? opacities[index] : 0)
+                    }
                     .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
                         let newPosition = max(currentProgress - 1, 0)
                         if currentImage != newPosition {
-                            advanceToNextImage()
+                            advanceToNextImage(duration: duration)
                         }
                         let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
                         customStateMap?[positionKey] = currentProgress
                         let key = CustomStateIdentifiable(position: config.position, key: .imageCarouselKey(key: model.key))
                         customStateMap?[key] = currentProgress
                         model.layoutState?.publishStateChange()
+                    }
+                }
+
+                if let indicatorViewModel = model.indicatorViewModel, model.requiresIndicator(colorScheme) {
+                    VStack(
+                        alignment: .center, spacing: 0
+                    ) {
+                        Spacer()
+                        ImageCarouselIndicator(
+                            config: config,
+                            model: indicatorViewModel,
+                            styleState: $styleState,
+                            parentWidth: $availableWidth,
+                            parentHeight: $availableHeight,
+                            parentOverride: parentOverride,
+                            customStateMap: $customStateMap
+                        )
                     }
                 }
             }
@@ -190,11 +257,11 @@ struct DataImageCarouselComponent: View {
         .aspectRatio(contentMode: .fit)
     }
 
-    private func advanceToNextImage() {
+    private func advanceToNextImage(duration: Double) {
         guard !model.images.isEmpty else { return }
 
         // Fade out current image
-        withAnimation(.easeInOut(duration: 0.5)) {
+        withAnimation(.easeInOut(duration: duration/1000.0)) {
             opacities[currentImage] = 0.0
         }
 
@@ -202,7 +269,7 @@ struct DataImageCarouselComponent: View {
         currentImage = (currentImage + 1) % model.images.count
 
         // Fade in new image
-        withAnimation(.easeInOut(duration: 0.5)) {
+        withAnimation(.easeInOut(duration: duration/1000.0)) {
             opacities[currentImage] = 1.0
         }
     }

@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ROKT/dcui-swift-schema.git",
       "state" : {
-        "revision" : "d88a60eb7d51bfc6b6265f9752d9a06255fdff72",
-        "version" : "2.2.0"
+        "revision" : "20dcc5eac229ddb2265dfb55befe79038716fa92",
+        "version" : "2.3.0-carousel-support-alpha"
       }
     },
     {

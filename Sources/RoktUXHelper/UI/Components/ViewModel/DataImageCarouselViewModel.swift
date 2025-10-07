@@ -17,34 +17,26 @@ import SwiftUI
 
 @available(iOS 15, *)
 class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
+    enum Transition {
+        case slideInOut(Double)
+        case fadeInOut(Double)
+    }
+
     let id: UUID = UUID()
     let key: String
     let images: [CreativeImage]
     let duration: Int32
     let stylingProperties: [BasicStateStylingBlock<DataImageCarouselStyles>]?
-
-    let indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    let seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    let activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
-    let indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?
+    let transition: Transition
 
     weak var layoutState: (any LayoutStateRepresenting)?
 
     @Published var currentProgress: Int = 1
+    @Published var pageIndex: Int = 0
 
     private var timer: Timer?
 
-    private(set) lazy var indicatorViewModel: ImageCarouselIndicatorViewModel = {
-        .init(
-            positions: images.count,
-            duration: duration,
-            stylingProperties: indicatorContainer,
-            indicatorStyle: indicatorStyle,
-            seenIndicatorStyle: seenIndicatorStyle,
-            activeIndicatorStyle: activeIndicatorStyle,
-            layoutState: layoutState
-        )
-    }()
+    let indicatorViewModel: ImageCarouselIndicatorViewModel?
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -58,20 +50,16 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
          images: [CreativeImage],
          duration: Int32,
          ownStyle: [BasicStateStylingBlock<DataImageCarouselStyles>]?,
-         indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         indicatorContainer: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-         layoutState: (any LayoutStateRepresenting)?) {
+         indicatorViewModel: ImageCarouselIndicatorViewModel?,
+         layoutState: (any LayoutStateRepresenting)?,
+         transition: Transition) {
         self.key = key
         self.images = images
         self.duration = duration
         stylingProperties = ownStyle
-        self.indicatorStyle = indicatorStyle
-        self.seenIndicatorStyle = seenIndicatorStyle
-        self.activeIndicatorStyle = activeIndicatorStyle
-        self.indicatorContainer = indicatorContainer
+        self.indicatorViewModel = indicatorViewModel
         self.layoutState = layoutState
+        self.transition = transition
     }
 
     func onAppear() {
@@ -109,5 +97,6 @@ class DataImageCarouselViewModel: Hashable, Identifiable, ObservableObject, Scre
 
     private func incrementStateMap() {
         currentProgress = max((currentProgress + 1) % (images.count + 1), 1)
+        pageIndex = (pageIndex + 1) % images.count
     }
 }
