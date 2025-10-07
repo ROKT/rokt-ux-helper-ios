@@ -13,7 +13,7 @@ import Foundation
 import DcuiSchema
 
 fileprivate extension BaseStyles {
-    fileprivate static let wrapContentStyle = BaseStyles(
+    static let wrapContentStyle = BaseStyles(
         dimension: .init(
             minWidth: nil,
             maxWidth: nil,
