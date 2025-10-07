@@ -177,11 +177,6 @@ struct DataImageCarouselComponent: View {
                         if currentImage != newPosition {
                             advanceToNextImage(duration: duration)
                         }
-                        let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
-                        customStateMap?[positionKey] = currentProgress
-                        let key = CustomStateIdentifiable(position: config.position, key: .imageCarouselKey(key: model.key))
-                        customStateMap?[key] = currentProgress
-                        model.layoutState?.publishStateChange()
                     }
                 }
 
@@ -198,6 +193,13 @@ struct DataImageCarouselComponent: View {
                             parentHeight: $availableHeight,
                             parentOverride: parentOverride
                         )
+                        .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
+                            let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
+                            customStateMap?[positionKey] = currentProgress
+                            let key = CustomStateIdentifiable(position: config.position, key: .imageCarouselKey(key: model.key))
+                            customStateMap?[key] = currentProgress
+                            model.layoutState?.publishStateChange()
+                        }
                     }
                 }
             }
