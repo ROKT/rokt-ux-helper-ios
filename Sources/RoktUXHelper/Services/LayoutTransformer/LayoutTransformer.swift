@@ -774,7 +774,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         model: CatalogDropdownModel<LayoutSchemaModel, WhenPredicate>,
         context: Context
     ) throws -> CatalogDropdownViewModel {
-        guard case let .inner(.addToCart(catalogItem)) = context else {
+        guard case .inner(.addToCart) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }
 

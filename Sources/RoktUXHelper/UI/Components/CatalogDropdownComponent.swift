@@ -150,7 +150,7 @@ struct CatalogDropdownComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            if let selectedIndex = selectedItemIndex, let closedTemplate = model.closedTemplate {
+            if selectedItemIndex != nil, let closedTemplate = model.closedTemplate {
                 dropdownButtonContent(
                     layout: closedTemplate,
                     tapHandler: { toggleDropdownExpansion() }
