@@ -196,8 +196,7 @@ struct DataImageCarouselComponent: View {
                             styleState: $styleState,
                             parentWidth: $availableWidth,
                             parentHeight: $availableHeight,
-                            parentOverride: parentOverride,
-                            customStateMap: $customStateMap
+                            parentOverride: parentOverride
                         )
                     }
                 }

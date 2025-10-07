@@ -28,7 +28,6 @@ struct ImageCarouselIndicator: View {
     @State var frameChangeIndex: Int = 0
 
     let parentOverride: ComponentParentOverride?
-    @Binding var customStateMap: RoktUXCustomStateMap?
 
     var style: BaseStyles? {
         model.defaultStyle?[safe: model.breakpointIndex]
