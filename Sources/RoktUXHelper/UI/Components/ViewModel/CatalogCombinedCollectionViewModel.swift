@@ -20,6 +20,7 @@ class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdap
     var children: [LayoutSchemaViewModel]?
     let defaultStyle: [CatalogCombinedCollectionStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
+    private let childBuilder: ((CatalogItem) -> [LayoutSchemaViewModel]?)?
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -27,10 +28,27 @@ class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdap
     init(
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogCombinedCollectionStyles]?,
-        layoutState: any LayoutStateRepresenting
+        layoutState: any LayoutStateRepresenting,
+        childBuilder: ((CatalogItem) -> [LayoutSchemaViewModel]?)? = nil
     ) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.layoutState = layoutState
+        self.childBuilder = childBuilder
+    }
+
+    @discardableResult
+    func rebuildChildren(for catalogItem: CatalogItem) -> Bool {
+        guard let newChildren = childBuilder?(catalogItem) else { return false }
+        children = newChildren
+        return true
+    }
+
+    static func == (lhs: CatalogCombinedCollectionViewModel, rhs: CatalogCombinedCollectionViewModel) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

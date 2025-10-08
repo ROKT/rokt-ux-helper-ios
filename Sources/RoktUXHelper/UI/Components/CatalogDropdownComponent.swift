@@ -264,7 +264,7 @@ struct CatalogDropdownComponent: View {
         guard index < model.catalogItems.count else { return }
         let selectedItem = model.catalogItems[index]
         model.layoutState?.items[LayoutState.activeCatalogItemKey] = selectedItem
-        print("Selected item with ID: \(selectedItem.catalogItemId) and title: \(selectedItem.title)")
+        model.layoutState?.publishStateChange()
     }
 
     private func syncSelectedItemFromLayoutState() {

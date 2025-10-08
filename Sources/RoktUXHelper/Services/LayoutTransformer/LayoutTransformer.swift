@@ -684,38 +684,50 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
 
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
 
-        // Create a single template instance with the first catalog item as addToCart context
-        let children: [LayoutSchemaViewModel]? = try {
-            guard let firstCatalogItem = offer.catalogItems?.first else { return [] }
+        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
+            do {
+                switch model.template {
+                case .column(let templateModel):
+                    let transformedChildren = try self.transformChildren(
+                        templateModel.children,
+                        context: .inner(.addToCart(catalogItem))
+                    )
 
-            switch model.template {
-            case .column(let templateModel):
-                return [.column(
-                    try getColumn(
-                        templateModel.styles,
-                        children: transformChildren(
-                            templateModel.children,
-                            context: .inner(.addToCart(firstCatalogItem))
+                    return [
+                        .column(
+                            try self.getColumn(
+                                templateModel.styles,
+                                children: transformedChildren
+                            )
                         )
+                    ]
+                case .row(let templateModel):
+                    let transformedChildren = try self.transformChildren(
+                        templateModel.children,
+                        context: .inner(.addToCart(catalogItem))
                     )
-                )]
-            case .row(let templateModel):
-                return [.row(
-                    try getRow(
-                        templateModel.styles,
-                        children: transformChildren(
-                            templateModel.children,
-                            context: .inner(.addToCart(firstCatalogItem))
+
+                    return [
+                        .row(
+                            try self.getRow(
+                                templateModel.styles,
+                                children: transformedChildren
+                            )
                         )
-                    )
-                )]
+                    ]
+                }
+            } catch {
+                return nil
             }
-        }()
+        }
+
+        let initialChildren = offer.catalogItems?.first.flatMap(childBuilder) ?? []
 
         return CatalogCombinedCollectionViewModel(
-            children: children,
-            defaultStyle: updateStyles.compactMap {$0.default},
-            layoutState: layoutState
+            children: initialChildren,
+            defaultStyle: updateStyles.compactMap { $0.default },
+            layoutState: layoutState,
+            childBuilder: childBuilder
         )
     }
 

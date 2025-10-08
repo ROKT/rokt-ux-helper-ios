@@ -10,8 +10,19 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import SwiftUI
+import Combine
 import DcuiSchema
 
+/// A collection component that dynamically rebuilds its content based on the active catalog item.
+///
+/// This component works in conjunction with `CatalogDropdownComponent` to provide a unified
+/// catalog browsing experience. When a user selects an item from the dropdown, this collection
+/// automatically rebuilds its children to reflect the selected item's data.
+///
+/// ## State Management
+/// - Uses `LayoutState.activeCatalogItemKey` to track the currently selected catalog item
+/// - Uses `LayoutState.fullOfferKey` to access all available catalog items
+/// - Rebuilds children only when the active catalog item changes
 @available(iOS 15, *)
 struct CatalogCombinedCollectionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
@@ -71,12 +82,14 @@ struct CatalogCombinedCollectionComponent: View {
         }
     }
 
-    private var activeCatalogItem: CatalogItem? {
-        model.layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
-    }
+    private var layoutItemsPublisher: AnyPublisher<[String: Any], Never> {
+        if let publisher = model.layoutState?.itemsPublisher {
+            return publisher
+                .receive(on: RunLoop.main)
+                .eraseToAnyPublisher()
+        }
 
-    private var fullOffer: OfferModel? {
-        model.layoutState?.items["fullOffer"] as? OfferModel
+        return Just([:]).eraseToAnyPublisher()
     }
 
     var body: some View {
@@ -112,14 +125,16 @@ struct CatalogCombinedCollectionComponent: View {
                     frameChangeIndex += 1
                 }
             }
-            .onChange(of: activeCatalogItem?.catalogItemId) { newCatalogItemId in
-                if let newId = newCatalogItemId, newId != activeCatalogItemId {
-                    activeCatalogItemId = newId
+            .onReceive(layoutItemsPublisher) { items in
+                guard let catalogItem = items[LayoutState.activeCatalogItemKey] as? CatalogItem else { return }
+
+                guard catalogItem.catalogItemId != activeCatalogItemId else { return }
+
+                activeCatalogItemId = catalogItem.catalogItemId
+
+                if model.rebuildChildren(for: catalogItem) {
                     frameChangeIndex += 1
                 }
-            }
-            .onAppear {
-                activeCatalogItemId = activeCatalogItem?.catalogItemId ?? ""
             }
     }
 
