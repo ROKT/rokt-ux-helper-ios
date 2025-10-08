@@ -25,8 +25,6 @@ import DcuiSchema
 /// - Rebuilds children only when the active catalog item changes
 @available(iOS 15, *)
 struct CatalogCombinedCollectionComponent: View {
-    @SwiftUI.Environment(\.colorScheme) var colorScheme
-
     var style: CatalogCombinedCollectionStyles? {
         switch styleState {
         default:
@@ -46,15 +44,14 @@ struct CatalogCombinedCollectionComponent: View {
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
 
     let config: ComponentConfig
-    let model: CatalogCombinedCollectionViewModel
+    @ObservedObject var model: CatalogCombinedCollectionViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    // State to trigger re-rendering when active catalog item changes
-    @State private var activeCatalogItemId: String = ""
+    @State private var activeCatalogItemId: String?
 
     let parentOverride: ComponentParentOverride?
 
@@ -83,13 +80,11 @@ struct CatalogCombinedCollectionComponent: View {
     }
 
     private var layoutItemsPublisher: AnyPublisher<[String: Any], Never> {
-        if let publisher = model.layoutState?.itemsPublisher {
-            return publisher
-                .receive(on: RunLoop.main)
-                .eraseToAnyPublisher()
-        }
-
-        return Just([:]).eraseToAnyPublisher()
+        model.layoutState?
+            .itemsPublisher
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+        ?? Empty<[String: Any], Never>(completeImmediately: false).eraseToAnyPublisher()
     }
 
     var body: some View {
@@ -119,27 +114,20 @@ struct CatalogCombinedCollectionComponent: View {
                 availableHeight = size.height
             }
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
                 DispatchQueue.background.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
                 }
             }
-            .onReceive(layoutItemsPublisher) { items in
-                guard let catalogItem = items[LayoutState.activeCatalogItemKey] as? CatalogItem else { return }
-
-                guard catalogItem.catalogItemId != activeCatalogItemId else { return }
-
-                activeCatalogItemId = catalogItem.catalogItemId
-
-                if model.rebuildChildren(for: catalogItem) {
-                    frameChangeIndex += 1
-                }
+            .onReceive(layoutItemsPublisher, perform: handleLayoutItemsUpdate)
+            .onChange(of: model.children) { _ in
+                frameChangeIndex += 1
             }
     }
 
+    @ViewBuilder
     private func build() -> some View {
-        return VStack(
+        VStack(
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
@@ -163,5 +151,13 @@ struct CatalogCombinedCollectionComponent: View {
                 )
             }
         }
+    }
+
+    private func handleLayoutItemsUpdate(_ items: [String: Any]) {
+        guard let catalogItem = items[LayoutState.activeCatalogItemKey] as? CatalogItem else { return }
+        guard catalogItem.catalogItemId != activeCatalogItemId else { return }
+
+        activeCatalogItemId = catalogItem.catalogItemId
+        model.rebuildChildren(for: catalogItem)
     }
 }
