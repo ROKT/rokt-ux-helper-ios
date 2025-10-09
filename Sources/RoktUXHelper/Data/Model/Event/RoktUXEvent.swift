@@ -181,4 +181,18 @@ public class RoktUXEvent {
             self.unitPrice = unitPrice
         }
     }
+
+    public class CartItemInstantPurchaseInitiated: RoktUXEvent {
+        public let layoutId: String
+        public let catalogItemId: String
+        public let quantity: Decimal
+
+        init(layoutId: String,
+             catalogItemId: String,
+             quantity: Decimal) {
+            self.layoutId = layoutId
+            self.catalogItemId = catalogItemId
+            self.quantity = quantity
+        }
+    }
 }

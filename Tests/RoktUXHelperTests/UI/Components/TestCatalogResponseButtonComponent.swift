@@ -47,14 +47,14 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
 
     func test_send_ux_event() throws {
         var closeEventCalled = false
-        var signalCartItemInitiatedCalled = false
+        var signalCartItemPurchaseCalled = false
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventHandler: { event in
                 if event.eventType == .SignalDismissal {
                     closeEventCalled = true
-                } else if event.eventType == .SignalCartItemInstantPurchaseInitiated {
-                    signalCartItemInitiatedCalled = true
+                } else if event.eventType == .SignalCartItemInstantPurchase {
+                    signalCartItemPurchaseCalled = true
                 }
             },
             eventDelegate: eventDelegate,
@@ -73,7 +73,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
 
         XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchase))
         XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))
-        XCTAssertTrue(signalCartItemInitiatedCalled)
+        XCTAssertTrue(signalCartItemPurchaseCalled)
         XCTAssertTrue(closeEventCalled)
         XCTAssertNotNil(sut.layoutState)
     }

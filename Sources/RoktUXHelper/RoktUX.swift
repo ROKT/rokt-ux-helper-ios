@@ -568,4 +568,12 @@ public class RoktUX: UXEventsDelegate {
             unitPrice: catalogItem.originalPrice
         ))
     }
+
+    func onCartItemInstantPurchaseInitiated(_ layoutId: String, catalogItem: CatalogItem) {
+        onRoktEvent?(RoktUXEvent.CartItemInstantPurchaseInitiated(
+            layoutId: layoutId,
+            catalogItemId: catalogItem.catalogItemId,
+            quantity: 1,
+        ))
+    }
 }

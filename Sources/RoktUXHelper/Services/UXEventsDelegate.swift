@@ -34,4 +34,5 @@ protocol UXEventsDelegate: AnyObject {
                  onError: @escaping (String, Error?) -> Void)
 
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem)
+    func onCartItemInstantPurchaseInitiated(_ layoutId: String, catalogItem: CatalogItem)
 }

@@ -343,7 +343,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.openUrlType, .passthrough)
     }
 
-    func test_send_instant_purchase_initiated() {
+    func test_send_instant_purchase() {
         // Arrange
         let eventService = get_mock_event_processor(
             startDate: startDate,
@@ -354,6 +354,44 @@ final class TestEventService: XCTestCase {
 
         // Act
         eventService.cartItemInstantPurchase(catalogItem: .mock())
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
+        XCTAssertEqual(cartItemId?.value, "cartItemId")
+        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
+        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
+        let currency = event?.eventData.first { $0.name == kCurrency }
+        XCTAssertEqual(currency?.value, "USD")
+        let description = event?.eventData.first { $0.name == kDescription }
+        XCTAssertEqual(description?.value, "Catalog Description")
+        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
+        XCTAssertEqual(linkedProductId?.value, "linked")
+        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
+        XCTAssertEqual(totalPrice?.value, "14.99")
+        let quantity = event?.eventData.first { $0.name == kQuantity }
+        XCTAssertEqual(quantity?.value, "1")
+        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
+        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemInstantPurchase))
+    }
+
+    func test_send_instant_purchase_initiated() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act
+        eventService.cartItemInstantPurchaseInitiated(catalogItem: .mock())
 
         // Assert
         let event = events.first
@@ -378,7 +416,7 @@ final class TestEventService: XCTestCase {
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
-        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemInstantPurchase))
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemInstantPurchaseInitiated))
     }
 
     func test_send_instant_purchase_succeeded() {
@@ -555,4 +593,9 @@ class MockUXHelper: UXEventsDelegate {
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
         self.roktEvents.append(.CartItemInstantPurchase)
     }
+
+    func onCartItemInstantPurchaseInitiated(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
+        self.roktEvents.append(.CartItemInstantPurchaseInitiated)
+    }
+
 }

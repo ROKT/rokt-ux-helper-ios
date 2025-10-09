@@ -53,7 +53,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
 
     func cartItemDevicePay() {
         if let catalogItem {
-            eventService?.cartItemInstantPurchase(catalogItem: catalogItem)
+            eventService?.cartItemInstantPurchaseInitiated(catalogItem: catalogItem)
         }
     }
 }

@@ -176,9 +176,14 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
+    }
+
+    func cartItemInstantPurchaseInitiated(catalogItem: CatalogItem) {
         // TODO: Update to support sending param for payment provider
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
-        uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemInstantPurchaseInitiated(pluginId, catalogItem: catalogItem)
     }
 
     func cartItemInstantPurchaseSuccess(itemId: String) {

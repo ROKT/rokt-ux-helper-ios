@@ -20,6 +20,7 @@ class MockEventService: EventServicing {
     var dismissalEventCalled = false
     var openURLCalled = false
     var cartItemInstantPurchaseCalled = false
+    var cartItemInstantPurchaseInitiatedCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
 
@@ -72,6 +73,10 @@ class MockEventService: EventServicing {
 
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
         cartItemInstantPurchaseCalled = true
+    }
+
+    func cartItemInstantPurchaseInitiated(catalogItem: CatalogItem) {
+        cartItemInstantPurchaseInitiatedCalled = true
     }
 
     func cartItemInstantPurchaseSuccess(itemId: String) {

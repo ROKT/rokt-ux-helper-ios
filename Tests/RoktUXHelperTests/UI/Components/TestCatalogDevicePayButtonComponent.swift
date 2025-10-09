@@ -73,7 +73,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertNotNil(sut.layoutState)
     }
 
-    func test_tapGesture_shouldTriggerCartItemDevicePay() throws {
+    func test_tapGesture_shouldTriggerCartItemInitiated() throws {
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventDelegate: eventDelegate,
