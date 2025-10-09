@@ -20,9 +20,7 @@ struct CatalogDropdownComponent: View {
     var style: CatalogDropdownStyles? {
         style(for: styleState,
               defaultStyles: model.defaultStyle,
-              pressedStyles: model.pressedStyle,
-              hoveredStyles: model.hoveredStyle,
-              disabledStyles: model.disabledStyle)
+              pressedStyles: model.pressedStyle)
     }
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
@@ -39,9 +37,7 @@ struct CatalogDropdownComponent: View {
     var dropdownListContainerStyle: CatalogDropdownStyles? {
         style(for: styleState,
               defaultStyles: model.dropDownListContainerDefaultStyle,
-              pressedStyles: model.dropDownListContainerPressedStyle,
-              hoveredStyles: model.dropDownListContainerHoveredStyle,
-              disabledStyles: model.dropDownListContainerDisabledStyle)
+              pressedStyles: model.dropDownListContainerPressedStyle)
     }
     var dropdownListContainerContainerStyle: ContainerStylingProperties? { dropdownListContainerStyle?.container }
     var dropdownListContainerDimensionStyle: DimensionStylingProperties? { dropdownListContainerStyle?.dimension }
@@ -130,18 +126,12 @@ struct CatalogDropdownComponent: View {
     private func style(
         for state: StyleState,
         defaultStyles: [CatalogDropdownStyles]?,
-        pressedStyles: [CatalogDropdownStyles]?,
-        hoveredStyles: [CatalogDropdownStyles]?,
-        disabledStyles: [CatalogDropdownStyles]?
+        pressedStyles: [CatalogDropdownStyles]?
     ) -> CatalogDropdownStyles? {
         let index = breakpointIndex
         switch state {
         case .pressed:
             return pressedStyles?[safe: index] ?? defaultStyles?[safe: index]
-        case .hovered:
-            return hoveredStyles?[safe: index] ?? defaultStyles?[safe: index]
-        case .disabled:
-            return disabledStyles?[safe: index] ?? defaultStyles?[safe: index]
         default:
             return defaultStyles?[safe: index]
         }
@@ -151,17 +141,13 @@ struct CatalogDropdownComponent: View {
         if isSelected,
            let selectedStyle = style(for: styleState,
                                      defaultStyles: model.dropDownSelectedItemDefaultStyle,
-                                     pressedStyles: model.dropDownSelectedItemPressedStyle,
-                                     hoveredStyles: model.dropDownSelectedItemHoveredStyle,
-                                     disabledStyles: model.dropDownSelectedItemDisabledStyle) {
+                                     pressedStyles: model.dropDownSelectedItemPressedStyle) {
             return selectedStyle
         }
 
         return style(for: styleState,
                      defaultStyles: model.dropDownListItemDefaultStyle,
-                     pressedStyles: model.dropDownListItemPressedStyle,
-                     hoveredStyles: model.dropDownListItemHoveredStyle,
-                     disabledStyles: model.dropDownListItemDisabledStyle)
+                     pressedStyles: model.dropDownListItemPressedStyle)
     }
 
     private func verticalAlignment(for container: ContainerStylingProperties?) -> VerticalAlignmentProperty {
