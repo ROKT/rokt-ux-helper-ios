@@ -10,6 +10,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import SwiftUI
+import Combine
 import DcuiSchema
 
 @available(iOS 15, *)
@@ -81,6 +82,14 @@ struct CatalogDropdownComponent: View {
         }
     }
 
+    private var layoutItemsPublisher: AnyPublisher<[String: Any], Never> {
+        model.layoutState?
+            .itemsPublisher
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+        ?? Empty<[String: Any], Never>(completeImmediately: false).eraseToAnyPublisher()
+    }
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             dropdownButton()
@@ -143,6 +152,9 @@ struct CatalogDropdownComponent: View {
             availableWidth = size.width
             availableHeight = size.height
         }
+        .onReceive(layoutItemsPublisher) { _ in
+            syncSelectedItemFromLayoutState()
+        }
     }
 
     private func dropdownButton() -> some View {
@@ -150,7 +162,9 @@ struct CatalogDropdownComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            if selectedItemIndex != nil, let closedTemplate = model.closedTemplate {
+            if hasPersistedSelection,
+               selectedItemIndex != nil,
+               let closedTemplate = model.closedTemplate {
                 dropdownButtonContent(
                     layout: closedTemplate,
                     tapHandler: { toggleDropdownExpansion() }
@@ -260,6 +274,7 @@ struct CatalogDropdownComponent: View {
 
         selectedItemIndex = index
         isExpanded = false
+        persistSelectedIndex(index)
 
         guard index < model.catalogItems.count else { return }
         let selectedItem = model.catalogItems[index]
@@ -268,7 +283,21 @@ struct CatalogDropdownComponent: View {
     }
 
     private func syncSelectedItemFromLayoutState() {
+        if let persistedIndex = persistedSelectedIndex {
+            guard persistedIndex >= 0, persistedIndex < model.catalogItems.count else {
+                persistSelectedIndex(nil)
+                selectedItemIndex = nil
+                return
+            }
+
+            if selectedItemIndex != persistedIndex {
+                selectedItemIndex = persistedIndex
+            }
+            return
+        }
+
         guard let activeItem = model.layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem else {
+            selectedItemIndex = nil
             return
         }
 
@@ -280,6 +309,46 @@ struct CatalogDropdownComponent: View {
 
         if let index = model.catalogItems.firstIndex(where: { $0.catalogItemId == activeItem.catalogItemId }) {
             selectedItemIndex = index
+        } else {
+            selectedItemIndex = nil
         }
+    }
+
+    private var hasPersistedSelection: Bool {
+        persistedSelectedIndex != nil
+    }
+
+    private var dropdownStateKey: String {
+        if let position = config.position {
+            return "dropdown-\(position)"
+        }
+        return model.id.uuidString
+    }
+
+    private var persistedSelectedIndex: Int? {
+        guard let layoutState = model.layoutState else { return nil }
+        let selections = layoutState.items[LayoutState.catalogDropdownSelectedIndexKey] as? [String: Int]
+        return selections?[dropdownStateKey]
+    }
+
+    private func persistSelectedIndex(_ index: Int?) {
+        guard let layoutState = model.layoutState else { return }
+
+        var items = layoutState.items
+        var selections = items[LayoutState.catalogDropdownSelectedIndexKey] as? [String: Int] ?? [:]
+
+        if let index {
+            selections[dropdownStateKey] = index
+        } else {
+            selections.removeValue(forKey: dropdownStateKey)
+        }
+
+        if selections.isEmpty {
+            items.removeValue(forKey: LayoutState.catalogDropdownSelectedIndexKey)
+        } else {
+            items[LayoutState.catalogDropdownSelectedIndexKey] = selections
+        }
+
+        layoutState.items = items
     }
 }

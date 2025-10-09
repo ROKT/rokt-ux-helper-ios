@@ -28,6 +28,7 @@ class LayoutState: LayoutStateRepresenting {
     static let customStateMap = "customStateMap" // CustomStateMap
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
+    static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [String: Int]
 
     private var _items = [String: Any]()
     private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
