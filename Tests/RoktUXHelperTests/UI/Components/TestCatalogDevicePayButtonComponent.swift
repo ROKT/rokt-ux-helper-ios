@@ -50,7 +50,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventHandler: { event in
-                if event.eventType == .SignalCartItemDevicePayInitiated {
+                if event.eventType == .SignalCartItemInstantPurchaseInitiated {
                     signalCartItemInitiatedCalled = true
                 }
             },
@@ -68,7 +68,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let sut = catalogDevicePayButton.model
         sut.cartItemDevicePay()
 
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemDevicePay))
+        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchaseInitiated))
         XCTAssertTrue(signalCartItemInitiatedCalled)
         XCTAssertNotNil(sut.layoutState)
     }
@@ -87,11 +87,11 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             .view(CatalogDevicePayButtonComponent.self)
             .actualView()
 
-        XCTAssertFalse(eventDelegate.roktEvents.contains(.CartItemDevicePay))
+        XCTAssertFalse(eventDelegate.roktEvents.contains(.CartItemInstantPurchaseInitiated))
 
         try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
 
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemDevicePay))
+        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchaseInitiated))
     }
 
     func test_catalogDevicePayButton_computedProperties_usesModelProperties() throws {

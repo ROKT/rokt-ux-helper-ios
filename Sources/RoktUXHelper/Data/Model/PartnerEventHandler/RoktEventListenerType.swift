@@ -26,5 +26,4 @@ enum RoktEventListenerType: String, CaseIterable {
     case FirstPositiveEngagement
     case OpenUrl
     case CartItemInstantPurchase
-    case CartItemDevicePay
 }

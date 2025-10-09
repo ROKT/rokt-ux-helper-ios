@@ -15,7 +15,7 @@ import Combine
 import DcuiSchema
 
 enum LayoutDismissOptions {
-    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered
+    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered, instantPurchaseDismiss
 }
 
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
@@ -133,6 +133,8 @@ class EventService: Hashable, EventDiagnosticServicing {
             sendDismissalCollapsedEvent()
         case .partnerTriggered:
             sendDismissalPartnerTriggeredEvent()
+        case .instantPurchaseDismiss:
+            sendInstantPurchaseDissmissOfferEvent()
         default:
             sendDefaultDismissEvent()
         }
@@ -174,6 +176,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemInstantPurchase(catalogItem: CatalogItem) {
+        // TODO: Update to support sending param for payment provider
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemInstantPurchase(pluginId, catalogItem: catalogItem)
     }
@@ -186,21 +189,6 @@ class EventService: Hashable, EventDiagnosticServicing {
     func cartItemInstantPurchaseFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
-    }
-
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
-        sendCartItemEvent(eventType: .SignalCartItemDevicePayInitiated, catalogItem: catalogItem)
-        uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
-    }
-
-    func cartItemDevicePaySuccess(itemId: String) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemDevicePay, catalogItem: catalogItem)
-    }
-
-    func cartItemDevicePayFailure(itemId: String) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemDevicePayFailure, catalogItem: catalogItem)
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
@@ -293,6 +281,12 @@ class EventService: Hashable, EventDiagnosticServicing {
                   jwtToken: pluginConfigJWTToken)
     }
 
+    private func sendInstantPurchaseDissmissOfferEvent() {
+        sendEvent(.SignalInstantPurchaseDismissal, parentGuid: pluginInstanceGuid,
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kInstantPurchaseDismiss)],
+                  jwtToken: pluginConfigJWTToken)
+    }
+
     private func sendDefaultDismissEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [RoktEventNameValue(name: kInitiator, value: kDismissed)],
@@ -321,7 +315,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         switch dismissOption {
         case .noMoreOffer, .endMessage, .collapsed:
             uxEventDelegate?.onPlacementCompleted(pluginId)
-        case .closeButton, .partnerTriggered:
+        case .closeButton, .partnerTriggered, .instantPurchaseDismiss:
             uxEventDelegate?.onPlacementClosed(pluginId)
         default:
             uxEventDelegate?.onPlacementClosed(pluginId)

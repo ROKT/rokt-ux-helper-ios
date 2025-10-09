@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.6] - 2025-10-08
+
+### Added
+
+- `CartItemDevicePay` UX event support removed, updated to instant purchase events instead
+- `SignalInstantPurchaseDismissal` UX event support added
+
 ## [0.7.5] - 2025-09-24
 
 ### Added

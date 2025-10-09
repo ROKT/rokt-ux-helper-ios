@@ -27,7 +27,4 @@ protocol EventServicing: AnyObject {
     func cartItemInstantPurchase(catalogItem: CatalogItem)
     func cartItemInstantPurchaseSuccess(itemId: String)
     func cartItemInstantPurchaseFailure(itemId: String)
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider)
-    func cartItemDevicePaySuccess(itemId: String)
-    func cartItemDevicePayFailure(itemId: String)
 }

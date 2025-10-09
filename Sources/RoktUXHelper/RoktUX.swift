@@ -195,9 +195,9 @@ public class RoktUX: UXEventsDelegate {
      */
     public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
         if success {
-            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemInstantPurchaseSuccess(itemId: catalogItemId)
         } else {
-            eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemInstantPurchaseFailure(itemId: catalogItemId)
         }
     }
 
@@ -566,23 +566,6 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice
-        ))
-    }
-
-    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
-        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
-            layoutId: layoutId,
-            name: catalogItem.title,
-            cartItemId: catalogItem.cartItemId,
-            catalogItemId: catalogItem.catalogItemId,
-            currency: catalogItem.currency,
-            description: catalogItem.description,
-            linkedProductId: catalogItem.linkedProductId,
-            providerData: catalogItem.providerData,
-            quantity: 1,
-            totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice,
-            paymentProvider: paymentProvider
         ))
     }
 }

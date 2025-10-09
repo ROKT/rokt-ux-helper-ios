@@ -45,6 +45,7 @@ let kNoMoreOfferToShow = "NO_MORE_OFFERS_TO_SHOW"
 let kCollapsed = "COLLAPSED"
 let kEndMessage = "END_MESSAGE"
 let kDismissed = "DISMISSED"
+let kInstantPurchaseDismiss = "INSTANT_PURCHASE_DISMISSED"
 let kPartnerTriggered = "PARTNER_TRIGGERED"
 
 // MARK: - String keys
