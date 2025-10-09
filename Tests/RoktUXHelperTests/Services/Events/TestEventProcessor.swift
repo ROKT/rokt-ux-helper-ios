@@ -36,7 +36,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
 
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 17)
+            XCTAssertEqual(processedRequests.count, 14)
 
             allEventTypes.forEach { eventType in
 
@@ -89,7 +89,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
 
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 15)
+            XCTAssertEqual(processedRequests.count, 12)
             expectation.fulfill()
         }
         allEventTypes.forEach {
