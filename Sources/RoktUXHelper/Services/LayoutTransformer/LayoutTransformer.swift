@@ -804,11 +804,27 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             try transform(model.openTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
         } ?? []
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        let dropdownListItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListItem)
+        let dropdownSelectedItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownSelectedItem)
+        let dropdownListContainerStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListContainer)
         return CatalogDropdownViewModel(layoutState: layoutState,
                                         defaultStyle: updateStyles.compactMap {$0.default},
                                         pressedStyle: updateStyles.compactMap {$0.pressed},
                                         hoveredStyle: updateStyles.compactMap {$0.hovered},
                                         disabledStyle: updateStyles.compactMap {$0.disabled},
+                                        dropDownListItemDefaultStyle: dropdownListItemStyles.compactMap { $0.default },
+                                        dropDownListItemPressedStyle: dropdownListItemStyles.compactMap { $0.pressed },
+                                        dropDownListItemHoveredStyle: dropdownListItemStyles.compactMap { $0.hovered },
+                                        dropDownListItemDisabledStyle: dropdownListItemStyles.compactMap { $0.disabled },
+                                        dropDownSelectedItemDefaultStyle: dropdownSelectedItemStyles.compactMap { $0.default },
+                                        dropDownSelectedItemPressedStyle: dropdownSelectedItemStyles.compactMap { $0.pressed },
+                                        dropDownSelectedItemHoveredStyle: dropdownSelectedItemStyles.compactMap { $0.hovered },
+                                        dropDownSelectedItemDisabledStyle: dropdownSelectedItemStyles.compactMap { $0.disabled },
+                                        dropDownListContainerDefaultStyle: dropdownListContainerStyles.compactMap { $0.default },
+                                        dropDownListContainerPressedStyle: dropdownListContainerStyles.compactMap { $0.pressed },
+                                        dropDownListContainerHoveredStyle: dropdownListContainerStyles.compactMap { $0.hovered },
+                                        dropDownListContainerDisabledStyle: dropdownListContainerStyles
+                                        .compactMap { $0.disabled },
                                         a11yLabel: model.a11yLabel,
                                         openDropdownChildren: openDropdownChildren,
                                         closedTemplate: closedTemplate,

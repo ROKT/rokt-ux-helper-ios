@@ -18,21 +18,17 @@ struct CatalogDropdownComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     var style: CatalogDropdownStyles? {
-        switch styleState {
-        case .hovered:
-            return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
-        case .pressed:
-            return model.pressedStyle?.count ?? -1 > breakpointIndex ? model.pressedStyle?[breakpointIndex] : nil
-        case .disabled:
-            return model.disabledStyle?.count ?? -1 > breakpointIndex ? model.disabledStyle?[breakpointIndex] : nil
-        default:
-            return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
-        }
+        style(for: styleState,
+              defaultStyles: model.defaultStyle,
+              pressedStyles: model.pressedStyle,
+              hoveredStyles: model.hoveredStyle,
+              disabledStyles: model.disabledStyle)
     }
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @State var breakpointIndex: Int = 0
     @State var frameChangeIndex: Int = 0
+    @State private var dropdownFrameChangeIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
     var dimensionStyle: DimensionStylingProperties? { style?.dimension }
@@ -40,6 +36,19 @@ struct CatalogDropdownComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var dropdownListContainerStyle: CatalogDropdownStyles? {
+        style(for: styleState,
+              defaultStyles: model.dropDownListContainerDefaultStyle,
+              pressedStyles: model.dropDownListContainerPressedStyle,
+              hoveredStyles: model.dropDownListContainerHoveredStyle,
+              disabledStyles: model.dropDownListContainerDisabledStyle)
+    }
+    var dropdownListContainerContainerStyle: ContainerStylingProperties? { dropdownListContainerStyle?.container }
+    var dropdownListContainerDimensionStyle: DimensionStylingProperties? { dropdownListContainerStyle?.dimension }
+    var dropdownListContainerFlexStyle: FlexChildStylingProperties? { dropdownListContainerStyle?.flexChild }
+    var dropdownListContainerBorderStyle: BorderStylingProperties? { dropdownListContainerStyle?.border }
+    var dropdownListContainerSpacingStyle: SpacingStylingProperties? { dropdownListContainerStyle?.spacing }
+    var dropdownListContainerBackgroundStyle: BackgroundStylingProperties? { dropdownListContainerStyle?.background }
 
     let config: ComponentConfig
     let model: CatalogDropdownViewModel
@@ -62,6 +71,113 @@ struct CatalogDropdownComponent: View {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
     }
 
+    private var dropdownPassableBackgroundStyle: BackgroundStylingProperties? {
+        dropdownListContainerBackgroundStyle ?? passableBackgroundStyle
+    }
+
+    private var dropdownParentOverride: ComponentParentOverride? {
+        mergedParentOverride(
+            base: parentOverride?.updateBackground(dropdownPassableBackgroundStyle),
+            container: dropdownListContainerContainerStyle,
+            background: dropdownListContainerBackgroundStyle
+        )
+    }
+
+    private var dropdownMinimumWidth: CGFloat? {
+        guard dropdownListContainerDimensionStyle?.width == nil,
+              dropdownListContainerDimensionStyle?.minWidth == nil else {
+            return nil
+        }
+
+        return max(availableWidth ?? 200, 200)
+    }
+
+    private var availableWidthBinding: Binding<CGFloat?> {
+        Binding(
+            get: { availableWidth },
+            set: { _ in }
+        )
+    }
+
+    private var availableHeightBinding: Binding<CGFloat?> {
+        Binding(
+            get: { availableHeight },
+            set: { _ in }
+        )
+    }
+
+    private func mergedParentOverride(
+        base: ComponentParentOverride?,
+        container: ContainerStylingProperties?,
+        background: BackgroundStylingProperties?
+    ) -> ComponentParentOverride? {
+        if container == nil && background == nil {
+            return base
+        }
+
+        return ComponentParentOverride(
+            parentVerticalAlignment: container.flatMap {
+                columnPrimaryAxisAlignment(justifyContent: $0.justifyContent).asVerticalType
+            } ?? base?.parentVerticalAlignment,
+            parentHorizontalAlignment: container.flatMap {
+                columnPerpendicularAxisAlignment(alignItems: $0.alignItems)
+            } ?? base?.parentHorizontalAlignment,
+            parentBackgroundStyle: background ?? base?.parentBackgroundStyle,
+            stretchChildren: container?.alignItems == .stretch
+        )
+    }
+
+    private func style(
+        for state: StyleState,
+        defaultStyles: [CatalogDropdownStyles]?,
+        pressedStyles: [CatalogDropdownStyles]?,
+        hoveredStyles: [CatalogDropdownStyles]?,
+        disabledStyles: [CatalogDropdownStyles]?
+    ) -> CatalogDropdownStyles? {
+        let index = breakpointIndex
+        switch state {
+        case .pressed:
+            return pressedStyles?[safe: index] ?? defaultStyles?[safe: index]
+        case .hovered:
+            return hoveredStyles?[safe: index] ?? defaultStyles?[safe: index]
+        case .disabled:
+            return disabledStyles?[safe: index] ?? defaultStyles?[safe: index]
+        default:
+            return defaultStyles?[safe: index]
+        }
+    }
+
+    private func dropdownItemStyle(isSelected: Bool) -> CatalogDropdownStyles? {
+        if isSelected,
+           let selectedStyle = style(for: styleState,
+                                     defaultStyles: model.dropDownSelectedItemDefaultStyle,
+                                     pressedStyles: model.dropDownSelectedItemPressedStyle,
+                                     hoveredStyles: model.dropDownSelectedItemHoveredStyle,
+                                     disabledStyles: model.dropDownSelectedItemDisabledStyle) {
+            return selectedStyle
+        }
+
+        return style(for: styleState,
+                     defaultStyles: model.dropDownListItemDefaultStyle,
+                     pressedStyles: model.dropDownListItemPressedStyle,
+                     hoveredStyles: model.dropDownListItemHoveredStyle,
+                     disabledStyles: model.dropDownListItemDisabledStyle)
+    }
+
+    private func verticalAlignment(for container: ContainerStylingProperties?) -> VerticalAlignmentProperty {
+        if let justifyContent = container?.justifyContent?.asVerticalAlignmentProperty {
+            return justifyContent
+        }
+        return .top
+    }
+
+    private func horizontalAlignment(for container: ContainerStylingProperties?) -> HorizontalAlignmentProperty {
+        if let alignItems = container?.alignItems?.asHorizontalAlignmentProperty {
+            return alignItems
+        }
+        return .start
+    }
+
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.justifyContent?.asVerticalAlignmentProperty {
             return justifyContent
@@ -80,6 +196,22 @@ struct CatalogDropdownComponent: View {
         } else {
             return .start
         }
+    }
+
+    private var dropdownContainerVerticalAlignment: VerticalAlignmentProperty {
+        if let justifyContent = dropdownListContainerContainerStyle?.justifyContent?.asVerticalAlignmentProperty {
+            return justifyContent
+        }
+
+        return .top
+    }
+
+    private var dropdownContainerHorizontalAlignment: HorizontalAlignmentProperty {
+        if let alignItems = dropdownListContainerContainerStyle?.alignItems?.asHorizontalAlignmentProperty {
+            return alignItems
+        }
+
+        return .start
     }
 
     private var layoutItemsPublisher: AnyPublisher<[String: Any], Never> {
@@ -137,6 +269,7 @@ struct CatalogDropdownComponent: View {
             DispatchQueue.background.async {
                 breakpointIndex = model.updateBreakpointIndex(for: newSize)
                 frameChangeIndex += 1
+                dropdownFrameChangeIndex += 1
             }
         }
         .contentShape(Rectangle())
@@ -202,35 +335,90 @@ struct CatalogDropdownComponent: View {
     }
 
     @ViewBuilder
+    private func dropdownItemView(for index: Int) -> some View {
+        let isSelected = selectedItemIndex == index
+        let itemStyle = dropdownItemStyle(isSelected: isSelected)
+        let itemContainerStyle = itemStyle?.container
+        let itemDimensionStyle = itemStyle?.dimension
+        let itemFlexStyle = itemStyle?.flexChild
+        let itemBorderStyle = itemStyle?.border
+        let itemSpacingStyle = itemStyle?.spacing
+        let itemBackgroundStyle = itemStyle?.background
+        let itemParentOverride = mergedParentOverride(base: dropdownParentOverride,
+                                                      container: itemContainerStyle,
+                                                      background: itemBackgroundStyle)
+
+        LayoutSchemaComponent(
+            config: config.updateParent(.column),
+            layout: model.openDropdownChildren[index],
+            parentWidth: $parentWidth,
+            parentHeight: $parentHeight,
+            styleState: $styleState,
+            parentOverride: itemParentOverride
+        )
+        .applyLayoutModifier(
+            verticalAlignmentProperty: verticalAlignment(for: itemContainerStyle),
+            horizontalAlignmentProperty: horizontalAlignment(for: itemContainerStyle),
+            spacing: itemSpacingStyle,
+            dimension: itemDimensionStyle,
+            flex: itemFlexStyle,
+            border: itemBorderStyle,
+            background: itemBackgroundStyle,
+            container: itemContainerStyle,
+            parent: .column,
+            parentWidth: availableWidthBinding,
+            parentHeight: availableHeightBinding,
+            parentOverride: itemParentOverride,
+            defaultHeight: .wrapContent,
+            defaultWidth: .wrapContent,
+            isContainer: true,
+            containerType: .column,
+            frameChangeIndex: .constant(0),
+            imageLoader: model.imageLoader
+        )
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
     private func expandedDropdown() -> some View {
-        VStack(spacing: 0) {
+        VStack(
+            alignment: columnPerpendicularAxisAlignment(alignItems: dropdownListContainerContainerStyle?.alignItems),
+            spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
+        ) {
             if !model.openDropdownChildren.isEmpty {
                 ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
                     Button {
                         selectItem(at: index)
                     } label: {
-                        LayoutSchemaComponent(
-                            config: config,
-                            layout: model.openDropdownChildren[index],
-                            parentWidth: $parentWidth,
-                            parentHeight: $parentHeight,
-                            styleState: $styleState,
-                            parentOverride: parentOverride
-                        )
-                        .contentShape(Rectangle())
+                        dropdownItemView(for: index)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .background(Color.white)
-        .cornerRadius(8)
-        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        .applyLayoutModifier(
+            verticalAlignmentProperty: dropdownContainerVerticalAlignment,
+            horizontalAlignmentProperty: dropdownContainerHorizontalAlignment,
+            spacing: dropdownListContainerSpacingStyle,
+            dimension: dropdownListContainerDimensionStyle,
+            flex: dropdownListContainerFlexStyle,
+            border: dropdownListContainerBorderStyle,
+            background: dropdownListContainerBackgroundStyle,
+            container: dropdownListContainerContainerStyle,
+            parent: config.parent,
+            parentWidth: $parentWidth,
+            parentHeight: $parentHeight,
+            parentOverride: dropdownParentOverride,
+            defaultHeight: .wrapContent,
+            defaultWidth: .wrapContent,
+            isContainer: true,
+            containerType: .column,
+            frameChangeIndex: $dropdownFrameChangeIndex,
+            imageLoader: model.imageLoader
         )
-        .frame(minWidth: max(availableWidth ?? 200, 200), alignment: .leading)
+        .ifLet(dropdownMinimumWidth) { view, minWidth in
+            view.frame(minWidth: minWidth, alignment: .leading)
+        }
         .offset(y: buttonHeight)
     }
 
