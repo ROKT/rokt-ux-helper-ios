@@ -31,35 +31,71 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
     init(
         index: Int32,
         duration: Int32,
-        progressStyle: BasicStateStylingBlock<BaseStyles>,
-        inactiveStyle: [BasicStateStylingBlock<BaseStyles>]?,
-        activeStyle: [BasicStateStylingBlock<BaseStyles>]?,
+        activeStyle: BasicStateStylingBlock<BaseStyles>,
+        indicatorStyle: [BasicStateStylingBlock<BaseStyles>]?,
+        seenStyle: [BasicStateStylingBlock<BaseStyles>]?,
         layoutState: (any LayoutStateRepresenting)?,
         shouldDisplayProgress: Bool
     ) {
+        func whenNode(
+            index: Int32,
+            condition: OrderableWhenCondition,
+            style: [BasicStateStylingBlock<BaseStyles>]?,
+            layoutState: (any LayoutStateRepresenting)?,
+            child: RowViewModel? = nil
+        ) -> LayoutSchemaViewModel {
+
+            var children = [LayoutSchemaViewModel]()
+            if let child {
+                children.append(.row(child))
+            }
+
+            let row = RowViewModel(
+                children: children,
+                stylingProperties: style,
+                animatableStyle: nil,
+                accessibilityGrouped: false,
+                layoutState: layoutState,
+                predicates: nil,
+                globalBreakPoints: nil,
+                offers: []
+            )
+
+            return .when(WhenViewModel(
+                children: [.row(row)],
+                predicates: [.customState(.init(key: .imageCarouselPosition, condition: condition, value: index))],
+                transition: nil,
+                offers: [],
+                globalBreakPoints: nil,
+                layoutState: layoutState
+            ))
+        }
+
+        let progressStyle: [BasicStateStylingBlock<BaseStyles>] = [
+            .init(
+                default: BaseStyles(
+                    background: activeStyle.default.background,
+                    container: nil,
+                    dimension: .init(
+                        minWidth: nil,
+                        maxWidth: nil,
+                        width: shouldDisplayProgress ? .fixed(0) : activeStyle.default.dimension?.width,
+                        minHeight: nil,
+                        maxHeight: nil,
+                        height: activeStyle.default.dimension?.height,
+                        rotateZ: nil
+                    )
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
         let progressViewModel = RowViewModel(
             children: nil,
-            stylingProperties: [
-                .init(
-                    default: BaseStyles(
-                        background: progressStyle.default.background,
-                        container: nil,
-                        dimension: .init(
-                            minWidth: nil,
-                            maxWidth: nil,
-                            width: shouldDisplayProgress ? .fixed(0) : progressStyle.default.dimension?.width,
-                            minHeight: nil,
-                            maxHeight: nil,
-                            height: progressStyle.default.dimension?.height,
-                            rotateZ: nil
-                        )
-                    ),
-                    pressed: nil,
-                    hovered: nil,
-                    disabled: nil
-                )
-            ],
-            animatableStyle: shouldDisplayProgress ? .init(duration: Double(duration)/1000.0, style: progressStyle.default) : nil,
+            stylingProperties: progressStyle,
+            animatableStyle: shouldDisplayProgress ? .init(duration: Double(duration)/1000.0, style: activeStyle.default) : nil,
             accessibilityGrouped: false,
             layoutState: layoutState,
             predicates: nil,
@@ -67,48 +103,35 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
             offers: []
         )
 
-        let activeRowItem = RowViewModel(
-            children: [.row(progressViewModel)],
-            stylingProperties: activeStyle,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
+        let activeStylingProperties: [BasicStateStylingBlock<BaseStyles>]? = [
+            .init(
+                default: BaseStyles(
+                    background: indicatorStyle?[0].default.background,
+                    border: activeStyle.default.border,
+                    container: activeStyle.default.container,
+                    dimension: activeStyle.default.dimension,
+                    flexChild: activeStyle.default.flexChild,
+                    spacing: activeStyle.default.spacing,
+                    text: activeStyle.default.text
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
+        let whenSeen = whenNode(index: index, condition: .isBelow, style: seenStyle, layoutState: layoutState)
+        let whenActive = whenNode(
+            index: index,
+            condition: .is,
+            style: activeStylingProperties,
             layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
+            child: progressViewModel
         )
-
-        let inactiveRowItem = RowViewModel(
-            children: [],
-            stylingProperties: inactiveStyle,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
-            layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
-        )
-
-        let whenActive = WhenViewModel(
-            children: [.row(activeRowItem)],
-            predicates: [.customState(.init(key: .imageCarouselPosition, condition: .is, value: index))],
-            transition: nil,
-            offers: [],
-            globalBreakPoints: nil,
-            layoutState: layoutState
-        )
-
-        let whenInActive = WhenViewModel(
-            children: [.row(inactiveRowItem)],
-            predicates: [.customState(.init(key: .imageCarouselPosition, condition: .isNot, value: index))],
-            transition: nil,
-            offers: [],
-            globalBreakPoints: nil,
-            layoutState: layoutState
-        )
+        let whenNotSeen = whenNode(index: index, condition: .isAbove, style: indicatorStyle, layoutState: layoutState)
 
         super.init(
-            children: [.when(whenActive), .when(whenInActive)],
+            children: [whenSeen, whenActive, whenNotSeen],
             stylingProperties: [
                 .init(
                     default: .wrapContentStyle,

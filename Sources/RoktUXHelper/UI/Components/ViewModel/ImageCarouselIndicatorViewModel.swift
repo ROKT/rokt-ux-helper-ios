@@ -73,9 +73,9 @@ class ImageCarouselIndicatorViewModel:
                 ImageCarouselIndicatorItemViewModel(
                     index: Int32(i + 1),
                     duration: duration,
-                    progressStyle: activeStyle,
-                    inactiveStyle: indicatorStyle,
-                    activeStyle: seenIndicatorStyle,
+                    activeStyle: activeStyle,
+                    indicatorStyle: indicatorStyle,
+                    seenStyle: seenIndicatorStyle,
                     layoutState: layoutState,
                     shouldDisplayProgress: shouldDisplayProgress
                 )
