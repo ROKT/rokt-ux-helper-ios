@@ -189,18 +189,18 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
-        sendCartItemEvent(eventType: .SignalCartItemDevicePayInitiated, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemDevicePay, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
     }
 
     func cartItemDevicePayFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
-        sendCartItemEvent(eventType: .SignalCartItemDevicePayFailure, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {

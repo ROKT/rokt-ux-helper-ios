@@ -50,7 +50,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventHandler: { event in
-                if event.eventType == .SignalCartItemDevicePayInitiated {
+                if event.eventType == .SignalCartItemInstantPurchaseInitiated {
                     signalCartItemInitiatedCalled = true
                 }
             },

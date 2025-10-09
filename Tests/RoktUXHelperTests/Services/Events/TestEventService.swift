@@ -332,7 +332,7 @@ final class TestEventService: XCTestCase {
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePayInitiated)
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
@@ -370,7 +370,7 @@ final class TestEventService: XCTestCase {
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePay)
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
@@ -408,7 +408,7 @@ final class TestEventService: XCTestCase {
 
         // Assert
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemDevicePayFailure)
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseFailure)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         let cartItemId = event?.eventData.first { $0.name == kCartItemId }
         XCTAssertEqual(cartItemId?.value, "cartItemId")
