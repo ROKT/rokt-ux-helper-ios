@@ -156,6 +156,12 @@ struct LayoutSchemaComponent: View {
                                  parentWidth: $parentWidth,
                                  parentHeight: $parentHeight,
                                  parentOverride: parentOverride)
+        case .dismissInstantPurchaseButton(let dismissInstantPurchaseButtonModel):
+            DismissInstantPurchaseButtonComponent(config: config,
+                                                  model: dismissInstantPurchaseButtonModel,
+                                                  parentWidth: $parentWidth,
+                                                  parentHeight: $parentHeight,
+                                                  parentOverride: parentOverride)
         case .staticLink(let staticLinkModel):
             StaticLinkComponent(config: config,
                                 model: staticLinkModel,

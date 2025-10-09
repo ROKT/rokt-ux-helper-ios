@@ -44,6 +44,7 @@ let kCloseButton = "CLOSE_BUTTON"
 let kNoMoreOfferToShow = "NO_MORE_OFFERS_TO_SHOW"
 let kCollapsed = "COLLAPSED"
 let kEndMessage = "END_MESSAGE"
+let kInstantPurchaseDismiss = "INSTANT_PURCHASE_DISMISSED"
 let kDismissed = "DISMISSED"
 let kPartnerTriggered = "PARTNER_TRIGGERED"
 

@@ -208,6 +208,31 @@ final class TestEventService: XCTestCase {
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementClosed))
     }
 
+    func test_sendDismissal_onInstantPurchaseDismissed_dismissalEventsAndSignals_shouldSend() throws {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act
+        eventService.dismissOption = .instantPurchaseDismiss
+        eventService.sendDismissalEvent()
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalInstantPurchaseDismissal)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        XCTAssertNotNil(event?.metadata.first { $0.name == kInitiator })
+        XCTAssertNotNil(event?.metadata.first { $0.value == kInstantPurchaseDismiss })
+
+        // Rokt callbacks
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.PlacementClosed))
+    }
+    
     func test_dismissal_dimissed_event() throws {
         // Arrange
         let eventService = get_mock_event_processor(

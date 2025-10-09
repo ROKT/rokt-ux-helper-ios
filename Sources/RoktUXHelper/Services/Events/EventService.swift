@@ -15,7 +15,7 @@ import Combine
 import DcuiSchema
 
 enum LayoutDismissOptions {
-    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered
+    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered, instantPurchaseDismiss
 }
 
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
@@ -135,6 +135,8 @@ class EventService: Hashable, EventDiagnosticServicing {
             sendDismissalCollapsedEvent()
         case .partnerTriggered:
             sendDismissalPartnerTriggeredEvent()
+        case .instantPurchaseDismiss:
+            sendInstantPurchaseDissmissOfferEvent()
         default:
             sendDefaultDismissEvent()
         }
@@ -296,6 +298,12 @@ class EventService: Hashable, EventDiagnosticServicing {
                   jwtToken: pluginConfigJWTToken)
     }
 
+    private func sendInstantPurchaseDissmissOfferEvent() {
+        sendEvent(.SignalInstantPurchaseDismissal, parentGuid: pluginInstanceGuid,
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kInstantPurchaseDismiss)],
+                  jwtToken: pluginConfigJWTToken)
+    }
+
     private func sendDismissalNoMoreOfferEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [RoktEventNameValue(name: kInitiator, value: kNoMoreOfferToShow)],
@@ -330,7 +338,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         switch dismissOption {
         case .noMoreOffer, .endMessage, .collapsed:
             uxEventDelegate?.onPlacementCompleted(pluginId)
-        case .closeButton, .partnerTriggered:
+        case .closeButton, .partnerTriggered, .instantPurchaseDismiss:
             uxEventDelegate?.onPlacementClosed(pluginId)
         default:
             uxEventDelegate?.onPlacementClosed(pluginId)

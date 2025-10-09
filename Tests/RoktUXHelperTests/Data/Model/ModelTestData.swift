@@ -103,6 +103,13 @@ class ModelTestData: NSObject {
         }
     }
 
+    enum DismissInstantPurchaseButtonData {
+        static func dismissInstantPurchaseButton() -> DismissInstantPurchaseButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_dismiss_instant_purchase_button")
+            return try! JSONDecoder().decode(DismissInstantPurchaseButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
+
     enum ProgressControlData {
         static func progressControl() -> ProgressControlModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_progress_control")

@@ -40,6 +40,8 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalCartItemInstantPurchase
     /// Triggered when instant purchase fails
     case SignalCartItemInstantPurchaseFailure
+    /// Triggered when an instant purchase offer is explicitly dismissed.
+    case SignalInstantPurchaseDismissal
     /// Not applicable
     case CaptureAttributes
 }
