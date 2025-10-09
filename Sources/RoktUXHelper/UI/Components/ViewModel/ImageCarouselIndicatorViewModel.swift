@@ -63,25 +63,65 @@ class ImageCarouselIndicatorViewModel:
     }
 
     private func createRowViewModels() -> [RowViewModel] {
-        var rowViewModels: [RowViewModel] = []
-        for i in 0..<positions {
-            guard let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] else {
-                continue
-            }
+        guard let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] ?? activeIndicatorStyle?.first else {
+            return []
+        }
 
-            rowViewModels.append(
-                ImageCarouselIndicatorItemViewModel(
-                    index: Int32(i + 1),
-                    duration: duration,
-                    activeStyle: activeStyle,
-                    indicatorStyle: indicatorStyle,
-                    seenStyle: seenIndicatorStyle,
-                    layoutState: layoutState,
-                    shouldDisplayProgress: shouldDisplayProgress
-                )
+        let animatableStyle: AnimationStyle? = shouldDisplayProgress ? .init(
+            duration: Double(duration)/1000.0,
+            style: activeStyle.default
+        ) : nil
+        let activeStylingProperties: [BasicStateStylingBlock<BaseStyles>]? = [
+            .init(
+                default: BaseStyles(
+                    background: indicatorStyle?[0].default.background,
+                    border: activeStyle.default.border,
+                    container: activeStyle.default.container,
+                    dimension: activeStyle.default.dimension,
+                    flexChild: activeStyle.default.flexChild,
+                    spacing: activeStyle.default.spacing,
+                    text: activeStyle.default.text
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
+        let progressStyle: [BasicStateStylingBlock<BaseStyles>] = [
+            .init(
+                default: BaseStyles(
+                    background: activeStyle.default.background,
+                    container: nil,
+                    dimension: .init(
+                        minWidth: nil,
+                        maxWidth: nil,
+                        width: shouldDisplayProgress ? .fixed(0) : activeStyle.default.dimension?.width,
+                        minHeight: nil,
+                        maxHeight: nil,
+                        height: activeStyle.default.dimension?.height,
+                        rotateZ: nil
+                    )
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
+        return (0..<positions).map {
+            ImageCarouselIndicatorItemViewModel(
+                index: Int32($0 + 1),
+                duration: duration,
+                progressStyle: progressStyle,
+                activeStyle: activeStylingProperties,
+                animatableStyle: animatableStyle,
+                indicatorStyle: indicatorStyle,
+                seenStyle: seenIndicatorStyle,
+                layoutState: layoutState,
+                shouldDisplayProgress: shouldDisplayProgress
             )
         }
-        return rowViewModels
     }
 
     func shouldUpdate(_ size: CGSize) {
