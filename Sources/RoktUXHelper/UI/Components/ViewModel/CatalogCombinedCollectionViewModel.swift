@@ -10,14 +10,15 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import Foundation
+import Combine
 import DcuiSchema
 
 @available(iOS 15, *)
-class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
+final class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSizeAdaptive, ObservableObject {
     typealias Item = CatalogCombinedCollectionStyles
 
     let id: UUID = UUID()
-    var children: [LayoutSchemaViewModel]?
+    @Published var children: [LayoutSchemaViewModel]?
     let defaultStyle: [CatalogCombinedCollectionStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
     private let childBuilder: ((CatalogItem) -> [LayoutSchemaViewModel]?)?
