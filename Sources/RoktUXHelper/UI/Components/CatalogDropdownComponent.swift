@@ -357,7 +357,7 @@ struct CatalogDropdownComponent: View {
 
     @ViewBuilder
     private func dropdownItemView(for index: Int) -> some View {
-        let isSelected = selectedItemIndex == index
+        let isSelected = persistedSelectedIndex == index
         let itemStyle = dropdownItemStyle(isSelected: isSelected)
         let itemContainerStyle = itemStyle?.container
         let itemDimensionStyle = itemStyle?.dimension

@@ -178,7 +178,7 @@
                       "provider.pricing.salesTax": "1.94",
                       "provider.pricing.totalPrice": "26.72"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": ""
                   },
                   {
                     "images": {
@@ -211,7 +211,7 @@
                     "cartItemId": "cartItemId1",
                     "instanceGuid": "CatalogItemInstanceGuidTwo",
                     "title": "Niagara Blue",
-                    "description": "One size, fits all.<br/>• Dip-dye clay effect</br>• 85% Cotton + 13% Polyamide + 2% Elastane</br>• Embroidery on leg</br>• Screenprint on foot</br>• Made in Portugal",
+                    "description": "One size, fits all.\n• Dip-dye clay effect\n• 85% Cotton + 13% Polyamide + 2% Elastane\n• Embroidery on leg\n• Screenprint on foot\n• Made in Portugal",
                     "price": 20,
                     "priceFormatted": "$20",
                     "originalPrice": 30,
@@ -239,7 +239,7 @@
                       "provider.pricing.salesTax": "1.94",
                       "provider.pricing.totalPrice": "26.72"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": ""
                   },
                   {
                     "images": {
@@ -300,7 +300,7 @@
                       "provider.pricing.salesTax": "1.94",
                       "provider.pricing.totalPrice": "26.72"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": ""
                   }
                 ],
                 "metadata": {}
