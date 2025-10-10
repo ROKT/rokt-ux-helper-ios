@@ -244,6 +244,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .dismissInstantPurchaseButton:
+                // unimplemented
+                throw LayoutTransformerError.InvalidMapping()
         }
     }
 
