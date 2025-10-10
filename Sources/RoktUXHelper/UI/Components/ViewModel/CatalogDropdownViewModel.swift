@@ -19,8 +19,12 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     let defaultStyle: [CatalogDropdownStyles]?
     let pressedStyle: [CatalogDropdownStyles]?
-    let hoveredStyle: [CatalogDropdownStyles]?
-    let disabledStyle: [CatalogDropdownStyles]?
+    let dropDownListItemDefaultStyle: [CatalogDropdownStyles]?
+    let dropDownListItemPressedStyle: [CatalogDropdownStyles]?
+    let dropDownSelectedItemDefaultStyle: [CatalogDropdownStyles]?
+    let dropDownSelectedItemPressedStyle: [CatalogDropdownStyles]?
+    let dropDownListContainerDefaultStyle: [CatalogDropdownStyles]?
+    let dropDownListContainerPressedStyle: [CatalogDropdownStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
     weak var eventService: EventDiagnosticServicing?
     let a11yLabel: String?
@@ -43,8 +47,12 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     init(layoutState: any LayoutStateRepresenting,
          defaultStyle: [CatalogDropdownStyles]?,
          pressedStyle: [CatalogDropdownStyles]?,
-         hoveredStyle: [CatalogDropdownStyles]?,
-         disabledStyle: [CatalogDropdownStyles]?,
+         dropDownListItemDefaultStyle: [CatalogDropdownStyles]?,
+         dropDownListItemPressedStyle: [CatalogDropdownStyles]?,
+         dropDownSelectedItemDefaultStyle: [CatalogDropdownStyles]?,
+         dropDownSelectedItemPressedStyle: [CatalogDropdownStyles]?,
+         dropDownListContainerDefaultStyle: [CatalogDropdownStyles]?,
+         dropDownListContainerPressedStyle: [CatalogDropdownStyles]?,
          a11yLabel: String?,
          openDropdownChildren: [LayoutSchemaViewModel],
          closedTemplate: LayoutSchemaViewModel?,
@@ -53,8 +61,12 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          eventService: EventDiagnosticServicing?) {
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
-        self.hoveredStyle = hoveredStyle
-        self.disabledStyle = disabledStyle
+        self.dropDownListItemDefaultStyle = dropDownListItemDefaultStyle
+        self.dropDownListItemPressedStyle = dropDownListItemPressedStyle
+        self.dropDownSelectedItemDefaultStyle = dropDownSelectedItemDefaultStyle
+        self.dropDownSelectedItemPressedStyle = dropDownSelectedItemPressedStyle
+        self.dropDownListContainerDefaultStyle = dropDownListContainerDefaultStyle
+        self.dropDownListContainerPressedStyle = dropDownListContainerPressedStyle
         self.layoutState = layoutState
         self.eventService = eventService
         self.a11yLabel = a11yLabel

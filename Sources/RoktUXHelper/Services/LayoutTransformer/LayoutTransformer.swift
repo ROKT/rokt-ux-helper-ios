@@ -244,6 +244,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .dismissInstantPurchaseButton:
+                // unimplemented
+                throw LayoutTransformerError.InvalidMapping()
         }
     }
 
@@ -804,11 +807,18 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             try transform(model.openTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
         } ?? []
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        let dropdownListItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListItem)
+        let dropdownSelectedItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownSelectedItem)
+        let dropdownListContainerStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListContainer)
         return CatalogDropdownViewModel(layoutState: layoutState,
-                                        defaultStyle: updateStyles.compactMap {$0.default},
-                                        pressedStyle: updateStyles.compactMap {$0.pressed},
-                                        hoveredStyle: updateStyles.compactMap {$0.hovered},
-                                        disabledStyle: updateStyles.compactMap {$0.disabled},
+                                        defaultStyle: updateStyles.compactMap { $0.default },
+                                        pressedStyle: updateStyles.compactMap { $0.pressed },
+                                        dropDownListItemDefaultStyle: dropdownListItemStyles.compactMap { $0.default },
+                                        dropDownListItemPressedStyle: dropdownListItemStyles.compactMap { $0.pressed },
+                                        dropDownSelectedItemDefaultStyle: dropdownSelectedItemStyles.compactMap { $0.default },
+                                        dropDownSelectedItemPressedStyle: dropdownSelectedItemStyles.compactMap { $0.pressed },
+                                        dropDownListContainerDefaultStyle: dropdownListContainerStyles.compactMap { $0.default },
+                                        dropDownListContainerPressedStyle: dropdownListContainerStyles.compactMap { $0.pressed },
                                         a11yLabel: model.a11yLabel,
                                         openDropdownChildren: openDropdownChildren,
                                         closedTemplate: closedTemplate,
