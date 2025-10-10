@@ -21,11 +21,12 @@ protocol FormValidationCoordinating: AnyObject {
 
     func registerField(
         key: String,
+        owner: AnyObject,
         validation: @escaping ValidationClosure,
         onStatusChange: @escaping (ValidationStatus) -> Void
     )
 
-    func unregisterField(for key: String)
+    func unregisterField(for key: String, owner: AnyObject)
 
     @discardableResult
     func validate(fields keys: [String]) -> Bool
@@ -39,6 +40,7 @@ final class FormValidationCoordinator: FormValidationCoordinating {
         var validation: ValidationClosure
         var onStatusChange: (ValidationStatus) -> Void
         var lastStatus: ValidationStatus?
+        var owner: ObjectIdentifier
     }
 
     private var registrations: [String: Registration] = [:]
@@ -46,6 +48,7 @@ final class FormValidationCoordinator: FormValidationCoordinating {
 
     func registerField(
         key: String,
+        owner: AnyObject,
         validation: @escaping ValidationClosure,
         onStatusChange: @escaping (ValidationStatus) -> Void
     ) {
@@ -53,14 +56,18 @@ final class FormValidationCoordinator: FormValidationCoordinating {
             self.registrations[key] = Registration(
                 validation: validation,
                 onStatusChange: onStatusChange,
-                lastStatus: nil
+                lastStatus: nil,
+                owner: ObjectIdentifier(owner)
             )
         }
     }
 
-    func unregisterField(for key: String) {
+    func unregisterField(for key: String, owner: AnyObject) {
         queue.async(flags: .barrier) {
-            self.registrations.removeValue(forKey: key)
+            guard let registration = self.registrations[key] else { return }
+            if registration.owner == ObjectIdentifier(owner) {
+                self.registrations.removeValue(forKey: key)
+            }
         }
     }
 

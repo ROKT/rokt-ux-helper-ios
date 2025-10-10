@@ -13,6 +13,7 @@ final class FormValidationCoordinatorTests: XCTestCase {
 
         coordinator.registerField(
             key: "field",
+            owner: self,
             validation: { shouldBeValid ? .valid : .invalid },
             onStatusChange: { status in
                 switch status {
@@ -39,12 +40,14 @@ final class FormValidationCoordinatorTests: XCTestCase {
 
         coordinator.registerField(
             key: "first",
+            owner: self,
             validation: { firstValid ? .valid : .invalid },
             onStatusChange: { _ in }
         )
 
         coordinator.registerField(
             key: "second",
+            owner: self,
             validation: { secondValid ? .valid : .invalid },
             onStatusChange: { _ in }
         )

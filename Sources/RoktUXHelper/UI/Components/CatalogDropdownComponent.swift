@@ -214,6 +214,7 @@ struct CatalogDropdownComponent: View {
 
         layoutState.validationCoordinator.registerField(
             key: key,
+            owner: self.model,
             validation: { validateSelectionStatus() },
             onStatusChange: { status in
                 showValidationError = status == .invalid
@@ -232,7 +233,7 @@ struct CatalogDropdownComponent: View {
             return
         }
 
-        layoutState.validationCoordinator.unregisterField(for: key)
+        layoutState.validationCoordinator.unregisterField(for: key, owner: self.model)
         isValidatorRegistered = false
         showValidationError = false
     }
@@ -398,10 +399,14 @@ struct CatalogDropdownComponent: View {
                     tapHandler: { toggleDropdownExpansion() }
                 )
             }
+            validationErrorView()
         }
         .onAppear {
             registerValidatorIfNeeded()
             syncSelectedItemFromLayoutState()
+        }
+        .onDisappear {
+            unregisterValidator()
         }
     }
 

@@ -12,6 +12,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
+            owner: self,
             validation: { isValid ? .valid : .invalid },
             onStatusChange: { _ in }
         )
@@ -41,6 +42,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
+            owner: self,
             validation: { isValid ? .valid : .invalid },
             onStatusChange: { _ in }
         )
