@@ -219,6 +219,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         style: model.styles,
                         children: transformChildren(model.children, context: context),
                         provider: model.provider,
+                        validatorTriggerConfig: model.validatorTriggerConfig,
                         context: context
                     )
                 )
@@ -759,15 +760,16 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         )
     }
 
-     func getCatalogDevicePayButtonModel(
-         style: LayoutStyle<
-             CatalogDevicePayButtonElements,
-             ConditionalStyleTransition<CatalogDevicePayButtonTransitions, WhenPredicate>
-         >?,
-         children: [LayoutSchemaViewModel]?,
-         provider: PaymentProvider,
-         context: Context
-     ) throws -> CatalogDevicePayButtonViewModel {
+    func getCatalogDevicePayButtonModel(
+        style: LayoutStyle<
+            CatalogDevicePayButtonElements,
+            ConditionalStyleTransition<CatalogDevicePayButtonTransitions, WhenPredicate>
+        >?,
+        children: [LayoutSchemaViewModel]?,
+        provider: PaymentProvider,
+        validatorTriggerConfig: ValidationTriggerConfig?,
+        context: Context
+    ) throws -> CatalogDevicePayButtonViewModel {
         guard case let .inner(.addToCart(catalogItem)) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }
@@ -781,7 +783,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             defaultStyle: updateStyles.compactMap {$0.default},
             pressedStyle: updateStyles.compactMap {$0.pressed},
             hoveredStyle: updateStyles.compactMap {$0.hovered},
-            disabledStyle: updateStyles.compactMap {$0.disabled}
+            disabledStyle: updateStyles.compactMap {$0.disabled},
+            validatorTriggerConfig: validatorTriggerConfig
         )
     }
 
@@ -810,6 +813,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         let dropdownListItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListItem)
         let dropdownSelectedItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownSelectedItem)
         let dropdownListContainerStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListContainer)
+        let validatorFieldKey = model.validatorFieldConfig?.validationFieldKey
+        let validatorRules = model.validatorFieldConfig?.validators ?? []
+        let validateOnChange = model.validatorFieldConfig?.validateOnChange ?? false
         return CatalogDropdownViewModel(layoutState: layoutState,
                                         defaultStyle: updateStyles.compactMap { $0.default },
                                         pressedStyle: updateStyles.compactMap { $0.pressed },
@@ -819,6 +825,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                         dropDownSelectedItemPressedStyle: dropdownSelectedItemStyles.compactMap { $0.pressed },
                                         dropDownListContainerDefaultStyle: dropdownListContainerStyles.compactMap { $0.default },
                                         dropDownListContainerPressedStyle: dropdownListContainerStyles.compactMap { $0.pressed },
+                                        validatorFieldKey: validatorFieldKey,
+                                        validatorRules: validatorRules,
+                                        validateOnChange: validateOnChange,
                                         a11yLabel: model.a11yLabel,
                                         openDropdownChildren: openDropdownChildren,
                                         closedTemplate: closedTemplate,

@@ -229,7 +229,7 @@ struct CatalogDevicePayButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        model.cartItemDevicePay()
+        model.handleTap()
     }
 
     private func updateStyleState() {

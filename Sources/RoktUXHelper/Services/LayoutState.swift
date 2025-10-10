@@ -34,6 +34,7 @@ class LayoutState: LayoutStateRepresenting {
     private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
     let config: RoktUXConfig?
+    let validationCoordinator: FormValidationCoordinating
 
     var items: [String: Any] {
         get {
@@ -66,11 +67,13 @@ class LayoutState: LayoutStateRepresenting {
 
     init(actionCollection: ActionCollecting = ActionCollection(),
          config: RoktUXConfig? = nil,
+         validationCoordinator: FormValidationCoordinating = FormValidationCoordinator(),
          pluginId: String? = nil,
          initialPluginViewState: RoktPluginViewState? = nil,
          onPluginViewStateChange: ((RoktPluginViewState) -> Void)? = nil) {
         self.actionCollection = actionCollection
         self.config = config
+        self.validationCoordinator = validationCoordinator
         self.pluginId = pluginId
         self.initialPluginViewState = initialPluginViewState
         self.onPluginViewStateChange = onPluginViewStateChange
