@@ -315,6 +315,7 @@ struct CatalogDropdownComponent: View {
                         .transition(.opacity)
                 }
             }
+            .zIndex(isExpanded ? 1000 : 0)
     }
 
     private func dropdownButton() -> some View {
