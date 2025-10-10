@@ -12,6 +12,41 @@
 import SwiftUI
 import Combine
 import DcuiSchema
+import UIKit
+
+private final class FrameObserverView: UIView {
+    var onFrameChange: ((CGRect) -> Void)?
+    private var lastFrame: CGRect = .zero
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard let superview = superview else { return }
+        let convertedFrame = superview.convert(bounds, to: nil)
+        guard convertedFrame != lastFrame else { return }
+        lastFrame = convertedFrame
+        onFrameChange?(convertedFrame)
+    }
+}
+
+private struct ViewFrameReader: UIViewRepresentable {
+    let onChange: (CGRect) -> Void
+
+    func makeUIView(context: Context) -> FrameObserverView {
+        let view = FrameObserverView()
+        view.isUserInteractionEnabled = false
+        view.backgroundColor = .clear
+        view.onFrameChange = onChange
+        return view
+    }
+
+    func updateUIView(_ uiView: FrameObserverView, context: Context) {
+        uiView.onFrameChange = onChange
+    }
+
+    static func dismantleUIView(_ uiView: FrameObserverView, coordinator: ()) {
+        uiView.onFrameChange = nil
+    }
+}
 
 @available(iOS 15, *)
 struct CatalogDropdownComponent: View {
@@ -56,10 +91,10 @@ struct CatalogDropdownComponent: View {
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
     @State private var isExpanded: Bool = false
-    @State private var buttonHeight: CGFloat = 0
     @State private var selectedItemIndex: Int?
     @State private var isPressed: Bool = false
     @State private var isDisabled: Bool = false
+    @State private var buttonFrameInGlobal: CGRect = .zero
 
     let parentOverride: ComponentParentOverride?
 
@@ -209,71 +244,77 @@ struct CatalogDropdownComponent: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            dropdownButton()
-                .zIndex(1)
-
-            if isExpanded {
-                expandedBackground()
-                    .zIndex(0)
-
-                expandedDropdown()
-                    .zIndex(2)
+        let base = dropdownButton()
+            .accessibilityAddTraits(.isButton)
+            .onHover { isHovered in
+                self.isHovered = isHovered
+                updateStyleState()
             }
-        }
-        .accessibilityAddTraits(.isButton)
-        .onHover { isHovered in
-            self.isHovered = isHovered
-            updateStyleState()
-        }
-        .applyLayoutModifier(
-            verticalAlignmentProperty: verticalAlignment,
-            horizontalAlignmentProperty: horizontalAlignment,
-            spacing: spacingStyle,
-            dimension: dimensionStyle,
-            flex: flexStyle,
-            border: borderStyle,
-            background: backgroundStyle,
-            container: containerStyle,
-            parent: config.parent,
-            parentWidth: $parentWidth,
-            parentHeight: $parentHeight,
-            parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
-            defaultHeight: .wrapContent,
-            defaultWidth: .wrapContent,
-            isContainer: true,
-            containerType: .column,
-            frameChangeIndex: $frameChangeIndex,
-            imageLoader: model.imageLoader
-        )
-        .readSize(spacing: spacingStyle) { size in
-            availableWidth = size.width
-            availableHeight = size.height
-        }
-        .onChange(of: globalScreenSize.width) { newSize in
-            // run it in background thread for smooth transition
-            DispatchQueue.background.async {
-                breakpointIndex = model.updateBreakpointIndex(for: newSize)
-                frameChangeIndex += 1
-                dropdownFrameChangeIndex += 1
+            .applyLayoutModifier(
+                verticalAlignmentProperty: verticalAlignment,
+                horizontalAlignmentProperty: horizontalAlignment,
+                spacing: spacingStyle,
+                dimension: dimensionStyle,
+                flex: flexStyle,
+                border: borderStyle,
+                background: backgroundStyle,
+                container: containerStyle,
+                parent: config.parent,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
+                defaultHeight: .wrapContent,
+                defaultWidth: .wrapContent,
+                isContainer: true,
+                containerType: .column,
+                frameChangeIndex: $frameChangeIndex,
+                imageLoader: model.imageLoader
+            )
+            .readSize(spacing: spacingStyle) { size in
+                availableWidth = size.width
+                availableHeight = size.height
             }
-        }
-        .contentShape(Rectangle())
-        .alignSelf(alignSelf: flexStyle?.alignSelf,
-                   parent: config.parent,
-                   parentHeight: parentHeight,
-                   parentWidth: parentWidth,
-                   parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
-                   parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
-                   applyAlignSelf: true)
-        .margin(spacing: spacingStyle, applyMargin: true)
-        .readSize(spacing: spacingStyle) { size in
-            availableWidth = size.width
-            availableHeight = size.height
-        }
-        .onReceive(layoutItemsPublisher) { _ in
-            syncSelectedItemFromLayoutState()
-        }
+            .onChange(of: globalScreenSize.width) { newSize in
+                // run it in background thread for smooth transition
+                DispatchQueue.background.async {
+                    breakpointIndex = model.updateBreakpointIndex(for: newSize)
+                    frameChangeIndex += 1
+                    dropdownFrameChangeIndex += 1
+                }
+            }
+            .contentShape(Rectangle())
+            .alignSelf(alignSelf: flexStyle?.alignSelf,
+                       parent: config.parent,
+                       parentHeight: parentHeight,
+                       parentWidth: parentWidth,
+                       parentVerticalAlignment: parentOverride?.parentVerticalAlignment,
+                       parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
+                       applyAlignSelf: true)
+            .margin(spacing: spacingStyle, applyMargin: true)
+            .readSize(spacing: spacingStyle) { size in
+                availableWidth = size.width
+                availableHeight = size.height
+            }
+            .onReceive(layoutItemsPublisher) { _ in
+                syncSelectedItemFromLayoutState()
+            }
+        return base
+            .background(
+                ViewFrameReader { frame in
+                    guard frame != .zero else { return }
+                    DispatchQueue.main.async {
+                        if buttonFrameInGlobal != frame {
+                            buttonFrameInGlobal = frame
+                        }
+                    }
+                }
+            )
+            .overlay(alignment: .topLeading) {
+                if isExpanded, buttonFrameInGlobal != .zero {
+                    expandedOverlayView()
+                        .transition(.opacity)
+                }
+            }
     }
 
     private func dropdownButton() -> some View {
@@ -309,13 +350,6 @@ struct CatalogDropdownComponent: View {
             parentHeight: $parentHeight,
             styleState: $styleState,
             parentOverride: parentOverride
-        )
-        .background(
-            GeometryReader { geometry in
-                Color.clear
-                    .onAppear { updateButtonHeight(with: geometry.size.height) }
-                    .onChange(of: geometry.size.height) { updateButtonHeight(with: $0) }
-            }
         )
         .onTapGesture(perform: tapHandler)
     }
@@ -405,7 +439,27 @@ struct CatalogDropdownComponent: View {
         .ifLet(dropdownMinimumWidth) { view, minWidth in
             view.frame(minWidth: minWidth, alignment: .leading)
         }
-        .offset(y: buttonHeight)
+    }
+
+    @ViewBuilder
+    private func expandedOverlayView() -> some View {
+        let overlayWidth = globalScreenSize.width ?? UIScreen.main.bounds.width
+        let overlayHeight = globalScreenSize.height ?? UIScreen.main.bounds.height
+        ZStack(alignment: .topLeading) {
+            expandedBackground()
+                .frame(width: overlayWidth,
+                       height: overlayHeight,
+                       alignment: .topLeading)
+            expandedDropdown()
+                .offset(x: buttonFrameInGlobal.minX,
+                        y: buttonFrameInGlobal.maxY)
+        }
+        .frame(width: overlayWidth,
+               height: overlayHeight,
+               alignment: .topLeading)
+        .offset(x: -buttonFrameInGlobal.minX,
+                y: -buttonFrameInGlobal.minY)
+        .ignoresSafeArea()
     }
 
     @ViewBuilder
@@ -435,11 +489,6 @@ struct CatalogDropdownComponent: View {
 
     private func toggleDropdownExpansion() {
         isExpanded.toggle()
-    }
-
-    private func updateButtonHeight(with height: CGFloat) {
-        guard buttonHeight != height else { return }
-        buttonHeight = height
     }
 
     private func selectItem(at index: Int) {
