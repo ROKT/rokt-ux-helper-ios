@@ -362,16 +362,6 @@ struct CatalogDropdownComponent: View {
                 syncSelectedItemFromLayoutState()
             }
         return base
-            .background(
-                ViewFrameReader { frame in
-                    guard frame != .zero else { return }
-                    DispatchQueue.main.async {
-                        if buttonFrameInGlobal != frame {
-                            buttonFrameInGlobal = frame
-                        }
-                    }
-                }
-            )
             .overlay(alignment: .topLeading) {
                 if isExpanded, buttonFrameInGlobal != .zero {
                     expandedOverlayView()
@@ -386,19 +376,7 @@ struct CatalogDropdownComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            if hasPersistedSelection,
-               selectedItemIndex != nil,
-               let closedTemplate = model.closedTemplate {
-                dropdownButtonContent(
-                    layout: closedTemplate,
-                    tapHandler: { toggleDropdownExpansion() }
-                )
-            } else if let closedDefaultTemplate = model.closedDefaultTemplate {
-                dropdownButtonContent(
-                    layout: closedDefaultTemplate,
-                    tapHandler: { toggleDropdownExpansion() }
-                )
-            }
+            dropdownButtonPrimaryContent()
             validationErrorView()
         }
         .onAppear {
@@ -407,6 +385,23 @@ struct CatalogDropdownComponent: View {
         }
         .onDisappear {
             unregisterValidator()
+        }
+    }
+
+    @ViewBuilder
+    private func dropdownButtonPrimaryContent() -> some View {
+        if hasPersistedSelection,
+           selectedItemIndex != nil,
+           let closedTemplate = model.closedTemplate {
+            dropdownButtonContent(
+                layout: closedTemplate,
+                tapHandler: { toggleDropdownExpansion() }
+            )
+        } else if let closedDefaultTemplate = model.closedDefaultTemplate {
+            dropdownButtonContent(
+                layout: closedDefaultTemplate,
+                tapHandler: { toggleDropdownExpansion() }
+            )
         }
     }
 
@@ -438,6 +433,16 @@ struct CatalogDropdownComponent: View {
             parentOverride: parentOverride
         )
         .onTapGesture(perform: tapHandler)
+        .background(
+            ViewFrameReader { frame in
+                guard frame != .zero else { return }
+                DispatchQueue.main.async {
+                    if buttonFrameInGlobal != frame {
+                        buttonFrameInGlobal = frame
+                    }
+                }
+            }
+        )
     }
 
     @ViewBuilder
