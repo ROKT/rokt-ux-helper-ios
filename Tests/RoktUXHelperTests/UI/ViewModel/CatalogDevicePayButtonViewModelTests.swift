@@ -13,7 +13,9 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
             owner: self,
-            validation: { isValid ? .valid : .invalid },
+            validation: {
+                return isValid ? .valid : .invalid
+            },
             onStatusChange: { _ in }
         )
 
@@ -29,9 +31,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             disabledStyle: nil,
             validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
-
         sut.handleTap()
-
         XCTAssertFalse(eventService.cartItemDevicePayCalled)
     }
 
@@ -43,7 +43,9 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
             owner: self,
-            validation: { isValid ? .valid : .invalid },
+            validation: {
+                return isValid ? .valid : .invalid
+            },
             onStatusChange: { _ in }
         )
 
