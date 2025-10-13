@@ -1,5 +1,5 @@
 //
-//  TestImageCarouselIndicatorItemViewModel.swift
+//  TestImageCarouselIndicatorViewModel.swift
 //  RoktUXHelper
 //
 //  Copyright 2020 Rokt Pte Ltd
