@@ -28,6 +28,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let pressedStyle: [CatalogDevicePayButtonStyles]?
     let hoveredStyle: [CatalogDevicePayButtonStyles]?
     let disabledStyle: [CatalogDevicePayButtonStyles]?
+    let validatorTriggerConfig: ValidationTriggerConfig?
 
     init(
         catalogItem: CatalogItem?,
@@ -38,7 +39,8 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         defaultStyle: [CatalogDevicePayButtonStyles]?,
         pressedStyle: [CatalogDevicePayButtonStyles]?,
         hoveredStyle: [CatalogDevicePayButtonStyles]?,
-        disabledStyle: [CatalogDevicePayButtonStyles]?
+        disabledStyle: [CatalogDevicePayButtonStyles]?,
+        validatorTriggerConfig: ValidationTriggerConfig?
     ) {
         self.catalogItem = catalogItem
         self.children = children
@@ -49,11 +51,26 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
+        self.validatorTriggerConfig = validatorTriggerConfig
     }
 
     func cartItemDevicePay() {
         if let catalogItem {
             eventService?.cartItemDevicePay(catalogItem: catalogItem, paymentProvider: provider)
         }
+    }
+
+    func handleTap() {
+        guard shouldProceedAfterValidation() else { return }
+        cartItemDevicePay()
+    }
+
+    private func shouldProceedAfterValidation() -> Bool {
+        guard let triggerConfig = validatorTriggerConfig,
+              !triggerConfig.validatorFieldKeys.isEmpty,
+              let coordinator = layoutState?.validationCoordinator else {
+            return true
+        }
+        return coordinator.validate(fields: triggerConfig.validatorFieldKeys)
     }
 }

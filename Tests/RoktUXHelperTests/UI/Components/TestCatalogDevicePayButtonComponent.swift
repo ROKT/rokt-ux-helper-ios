@@ -147,6 +147,7 @@ extension LayoutSchemaViewModel {
                     context: .inner(.addToCart(catalogItem))
                 ),
                 provider: catalogDevicePayButton.provider,
+                validatorTriggerConfig: catalogDevicePayButton.validatorTriggerConfig,
                 context: .inner(.addToCart(catalogItem))
             )
         )

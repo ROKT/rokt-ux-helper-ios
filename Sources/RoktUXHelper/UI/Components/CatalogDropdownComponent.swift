@@ -80,6 +80,9 @@ struct CatalogDropdownComponent: View {
     var dropdownListContainerBorderStyle: BorderStylingProperties? { dropdownListContainerStyle?.border }
     var dropdownListContainerSpacingStyle: SpacingStylingProperties? { dropdownListContainerStyle?.spacing }
     var dropdownListContainerBackgroundStyle: BackgroundStylingProperties? { dropdownListContainerStyle?.background }
+    private var validationFieldKey: String? { model.validatorFieldKey }
+    private var validatorRules: [CatalogDropDownValidators] { model.validatorRules }
+    private var shouldValidateOnChange: Bool { model.validateOnChange }
 
     let config: ComponentConfig
     let model: CatalogDropdownViewModel
@@ -95,6 +98,8 @@ struct CatalogDropdownComponent: View {
     @State private var isPressed: Bool = false
     @State private var isDisabled: Bool = false
     @State private var buttonFrameInGlobal: CGRect = .zero
+    @State private var showValidationError: Bool = false
+    @State private var isValidatorRegistered: Bool = false
 
     let parentOverride: ComponentParentOverride?
 
@@ -199,6 +204,65 @@ struct CatalogDropdownComponent: View {
         return .start
     }
 
+    private func registerValidatorIfNeeded() {
+        guard !isValidatorRegistered,
+              let key = validationFieldKey,
+              let layoutState = model.layoutState,
+              !validatorRules.isEmpty else {
+            return
+        }
+
+        layoutState.validationCoordinator.registerField(
+            key: key,
+            owner: self.model,
+            validation: { validateSelectionStatus() },
+            onStatusChange: { status in
+                showValidationError = status == .invalid
+            }
+        )
+
+        isValidatorRegistered = true
+        showValidationError = false
+    }
+
+    private func unregisterValidator() {
+        guard isValidatorRegistered,
+              let key = validationFieldKey,
+              let layoutState = model.layoutState else {
+            showValidationError = false
+            return
+        }
+
+        layoutState.validationCoordinator.unregisterField(for: key, owner: self.model)
+        isValidatorRegistered = false
+        showValidationError = false
+    }
+
+    private func notifyValidationOfSelectionChange() {
+        guard isValidatorRegistered,
+              let key = validationFieldKey,
+              let layoutState = model.layoutState else { return }
+
+        if shouldValidateOnChange || showValidationError {
+            layoutState.validationCoordinator.validate(field: key)
+        }
+    }
+
+    private func validateSelectionStatus() -> ValidationStatus {
+        guard !validatorRules.isEmpty else { return .valid }
+
+        for rule in validatorRules {
+            switch rule {
+            case .required:
+                if persistedSelectedIndex == nil {
+                    return .invalid
+                }
+            }
+        }
+
+        return .valid
+    }
+
     var verticalAlignment: VerticalAlignmentProperty {
         if let justifyContent = containerStyle?.justifyContent?.asVerticalAlignmentProperty {
             return justifyContent
@@ -275,7 +339,6 @@ struct CatalogDropdownComponent: View {
                 availableHeight = size.height
             }
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
                 DispatchQueue.background.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
@@ -299,16 +362,6 @@ struct CatalogDropdownComponent: View {
                 syncSelectedItemFromLayoutState()
             }
         return base
-            .background(
-                ViewFrameReader { frame in
-                    guard frame != .zero else { return }
-                    DispatchQueue.main.async {
-                        if buttonFrameInGlobal != frame {
-                            buttonFrameInGlobal = frame
-                        }
-                    }
-                }
-            )
             .overlay(alignment: .topLeading) {
                 if isExpanded, buttonFrameInGlobal != .zero {
                     expandedOverlayView()
@@ -323,21 +376,48 @@ struct CatalogDropdownComponent: View {
             alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
             spacing: CGFloat(containerStyle?.gap ?? 0)
         ) {
-            if hasPersistedSelection,
-               selectedItemIndex != nil,
-               let closedTemplate = model.closedTemplate {
-                dropdownButtonContent(
-                    layout: closedTemplate,
-                    tapHandler: { toggleDropdownExpansion() }
-                )
-            } else if let closedDefaultTemplate = model.closedDefaultTemplate {
-                dropdownButtonContent(
-                    layout: closedDefaultTemplate,
-                    tapHandler: { toggleDropdownExpansion() }
-                )
-            }
+            dropdownButtonPrimaryContent()
+            validationErrorView()
         }
-        .onAppear(perform: syncSelectedItemFromLayoutState)
+        .onAppear {
+            registerValidatorIfNeeded()
+            syncSelectedItemFromLayoutState()
+        }
+        .onDisappear {
+            unregisterValidator()
+        }
+    }
+
+    @ViewBuilder
+    private func dropdownButtonPrimaryContent() -> some View {
+        if hasPersistedSelection,
+           selectedItemIndex != nil,
+           let closedTemplate = model.closedTemplate {
+            dropdownButtonContent(
+                layout: closedTemplate,
+                tapHandler: { toggleDropdownExpansion() }
+            )
+        } else if let closedDefaultTemplate = model.closedDefaultTemplate {
+            dropdownButtonContent(
+                layout: closedDefaultTemplate,
+                tapHandler: { toggleDropdownExpansion() }
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func validationErrorView() -> some View {
+        if showValidationError,
+           let errorTemplate = model.requiredSelectionErrorTemplate {
+            LayoutSchemaComponent(
+                config: config,
+                layout: errorTemplate,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
+        }
     }
 
     private func dropdownButtonContent(
@@ -353,6 +433,16 @@ struct CatalogDropdownComponent: View {
             parentOverride: parentOverride
         )
         .onTapGesture(perform: tapHandler)
+        .background(
+            ViewFrameReader { frame in
+                guard frame != .zero else { return }
+                DispatchQueue.main.async {
+                    if buttonFrameInGlobal != frame {
+                        buttonFrameInGlobal = frame
+                    }
+                }
+            }
+        )
     }
 
     @ViewBuilder
@@ -504,24 +594,32 @@ struct CatalogDropdownComponent: View {
         let selectedItem = model.catalogItems[index]
         model.layoutState?.items[LayoutState.activeCatalogItemKey] = selectedItem
         model.layoutState?.publishStateChange()
+        notifyValidationOfSelectionChange()
     }
 
     private func syncSelectedItemFromLayoutState() {
         if let persistedIndex = persistedSelectedIndex {
             guard persistedIndex >= 0, persistedIndex < model.catalogItems.count else {
                 persistSelectedIndex(nil)
-                selectedItemIndex = nil
+                if selectedItemIndex != nil {
+                    selectedItemIndex = nil
+                    notifyValidationOfSelectionChange()
+                }
                 return
             }
 
             if selectedItemIndex != persistedIndex {
                 selectedItemIndex = persistedIndex
+                notifyValidationOfSelectionChange()
             }
             return
         }
 
         guard let activeItem = model.layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem else {
-            selectedItemIndex = nil
+            if selectedItemIndex != nil {
+                selectedItemIndex = nil
+                notifyValidationOfSelectionChange()
+            }
             return
         }
 
@@ -533,8 +631,12 @@ struct CatalogDropdownComponent: View {
 
         if let index = model.catalogItems.firstIndex(where: { $0.catalogItemId == activeItem.catalogItemId }) {
             selectedItemIndex = index
+            notifyValidationOfSelectionChange()
         } else {
-            selectedItemIndex = nil
+            if selectedItemIndex != nil {
+                selectedItemIndex = nil
+                notifyValidationOfSelectionChange()
+            }
         }
     }
 
