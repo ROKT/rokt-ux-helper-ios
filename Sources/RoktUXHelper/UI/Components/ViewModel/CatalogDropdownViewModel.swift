@@ -32,6 +32,9 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let closedTemplate: LayoutSchemaViewModel?
     let closedDefaultTemplate: LayoutSchemaViewModel?
     let requiredSelectionErrorTemplate: LayoutSchemaViewModel?
+    let validatorFieldKey: String?
+    let validatorRules: [CatalogDropDownValidators]
+    let validateOnChange: Bool
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -53,6 +56,9 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          dropDownSelectedItemPressedStyle: [CatalogDropdownStyles]?,
          dropDownListContainerDefaultStyle: [CatalogDropdownStyles]?,
          dropDownListContainerPressedStyle: [CatalogDropdownStyles]?,
+         validatorFieldKey: String?,
+         validatorRules: [CatalogDropDownValidators],
+         validateOnChange: Bool,
          a11yLabel: String?,
          openDropdownChildren: [LayoutSchemaViewModel],
          closedTemplate: LayoutSchemaViewModel?,
@@ -74,5 +80,8 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.closedTemplate = closedTemplate
         self.closedDefaultTemplate = closedDefaultTemplate
         self.requiredSelectionErrorTemplate = requiredSelectionErrorTemplate
+        self.validatorFieldKey = validatorFieldKey
+        self.validatorRules = validatorRules
+        self.validateOnChange = validateOnChange
     }
 }

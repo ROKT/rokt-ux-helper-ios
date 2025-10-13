@@ -13,6 +13,7 @@ class MockLayoutState: LayoutStateRepresenting {
     var colorMode: RoktUXConfig.ColorMode?
     var config: RoktUXConfig?
     var initialPluginViewState: RoktPluginViewState?
+    var validationCoordinator: FormValidationCoordinating = FormValidationCoordinator()
     private var currentLayoutType: RoktUXPlacementLayoutCode = .overlayLayout
     var shouldCloseOnComplete: Bool = false
     var mockBreakpointIndex: Int = 0

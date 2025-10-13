@@ -4,12 +4,9 @@ import Foundation
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
-class MockEventService: EventServicing & DiagnosticServicing {
+class MockEventService: EventDiagnosticServicing {
     // MARK: - Test Tracking Properties
 
-    var pluginInstanceGuid: String = "test-plugin-instance-guid"
-    var pluginConfigJWTToken: String = "test-jwt-token"
-    var useDiagnosticEvents: Bool = true
     var dismissalCollapsedEventSent = false
     var dismissalNoMoreOfferEventSent = false
     var signalLoadStartEventCalled = false
@@ -28,29 +25,25 @@ class MockEventService: EventServicing & DiagnosticServicing {
     var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var diagnosticsSent: [(message: String, callStack: String, severity: Severity)] = []
+    var fontDiagnosticsSent: [String] = []
+    var eventsSent: [(
+        eventType: RoktUXEventType,
+        parentGuid: String,
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
+        jwtToken: String
+    )] = []
     var cartItemDevicePayCompletionCallback: (() -> Void)? = nil
 
     // MARK: - Protocol Properties
 
     var dismissOption: LayoutDismissOptions?
+    var pluginInstanceGuid: String = "mock-instance"
+    var pluginConfigJWTToken: String = "mock-token"
+    var useDiagnosticEvents: Bool = false
 
     // MARK: - Protocol Methods
-
-    func sendEvent(
-        _ eventType: RoktUXEventType,
-        parentGuid: String,
-        extraMetadata: [RoktEventNameValue],
-        eventData: [String: String],
-        jwtToken: String
-    ) {}
-
-    func sendDiagnostics(
-        message: String,
-        callStack: String,
-        severity: Severity
-    ) {}
-
-    func sendFontDiagnostics(_ fontFamily: String) {}
 
     func sendSignalLoadStartEvent() {
         signalLoadStartEventCalled = true
@@ -121,6 +114,28 @@ class MockEventService: EventServicing & DiagnosticServicing {
         cartItemDevicePayCompletionCallback = nil
     }
 
+    func sendEvent(
+        _ eventType: RoktUXEventType,
+        parentGuid: String,
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
+        jwtToken: String
+    ) {
+        eventsSent.append((eventType, parentGuid, extraMetadata, eventData, jwtToken))
+    }
+
+    func sendDiagnostics(
+        message: String,
+        callStack: String,
+        severity: Severity
+    ) {
+        diagnosticsSent.append((message, callStack, severity))
+    }
+
+    func sendFontDiagnostics(_ fontFamily: String) {
+        fontDiagnosticsSent.append(fontFamily)
+    }
+
     // MARK: - Additional Test Methods
 
     func sendImpressionEvents(currentOffer: Int) {
@@ -158,5 +173,8 @@ class MockEventService: EventServicing & DiagnosticServicing {
         cartItemDevicePayFailureCalled = false
         cartItemDevicePayCompletionCallback = nil
         dismissOption = nil
+        diagnosticsSent = []
+        fontDiagnosticsSent = []
+        eventsSent = []
     }
 }
