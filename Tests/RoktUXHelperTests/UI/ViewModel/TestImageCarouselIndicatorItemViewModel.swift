@@ -43,9 +43,11 @@ class TestImageCarouselIndicatorItemViewModel: XCTestCase {
         let sut = ImageCarouselIndicatorItemViewModel(
             index: 0,
             duration: 1000,
-            progressStyle: .init(default: .init(), pressed: nil, hovered: nil, disabled: nil),
-            inactiveStyle: nil,
+            progressStyle: [.init(default: .init(), pressed: nil, hovered: nil, disabled: nil)],
             activeStyle: nil,
+            animatableStyle: nil,
+            indicatorStyle: nil,
+            seenStyle: nil,
             layoutState: nil,
             shouldDisplayProgress: false
         )
@@ -56,7 +58,7 @@ class TestImageCarouselIndicatorItemViewModel: XCTestCase {
             return
         }
         
-        XCTAssertEqual(children.count, 2)
+        XCTAssertEqual(children.count, 3)
         
         testWhenNode(node: children[0]) { whenModel in
             guard let children = whenModel.children else {
@@ -65,7 +67,7 @@ class TestImageCarouselIndicatorItemViewModel: XCTestCase {
             }
             XCTAssertEqual(children.count, 1)
             testRowNode(node: children[0]) { activeRowItem in
-                XCTAssertEqual(activeRowItem.children?.count, 1)
+                XCTAssertEqual(activeRowItem.children?.count, 0)
             }
         }
         
@@ -77,7 +79,19 @@ class TestImageCarouselIndicatorItemViewModel: XCTestCase {
             XCTAssertEqual(children.count, 1)
             
             testRowNode(node: children[0]) { inactiveRowItem in
-                XCTAssertEqual(inactiveRowItem.children?.count, 0)
+                XCTAssertEqual(inactiveRowItem.children?.count, 1)
+            }
+        }
+        
+        testWhenNode(node: children[2]) { whenModel in
+            guard let children = whenModel.children else {
+                XCTFail("Should have children")
+                return
+            }
+            XCTAssertEqual(children.count, 1)
+            
+            testRowNode(node: children[0]) { notSeenRowItem in
+                XCTAssertEqual(notSeenRowItem.children?.count, 0)
             }
         }
     }
