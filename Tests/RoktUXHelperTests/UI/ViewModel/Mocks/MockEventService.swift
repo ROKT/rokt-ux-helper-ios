@@ -4,9 +4,12 @@ import Foundation
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
-class MockEventService: EventServicing {
+class MockEventService: EventServicing & DiagnosticServicing {
     // MARK: - Test Tracking Properties
 
+    var pluginInstanceGuid: String = "test-plugin-instance-guid"
+    var pluginConfigJWTToken: String = "test-jwt-token"
+    var useDiagnosticEvents: Bool = true
     var dismissalCollapsedEventSent = false
     var dismissalNoMoreOfferEventSent = false
     var signalLoadStartEventCalled = false
@@ -25,12 +28,29 @@ class MockEventService: EventServicing {
     var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemDevicePayCompletionCallback: (() -> Void)? = nil
 
     // MARK: - Protocol Properties
 
     var dismissOption: LayoutDismissOptions?
 
     // MARK: - Protocol Methods
+
+    func sendEvent(
+        _ eventType: RoktUXEventType,
+        parentGuid: String,
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
+        jwtToken: String
+    ) {}
+
+    func sendDiagnostics(
+        message: String,
+        callStack: String,
+        severity: Severity
+    ) {}
+
+    func sendFontDiagnostics(_ fontFamily: String) {}
 
     func sendSignalLoadStartEvent() {
         signalLoadStartEventCalled = true
@@ -85,16 +105,20 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider, completion: @escaping () -> Void) {
         cartItemDevicePayCalled = true
+        cartItemDevicePayCompletionCallback = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
         cartItemDevicePaySuccessCalled = true
+        cartItemDevicePayCompletionCallback?()
+        cartItemDevicePayCompletionCallback = nil
     }
 
     func cartItemDevicePayFailure(itemId: String) {
         cartItemDevicePayFailureCalled = true
+        cartItemDevicePayCompletionCallback = nil
     }
 
     // MARK: - Additional Test Methods
@@ -132,6 +156,7 @@ class MockEventService: EventServicing {
         cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemDevicePayCompletionCallback = nil
         dismissOption = nil
     }
 }
