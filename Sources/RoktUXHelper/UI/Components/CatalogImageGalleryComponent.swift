@@ -152,58 +152,68 @@ struct CatalogImageGalleryComponent: View {
     }
 
     private var thumbnailsView: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
-                   spacing: CGFloat(containerStyle?.gap ?? 8)) {
-                ForEach(Array(model.images.enumerated()), id: \.element.id) { index, imageViewModel in
-                    let isSelected = index == selectedIndex
-                    DataImageViewComponent(
-                        config: config.updateParent(.row),
-                        model: imageViewModel,
-                        parentWidth: .constant(nil),
-                        parentHeight: .constant(nil),
-                        styleState: $styleState,
-                        parentOverride: ComponentParentOverride(
-                            parentVerticalAlignment: .center,
-                            parentHorizontalAlignment: .center,
-                            parentBackgroundStyle: passableBackgroundStyle,
-                            stretchChildren: false
-                        ),
-                        expandsToContainerOnSelfAlign: false
-                    )
-                    .applyLayoutModifier(
-                        verticalAlignmentProperty: .center,
-                        horizontalAlignmentProperty: .center,
-                        spacing: model.thumbnailSpacing(breakpointIndex: breakpointIndex),
-                        dimension: model.thumbnailDimension(for: styleState, breakpointIndex: breakpointIndex),
-                        flex: nil,
-                        border: model.borderForThumbnail(
-                            isSelected: isSelected,
-                            state: styleState,
-                            breakpointIndex: breakpointIndex
-                        ),
-                        background: model.backgroundForThumbnail(state: styleState, breakpointIndex: breakpointIndex),
-                        container: nil,
-                        parent: config.parent,
-                        parentWidth: .constant(nil),
-                        parentHeight: .constant(nil),
-                        parentOverride: parentOverride,
-                        defaultHeight: .wrapContent,
-                        defaultWidth: .wrapContent,
-                        expandsToContainerOnSelfAlign: false,
-                        isContainer: false,
-                        containerType: .row,
-                        frameChangeIndex: .constant(0),
-                        imageLoader: model.imageLoader
-                    )
-                    .onTapGesture {
-                        withAnimation(.easeInOut) {
-                            selectedIndex = index
+        ScrollViewReader { scrollProxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
+                       spacing: CGFloat(containerStyle?.gap ?? 8)) {
+                    ForEach(Array(model.images.enumerated()), id: \.element.id) { index, imageViewModel in
+                        let isSelected = index == selectedIndex
+                        DataImageViewComponent(
+                            config: config.updateParent(.row),
+                            model: imageViewModel,
+                            parentWidth: .constant(nil),
+                            parentHeight: .constant(nil),
+                            styleState: $styleState,
+                            parentOverride: ComponentParentOverride(
+                                parentVerticalAlignment: .center,
+                                parentHorizontalAlignment: .center,
+                                parentBackgroundStyle: passableBackgroundStyle,
+                                stretchChildren: false
+                            ),
+                            expandsToContainerOnSelfAlign: false
+                        )
+                        .applyLayoutModifier(
+                            verticalAlignmentProperty: .center,
+                            horizontalAlignmentProperty: .center,
+                            spacing: model.thumbnailSpacing(breakpointIndex: breakpointIndex),
+                            dimension: model.thumbnailDimension(for: styleState, breakpointIndex: breakpointIndex),
+                            flex: nil,
+                            border: model.borderForThumbnail(
+                                isSelected: isSelected,
+                                state: styleState,
+                                breakpointIndex: breakpointIndex
+                            ),
+                            background: model.backgroundForThumbnail(
+                                state: styleState,
+                                breakpointIndex: breakpointIndex
+                            ),
+                            container: nil,
+                            parent: config.parent,
+                            parentWidth: .constant(nil),
+                            parentHeight: .constant(nil),
+                            parentOverride: parentOverride,
+                            defaultHeight: .wrapContent,
+                            defaultWidth: .wrapContent,
+                            expandsToContainerOnSelfAlign: false,
+                            isContainer: false,
+                            containerType: .row,
+                            frameChangeIndex: .constant(0),
+                            imageLoader: model.imageLoader
+                        )
+                        .id(index)
+                        .onTapGesture {
+                            withAnimation(.easeInOut) {
+                                selectedIndex = index
+                                scrollToThumbnail(at: index, proxy: scrollProxy)
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, horizontalInset)
             }
-            .padding(.horizontal, horizontalInset)
+            .onChange(of: selectedIndex) { newIndex in
+                scrollToThumbnail(at: newIndex, proxy: scrollProxy)
+            }
         }
     }
 
@@ -234,6 +244,12 @@ struct CatalogImageGalleryComponent: View {
         guard selectedIndex > 0 else { return }
         withAnimation(.easeInOut) {
             selectedIndex -= 1
+        }
+    }
+
+    private func scrollToThumbnail(at index: Int, proxy: ScrollViewProxy) {
+        withAnimation(.easeInOut) {
+            proxy.scrollTo(index, anchor: .center)
         }
     }
 }
