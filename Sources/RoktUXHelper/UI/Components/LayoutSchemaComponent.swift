@@ -224,6 +224,15 @@ struct LayoutSchemaComponent: View {
                 styleState: $styleState,
                 parentOverride: parentOverride
             )
+        case .catalogImageGallery(let model):
+            CatalogImageGalleryComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
         default:
             EmptyView()
         }
