@@ -103,16 +103,20 @@ extension OfferModel {
 }
 
 extension CatalogItem {
-    static func mock(catalogItemId: String = "catalogItemId") -> Self {
-        .init(
-            images: [
-                "catalogItemImage0": CreativeImage(
-                    light: "https://www.rokt.com",
-                    dark: nil,
-                    alt: nil,
-                    title: nil
-                )
-            ],
+    static func mock(
+        catalogItemId: String = "catalogItemId",
+        images: [String: CreativeImage]? = nil
+    ) -> Self {
+        let imageMap = images ?? [
+            "catalogItemImage0": CreativeImage(
+                light: "https://www.rokt.com",
+                dark: nil,
+                alt: nil,
+                title: nil
+            )
+        ]
+        return .init(
+            images: imageMap,
             catalogItemId: catalogItemId,
             cartItemId: "cartItemId",
             instanceGuid: "catalogInstanceGuid",

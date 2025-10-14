@@ -230,6 +230,13 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .catalogImageGallery(let model):
+                .catalogImageGallery(
+                    try getCatalogImageGalleryModel(
+                        model: model,
+                        context: context
+                    )
+                )
         case .catalogResponseButton(let model):
                 .catalogResponseButton(
                     try getCatalogResponseButtonModel(
@@ -834,6 +841,51 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                         closedDefaultTemplate: closedDefaultTemplate,
                                         requiredSelectionErrorTemplate: requiredSelectionErrorTemplate,
                                         eventService: eventService)
+    }
+
+    func getCatalogImageGalleryModel(
+        model: CatalogImageGalleryModel<WhenPredicate>,
+        context: Context
+    ) throws -> CatalogImageGalleryViewModel {
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
+        let elements = model.styles?.elements
+        let defaultStyle = try StyleTransformer.updatedStyles(elements?.own)
+        let mainImageStyles = try StyleTransformer.updatedStyles(elements?.mainImage)
+
+        let images = catalogItem.images
+            .sorted(by: { $0.key < $1.key })
+            .map { _, image in
+                DataImageViewModel(
+                    image: image,
+                    defaultStyle: mainImageStyles.compactMap { $0.default },
+                    pressedStyle: mainImageStyles.compactMap { $0.pressed },
+                    hoveredStyle: mainImageStyles.compactMap { $0.hovered },
+                    disabledStyle: mainImageStyles.compactMap { $0.disabled },
+                    layoutState: layoutState
+                )
+            }
+
+        let thumbnailStyle = elements?.thumbnailImage
+        let selectedThumbnailStyle = elements?.selectedThumbnailImage
+        let thumbnailRowStyle = elements?.thumbnailList
+
+        let leftScrollIcon = try model.leftScrollIconTemplate.map { try getStaticImage($0) }
+        let rightScrollIcon = try model.rightScrollIconTemplate.map { try getStaticImage($0) }
+
+        return CatalogImageGalleryViewModel(
+            images: images,
+            defaultStyle: defaultStyle.compactMap { $0.default },
+            thumbnailStyle: thumbnailStyle,
+            selectedThumbnailStyle: selectedThumbnailStyle,
+            thumbnailRowStyle: thumbnailRowStyle,
+            scrollGradientLength: model.scrollGradientLength,
+            leftScrollIcon: leftScrollIcon,
+            rightScrollIcon: rightScrollIcon,
+            layoutState: layoutState
+        )
     }
 
     func getProgressIndicatorUIModel(

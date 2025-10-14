@@ -112,6 +112,17 @@ extension BaseStyles {
             spacing: style.spacing
         )
     }
+
+    init(_ style: CatalogImageGalleryStyles) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
 }
 
 extension BasicStateStylingBlock where StyleProperties: Codable {
