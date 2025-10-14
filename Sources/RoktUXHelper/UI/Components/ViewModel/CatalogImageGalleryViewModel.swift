@@ -10,6 +10,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 //
 
+import Combine
 import Foundation
 import DcuiSchema
 
@@ -20,7 +21,13 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     let id: UUID = UUID()
     weak var layoutState: (any LayoutStateRepresenting)?
 
-    @Published var images: [DataImageViewModel]
+    @Published var images: [DataImageViewModel] {
+        didSet {
+            clampSelectedIndex()
+        }
+    }
+
+    @Published private(set) var selectedIndex: Int = 0
 
     let defaultStyle: [CatalogImageGalleryStyles]?
     private let thumbnailStyleBlock: [BasicStateStylingBlock<DataImageStyles>]?
@@ -51,10 +58,38 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         self.scrollGradientLength = scrollGradientLength
         self.leftScrollIcon = leftScrollIcon
         self.rightScrollIcon = rightScrollIcon
+        clampSelectedIndex()
     }
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
+    }
+
+    var selectedImage: DataImageViewModel? {
+        images[safe: selectedIndex]
+    }
+
+    var canSelectNextImage: Bool {
+        selectedIndex < images.count - 1
+    }
+
+    var canSelectPreviousImage: Bool {
+        selectedIndex > 0
+    }
+
+    func selectImage(at index: Int) {
+        guard images.indices.contains(index), index != selectedIndex else { return }
+        selectedIndex = index
+    }
+
+    func selectNextImage() {
+        guard canSelectNextImage else { return }
+        selectedIndex += 1
+    }
+
+    func selectPreviousImage() {
+        guard canSelectPreviousImage else { return }
+        selectedIndex -= 1
     }
 
     func thumbnailDimension(
@@ -118,5 +153,15 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
 
     static func == (lhs: CatalogImageGalleryViewModel, rhs: CatalogImageGalleryViewModel) -> Bool {
         lhs.id == rhs.id
+    }
+
+    private func clampSelectedIndex() {
+        guard !images.isEmpty else {
+            selectedIndex = 0
+            return
+        }
+        if selectedIndex > images.count - 1 {
+            selectedIndex = images.count - 1
+        }
     }
 }

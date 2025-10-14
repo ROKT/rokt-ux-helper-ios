@@ -36,7 +36,6 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @State private var selectedIndex: Int = 0
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -100,14 +99,11 @@ struct CatalogImageGalleryComponent: View {
                 frameChangeIndex += 1
             }
         }
-        .onChange(of: model.images) { _ in
-            selectedIndex = min(selectedIndex, max(0, model.images.count - 1))
-        }
     }
 
     private var mainImageView: some View {
         ZStack {
-            if let currentImage = model.images[safe: selectedIndex] {
+            if let currentImage = model.selectedImage {
                 DataImageViewComponent(
                     config: config.updateParent(.column),
                     model: currentImage,
@@ -157,7 +153,7 @@ struct CatalogImageGalleryComponent: View {
                 HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                        spacing: CGFloat(containerStyle?.gap ?? 8)) {
                     ForEach(Array(model.images.enumerated()), id: \.element.id) { index, imageViewModel in
-                        let isSelected = index == selectedIndex
+                        let isSelected = index == model.selectedIndex
                         DataImageViewComponent(
                             config: config.updateParent(.row),
                             model: imageViewModel,
@@ -203,7 +199,7 @@ struct CatalogImageGalleryComponent: View {
                         .id(index)
                         .onTapGesture {
                             withAnimation(.easeInOut) {
-                                selectedIndex = index
+                                model.selectImage(at: index)
                                 scrollToThumbnail(at: index, proxy: scrollProxy)
                             }
                         }
@@ -211,7 +207,7 @@ struct CatalogImageGalleryComponent: View {
                 }
                 .padding(.horizontal, horizontalInset)
             }
-            .onChange(of: selectedIndex) { newIndex in
+            .onChange(of: model.selectedIndex) { newIndex in
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
         }
@@ -234,16 +230,14 @@ struct CatalogImageGalleryComponent: View {
     }
 
     private func goToNextImage() {
-        guard selectedIndex < model.images.count - 1 else { return }
         withAnimation(.easeInOut) {
-            selectedIndex += 1
+            model.selectNextImage()
         }
     }
 
     private func goToPreviousImage() {
-        guard selectedIndex > 0 else { return }
         withAnimation(.easeInOut) {
-            selectedIndex -= 1
+            model.selectPreviousImage()
         }
     }
 
