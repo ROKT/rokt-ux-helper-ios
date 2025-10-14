@@ -34,6 +34,7 @@ class MockEventService: EventDiagnosticServicing {
         eventData: [String: String],
         jwtToken: String
     )] = []
+    var cartItemDevicePayCompletionCallback: (() -> Void)? = nil
 
     // MARK: - Protocol Properties
 
@@ -97,16 +98,20 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider, completion: @escaping () -> Void) {
         cartItemDevicePayCalled = true
+        cartItemDevicePayCompletionCallback = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
         cartItemDevicePaySuccessCalled = true
+        cartItemDevicePayCompletionCallback?()
+        cartItemDevicePayCompletionCallback = nil
     }
 
     func cartItemDevicePayFailure(itemId: String) {
         cartItemDevicePayFailureCalled = true
+        cartItemDevicePayCompletionCallback = nil
     }
 
     func sendEvent(
@@ -166,6 +171,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemDevicePayCompletionCallback = nil
         dismissOption = nil
         diagnosticsSent = []
         fontDiagnosticsSent = []

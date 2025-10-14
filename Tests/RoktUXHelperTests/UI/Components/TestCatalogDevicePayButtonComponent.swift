@@ -119,13 +119,103 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertEqual(sut.horizontalAlignment, .center)
         XCTAssertNotNil(model.layoutState)
     }
+
+    func test_cartItemDevicePay_callsCompletionOnSuccess() throws {
+        var completionCalled = false
+        let mockEventService = MockEventService()
+        let layoutState = LayoutState()
+
+        // Create a mock action collection to track close calls
+        var closeActionCalled = false
+        layoutState.actionCollection[.close] = { _ in
+            closeActionCalled = true
+        }
+
+        let view = try TestPlaceHolder.make(
+            eventDelegate: MockUXHelper(),
+            layoutMaker: { _, _ in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService
+                )
+            }
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        // Verify initial state
+        XCTAssertFalse(completionCalled)
+        XCTAssertFalse(closeActionCalled)
+        XCTAssertFalse(mockEventService.cartItemDevicePayCalled)
+
+        // Call cartItemDevicePay
+        sut.model.cartItemDevicePay()
+
+        // Verify device pay was called
+        XCTAssertTrue(mockEventService.cartItemDevicePayCalled)
+        XCTAssertNotNil(mockEventService.cartItemDevicePayCompletionCallback)
+
+        // Simulate device pay success
+        mockEventService.cartItemDevicePaySuccess(itemId: "testItemId")
+
+        // Verify completion callback was called (which should close the layout)
+        XCTAssertTrue(closeActionCalled)
+        XCTAssertNil(mockEventService.cartItemDevicePayCompletionCallback) // Should be cleared after success
+    }
+
+    func test_cartItemDevicePay_doesNotCallCompletionOnFailure() throws {
+        let mockEventService = MockEventService()
+        let layoutState = LayoutState()
+
+        // Create a mock action collection to track close calls
+        var closeActionCalled = false
+        layoutState.actionCollection[.close] = { _ in
+            closeActionCalled = true
+        }
+
+        let view = try TestPlaceHolder.make(
+            eventDelegate: MockUXHelper(),
+            layoutMaker: { _, _ in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService
+                )
+            }
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        // Call cartItemDevicePay
+        sut.model.cartItemDevicePay()
+
+        // Verify device pay was called
+        XCTAssertTrue(mockEventService.cartItemDevicePayCalled)
+        XCTAssertNotNil(mockEventService.cartItemDevicePayCompletionCallback)
+
+        // Simulate device pay failure
+        mockEventService.cartItemDevicePayFailure(itemId: "testItemId")
+
+        // Verify completion callback was NOT called (layout should not close)
+        XCTAssertFalse(closeActionCalled)
+        XCTAssertNil(mockEventService.cartItemDevicePayCompletionCallback) // Should be cleared after failure
+    }
 }
 
 @available(iOS 15.0, *)
 extension LayoutSchemaViewModel {
     static func makeCatalogDevicePayButton(
         layoutState: LayoutState,
-        eventService: EventService
+        eventService: EventDiagnosticServicing
     ) throws -> Self {
         let transformer = LayoutTransformer(
             layoutPlugin: get_mock_layout_plugin(),

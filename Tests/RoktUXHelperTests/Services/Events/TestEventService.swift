@@ -328,7 +328,9 @@ final class TestEventService: XCTestCase {
             })
 
         // Act
-        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay)
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+            // Completion handler - not called immediately
+        }
 
         // Assert
         let event = events.first
@@ -393,6 +395,38 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
     }
 
+    func test_device_pay_completion_handler_flow() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        var completionCalled = false
+
+        // Act - First call cartItemDevicePay (completion should be stored but not called)
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+            completionCalled = true
+        }
+
+        // Assert - Completion should not be called yet
+        XCTAssertFalse(completionCalled, "Completion should not be called immediately")
+
+        // Act - Then call cartItemDevicePaySuccess (completion should be called)
+        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+
+        // Assert - Completion should now be called
+        XCTAssertTrue(completionCalled, "Completion should be called on success")
+
+        // Verify events were sent
+        XCTAssertEqual(events.count, 2)
+        XCTAssertEqual(events[0].eventType, .SignalCartItemInstantPurchaseInitiated)
+        XCTAssertEqual(events[1].eventType, .SignalCartItemInstantPurchase)
+    }
+
     func test_send_device_pay_failed() {
         // Arrange
         let eventService = get_mock_event_processor(
@@ -429,6 +463,38 @@ final class TestEventService: XCTestCase {
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
+    }
+
+    func test_device_pay_completion_handler_not_called_on_failure() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        var completionCalled = false
+
+        // Act - First call cartItemDevicePay (completion should be stored but not called)
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+            completionCalled = true
+        }
+
+        // Assert - Completion should not be called yet
+        XCTAssertFalse(completionCalled, "Completion should not be called immediately")
+
+        // Act - Then call cartItemDevicePayFailure (completion should NOT be called)
+        eventService.cartItemDevicePayFailure(itemId: "catalogItemId")
+
+        // Assert - Completion should still not be called
+        XCTAssertFalse(completionCalled, "Completion should not be called on failure")
+
+        // Verify events were sent
+        XCTAssertEqual(events.count, 2)
+        XCTAssertEqual(events[0].eventType, .SignalCartItemInstantPurchaseInitiated)
+        XCTAssertEqual(events[1].eventType, .SignalCartItemInstantPurchaseFailure)
     }
 
     func test_send_instant_purchase_initiated() {

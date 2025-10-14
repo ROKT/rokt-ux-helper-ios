@@ -39,6 +39,8 @@ class EventService: Hashable, EventDiagnosticServicing {
     var isFirstPositiveEngagementSend = false
     var dismissOption: LayoutDismissOptions?
 
+    private var devicePayCompletion: (() -> Void)?
+
     init(pageId: String?,
          pageInstanceGuid: String,
          sessionId: String,
@@ -188,19 +190,26 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider, completion: @escaping () -> Void) {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
+
+        self.devicePayCompletion = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
+
+        devicePayCompletion?()
+        devicePayCompletion = nil
     }
 
     func cartItemDevicePayFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
+
+        devicePayCompletion = nil
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
