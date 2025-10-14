@@ -851,8 +851,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             throw LayoutTransformerError.InvalidMapping()
         }
 
-        let defaultStyle = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
-        let mainImageStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.mainImage)
+        let elements = model.styles?.elements
+        let defaultStyle = try StyleTransformer.updatedStyles(elements?.own)
+        let mainImageStyles = try StyleTransformer.updatedStyles(elements?.mainImage)
 
         let images = catalogItem.images
             .sorted(by: { $0.key < $1.key })
@@ -867,9 +868,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                 )
             }
 
-        let thumbnailStyle = model.styles?.elements?.thumbnailImage
-        let selectedThumbnailStyle = model.styles?.elements?.selectedThumbnailImage
-        let thumbnailRowStyle = model.styles?.elements?.thumbnailList
+        let thumbnailStyle = elements?.thumbnailImage
+        let selectedThumbnailStyle = elements?.selectedThumbnailImage
+        let thumbnailRowStyle = elements?.thumbnailList
 
         let leftScrollIcon = try model.leftScrollIconTemplate.map { try getStaticImage($0) }
         let rightScrollIcon = try model.rightScrollIconTemplate.map { try getStaticImage($0) }
