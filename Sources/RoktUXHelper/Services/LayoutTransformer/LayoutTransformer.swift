@@ -160,6 +160,13 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         children: transformChildren(closeButtonModel.children, context: context)
                     )
                 )
+        case .dismissInstantPurchaseButton(let dismissInstantPurchaseButtonModel):
+                .dismissInstantPurchaseButton(
+                    try getDismissInstantPurchaseButton(
+                        styles: dismissInstantPurchaseButtonModel.styles,
+                        children: transformChildren(dismissInstantPurchaseButtonModel.children, context: context)
+                    )
+                )
         case .carouselDistribution(let carouselModel):
                 .carousel(try getCarousel(carouselModel: carouselModel, context: context))
         case .groupedDistribution(let groupedModel):
@@ -252,9 +259,6 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
-        case .dismissInstantPurchaseButton:
-                // unimplemented
-                throw LayoutTransformerError.InvalidMapping()
         }
     }
 
@@ -374,6 +378,22 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState,
                                     eventService: eventService)
+    }
+
+    func getDismissInstantPurchaseButton(styles: LayoutStyle<DismissInstantPurchaseButtonElements,
+                                                             ConditionalStyleTransition<
+                                                                 DismissInstantPurchaseButtonTransitions,
+                                                                 WhenPredicate
+                                                             >>?,
+                                         children: [LayoutSchemaViewModel]?) throws -> DismissInstantPurchaseButtonViewModel {
+        let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
+        return DismissInstantPurchaseButtonViewModel(children: children,
+                                                     defaultStyle: updateStyles.compactMap {$0.default},
+                                                     pressedStyle: updateStyles.compactMap {$0.pressed},
+                                                     hoveredStyle: updateStyles.compactMap {$0.hovered},
+                                                     disabledStyle: updateStyles.compactMap {$0.disabled},
+                                                     layoutState: layoutState,
+                                                     eventService: eventService)
     }
 
     func getProgressControl(styles: LayoutStyle<ProgressControlElements,

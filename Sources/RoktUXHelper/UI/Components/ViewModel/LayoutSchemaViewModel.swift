@@ -34,6 +34,7 @@ enum LayoutSchemaViewModel: Hashable {
     case dataImage(DataImageViewModel)
     case progressIndicator(ProgressIndicatorViewModel)
     case closeButton(CloseButtonViewModel)
+    case dismissInstantPurchaseButton(DismissInstantPurchaseButtonViewModel)
     case staticLink(StaticLinkViewModel)
     case progressControl(ProgressControlViewModel)
     case toggleButton(ToggleButtonViewModel)
@@ -93,6 +94,8 @@ extension LayoutSchemaViewModel: Hashable {
         case (.when(let lhsModel), .when(let rhsModel)):
             return lhsModel == rhsModel
         case (.closeButton(let lhsModel), .closeButton(let rhsModel)):
+            return lhsModel == rhsModel
+        case (.dismissInstantPurchaseButton(let lhsModel), .dismissInstantPurchaseButton(let rhsModel)):
             return lhsModel == rhsModel
         case (.staticLink(let lhsModel), .staticLink(let rhsModel)):
             return lhsModel == rhsModel
