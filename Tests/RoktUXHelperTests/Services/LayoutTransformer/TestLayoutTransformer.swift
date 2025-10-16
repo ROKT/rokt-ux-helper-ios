@@ -560,7 +560,14 @@ final class TestLayoutTransformer: XCTestCase {
             "carousel.2": image2,
             "other_1": otherImage
         ])
-        let model = DataImageCarouselModel<WhenPredicate>(styles: nil, imageKey: "carousel", duration: 5000, a11yLabel: nil)
+        let model = DataImageCarouselModel<WhenPredicate>(
+            styles: nil,
+            indicators: nil,
+            transition: nil,
+            imageKey: "carousel",
+            duration: 5000,
+            a11yLabel: nil
+        )
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
 
         // Act
@@ -579,6 +586,8 @@ final class TestLayoutTransformer: XCTestCase {
         let offer = get_offer_with_images(["carousel1.1": image1, "carousel2.1": image2, "carousel3.1": image3])
         let model = DataImageCarouselModel<WhenPredicate>(
             styles: nil,
+            indicators: nil,
+            transition: nil,
             imageKey: "invalidKey|carousel2",
             duration: 5000,
             a11yLabel: nil
@@ -601,6 +610,8 @@ final class TestLayoutTransformer: XCTestCase {
         let offer = get_offer_with_images(["carousel1.1": image1, "carousel1.2": image2, "carousel3.1": image3])
         let model = DataImageCarouselModel<WhenPredicate>(
             styles: nil,
+            indicators: nil,
+            transition: nil,
             imageKey: "invalidKey | carousel1",
             duration: 5000,
             a11yLabel: nil
@@ -622,6 +633,8 @@ final class TestLayoutTransformer: XCTestCase {
         let offer = get_offer_with_images(["carousel1.1": image1])
         let model = DataImageCarouselModel<WhenPredicate>(
             styles: nil,
+            indicators: nil,
+            transition: nil,
             imageKey: "carousel2|carousel3",
             duration: 5000,
             a11yLabel: nil

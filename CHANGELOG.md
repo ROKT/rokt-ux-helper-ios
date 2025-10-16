@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support of new animation style for DataImageCarousel
+- Add support of new style for ImageCarouselIndicator
+
+### Fixed
+
+- Fix visualization ImageCarouselIndicator
+
 ## [0.7.3] - 2025-09-18
 
 ## [0.7.2] - 2025-09-17

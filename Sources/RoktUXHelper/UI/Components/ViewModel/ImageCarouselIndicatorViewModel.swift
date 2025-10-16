@@ -28,6 +28,7 @@ class ImageCarouselIndicatorViewModel:
     let indicatorStyle: [BasicStateStylingBlock<BaseStyles>]?
     let seenIndicatorStyle: [BasicStateStylingBlock<BaseStyles>]?
     let activeIndicatorStyle: [BasicStateStylingBlock<BaseStyles>]?
+    let shouldDisplayProgress: Bool
 
     @Published var availableWidth: CGFloat?
     @Published var availableHeight: CGFloat?
@@ -48,7 +49,8 @@ class ImageCarouselIndicatorViewModel:
         indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
         seenIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
         activeIndicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]?,
-        layoutState: (any LayoutStateRepresenting)?
+        layoutState: (any LayoutStateRepresenting)?,
+        shouldDisplayProgress: Bool
     ) {
         self.positions = positions
         self.duration = duration
@@ -57,56 +59,69 @@ class ImageCarouselIndicatorViewModel:
         self.seenIndicatorStyle = seenIndicatorStyle?.mapToBaseStyles(BaseStyles.init)
         self.activeIndicatorStyle = activeIndicatorStyle?.mapToBaseStyles(BaseStyles.init)
         self.layoutState = layoutState
+        self.shouldDisplayProgress = shouldDisplayProgress
     }
 
     private func createRowViewModels() -> [RowViewModel] {
-        var rowViewModels: [RowViewModel] = []
-        for i in 0..<positions {
-            guard let inactiveStyle = indicatorStyle,
-                  let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] else { continue }
-            let activeIndicator = RowViewModel(
-                children: nil,
-                stylingProperties: [
-                    BasicStateStylingBlock(
-                        default: BaseStyles(
-                            background: activeStyle.default.background,
-                            container: nil,
-                            dimension: .init(
-                                minWidth: nil,
-                                maxWidth: nil,
-                                width: .fixed(0),
-                                minHeight: nil,
-                                maxHeight: nil,
-                                height: .percentage(100),
-                                rotateZ: nil
-                            )
-                        ),
-                        pressed: nil,
-                        hovered: nil,
-                        disabled: nil
-                    )
-                ],
-                animatableStyle: .init(duration: Double(duration)/1000.0, style: activeStyle.default),
-                accessibilityGrouped: false,
-                layoutState: layoutState,
-                predicates: [.customState(.init(key: .imageCarouselPosition, condition: .is, value: Int32(i + 1)))],
-                globalBreakPoints: nil,
-                offers: []
-            )
-            let indicator = RowViewModel(
-                children: [.row(activeIndicator)],
-                stylingProperties: inactiveStyle,
-                animatableStyle: nil,
-                accessibilityGrouped: false,
-                layoutState: layoutState,
-                predicates: nil,
-                globalBreakPoints: nil,
-                offers: []
-            )
-
-            rowViewModels.append(indicator)
+        guard let activeStyle = activeIndicatorStyle?[safe: breakpointIndex] ?? activeIndicatorStyle?.first else {
+            return []
         }
-        return rowViewModels
+
+        let animatableStyle: AnimationStyle? = shouldDisplayProgress ? .init(
+            duration: Double(duration)/1000.0,
+            style: activeStyle.default
+        ) : nil
+        let activeStylingProperties: [BasicStateStylingBlock<BaseStyles>]? = [
+            .init(
+                default: BaseStyles(
+                    background: indicatorStyle?[0].default.background,
+                    border: activeStyle.default.border,
+                    container: activeStyle.default.container,
+                    dimension: activeStyle.default.dimension,
+                    flexChild: activeStyle.default.flexChild,
+                    spacing: activeStyle.default.spacing,
+                    text: activeStyle.default.text
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
+        let progressStyle: [BasicStateStylingBlock<BaseStyles>] = [
+            .init(
+                default: BaseStyles(
+                    background: activeStyle.default.background,
+                    container: nil,
+                    dimension: .init(
+                        minWidth: nil,
+                        maxWidth: nil,
+                        width: shouldDisplayProgress ? .fixed(0) : activeStyle.default.dimension?.width,
+                        minHeight: nil,
+                        maxHeight: nil,
+                        height: activeStyle.default.dimension?.height,
+                        rotateZ: nil
+                    )
+                ),
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
+
+        return (0..<positions).map {
+            ImageCarouselIndicatorItemViewModel(
+                index: Int32($0 + 1),
+                duration: duration,
+                progressStyle: progressStyle,
+                activeStyle: activeStylingProperties,
+                animatableStyle: animatableStyle,
+                indicatorStyle: indicatorStyle,
+                seenStyle: seenIndicatorStyle,
+                layoutState: layoutState,
+                shouldDisplayProgress: shouldDisplayProgress
+            )
+        }
     }
 
     func shouldUpdate(_ size: CGSize) {
