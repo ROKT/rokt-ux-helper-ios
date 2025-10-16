@@ -26,11 +26,13 @@ class LayoutState: LayoutStateRepresenting {
     static let viewableItemsKey = "viewableItems" // Binding<Int>
     static let layoutSettingsKey = "layoutSettings" // LayoutSettings
     static let customStateMap = "customStateMap" // CustomStateMap
+    static let globalCustomStateMapKey = "globalCustomStateMap" // Global CustomStateMap
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
     static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [String: Int]
 
     private var _items = [String: Any]()
+    private var _globalCustomStateMap = RoktUXCustomStateMap()
     private(set) var itemsPublisher: CurrentValueSubject<[String: Any], Never> = .init([:])
     private let queue = DispatchQueue(label: kSharedDataItemsQueueLabel, attributes: .concurrent)
     let config: RoktUXConfig?
@@ -77,16 +79,30 @@ class LayoutState: LayoutStateRepresenting {
         self.pluginId = pluginId
         self.initialPluginViewState = initialPluginViewState
         self.onPluginViewStateChange = onPluginViewStateChange
+        if let initialCustomStates = initialPluginViewState?.customStateMap {
+            let globalEntries = initialCustomStates.filter { $0.key.position == nil }
+            if !globalEntries.isEmpty {
+                _globalCustomStateMap = globalEntries.reduce(into: RoktUXCustomStateMap()) { partialResult, element in
+                    partialResult[element.key] = element.value
+                }
+            }
+        }
+        items[LayoutState.globalCustomStateMapKey] = globalCustomStateMapBinding
     }
 
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?) {
         guard let pluginId else { return }
         let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
         let customStateMap: Binding<RoktUXCustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
+        let globalStates = queue.sync { _globalCustomStateMap }
+        var combinedStates = customStateMap?.wrappedValue ?? [:]
+        for (key, value) in globalStates {
+            combinedStates[key] = value
+        }
         onPluginViewStateChange?(RoktPluginViewState(pluginId: pluginId,
                                                      offerIndex: offerIndex ?? currentProgress?.wrappedValue,
                                                      isPluginDismissed: dismiss,
-                                                     customStateMap: customStateMap?.wrappedValue))
+                                                     customStateMap: combinedStates.isEmpty ? nil : combinedStates))
     }
 
     func setLayoutType(_ type: RoktUXPlacementLayoutCode) {
@@ -126,5 +142,48 @@ class LayoutState: LayoutStateRepresenting {
 
     func publishStateChange() {
         itemsPublisher.send(items)
+    }
+
+    private lazy var globalCustomStateMapBinding: Binding<RoktUXCustomStateMap?> = Binding(
+        get: { [weak self] in
+            guard let self else { return nil }
+            return self.queue.sync {
+                self._globalCustomStateMap.isEmpty ? nil : self._globalCustomStateMap
+            }
+        },
+        set: { [weak self] newValue in
+            guard let self else { return }
+            self.queue.async(flags: .barrier) {
+                self._globalCustomStateMap = newValue ?? [:]
+                DispatchQueue.main.async {
+                    self.publishStateChange()
+                }
+            }
+        }
+    )
+
+    func globalCustomStateValue(for key: String) -> Int? {
+        let identifier = CustomStateIdentifiable(position: nil, key: key)
+        return queue.sync { _globalCustomStateMap[identifier] }
+    }
+
+    func setGlobalCustomState(key: String, value: Int) {
+        let identifier = CustomStateIdentifiable(position: nil, key: key)
+        queue.async(flags: .barrier) {
+            self._globalCustomStateMap[identifier] = value
+            DispatchQueue.main.async {
+                self.publishStateChange()
+            }
+        }
+    }
+
+    func resetGlobalCustomState(key: String) {
+        let identifier = CustomStateIdentifiable(position: nil, key: key)
+        queue.async(flags: .barrier) {
+            self._globalCustomStateMap.removeValue(forKey: identifier)
+            DispatchQueue.main.async {
+                self.publishStateChange()
+            }
+        }
     }
 }

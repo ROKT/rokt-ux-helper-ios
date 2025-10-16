@@ -29,6 +29,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let hoveredStyle: [CatalogDevicePayButtonStyles]?
     let disabledStyle: [CatalogDevicePayButtonStyles]?
     let validatorTriggerConfig: ValidationTriggerConfig?
+    let customStateKey: String?
 
     init(
         catalogItem: CatalogItem?,
@@ -40,7 +41,8 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         pressedStyle: [CatalogDevicePayButtonStyles]?,
         hoveredStyle: [CatalogDevicePayButtonStyles]?,
         disabledStyle: [CatalogDevicePayButtonStyles]?,
-        validatorTriggerConfig: ValidationTriggerConfig?
+        validatorTriggerConfig: ValidationTriggerConfig?,
+        customStateKey: String?
     ) {
         self.catalogItem = catalogItem
         self.children = children
@@ -52,6 +54,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         self.layoutState = layoutState
         self.eventService = eventService
         self.validatorTriggerConfig = validatorTriggerConfig
+        self.customStateKey = customStateKey
     }
 
     func cartItemDevicePay() {
@@ -59,9 +62,18 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             eventService?.cartItemDevicePay(
                 catalogItem: catalogItem,
                 paymentProvider: provider,
-                completion: { [weak self] in
-                    // 
-                    self?.layoutState?.actionCollection[.close](nil)
+                completion: { [weak self] status in
+                    guard let self else { return }
+                    if let customStateKey = self.customStateKey, !customStateKey.isEmpty {
+                        switch status {
+                        case .success:
+                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: 1)
+                        case .failure, .retry:
+                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: -1)
+                        }
+                    } else {
+                        self.layoutState?.actionCollection[.close](nil)
+                    }
                 }
             )
         }

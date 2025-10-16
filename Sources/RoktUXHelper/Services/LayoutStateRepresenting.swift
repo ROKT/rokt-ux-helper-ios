@@ -30,4 +30,7 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?)
     func publishStateChange()
+    func setGlobalCustomState(key: String, value: Int)
+    func resetGlobalCustomState(key: String)
+    func globalCustomStateValue(for key: String) -> Int?
 }
