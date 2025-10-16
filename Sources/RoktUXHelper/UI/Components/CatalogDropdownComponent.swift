@@ -48,6 +48,16 @@ private struct ViewFrameReader: UIViewRepresentable {
     }
 }
 
+private struct DropdownButtonFramePreferenceKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        let next = nextValue()
+        if next != .zero {
+            value = next
+        }
+    }
+}
+
 @available(iOS 15, *)
 struct CatalogDropdownComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
@@ -100,6 +110,8 @@ struct CatalogDropdownComponent: View {
     @State private var buttonFrameInGlobal: CGRect = .zero
     @State private var showValidationError: Bool = false
     @State private var isValidatorRegistered: Bool = false
+    @State private var shouldIgnoreDismissTap: Bool = false
+    @State private var dropdownContentSize: CGSize = .zero
 
     let parentOverride: ComponentParentOverride?
 
@@ -361,13 +373,23 @@ struct CatalogDropdownComponent: View {
             .onReceive(layoutItemsPublisher) { _ in
                 syncSelectedItemFromLayoutState()
             }
+        let overlayBinding = Binding<Bool>(
+            get: { isExpanded && buttonFrameInGlobal != .zero },
+            set: { shouldPresent in
+                if !shouldPresent {
+                    isExpanded = false
+                    shouldIgnoreDismissTap = false
+                }
+            }
+        )
+
         return base
-            .overlay(alignment: .topLeading) {
-                if isExpanded, buttonFrameInGlobal != .zero {
+            .background(
+                DropdownWindowOverlayPresenter(isPresented: overlayBinding) {
                     expandedOverlayView()
                         .transition(.opacity)
                 }
-            }
+            )
             .zIndex(isExpanded ? 1000 : 0)
     }
 
@@ -443,6 +465,18 @@ struct CatalogDropdownComponent: View {
                 }
             }
         )
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: DropdownButtonFramePreferenceKey.self, value: proxy.frame(in: .global))
+            }
+        )
+        .onPreferenceChange(DropdownButtonFramePreferenceKey.self) { frame in
+            guard frame != .zero else { return }
+            if buttonFrameInGlobal != frame {
+                buttonFrameInGlobal = frame
+            }
+        }
     }
 
     @ViewBuilder
@@ -492,11 +526,11 @@ struct CatalogDropdownComponent: View {
 
     @ViewBuilder
     private func expandedDropdown() -> some View {
-        VStack(
-            alignment: columnPerpendicularAxisAlignment(alignItems: dropdownListContainerContainerStyle?.alignItems),
-            spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
-        ) {
-            if !model.openDropdownChildren.isEmpty {
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(
+                alignment: columnPerpendicularAxisAlignment(alignItems: dropdownListContainerContainerStyle?.alignItems),
+                spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
+            ) {
                 ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
                     Button {
                         selectItem(at: index)
@@ -530,26 +564,52 @@ struct CatalogDropdownComponent: View {
         .ifLet(dropdownMinimumWidth) { view, minWidth in
             view.frame(minWidth: minWidth, alignment: .leading)
         }
+        .readSize { size in
+            if dropdownContentSize != size {
+                dropdownContentSize = size
+            }
+        }
     }
 
     @ViewBuilder
     private func expandedOverlayView() -> some View {
-        let overlayWidth = globalScreenSize.width ?? UIScreen.main.bounds.width
-        let overlayHeight = globalScreenSize.height ?? UIScreen.main.bounds.height
-        ZStack(alignment: .topLeading) {
-            expandedBackground()
-                .frame(width: overlayWidth,
-                       height: overlayHeight,
-                       alignment: .topLeading)
-            expandedDropdown()
-                .offset(x: buttonFrameInGlobal.minX,
-                        y: buttonFrameInGlobal.maxY)
+        let screenBounds = UIScreen.main.bounds
+        let overlayWidth = max(globalScreenSize.width ?? 0, screenBounds.width)
+        let overlayHeight = max(globalScreenSize.height ?? 0, screenBounds.height)
+
+        let dropdownWidth = dropdownContentSize.width > 0 ? dropdownContentSize.width : buttonFrameInGlobal.width
+        let dropdownHeight = dropdownContentSize.height > 0 ? dropdownContentSize.height : buttonFrameInGlobal.height
+
+        let targetX = buttonFrameInGlobal.minX
+        let maxXOffset = max(overlayWidth - dropdownWidth, 0)
+        let resolvedX = min(max(targetX, 0), maxXOffset)
+
+        let buttonTop = buttonFrameInGlobal.minY
+        let buttonBottom = buttonFrameInGlobal.maxY
+        let availableBelow = overlayHeight - buttonBottom
+        let availableAbove = buttonTop
+
+        let maxValidY = max(overlayHeight - dropdownHeight, 0)
+        var resolvedY: CGFloat
+        if availableBelow >= dropdownHeight {
+            resolvedY = buttonBottom
+        } else if availableAbove >= dropdownHeight {
+            resolvedY = max(buttonTop - dropdownHeight, 0)
+        } else {
+            let maxStart = max(overlayHeight - dropdownHeight, 0)
+            resolvedY = min(max(buttonBottom - dropdownHeight/2, 0), maxStart)
         }
-        .frame(width: overlayWidth,
-               height: overlayHeight,
+        resolvedY = min(max(resolvedY, 0), maxValidY)
+
+        return ZStack(alignment: .topLeading) {
+            expandedBackground()
+            expandedDropdown()
+                .offset(x: resolvedX,
+                        y: resolvedY)
+        }
+        .frame(maxWidth: .infinity,
+               maxHeight: .infinity,
                alignment: .topLeading)
-        .offset(x: -buttonFrameInGlobal.minX,
-                y: -buttonFrameInGlobal.minY)
         .ignoresSafeArea()
     }
 
@@ -560,8 +620,102 @@ struct CatalogDropdownComponent: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.all)
             .onTapGesture {
+                guard !shouldIgnoreDismissTap else {
+                    shouldIgnoreDismissTap = false
+                    return
+                }
                 isExpanded = false
             }
+    }
+
+    private struct DropdownWindowOverlayPresenter<Content: View>: UIViewRepresentable {
+        @EnvironmentObject private var globalScreenSize: GlobalScreenSize
+
+        @Binding var isPresented: Bool
+        let content: () -> Content
+
+        func makeUIView(context: Context) -> DropdownOverlayHostingView {
+            DropdownOverlayHostingView()
+        }
+
+        func updateUIView(_ uiView: DropdownOverlayHostingView, context: Context) {
+            if isPresented {
+                let overlayContent = AnyView(content().environmentObject(globalScreenSize))
+                uiView.present(content: overlayContent)
+            } else {
+                uiView.dismiss()
+            }
+        }
+
+        static func dismantleUIView(_ uiView: DropdownOverlayHostingView, coordinator: ()) {
+            uiView.dismiss()
+        }
+    }
+
+    private final class DropdownOverlayHostingView: UIView {
+        private var hostingController: UIHostingController<AnyView>?
+        private weak var attachedWindow: UIWindow?
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            isUserInteractionEnabled = false
+            backgroundColor = .clear
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        func present(content: AnyView) {
+            guard let window = currentWindow else {
+                return
+            }
+
+            if let hostingController {
+                if attachedWindow === window {
+                    hostingController.rootView = content
+                    window.bringSubviewToFront(hostingController.view)
+                    return
+                } else {
+                    hostingController.view.removeFromSuperview()
+                    self.hostingController = nil
+                    attachedWindow = nil
+                }
+            }
+
+            let controller = UIHostingController(rootView: content)
+            controller.view.backgroundColor = .clear
+            controller.view.translatesAutoresizingMaskIntoConstraints = false
+
+            window.addSubview(controller.view)
+            NSLayoutConstraint.activate([
+                controller.view.leadingAnchor.constraint(equalTo: window.leadingAnchor),
+                controller.view.trailingAnchor.constraint(equalTo: window.trailingAnchor),
+                controller.view.topAnchor.constraint(equalTo: window.topAnchor),
+                controller.view.bottomAnchor.constraint(equalTo: window.bottomAnchor)
+            ])
+
+            hostingController = controller
+            attachedWindow = window
+        }
+
+        func dismiss() {
+            hostingController?.view.removeFromSuperview()
+            hostingController = nil
+            attachedWindow = nil
+        }
+
+        private var currentWindow: UIWindow? {
+            if let hostingWindow = hostingController?.view.window ?? attachedWindow ?? self.window {
+                return hostingWindow
+            }
+
+            let availableWindow = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap { $0.windows }
+                .first { $0.isKeyWindow }
+            return availableWindow
+        }
     }
 
     private func updateStyleState() {
@@ -579,7 +733,19 @@ struct CatalogDropdownComponent: View {
     }
 
     private func toggleDropdownExpansion() {
-        isExpanded.toggle()
+        let newValue = !isExpanded
+        isExpanded = newValue
+
+        if newValue {
+            shouldIgnoreDismissTap = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if isExpanded {
+                    shouldIgnoreDismissTap = false
+                }
+            }
+        } else {
+            shouldIgnoreDismissTap = false
+        }
     }
 
     private func selectItem(at index: Int) {
@@ -588,6 +754,7 @@ struct CatalogDropdownComponent: View {
 
         selectedItemIndex = index
         isExpanded = false
+        shouldIgnoreDismissTap = false
         persistSelectedIndex(index)
 
         guard index < model.catalogItems.count else { return }
