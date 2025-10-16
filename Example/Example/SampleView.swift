@@ -30,7 +30,7 @@ struct SampleView: View {
         RoktLayoutView(
             experienceResponse: vm.experienceResponse,
             location: "#target_element", // "targetElementSelector" in experience JSON file
-            config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
+            config: RoktUXConfig.Builder().enableLogging(true).imageLoader(vm).build()
         ) { uxEvent in
             if uxEvent is RoktUXEvent.LayoutCompleted {
                 dismiss()
@@ -40,6 +40,13 @@ struct SampleView: View {
             } else if let uxEvent = (uxEvent as? RoktUXEvent.OpenUrl) {
                 // Handle open URL event
                 vm.handleURL(uxEvent)
+            } else if let uxEvent = (uxEvent as? RoktUXEvent.CartItemDevicePay) {
+                print("CartItemDevicePay")
+                // Wait for 3 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                    // RoktUX().devicePayFinalized(layoutId: uxEvent.layoutId, catalogItemId: uxEvent.catalogItemId, success: true)
+                    print("CartItemDevicePay success")
+                })
             }
             // Handle UX events here
 

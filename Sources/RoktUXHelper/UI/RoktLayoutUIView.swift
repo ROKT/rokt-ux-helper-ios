@@ -113,6 +113,15 @@ import SwiftUI
         )
     }
 
+    /// Call when device pay has succeeded or failed.
+    /// - Parameters:
+    ///   - layoutId: layout Id for the relevant displayed catalog item.
+    ///   - catalogItemId: Id of the catalog item that was selected.
+    ///   - success: whether the purchase succeeded or failed.
+    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        uxHelper?.devicePayFinalized(layoutId: layoutId, catalogItemId: catalogItemId, success: success)
+    }
+
     private func addEmbeddedLayoutConstraints(embeddedView: UIView) {
         NSLayoutConstraint.activate([
             embeddedView.topAnchor.constraint(equalTo: topAnchor),

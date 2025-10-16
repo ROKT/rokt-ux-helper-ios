@@ -16,6 +16,8 @@ import UIKit
 
 class SampleViewController: UIViewController {
 
+    private var roktView: RoktLayoutUIView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupView()
@@ -27,7 +29,7 @@ class SampleViewController: UIViewController {
             return
         }
 
-        let roktView = RoktLayoutUIView(
+        roktView = RoktLayoutUIView(
             experienceResponse: experience,
             location: "#target_element" // "targetElementSelector" in experience JSON file
         ) { [weak self] uxEvent in
@@ -51,6 +53,17 @@ class SampleViewController: UIViewController {
                 }
             } else if uxEvent is RoktUXEvent.LayoutCompleted {
                 dismiss(animated: true)
+            } else if let event = uxEvent as? RoktUXEvent.CartItemDevicePay {
+                print("CartItemDevicePay")
+                // Wait for 3 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: { [weak self] in
+                    self?.roktView?.devicePayFinalized(
+                        layoutId: event.layoutId,
+                        catalogItemId: event.catalogItemId,
+                        success: true
+                    )
+                    print("CartItemDevicePay success")
+                })
             }
 
             // Handle UX events here
@@ -59,6 +72,7 @@ class SampleViewController: UIViewController {
             // Send these platform events to Rokt API
         }
 
+        guard let roktView else { return }
         view.addSubview(roktView)
 
         roktView.translatesAutoresizingMaskIntoConstraints = false
