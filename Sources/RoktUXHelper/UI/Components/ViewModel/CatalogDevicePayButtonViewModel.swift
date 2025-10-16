@@ -60,6 +60,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
                 catalogItem: catalogItem,
                 paymentProvider: provider,
                 completion: { [weak self] in
+                    // 
                     self?.layoutState?.actionCollection[.close](nil)
                 }
             )
