@@ -20,7 +20,9 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
     func test_creative_response() throws {
 
         let view = try TestPlaceHolder
-            .make(layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:))
+            .make(layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState: layoutState, eventService: eventService)
+            })
 
         let catalogDevicePayButton = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -55,7 +57,9 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
                 }
             },
             eventDelegate: eventDelegate,
-            layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:)
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState: layoutState, eventService: eventService)
+            }
         )
 
         let catalogDevicePayButton = try view.inspect().view(TestPlaceHolder.self)
@@ -77,7 +81,9 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let eventDelegate = MockUXHelper()
         let view = try TestPlaceHolder.make(
             eventDelegate: eventDelegate,
-            layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:)
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState: layoutState, eventService: eventService)
+            }
         )
 
         let sut = try view.inspect().view(TestPlaceHolder.self)
@@ -97,7 +103,9 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
     func test_catalogDevicePayButton_computedProperties_usesModelProperties() throws {
         let view = try TestPlaceHolder.make(
             eventDelegate: MockUXHelper(),
-            layoutMaker: LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState:eventService:)
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState: layoutState, eventService: eventService)
+            }
         )
 
         let sut = try view.inspect().view(TestPlaceHolder.self)
@@ -168,7 +176,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertNil(mockEventService.cartItemDevicePayCompletionCallback) // Should be cleared after success
     }
 
-    func test_cartItemDevicePay_doesNotCallCompletionOnFailure() throws {
+    func test_cartItemDevicePay_callsCompletionOnFailure() throws {
         let mockEventService = MockEventService()
         let layoutState = LayoutState()
 
@@ -205,8 +213,8 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         // Simulate device pay failure
         mockEventService.cartItemDevicePayFailure(itemId: "testItemId")
 
-        // Verify completion callback was NOT called (layout should not close)
-        XCTAssertFalse(closeActionCalled)
+        // Verify completion callback WAS called (layout should close on failure when no custom state key)
+        XCTAssertTrue(closeActionCalled)
         XCTAssertNil(mockEventService.cartItemDevicePayCompletionCallback) // Should be cleared after failure
     }
 }
@@ -215,7 +223,8 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
 extension LayoutSchemaViewModel {
     static func makeCatalogDevicePayButton(
         layoutState: LayoutState,
-        eventService: EventDiagnosticServicing
+        eventService: EventDiagnosticServicing,
+        customStateKey: String? = nil
     ) throws -> Self {
         let transformer = LayoutTransformer(
             layoutPlugin: get_mock_layout_plugin(),
@@ -238,6 +247,7 @@ extension LayoutSchemaViewModel {
                 ),
                 provider: catalogDevicePayButton.provider,
                 validatorTriggerConfig: catalogDevicePayButton.validatorTriggerConfig,
+                customStateKey: customStateKey,
                 context: .inner(.addToCart(catalogItem))
             )
         )

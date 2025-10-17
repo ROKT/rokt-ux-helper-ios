@@ -741,6 +741,7 @@ final class TestLayoutTransformer: XCTestCase {
                 model.children, context: .inner(.addToCart(catalogItem))),
             provider: model.provider,
             validatorTriggerConfig: model.validatorTriggerConfig,
+            customStateKey: "",
             context: .inner(.addToCart(catalogItem)))
 
         // Assert
@@ -774,6 +775,7 @@ final class TestLayoutTransformer: XCTestCase {
                     model.children, context: .inner(.addToCart(catalogItem))),
                 provider: provider,
                 validatorTriggerConfig: model.validatorTriggerConfig,
+                customStateKey: "",
                 context: .inner(.addToCart(catalogItem)))
 
             // Assert
@@ -800,6 +802,7 @@ final class TestLayoutTransformer: XCTestCase {
                 model.children, context: .inner(.addToCart(catalogItem))),
             provider: model.provider,
             validatorTriggerConfig: model.validatorTriggerConfig,
+            customStateKey: "",
             context: .inner(.addToCart(catalogItem)))
 
         // Assert - Check that styles are properly transformed
@@ -828,6 +831,7 @@ final class TestLayoutTransformer: XCTestCase {
                     model.children, context: .inner(.generic(nil))),
                 provider: model.provider,
                 validatorTriggerConfig: model.validatorTriggerConfig,
+                customStateKey: "",
                 context: .inner(.generic(nil)))) { error in
             XCTAssertTrue(error is LayoutTransformerError)
         }
@@ -852,6 +856,7 @@ final class TestLayoutTransformer: XCTestCase {
                 model.children, context: .inner(.addToCart(catalogItem))),
             provider: model.provider,
             validatorTriggerConfig: model.validatorTriggerConfig,
+            customStateKey: "",
             context: .inner(.addToCart(catalogItem)))
 
         // Assert - Check that children are properly transformed

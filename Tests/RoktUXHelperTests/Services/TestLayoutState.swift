@@ -36,11 +36,14 @@ class TestLayoutState: XCTestCase {
     func testUpdateLayoutType() {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test layout type")
+        var fulfilled = false
         let cancellable = layoutState.itemsPublisher
             .dropFirst()
             .sink { newItems in
-                XCTAssertEqual(newItems[LayoutState.layoutType] as? RoktUXPlacementLayoutCode, .overlayLayout)
-                expectation.fulfill()
+                if !fulfilled, newItems[LayoutState.layoutType] as? RoktUXPlacementLayoutCode == .overlayLayout {
+                    fulfilled = true
+                    expectation.fulfill()
+                }
             }
         layoutState.items[LayoutState.layoutType] = RoktUXPlacementLayoutCode.overlayLayout
         wait(for: [expectation], timeout: 1)

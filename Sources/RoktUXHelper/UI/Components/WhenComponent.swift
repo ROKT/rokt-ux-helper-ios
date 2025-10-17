@@ -25,6 +25,7 @@ struct WhenComponent: View {
     let totalOffers: Int
 
     @Binding var customStateMap: RoktUXCustomStateMap?
+    @Binding var globalCustomStateMap: RoktUXCustomStateMap?
 
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
 
@@ -47,7 +48,8 @@ struct WhenComponent: View {
                 position: config.position,
                 width: globalScreenSize.width ?? 0,
                 isDarkMode: colorScheme == .dark,
-                customStateMap: customStateMap))
+                customStateMap: customStateMap,
+                globalCustomStateMap: globalCustomStateMap))
     }
 
     init(
@@ -67,6 +69,7 @@ struct WhenComponent: View {
         _currentProgress = model.currentProgress
         totalOffers = model.totalItems
         _customStateMap = model.customStateMap
+        _globalCustomStateMap = model.globalCustomStateMap
 
         self.parentOverride = parentOverride
         model.componentConfig = config
@@ -143,4 +146,5 @@ struct WhenComponentUIState {
     let width: CGFloat
     let isDarkMode: Bool
     let customStateMap: RoktUXCustomStateMap?
+    let globalCustomStateMap: RoktUXCustomStateMap?
 }

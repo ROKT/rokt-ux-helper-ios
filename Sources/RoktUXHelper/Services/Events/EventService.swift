@@ -18,6 +18,12 @@ enum LayoutDismissOptions {
     case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered, instantPurchaseDismiss
 }
 
+enum DevicePayStatus {
+    case success
+    case failure
+    case retry
+}
+
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
 
 @available(iOS 13.0, *)
@@ -39,7 +45,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     var isFirstPositiveEngagementSend = false
     var dismissOption: LayoutDismissOptions?
 
-    private var devicePayCompletion: (() -> Void)?
+    private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -192,7 +198,11 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
-    func cartItemDevicePay(catalogItem: CatalogItem, paymentProvider: PaymentProvider, completion: @escaping () -> Void) {
+    func cartItemDevicePay(
+        catalogItem: CatalogItem,
+        paymentProvider: PaymentProvider,
+        completion: @escaping (_ status: DevicePayStatus) -> Void
+    ) {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
 
@@ -203,7 +213,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
 
-        devicePayCompletion?()
+        devicePayCompletion?(.success)
         devicePayCompletion = nil
     }
 
@@ -211,6 +221,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
 
+        devicePayCompletion?(.failure)
         devicePayCompletion = nil
     }
 

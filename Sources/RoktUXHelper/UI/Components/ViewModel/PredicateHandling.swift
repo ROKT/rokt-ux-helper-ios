@@ -21,6 +21,7 @@ protocol PredicateHandling {
     var currentProgress: Binding<Int> { get }
     var totalItems: Int { get }
     var customStateMap: Binding<RoktUXCustomStateMap?> { get }
+    var globalCustomStateMap: Binding<RoktUXCustomStateMap?> { get }
     var globalBreakPoints: BreakPoint? { get }
     var offers: [OfferModel?] { get }
     var width: CGFloat { get }
@@ -51,6 +52,10 @@ extension PredicateHandling {
         layoutState?.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
     }
 
+    var globalCustomStateMap: Binding<RoktUXCustomStateMap?> {
+        layoutState?.items[LayoutState.globalCustomStateMapKey] as? Binding<RoktUXCustomStateMap?> ?? .constant(nil)
+    }
+
     func shouldApply() -> Bool {
         shouldApply(
             WhenComponentUIState(
@@ -59,7 +64,8 @@ extension PredicateHandling {
                 position: componentConfig?.position ?? 0,
                 width: width,
                 isDarkMode: layoutState?.colorMode == .dark,
-                customStateMap: customStateMap.wrappedValue
+                customStateMap: customStateMap.wrappedValue,
+                globalCustomStateMap: globalCustomStateMap.wrappedValue
             )
         )
     }
@@ -301,7 +307,9 @@ extension PredicateHandling {
         return matched
     }
 
-    private func customStatePredicatesMatched(customStateMap: RoktUXCustomStateMap?, position: Int?) -> Bool? {
+    private func customStatePredicatesMatched(customStateMap: RoktUXCustomStateMap?,
+                                              globalCustomStateMap: RoktUXCustomStateMap?,
+                                              position: Int?) -> Bool? {
         guard !customStatePredicates.isEmpty else { return nil }
 
         // Predicates need to applied if all of the predicates are met.
@@ -309,8 +317,17 @@ extension PredicateHandling {
         var matched = true
 
         customStatePredicates.forEach { predicate in
-            let customStateId = CustomStateIdentifiable(position: position, key: predicate.key)
-            let customStateValue = customStateMap?[customStateId] ?? 0
+            let localIdentifier = CustomStateIdentifiable(position: position, key: predicate.key)
+            let globalIdentifier = CustomStateIdentifiable(position: nil, key: predicate.key)
+            let customStateValue: Int
+            if let position,
+               let localValue = customStateMap?[localIdentifier] {
+                customStateValue = localValue
+            } else if let globalValue = globalCustomStateMap?[globalIdentifier] {
+                customStateValue = globalValue
+            } else {
+                customStateValue = 0
+            }
             switch predicate.condition {
             case .is:
                 matched = matched && customStateValue == predicate.value
@@ -336,7 +353,9 @@ extension PredicateHandling {
         let staticBooleanMatched = staticBooleanPredicatesMatched()
         let creativeCopyMatched = creativeCopyMatched(offerPosition: uiState.currentProgress)
         let staticStringMatched = staticStringPredicatesMatched()
-        let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap, position: uiState.position)
+        let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap,
+                                                              globalCustomStateMap: uiState.globalCustomStateMap,
+                                                              position: uiState.position)
 
         if progressionMatched == nil &&
             breakPointsMatched == nil &&

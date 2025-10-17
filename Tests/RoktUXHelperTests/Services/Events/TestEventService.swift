@@ -353,7 +353,7 @@ final class TestEventService: XCTestCase {
             })
 
         // Act
-        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) { _ in
             // Completion handler - not called immediately
         }
 
@@ -431,10 +431,12 @@ final class TestEventService: XCTestCase {
             })
 
         var completionCalled = false
+        var receivedStatus: DevicePayStatus?
 
         // Act - First call cartItemDevicePay (completion should be stored but not called)
-        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) { status in
             completionCalled = true
+            receivedStatus = status
         }
 
         // Assert - Completion should not be called yet
@@ -443,8 +445,9 @@ final class TestEventService: XCTestCase {
         // Act - Then call cartItemDevicePaySuccess (completion should be called)
         eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
 
-        // Assert - Completion should now be called
+        // Assert - Completion should now be called with success status
         XCTAssertTrue(completionCalled, "Completion should be called on success")
+        XCTAssertEqual(receivedStatus, .success, "Completion should receive .success status")
 
         // Verify events were sent
         XCTAssertEqual(events.count, 2)
@@ -490,7 +493,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
     }
 
-    func test_device_pay_completion_handler_not_called_on_failure() {
+    func test_device_pay_completion_handler_called_on_failure() {
         // Arrange
         let eventService = get_mock_event_processor(
             startDate: startDate,
@@ -501,20 +504,23 @@ final class TestEventService: XCTestCase {
             })
 
         var completionCalled = false
+        var receivedStatus: DevicePayStatus?
 
         // Act - First call cartItemDevicePay (completion should be stored but not called)
-        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) {
+        eventService.cartItemDevicePay(catalogItem: .mock(), paymentProvider: .applePay) { status in
             completionCalled = true
+            receivedStatus = status
         }
 
         // Assert - Completion should not be called yet
         XCTAssertFalse(completionCalled, "Completion should not be called immediately")
 
-        // Act - Then call cartItemDevicePayFailure (completion should NOT be called)
+        // Act - Then call cartItemDevicePayFailure (completion should be called with .failure)
         eventService.cartItemDevicePayFailure(itemId: "catalogItemId")
 
-        // Assert - Completion should still not be called
-        XCTAssertFalse(completionCalled, "Completion should not be called on failure")
+        // Assert - Completion should be called with failure status
+        XCTAssertTrue(completionCalled, "Completion should be called on failure")
+        XCTAssertEqual(receivedStatus, .failure, "Completion should receive .failure status")
 
         // Verify events were sent
         XCTAssertEqual(events.count, 2)

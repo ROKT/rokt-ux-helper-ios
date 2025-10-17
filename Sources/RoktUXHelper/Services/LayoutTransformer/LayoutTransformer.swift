@@ -227,6 +227,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         children: transformChildren(model.children, context: context),
                         provider: model.provider,
                         validatorTriggerConfig: model.validatorTriggerConfig,
+                        customStateKey: model.customStateKey,
                         context: context
                     )
                 )
@@ -795,6 +796,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         children: [LayoutSchemaViewModel]?,
         provider: PaymentProvider,
         validatorTriggerConfig: ValidationTriggerConfig?,
+        customStateKey: String?,
         context: Context
     ) throws -> CatalogDevicePayButtonViewModel {
         guard case let .inner(.addToCart(catalogItem)) = context else {
@@ -807,11 +809,12 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             provider: provider,
             layoutState: layoutState,
             eventService: eventService,
-            defaultStyle: updateStyles.compactMap {$0.default},
-            pressedStyle: updateStyles.compactMap {$0.pressed},
-            hoveredStyle: updateStyles.compactMap {$0.hovered},
-            disabledStyle: updateStyles.compactMap {$0.disabled},
-            validatorTriggerConfig: validatorTriggerConfig
+            defaultStyle: updateStyles.compactMap { $0.default },
+            pressedStyle: updateStyles.compactMap { $0.pressed },
+            hoveredStyle: updateStyles.compactMap { $0.hovered },
+            disabledStyle: updateStyles.compactMap { $0.disabled },
+            validatorTriggerConfig: validatorTriggerConfig,
+            customStateKey: customStateKey
         )
     }
 

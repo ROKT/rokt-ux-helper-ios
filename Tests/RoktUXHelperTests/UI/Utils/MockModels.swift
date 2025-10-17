@@ -45,13 +45,15 @@ func get_mock_uistate(currentProgress: Int = 0,
                       position: Int? = nil,
                       width: CGFloat = 100,
                       isDarkMode: Bool = false,
-                      customStateMap: RoktUXCustomStateMap? = nil) -> WhenComponentUIState {
+                      customStateMap: RoktUXCustomStateMap? = nil,
+                      globalCustomStateMap: RoktUXCustomStateMap? = nil) -> WhenComponentUIState {
     return WhenComponentUIState(currentProgress: currentProgress,
                                 totalOffers: totalOffers,
                                 position: position,
                                 width: width,
                                 isDarkMode: isDarkMode,
-                                customStateMap: customStateMap)
+                                customStateMap: customStateMap,
+                                globalCustomStateMap: globalCustomStateMap)
 }
 
 @available(iOS 13.0, *)
