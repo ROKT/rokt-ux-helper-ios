@@ -526,19 +526,17 @@ struct CatalogDropdownComponent: View {
 
     @ViewBuilder
     private func expandedDropdown() -> some View {
-        ScrollView(.vertical, showsIndicators: true) {
-            VStack(
-                alignment: columnPerpendicularAxisAlignment(alignItems: dropdownListContainerContainerStyle?.alignItems),
-                spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
-            ) {
-                ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
-                    Button {
-                        selectItem(at: index)
-                    } label: {
-                        dropdownItemView(for: index)
-                    }
-                    .buttonStyle(.plain)
+        VStack(
+            alignment: columnPerpendicularAxisAlignment(alignItems: dropdownListContainerContainerStyle?.alignItems),
+            spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
+        ) {
+            ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
+                Button {
+                    selectItem(at: index)
+                } label: {
+                    dropdownItemView(for: index)
                 }
+                .buttonStyle(.plain)
             }
         }
         .applyLayoutModifier(
