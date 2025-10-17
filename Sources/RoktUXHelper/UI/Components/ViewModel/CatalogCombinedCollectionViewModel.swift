@@ -41,6 +41,15 @@ final class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSi
     @discardableResult
     func rebuildChildren(for catalogItem: CatalogItem) -> Bool {
         guard let newChildren = childBuilder?(catalogItem) else { return false }
+
+        // Apply HTML transformation to the newly created children
+        newChildren.forEach { child in
+            AttributedStringTransformer.convertRichTextHTMLIfExists(
+                uiModel: child,
+                config: layoutState?.config
+            )
+        }
+
         children = newChildren
         return true
     }
