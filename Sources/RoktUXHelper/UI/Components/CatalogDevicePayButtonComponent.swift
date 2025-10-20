@@ -44,8 +44,6 @@ struct CatalogDevicePayButtonComponent: View {
     @State var isPressed: Bool = false
     @State var isDisabled: Bool = false
 
-    @GestureState private var isPressingDown: Bool = false
-
     var style: CatalogDevicePayButtonStyles? {
         switch styleState {
         case .hovered:
@@ -152,28 +150,21 @@ struct CatalogDevicePayButtonComponent: View {
             .onTapGesture {
                 handleButtonTapped()
             }
-            // consecutive gestures to track when long press is held vs released
-            .gesture(LongPressGesture()
-                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
-                .updating($isPressingDown) { value, state, _ in
-                    switch value {
-                    case .second(true, nil):
-                        state = true
-                    default:
-                        break
+            .simultaneousGesture(
+                LongPressGesture(minimumDuration: 0, maximumDistance: 44)
+                    .onChanged { _ in
+                        if !isPressed {
+                            isPressed = true
+                            updateStyleState()
+                        }
                     }
-                })
-            .onChange(of: isPressingDown) { value in
-                if !value {
-                    // handle link when long press is released
-                    handleButtonTapped()
-                }
-            }
-            .onLongPressGesture(perform: {
-            }, onPressingChanged: { isPressed in
-                self.isPressed = isPressed
-                updateStyleState()
-            })
+                    .onEnded { _ in
+                        if isPressed {
+                            isPressed = false
+                            updateStyleState()
+                        }
+                    }
+            )
     }
 
     func build() -> some View {

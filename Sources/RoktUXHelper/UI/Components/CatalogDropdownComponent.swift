@@ -357,7 +357,6 @@ struct CatalogDropdownComponent: View {
                     dropdownFrameChangeIndex += 1
                 }
             }
-            .contentShape(Rectangle())
             .alignSelf(alignSelf: flexStyle?.alignSelf,
                        parent: config.parent,
                        parentHeight: parentHeight,
@@ -366,6 +365,7 @@ struct CatalogDropdownComponent: View {
                        parentHorizontalAlignment: parentOverride?.parentHorizontalAlignment,
                        applyAlignSelf: true)
             .margin(spacing: spacingStyle, applyMargin: true)
+            .contentShape(Rectangle())
             .readSize(spacing: spacingStyle) { size in
                 availableWidth = size.width
                 availableHeight = size.height
@@ -401,6 +401,7 @@ struct CatalogDropdownComponent: View {
             dropdownButtonPrimaryContent()
             validationErrorView()
         }
+        .contentShape(Rectangle())
         .onAppear {
             registerValidatorIfNeeded()
             syncSelectedItemFromLayoutState()
@@ -454,7 +455,6 @@ struct CatalogDropdownComponent: View {
             styleState: $styleState,
             parentOverride: parentOverride
         )
-        .onTapGesture(perform: tapHandler)
         .background(
             ViewFrameReader { frame in
                 guard frame != .zero else { return }
@@ -477,6 +477,8 @@ struct CatalogDropdownComponent: View {
                 buttonFrameInGlobal = frame
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: tapHandler)
     }
 
     @ViewBuilder
