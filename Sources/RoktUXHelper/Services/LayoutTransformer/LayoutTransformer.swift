@@ -750,83 +750,20 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
 
         let ownStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.styles?.elements?.own)
 
-        let indicator = dataImageCarouselModel.styles?.elements?.indicator ?? [
-            .init(
-                default: .init(
-                    container: .init(justifyContent: nil, alignItems: nil, shadow: nil, overflow: .hidden, gap: nil, blur: nil),
-                    background: .init(backgroundColor: .init(light: "#66FFFFFF", dark: nil), backgroundImage: nil),
-                    border: .init(BorderStylingProperties(borderRadius: 4, borderColor: nil, borderWidth: nil, borderStyle: nil)),
-                    dimension: .init(
-                        minWidth: nil,
-                        maxWidth: 75,
-                        width: .fixed(8),
-                        minHeight: nil,
-                        maxHeight: nil,
-                        height: .fixed(8),
-                        rotateZ: nil
-                    ),
-                    flexChild: nil,
-                    spacing: nil
-                ),
-                pressed: nil,
-                hovered: nil,
-                disabled: nil
-            )
-        ]
-        let indicatorStyle = try StyleTransformer.updatedStyles(indicator)
+        let indicatorStyle = try StyleTransformer.updatedStyles(dataImageCarouselModel.indicatorStyles)
         let seenIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             indicatorStyle,
-            newStyles: dataImageCarouselModel.styles?.elements?.seenIndicator
+            newStyles: dataImageCarouselModel.seenIndicatorStyles
         )
-
-        let activeIndicator = dataImageCarouselModel.styles?.elements?.activeIndicator ?? [
-            .init(
-                default: .init(
-                    container: nil,
-                    background: .init(backgroundColor: .init(light: "#FFFFFF", dark: nil), backgroundImage: nil),
-                    border: nil,
-                    dimension: nil,
-                    flexChild: nil,
-                    spacing: nil
-                ),
-                pressed: nil,
-                hovered: nil,
-                disabled: nil
-            )
-        ]
 
         // active falls back to seen (which then falls back to indicator)
         let activeIndicatorStyle = try StyleTransformer.updatedIndicatorStyles(
             seenIndicatorStyle,
-            newStyles: activeIndicator
+            newStyles: dataImageCarouselModel.activeIndicatorStyles
         )
 
-        let progressIndicatorContainer = dataImageCarouselModel.styles?.elements?.progressIndicatorContainer ?? [
-            .init(
-                default: .init(
-                    container: .init(justifyContent: .center, alignItems: .center, shadow: nil, overflow: nil, gap: 2, blur: nil),
-                    background: nil,
-                    border: nil,
-                    dimension: .init(
-                        minWidth: nil,
-                        maxWidth: nil,
-                        width: .percentage(100),
-                        minHeight: nil,
-                        maxHeight: nil,
-                        height: nil,
-                        rotateZ: nil
-                    ),
-                    flexChild: nil,
-                    spacing: .init(padding: nil, margin: nil, offset: "0 -10")
-                ),
-                pressed: nil,
-                hovered: nil,
-                disabled: nil
-            )
-        ]
-
         let indicatorContainerStyle = try StyleTransformer
-            .updatedStyles(progressIndicatorContainer)
+            .updatedStyles(dataImageCarouselModel.progressIndicatorContainerStyles)
 
         let transition = dataImageCarouselModel.transition ?? .fadeInOut(.init(speed: .medium))
         let indicators = dataImageCarouselModel.indicators ?? .init(show: true, activeIndicatorMode: .timer)
@@ -950,5 +887,124 @@ private extension CarouselTransition {
         case let .slideInOut(settings):
             return .slideInOut(settings.doubleValue)
         }
+    }
+}
+
+private extension ContainerStylingProperties {
+    static func build(
+        justifyContent: FlexJustification? = nil,
+        alignItems: FlexAlignment? = nil,
+        shadow: Shadow? = nil,
+        overflow: Overflow? = nil,
+        gap: Float? = nil,
+        blur: Float? = nil
+    ) -> ContainerStylingProperties {
+        ContainerStylingProperties(
+            justifyContent: justifyContent,
+            alignItems: alignItems,
+            shadow: shadow,
+            overflow: overflow,
+            gap: gap,
+            blur: blur
+        )
+    }
+}
+
+private extension BasicStateStylingBlock<DataImageCarouselIndicatorStyles> {
+    static func build(
+        default: DataImageCarouselIndicatorStyles,
+        pressed: DataImageCarouselIndicatorStyles? = nil,
+        hovered: DataImageCarouselIndicatorStyles? = nil,
+        disabled: DataImageCarouselIndicatorStyles? = nil
+    ) -> BasicStateStylingBlock<DataImageCarouselIndicatorStyles> {
+        .init(
+            default: `default`,
+            pressed: pressed,
+            hovered: hovered,
+            disabled: disabled
+        )
+    }
+
+    static var dafaultIndicatorStyle: Self = .build(
+        default: .build(
+            container: .build(overflow: .hidden),
+            background: .init(backgroundColor: .init(light: "#66FFFFFF", dark: nil), backgroundImage: nil),
+            border: .init(BorderStylingProperties(borderRadius: 4, borderColor: nil, borderWidth: nil, borderStyle: nil)),
+            dimension: .build(maxWidth: 75, width: .fixed(8), height: .fixed(8))
+        )
+    )
+
+    static var dafaultActiveIndicatorStyle: Self = .build(
+        default: .build(
+            background: .init(backgroundColor: .init(light: "#FFFFFF", dark: nil), backgroundImage: nil),
+        )
+    )
+
+    static var dafaultProgressIndicatorStyle: Self = .build(
+        default: .build(
+            container: .build(justifyContent: .center, alignItems: .center, gap: 2),
+            dimension: .build(width: .percentage(100)),
+            spacing: .init(padding: nil, margin: nil, offset: "0 -10")
+        )
+    )
+}
+
+private extension DataImageCarouselIndicatorStyles {
+    static func build(
+        container: ContainerStylingProperties? = nil,
+        background: BackgroundStylingProperties? = nil,
+        border: BorderStylingProperties? = nil,
+        dimension: DimensionStylingProperties? = nil,
+        flexChild: FlexChildStylingProperties? = nil,
+        spacing: SpacingStylingProperties? = nil
+    ) -> DataImageCarouselIndicatorStyles {
+        .init(
+            container: container,
+            background: background,
+            border: border,
+            dimension: dimension,
+            flexChild: flexChild,
+            spacing: spacing
+        )
+    }
+}
+
+private extension DimensionStylingProperties {
+    static func build(
+        minWidth: Float? = nil,
+        maxWidth: Float? = nil,
+        width: DimensionWidthValue? = nil,
+        minHeight: Float? = nil,
+        maxHeight: Float? = nil,
+        height: DimensionHeightValue? = nil,
+        rotateZ: Float? = nil
+    ) -> DimensionStylingProperties {
+        .init(
+            minWidth: minWidth,
+            maxWidth: maxWidth,
+            width: width,
+            minHeight: minHeight,
+            maxHeight: maxHeight,
+            height: height,
+            rotateZ: rotateZ
+        )
+    }
+}
+
+private extension DataImageCarouselModel<WhenPredicate> {
+    var progressIndicatorContainerStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>] {
+        styles?.elements?.progressIndicatorContainer ?? [.dafaultProgressIndicatorStyle]
+    }
+
+    var activeIndicatorStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>] {
+        styles?.elements?.activeIndicator ?? [.dafaultActiveIndicatorStyle]
+    }
+
+    var indicatorStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>] {
+        styles?.elements?.indicator ?? [.dafaultIndicatorStyle]
+    }
+
+    var seenIndicatorStyles: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]? {
+        styles?.elements?.seenIndicator
     }
 }
