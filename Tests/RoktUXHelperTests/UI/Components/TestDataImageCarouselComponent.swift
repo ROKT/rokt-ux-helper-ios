@@ -62,7 +62,7 @@ extension CreativeImage {
 @available(iOS 15.0, *)
 extension ImageCarouselIndicatorViewModel {
     static func mock(
-        positions: Int = 0,
+        positions: Int = 2,
         duration: Int32 = 0,
         stylingProperties: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]? = nil,
         indicatorStyle: [BasicStateStylingBlock<DataImageCarouselIndicatorStyles>]? = nil,
