@@ -1,329 +1,335 @@
+
 {
-  "sessionId": "b20b0004-7cf8-493d-b0c2-b324ee580000",
-  "pageContext": {
-    "pageInstanceGuid": "b20b0004-7cf9-4566-a708-9c90574690f9",
-    "pageId": "6b1214f0-43e1-447d-b0bb-cf493d361411",
-    "language": "en",
-    "isPageDetected": true,
-    "pageVariantName": "iOSVaraint1",
-    "token": ""
-  },
-  "plugins": [
-    {
-      "plugin": {
-        "id": "3353172846080032866",
-        "name": "dcui",
-        "targetElementSelector": "#target_element",
-        "targetElementPosition": "append",
-        "targetElementRelation": "child",
-        "targetSection": "None",
-        "config": {
-          "slots": [
-            {
-              "instanceGuid": "e17a5b55-6af3-457b-b931-80b0311d511d",
-              "offer": {
-                "campaignId": "3357838645166342229",
-                "accountId": "3190863162773654563",
-                "maxTotalItemsQtyInOffer": 1,
-                "creative": {
-                  "referralCreativeId": "3357838791195164752",
-                  "instanceGuid": "30441ef1-8223-4b5f-abac-dc92dae7cedb",
-                  "responseOptionsMap": {
-                    "positive": {
-                      "id": "3357840785583243266",
-                      "action": "Url",
-                      "instanceGuid": "99ce00e8-8803-4112-9aa4-beed46deeaed",
-                      "signalType": "SignalResponse",
-                      "shortLabel": "Yes please",
-                      "longLabel": "Yes please",
-                      "shortSuccessLabel": "Email Sent",
-                      "isPositive": true,
-                      "url": "https://www.rokt.com",
-                      "ignoreBranch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
+    "sessionId": "b20b0004-7cf8-493d-b0c2-b324ee580000",
+    "pageContext": {
+      "pageInstanceGuid": "b20b0004-7cf9-4566-a708-9c90574690f9",
+      "pageId": "6b1214f0-43e1-447d-b0bb-cf493d361411",
+      "language": "en",
+      "isPageDetected": true,
+      "pageVariantName": "iOSVaraint1",
+      "token": ""
+    },
+    "plugins": [
+      {
+        "plugin": {
+          "id": "3353172846080032866",
+          "name": "dcui",
+          "targetElementSelector": "#target_element",
+          "targetElementPosition": "append",
+          "targetElementRelation": "child",
+          "targetSection": "None",
+          "config": {
+            "slots": [
+              {
+                "instanceGuid": "e17a5b55-6af3-457b-b931-80b0311d511d",
+                "offer": {
+                  "campaignId": "3357838645166342229",
+                  "accountId": "3190863162773654563",
+                  "maxTotalItemsQtyInOffer": 1,
+                  "creative": {
+                    "referralCreativeId": "3357838791195164752",
+                    "instanceGuid": "30441ef1-8223-4b5f-abac-dc92dae7cedb",
+                    "responseOptionsMap": {
+                      "positive": {
+                        "id": "3357840785583243266",
+                        "action": "Url",
+                        "instanceGuid": "99ce00e8-8803-4112-9aa4-beed46deeaed",
+                        "signalType": "SignalResponse",
+                        "shortLabel": "Yes please",
+                        "longLabel": "Yes please",
+                        "shortSuccessLabel": "Email Sent",
+                        "isPositive": true,
+                        "url": "https://www.rokt.com",
+                        "ignoreBranch": false,
+                        "urlBehavior": "newTab",
+                        "token": ""
+                      },
+                      "negative": {
+                        "id": "3357840785583243267",
+                        "action": "CaptureOnly",
+                        "instanceGuid": "a7616afb-fd9b-4949-9926-2dc30d3ffb47",
+                        "signalType": "SignalResponse",
+                        "shortLabel": "No thanks",
+                        "longLabel": "No thanks",
+                        "isPositive": false,
+                        "ignoreBranch": false,
+                        "urlBehavior": "newTab",
+                        "token": ""
+                      }
                     },
-                    "negative": {
-                      "id": "3357840785583243267",
-                      "action": "CaptureOnly",
-                      "instanceGuid": "a7616afb-fd9b-4949-9926-2dc30d3ffb47",
+                    "links": {},
+                    "images": {
+                      "creativeImage": {
+                        "light": "",
+                        "dark": "",
+                        "alt": "",
+                        "title": ""
+                      }
+                    },
+                    "icons": {},
+                    "token": "",
+                    "advertiser": {
+                      "name": "Test",
+                      "brand": "Test"
+                    },
+                    "copy": {
+                      "provider.hasDiscount": "true",
+                      "creative.heading.title": "Stained Socks",
+                      "creative.catalogItem.option.type": "shortlabel",
+                      "creative.gallery.image.1.src": "https://images.ctfassets.net/yn04o8yn9gx8/79ll3mHwlmzRUEqBdhRHMe/d83eb2d598bd6314b34ec579c6dd7f0b/SOCKS-CLAY.jpg?w=1200&h=1500&q=100&fm=webp",
+                      "creative.gallery.image.2.src": "https://images.ctfassets.net/yn04o8yn9gx8/Z5DsgMmxndmPgpF1K1L9E/cc3900cff84285429fca48aa674b1c4d/CLAY-BACKGROUND_.jpg?w=1200&h=1500&fl=progressive&q=50&fm=jpg",
+                      "creative.gallery.image.3.src": "https://www.careofcarl.com/bilder/artiklar/28379810.jpg?m=1743694441",
+                      "creative.gallery.image.4.src": "https://images.ctfassets.net/yn04o8yn9gx8/6jUgzAO4uxOaUPee3hUOCA/39d0cb2f3d5c3ce8bc54ed874465f669/PALMES-ECOM-SS25-73727777-web.jpg?w=1440&h=1800&fl=progressive&q=100&fm=jpg",
+                      "ppu.firstName": "Steve",
+                      "ppu.lastName": "Smith",
+                      "ppu.email": "steve.smith@sbcglobal.net",
+                      "ppu.shippingAddress1": "123 shippy lane",
+                      "ppu.shippingAddress2": "APT 123",
+                      "ppu.shippingCity": "New York",
+                      "ppu.shippingState": "NY",
+                      "ppu.shippingCountry": "United States",
+                      "ppu.shippingZipcode": "10001",
+                      "ppu.partnerPaymentReference": "1974582",
+                      "ppu.last4Digits": "4111",
+                      "ppu.paymentType": "visa"
+                    }
+                  },
+                  "catalogItemResponseAction": "Cart",
+                  "catalogItems": [
+                    {
+                      "images": {
+                        "catalogItemImage0": {
+                          "light": "https://images.ctfassets.net/yn04o8yn9gx8/79ll3mHwlmzRUEqBdhRHMe/d83eb2d598bd6314b34ec579c6dd7f0b/SOCKS-CLAY.jpg?w=1200&h=1500&q=100&fm=webp",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage1": {
+                          "light": "https://images.ctfassets.net/yn04o8yn9gx8/Z5DsgMmxndmPgpF1K1L9E/cc3900cff84285429fca48aa674b1c4d/CLAY-BACKGROUND_.jpg?w=1200&h=1500&fl=progressive&q=50&fm=jpg",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage2": {
+                          "light": "https://www.careofcarl.com/bilder/artiklar/28379810.jpg?m=1743694441",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage3": {
+                          "light": "https://images.ctfassets.net/yn04o8yn9gx8/6jUgzAO4uxOaUPee3hUOCA/39d0cb2f3d5c3ce8bc54ed874465f669/PALMES-ECOM-SS25-73727777-web.jpg?w=1440&h=1800&fl=progressive&q=100&fm=jpg",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage4": {
+                          "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/1uqf54mIQKHPbur9ootDHE/1a080df9f17448937a8b8142110faa8c/8861-lapisblue-adult-unisex-layflat-1-transparent.png",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage5": {
+                          "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/3pqcf7KDUjZV72FY9zSnDj/703751819560c9a9e86ceb79c4c2b3e5/8861-lapisblue-adult-male-onmodel-2-transparent.png",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage6": {
+                          "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw2273067d/images/DC0455406D-D1.jpg?sfrm=jpeg&sw=3000&q=80",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage7": {
+                          "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw583a6f6c/images/DC0455406D-FI.jpg?sfrm=jpeg&sw=3000&q=80",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        }
+                      },
+                      "catalogItemId": "catalogItemId0",
+                      "cartItemId": "cartItemId0",
+                      "instanceGuid": "CatalogItemInstanceGuidOne",
+                      "title": "Burnt Clay",
+                      "description": "Lorem ipsum dolor sit amet consectetur adipiscing elit. Ex sapien vitae pellentesque sem placerat in id. Pretium tellus duis convallis tempus leo eu aenean. Urna tempor pulvinar vivamus fringilla lacus nec metus. Iaculis massa nisl malesuada lacinia integer nunc posuere. Semper vel class aptent taciti sociosqu ad litora. Conubia nostra inceptos himenaeos orci varius natoque penatibus. Dis parturient montes nascetur ridiculus mus donec rhoncus. Nulla molestie mattis scelerisque maximus eget fermentum odio. Purus est efficitur laoreet mauris pharetra vestibulum fusce.",
+                      "price": 24,
+                      "priceFormatted": "$24",
+                      "originalPrice": 30,
+                      "originalPriceFormatted": "$30",
+                      "currency": "USD",
                       "signalType": "SignalResponse",
-                      "shortLabel": "No thanks",
-                      "longLabel": "No thanks",
-                      "isPositive": false,
-                      "ignoreBranch": false,
+                      "url": "",
+                      "minItemCount": 0,
+                      "maxItemCount": 1,
+                      "preSelectedQuantity": 1,
+                      "providerData": "1974582",
                       "urlBehavior": "newTab",
-                      "token": ""
+                      "positiveResponseText": "Add to Order",
+                      "negativeResponseText": "No Thanks",
+                      "addOns": [],
+                      "copy": {
+                        "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
+                        "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
+                        "provider.supplierName": "Reshoevn8r",
+                        "provider.shortlabel": "S",
+                        "provider.discountLabel": "Save 20%",
+                        "provider.color.hex": "#E6B8A2",
+                        "provider.variationTitle": "Burnt Clay",
+                        "provider.pricing.shippingFees": "4.90",
+                        "provider.pricing.salesTax": "1.94",
+                        "provider.pricing.totalPrice": "26.72"
+                      },
+                      "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    },
+                    {
+                      "images": {
+                        "catalogItemImage0": {
+                          "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/1uqf54mIQKHPbur9ootDHE/1a080df9f17448937a8b8142110faa8c/8861-lapisblue-adult-unisex-layflat-1-transparent.png",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage1": {
+                          "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/3pqcf7KDUjZV72FY9zSnDj/703751819560c9a9e86ceb79c4c2b3e5/8861-lapisblue-adult-male-onmodel-2-transparent.png",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage2": {
+                          "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw2273067d/images/DC0455406D-D1.jpg?sfrm=jpeg&sw=3000&q=80",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage3": {
+                          "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw583a6f6c/images/DC0455406D-FI.jpg?sfrm=jpeg&sw=3000&q=80",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        }
+                      },
+                      "catalogItemId": "catalogItemId1",
+                      "cartItemId": "cartItemId1",
+                      "instanceGuid": "CatalogItemInstanceGuidTwo",
+                      "title": "Niagara Blue",
+                      "description": "One size, fits all.<br>• Dip-dye clay effect<br>• 85% Cotton + 13% Polyamide + 2% Elastane<br>• Embroidery on leg<br>• Screenprint on foot<br>• Made in Portugal",
+                      "price": 20,
+                      "priceFormatted": "$20",
+                      "originalPrice": 30,
+                      "originalPriceFormatted": "$30",
+                      "currency": "USD",
+                      "signalType": "SignalResponse",
+                      "url": "",
+                      "minItemCount": 0,
+                      "maxItemCount": 1,
+                      "preSelectedQuantity": 1,
+                      "providerData": "1974582",
+                      "urlBehavior": "newTab",
+                      "positiveResponseText": "Add to Order",
+                      "negativeResponseText": "No Thanks",
+                      "addOns": [],
+                      "copy": {
+                        "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
+                        "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
+                        "provider.supplierName": "Reshoevn8r",
+                        "provider.shortlabel": "M",
+                        "provider.discountLabel": "Save 20%",
+                        "provider.color.hex": "#A2C6E6",
+                        "provider.variationTitle": "Niagara Blue",
+                        "provider.pricing.shippingFees": "4.90",
+                        "provider.pricing.salesTax": "1.94",
+                        "provider.pricing.totalPrice": "26.72"
+                      },
+                      "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    },
+                    {
+                      "images": {
+                        "catalogItemImage0": {
+                          "light": "https://image.uniqlo.com/UQ/ST3/WesternCommon/imagesgoods/461025/item/goods_53_461025_3x4.jpg?width=400",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage1": {
+                          "light": "https://static.falke.com/pdmain/1536630-64653f1700548.jpg",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage2": {
+                          "light": "https://static.falke.com/pdmain/1536618-64653f1243aa8.jpg",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        },
+                        "catalogItemImage3": {
+                          "light": "https://static.falke.com/pdmain/1536648-64653f1e0d8db.jpg",
+                          "dark": "",
+                          "alt": "",
+                          "title": ""
+                        }
+                      },
+                      "catalogItemId": "catalogItemId2",
+                      "cartItemId": "cartItemId2",
+                      "instanceGuid": "CatalogItemInstanceGuidThree",
+                      "title": "Caper Green",
+                      "description": "One size, fits all.<br>• Dip-dye clay effect<br>• 85% Cotton + 13% Polyamide + 2% Elastane<br>• Embroidery on leg<br>• Screenprint on foot<br>• Made in Portugal",
+                      "price": 25,
+                      "priceFormatted": "$25",
+                      "originalPrice": 30,
+                      "originalPriceFormatted": "$30",
+                      "currency": "USD",
+                      "signalType": "SignalResponse",
+                      "url": "",
+                      "minItemCount": 0,
+                      "maxItemCount": 1,
+                      "preSelectedQuantity": 1,
+                      "providerData": "1974582",
+                      "urlBehavior": "newTab",
+                      "positiveResponseText": "Add to Order",
+                      "negativeResponseText": "No Thanks",
+                      "addOns": [],
+                      "copy": {
+                        "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
+                        "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
+                        "provider.supplierName": "Reshoevn8r",
+                        "provider.shortlabel": "L",
+                        "provider.discountLabel": "Save 20%",
+                        "provider.color.hex": "#A2E6B8",
+                        "provider.variationTitle": "Caper Green",
+                        "provider.pricing.shippingFees": "4.90",
+                        "provider.pricing.salesTax": "1.94",
+                        "provider.pricing.totalPrice": "26.72"
+                      },
+                      "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
                     }
-                  },
-                  "links": {},
-                  "images": {
-                    "creativeImage": {
-                      "light": "",
-                      "dark": "",
-                      "alt": "",
-                      "title": ""
-                    }
-                  },
-                  "icons": {},
-                  "token": "",
-                  "advertiser": {
-                    "name": "Test",
-                    "brand": "Test"
-                  },
-                  "copy": {
-                    "provider.hasDiscount": "true",
-                    "creative.heading.title": "Stained Socks",
-                    "creative.catalogItem.option.type": "shortlabel",
-                    "creative.gallery.image.1.src": "https://images.ctfassets.net/yn04o8yn9gx8/79ll3mHwlmzRUEqBdhRHMe/d83eb2d598bd6314b34ec579c6dd7f0b/SOCKS-CLAY.jpg?w=1200&h=1500&q=100&fm=webp",
-                    "creative.gallery.image.2.src": "https://images.ctfassets.net/yn04o8yn9gx8/Z5DsgMmxndmPgpF1K1L9E/cc3900cff84285429fca48aa674b1c4d/CLAY-BACKGROUND_.jpg?w=1200&h=1500&fl=progressive&q=50&fm=jpg",
-                    "creative.gallery.image.3.src": "https://www.careofcarl.com/bilder/artiklar/28379810.jpg?m=1743694441",
-                    "creative.gallery.image.4.src": "https://images.ctfassets.net/yn04o8yn9gx8/6jUgzAO4uxOaUPee3hUOCA/39d0cb2f3d5c3ce8bc54ed874465f669/PALMES-ECOM-SS25-73727777-web.jpg?w=1440&h=1800&fl=progressive&q=100&fm=jpg",
-                    "ppu.firstName": "Steve",
-                    "ppu.lastName": "Smith",
-                    "ppu.email": "steve.smith@sbcglobal.net",
-                    "ppu.shippingAddress1": "123 shippy lane",
-                    "ppu.shippingAddress2": "APT 123",
-                    "ppu.shippingCity": "New York",
-                    "ppu.shippingState": "NY",
-                    "ppu.shippingCountry": "United States",
-                    "ppu.shippingZipcode": "10001",
-                    "ppu.partnerPaymentReference": "1974582",
-                    "ppu.last4Digits": "4111",
-                    "ppu.paymentType": "visa"
-                  }
+                  ],
+                  "metadata": {}
                 },
-                "catalogItemResponseAction": "Cart",
-                "catalogItems": [
-                  {
-                    "images": {
-                      "catalogItemImage0": {
-                        "light": "https://images.ctfassets.net/yn04o8yn9gx8/79ll3mHwlmzRUEqBdhRHMe/d83eb2d598bd6314b34ec579c6dd7f0b/SOCKS-CLAY.jpg?w=1200&h=1500&q=100&fm=webp",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage1": {
-                        "light": "https://images.ctfassets.net/yn04o8yn9gx8/Z5DsgMmxndmPgpF1K1L9E/cc3900cff84285429fca48aa674b1c4d/CLAY-BACKGROUND_.jpg?w=1200&h=1500&fl=progressive&q=50&fm=jpg",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage2": {
-                        "light": "https://www.careofcarl.com/bilder/artiklar/28379810.jpg?m=1743694441",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage3": {
-                        "light": "https://images.ctfassets.net/yn04o8yn9gx8/6jUgzAO4uxOaUPee3hUOCA/39d0cb2f3d5c3ce8bc54ed874465f669/PALMES-ECOM-SS25-73727777-web.jpg?w=1440&h=1800&fl=progressive&q=100&fm=jpg",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage4": {
-                        "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/1uqf54mIQKHPbur9ootDHE/1a080df9f17448937a8b8142110faa8c/8861-lapisblue-adult-unisex-layflat-1-transparent.png",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage5": {
-                        "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/3pqcf7KDUjZV72FY9zSnDj/703751819560c9a9e86ceb79c4c2b3e5/8861-lapisblue-adult-male-onmodel-2-transparent.png",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage6": {
-                        "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw2273067d/images/DC0455406D-D1.jpg?sfrm=jpeg&sw=3000&q=80",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage7": {
-                        "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw583a6f6c/images/DC0455406D-FI.jpg?sfrm=jpeg&sw=3000&q=80",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      }
-                    },
-                    "catalogItemId": "catalogItemId0",
-                    "cartItemId": "cartItemId0",
-                    "instanceGuid": "CatalogItemInstanceGuidOne",
-                    "title": "Burnt Clay",
-                    "description": "Lorem ipsum dolor sit amet consectetur adipiscing elit. Ex sapien vitae pellentesque sem placerat in id. Pretium tellus duis convallis tempus leo eu aenean. Urna tempor pulvinar vivamus fringilla lacus nec metus. Iaculis massa nisl malesuada lacinia integer nunc posuere. Semper vel class aptent taciti sociosqu ad litora. Conubia nostra inceptos himenaeos orci varius natoque penatibus. Dis parturient montes nascetur ridiculus mus donec rhoncus. Nulla molestie mattis scelerisque maximus eget fermentum odio. Purus est efficitur laoreet mauris pharetra vestibulum fusce.",
-                    "price": 24,
-                    "priceFormatted": "$24",
-                    "originalPrice": 30,
-                    "originalPriceFormatted": "$30",
-                    "currency": "USD",
-                    "signalType": "SignalResponse",
-                    "url": "",
-                    "minItemCount": 0,
-                    "maxItemCount": 1,
-                    "preSelectedQuantity": 1,
-                    "providerData": "1974582",
-                    "urlBehavior": "newTab",
-                    "positiveResponseText": "Add to Order",
-                    "negativeResponseText": "No Thanks",
-                    "addOns": [],
-                    "copy": {
-                      "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
-                      "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
-                      "provider.supplierName": "Reshoevn8r",
-                      "provider.shortlabel": "S",
-                      "provider.discountLabel": "Save 20%",
-                      "provider.color.hex": "#E6B8A2",
-                      "provider.variationTitle": "Burnt Clay",
-                      "provider.pricing.shippingFees": "4.90",
-                      "provider.pricing.salesTax": "1.94",
-                      "provider.pricing.totalPrice": "26.72"
-                    },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
-                  },
-                  {
-                    "images": {
-                      "catalogItemImage0": {
-                        "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/1uqf54mIQKHPbur9ootDHE/1a080df9f17448937a8b8142110faa8c/8861-lapisblue-adult-unisex-layflat-1-transparent.png",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage1": {
-                        "light": "https://assets.bombas.com/image/fetch/c_crop,h_3040,w_3040/b_rgb:F3F3F2,c_scale,w_1068/f_auto,q_auto/https://images.ctfassets.net/09hbx69ra4p2/3pqcf7KDUjZV72FY9zSnDj/703751819560c9a9e86ceb79c4c2b3e5/8861-lapisblue-adult-male-onmodel-2-transparent.png",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage2": {
-                        "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw2273067d/images/DC0455406D-D1.jpg?sfrm=jpeg&sw=3000&q=80",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage3": {
-                        "light": "https://www.calzedonia.com/dw/image/v2/BJHW_PRD/on/demandware.static/-/Sites-CAL_EC_COM/default/dw583a6f6c/images/DC0455406D-FI.jpg?sfrm=jpeg&sw=3000&q=80",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      }
-                    },
-                    "catalogItemId": "catalogItemId1",
-                    "cartItemId": "cartItemId1",
-                    "instanceGuid": "CatalogItemInstanceGuidTwo",
-                    "title": "Niagara Blue",
-                    "description": "One size, fits all.<br>• Dip-dye clay effect<br>• 85% Cotton + 13% Polyamide + 2% Elastane<br>• Embroidery on leg<br>• Screenprint on foot<br>• Made in Portugal",
-                    "price": 20,
-                    "priceFormatted": "$20",
-                    "originalPrice": 30,
-                    "originalPriceFormatted": "$30",
-                    "currency": "USD",
-                    "signalType": "SignalResponse",
-                    "url": "",
-                    "minItemCount": 0,
-                    "maxItemCount": 1,
-                    "preSelectedQuantity": 1,
-                    "providerData": "1974582",
-                    "urlBehavior": "newTab",
-                    "positiveResponseText": "Add to Order",
-                    "negativeResponseText": "No Thanks",
-                    "addOns": [],
-                    "copy": {
-                      "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
-                      "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
-                      "provider.supplierName": "Reshoevn8r",
-                      "provider.shortlabel": "M",
-                      "provider.discountLabel": "Save 20%",
-                      "provider.color.hex": "#A2C6E6",
-                      "provider.variationTitle": "Niagara Blue",
-                      "provider.pricing.shippingFees": "4.90",
-                      "provider.pricing.salesTax": "1.94",
-                      "provider.pricing.totalPrice": "26.72"
-                    },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
-                  },
-                  {
-                    "images": {
-                      "catalogItemImage0": {
-                        "light": "https://image.uniqlo.com/UQ/ST3/WesternCommon/imagesgoods/461025/item/goods_53_461025_3x4.jpg?width=400",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage1": {
-                        "light": "https://static.falke.com/pdmain/1536630-64653f1700548.jpg",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage2": {
-                        "light": "https://static.falke.com/pdmain/1536618-64653f1243aa8.jpg",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      },
-                      "catalogItemImage3": {
-                        "light": "https://static.falke.com/pdmain/1536648-64653f1e0d8db.jpg",
-                        "dark": "",
-                        "alt": "",
-                        "title": ""
-                      }
-                    },
-                    "catalogItemId": "catalogItemId2",
-                    "cartItemId": "cartItemId2",
-                    "instanceGuid": "CatalogItemInstanceGuidThree",
-                    "title": "Caper Green",
-                    "description": "One size, fits all.<br>• Dip-dye clay effect<br>• 85% Cotton + 13% Polyamide + 2% Elastane<br>• Embroidery on leg<br>• Screenprint on foot<br>• Made in Portugal",
-                    "price": 25,
-                    "priceFormatted": "$25",
-                    "originalPrice": 30,
-                    "originalPriceFormatted": "$30",
-                    "currency": "USD",
-                    "signalType": "SignalResponse",
-                    "url": "",
-                    "minItemCount": 0,
-                    "maxItemCount": 1,
-                    "preSelectedQuantity": 1,
-                    "providerData": "1974582",
-                    "urlBehavior": "newTab",
-                    "positiveResponseText": "Add to Order",
-                    "negativeResponseText": "No Thanks",
-                    "addOns": [],
-                    "copy": {
-                      "provider.links.termsOfSale": "https://reshoevn8r.com/policies/terms-of-service",
-                      "provider.links.privacyPolicy": "https://reshoevn8r.com/pages/privacy",
-                      "provider.supplierName": "Reshoevn8r",
-                      "provider.shortlabel": "L",
-                      "provider.discountLabel": "Save 20%",
-                      "provider.color.hex": "#A2E6B8",
-                      "provider.variationTitle": "Caper Green",
-                      "provider.pricing.shippingFees": "4.90",
-                      "provider.pricing.salesTax": "1.94",
-                      "provider.pricing.totalPrice": "26.72"
-                    },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
-                  }
-                ],
-                "metadata": {}
-              },
-              "layoutVariant": {
-                "layoutVariantId": "3353172846080032865",
-                "moduleName": "standard-marketing",
-                "layoutVariantSchema": "{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"overflow\":\"visible\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\",\"gap\":8},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"percentage\",\"value\":100},\"minHeight\":600}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"padding\":\"0 0 0 40\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderWidth\":\"0 0 1 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Success! Your order has been placed.\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":16,\"fontWeight\":\"500\",\"lineHeight\":26},\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"A confirmation was sent to %^ATTRIBUTE.rokt.email|^%.\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":12,\"fontWeight\":\"400\",\"lineHeight\":20},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}}}}]}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^ATTRIBUTE.rokt.firstname|^%, before you go\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#1A1A1A\"},\"fontSize\":20,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"600\",\"lineHeight\":24},\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}}}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"padding\":\"12 8\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"value\":\"Exclusive offer from our partner! Expires soon!!\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#C82C19\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"400\",\"lineHeight\":19,\"fontStyle\":\"normal\",\"letterSpacing\":0.064}}}]}}}}]}}]}},{\"type\":\"CatalogCombinedCollection\",\"node\":{\"template\":{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"justifyContent\":\"center\",\"gap\":32}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"spacing\":{\"padding\":\"0 16\"}}}]}},\"children\":[{\"type\":\"CatalogImageGallery\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"flexChild\":{\"alignSelf\":\"center\"},\"container\":{\"gap\":12}}}],\"mainImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":343}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1\",\"borderStyle\":\"solid\",\"borderColor\":{\"light\":\"#CFCFCF\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"thumbnailImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":96},\"height\":{\"type\":\"fixed\",\"value\":96}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1\",\"borderStyle\":\"solid\",\"borderColor\":{\"light\":\"#CFCFCF\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"selectedThumbnailImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":96},\"height\":{\"type\":\"fixed\",\"value\":96}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1 1 2 1\",\"borderColor\":{\"light\":\"#0F0F0F\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"thumbnailList\":[{\"default\":{\"spacing\":{\"margin\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"justifyContent\":\"center\",\"alignItems\":\"center\"}}}]}}}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"container\":{\"gap\":24},\"spacing\":{\"margin\":\"24 0 0 0\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":12}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\"},\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.supplierName^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#5F5F5F\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"500\",\"lineHeight\":19.25,\"letterSpacing\":0.064}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.title^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#444444\"},\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"lineHeight\":30}}}]}}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.priceFormatted|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":31.2}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.originalPriceFormatted|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#A6A6A6\"},\"textDecoration\":\"strike-through\",\"lineHeight\":31.2}}}]}}}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#fecdca\"},\"borderWidth\":\"1\",\"borderRadius\":4},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"container\":{\"alignItems\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":20},\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.discountLabel|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":12,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":18},\"spacing\":{\"padding\":\"3 4\"}}}]}}}}]}}]}}]}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Product Details\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"500\",\"lineHeight\":19.25,\"letterSpacing\":0.064}}}]}}}},{\"type\":\"RichText\",\"node\":{\"value\":\"%^DATA.catalogItem.description|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"lineHeight\":20,\"letterSpacing\":0.064,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#5F5F5F\"},\"fontSize\":14}}}]}}}}]}},{\"type\":\"CatalogDropdown\",\"node\":{\"validatorFieldConfig\":{\"validationFieldKey\":\"dropDownSelection\",\"validators\":[\"required\"]},\"openTemplate\":{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.variationTitle|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":14,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":18.2},\"flexChild\":{\"weight\":1}}}]}}}}]}},\"closedTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#fff\"}},\"spacing\":{\"margin\":\"5\",\"padding\":\"8\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderRadius\":8,\"borderWidth\":\"1\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.variationTitle|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontWeight\":\"600\",\"lineHeight\":18.2,\"textColor\":{\"light\":\"#1A202C\"}},\"flexChild\":{\"weight\":1}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMAYHCfoI2zrN8AAAGXSURBVHja7dqxaQRADAXRFW7AYFSCcztwfi0ctvpvxQVMtOzy4WCmACFe/JeZmZmZmZmZmZmZmZmZmZmZmZmZmdmr9L02+1hXe5v3tVXN17rZzzzXVj2/dwFmj6BmQHAGMHsEPQOCM4A9gpoBwSHAHkHPgOAMAAQIACA4AgABAgAITgBAgAAAgiMAECAAgOAEAAQIACA4AgABAgAITgBAgABwkeBzBgQIABcJekCwATB/6ygefG4+/FhhAgKECQiQJSBAmIAAWQIChAkIkCUgQIAgAUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQIA5AgDUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQgQJiAAGECAKQJABAgyAKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwJkC2IkC4BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4erg0NDMzMzMzMzMzMzMzMzMzMzMzMzMzM7PD/gG1fy54kgWKcgAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"maxHeight\":15,\"maxWidth\":15},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"3\"}}}]}}}}]}},\"closedDefaultTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":44}},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"margin\":\"5\",\"padding\":\"8\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderRadius\":8,\"borderWidth\":\"1\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Please select\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":14,\"fontWeight\":\"400\",\"lineHeight\":18.2,\"textColor\":{\"light\":\"#717680\"}},\"flexChild\":{\"weight\":1}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMAYHCfoI2zrN8AAAGXSURBVHja7dqxaQRADAXRFW7AYFSCcztwfi0ctvpvxQVMtOzy4WCmACFe/JeZmZmZmZmZmZmZmZmZmZmZmZmZmdmr9L02+1hXe5v3tVXN17rZzzzXVj2/dwFmj6BmQHAGMHsEPQOCM4A9gpoBwSHAHkHPgOAMAAQIACA4AgABAgAITgBAgAAAgiMAECAAgOAEAAQIACA4AgABAgAITgBAgABwkeBzBgQIABcJekCwATB/6ygefG4+/FhhAgKECQiQJSBAmIAAWQIChAkIkCUgQIAgAUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQIA5AgDUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQgQJiAAGECAKQJABAgyAKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwJkC2IkC4BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4erg0NDMzMzMzMzMzMzMzMzMzMzMzMzMzM7PD/gG1fy54kgWKcgAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"maxHeight\":15,\"maxWidth\":15},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"3\"}}}]}}}}]}},\"requiredSelectionErrorTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"6 0 0 8\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Please choose an option to continue\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#D92D20\"}}}}]}}}}]}},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"alignSelf\":\"center\"}}}],\"dropDownListItem\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\"}},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderStyle\":\"solid\",\"borderWidth\":\"0 0 1 0\"},\"spacing\":{\"padding\":\"12 12\"},\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":44}},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8}}}],\"dropDownSelectedItem\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#CFCFCF\"}},\"spacing\":{\"padding\":\"12 12\"}}}],\"dropDownListContainer\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D0D5DD\"},\"borderRadius\":8,\"borderStyle\":\"solid\",\"borderWidth\":\"1\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"spacing\":{\"margin\":\"0 4\"},\"container\":{\"overflow\":\"visible\"}}}]}}}}]}},{\"type\":\"CatalogDevicePayButton\",\"node\":{\"customStateKey\":\"PaymentCompleted\",\"validatorTriggerConfig\":{\"validatorFieldKeys\":[\"dropDownSelection\"]},\"provider\":\"ApplePay\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#006340\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Buy with \",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":20},\"height\":{\"type\":\"fixed\",\"value\":20}}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAV1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////+ORg7oAAAAHHRSTlMAECAwP0BPUF9gb3B/gI+Qn6CvsL/Az9Df4O/wQqu59AAABX9JREFUeNrt3e2SojwQBeDTyWQQgQFE5CN9/9f5Vr37o2u3VmXG6BqPzwVY5FTS6QRLkRP3WXfHk4KS23ez/gI+sj+pCSCzO6ihC0D2sypvAFKvqsQB2PApAyhm/Stw8EdV5gD2qzIHIEc9a2FY/aueNxIUf72kxYuTTi+q8NrkpIawDfCzXiF4ZTLrFRPn/Dct+fi1IBg/bQno9LoBr6vSDUq8rKBbCMEGSLoCOuVeAYUaxqOwrGoYD0KtbhEFL8qpoWyDj+QTIOgmzXsCcE+AknwCTCCfAB6vqievgKJbLIJXVZIvAJy4DwFw+r4IYywAZtSroscLYx9/wbkBmGbTEYC4BMSA17ZuW/+sffDiYQhPgqPg1VWcB0DTXJz+1AG0AuYAJg8OvRoTKxi+PmipBIZuCSwlDF0AsfUAbQBTX4CK3YhO49AEwdvb2yUfv0gGz7mv63r38eGRht/Vx5OqWY/HeveBZyMf9eGov1mP9afcFmd91HNO3d7hScjn10nPmLtP/IjsDquaBB+emj2oXnHYSeoPNYd/m8Hn4Q6PaaPfZP1y+DeknnWztfPYwnerftsh4PHc16rfM+9lw69F/Mwx4LGk05/oAs4LnZonj6Be9YfmM7uX2896oy/Bg4RZb3HcyZmqf6N1h0eQBA973FtJdDb6mx0Ed1esmsR87OpdXR9mTWktcGdf+uS+cE/upPeSxTLwq2bg5HAnpeZh9Xdb/tQJdKrUCXSq1Al0mpeTJB8/dQKV5qcj2P8uq5CK1zx5pCGr5mkWJHHSTC0eKTSaqVaQQtA8xYAkZNYsTYI0Ws1SD8O4AEoYwh0gFtQtsEaPVGTlHj8a8vHLmuX4uSdAgXSc5qcE9wRokdKquRkB6mugRWAYm8CAlAJ5AUDPeQA2K/cCQKGZ6cG9AqKAewU04F4BCxJrOV+DmZm8AjjyCoBS8yJIbODsAcxMeQ1kRLMSkVrI8RhIfBkWwF0DI8hr4IDkyNtgOM2KZ98EkFzF+TLANOw1cNScNOwBFOwBBBjKC1HH3gfhHcA7AO5OGOSd8IT3UeAdwDuAdwDMAYR3AO8A3nei1AG07AGM7AGsSG7RrAj5lZgG9gAapDawV8FG8yLsAZTkvbD27AGsSExUyTdCzcxA2ggYl74R4O6FGiUvg4UqdyvgNTcz0lIlrwKT5mYVpNSzT4FK8+M5TwPmhJRUyRfBqOSLoNUMnYSzFzQH0isB05K2QqYkbYWM5ywCZvVIQ5Q9gZE9gUYNZSX0yp5A1Hx1pBuhOTnOjdCsBd0aSP/3g4PmbQ64Tam5OzjOZtCstSRYA7wRFKrkEUR9CZy9kBmSvB4gPRksmr8oqV+RMX2Jzmn+CnC3AgvnkdA0MJRl0MEwlsERN5LIWQJNz1kCjSMtgWbg7AJNIO0CzZj1Hkg9BXr296QBaQTSJsiMnBPABNIJYEbOCWAC6QQwA/m3x+FIewDTcjaBRiL7rypUpP+9aCbO7wybQLoFmj67LZC2Dra4j4K0Apoho0MA8SJoYRgXQRQYxkVQ4J5k4VwAJpDuAKYl3QHMRHAIvMjHzH5qnuhgHD0M415YwjDuhQMexZPugKbK6RKA5XKkwiPJlNd7gPRc1KcyCQxhIYwOD1eSFkDTZNABkWwFFUCdQA9QJ9AD1An0QJ4JxHFsm/+14xgTjD+jBKa2DPidhKpfnvAKKP0lYewLwRmuGhLsfw9Xxu+MHpdJNelmi8dT8JNuMpWCDXwfdZNR8CSk1et6j62kWvSqWOKJhEUvWhrBtxTjtTwFz6WKetZQ4PtcG/Ws3uHpSLOoMVPl8EPF36tBbB2eU/nnA8ehcrhJaEf9zdIWeGahGcaoqss4NqVHEj40TdOPQ9NUSV/9/Qc0PG7kIez+3QAAAABJRU5ErkJggg==\"}}},{\"type\":\"BasicText\",\"node\":{\"value\":\" Pay\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#e6e6e6\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"10\",\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"No Thanks\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#006340\"},\"fontSize\":16,\"fontWeight\":\"500\"}}}]}}}}]},\"type\":\"DismissInstantPurchaseButton\"},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.creativeLink.termsAndConditions|^% and %^DATA.creativeLink.privacyPolicy|^% and %^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}}}]}}]}}"
-              },
-              "token": ""
-            }
-          ],
-          "instanceGuid": "8b97de56-1fc3-4647-a57f-ee885529c821",
-          "outerLayoutSchema": "{\"layout\":{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"container\":{\"shadow\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}},\"flexChild\":{\"alignSelf\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}],\"wrapper\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":null}}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":0}}],\"transition\":{\"outTransition\":[{\"type\":\"FadeOut\",\"settings\":{\"duration\":300}}]},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"12 16 12 16\"},\"container\":{\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"value\":\"Purchase complete. Order #: \",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"fontStyle\":null,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}]},\"type\":\"Row\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"6 0 6 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#00000000\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":null},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":16},\"height\":{\"type\":\"fixed\",\"value\":16}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}}},\"type\":\"StaticImage\"}]},\"type\":\"CloseButton\"}]},\"type\":\"Row\"},{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 16 0 16\",\"padding\":\"0 0 0 0\"},\"container\":{\"overflow\":\"visible\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":null}}}]}},\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}},\"type\":\"OneByOneDistribution\"}]}},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D7D7D7\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":\"1 0 0 0\",\"borderRadius\":null},\"spacing\":{\"margin\":\"10 16 10 16\",\"padding\":\"12 0 12 0\"},\"container\":{\"justifyContent\":\"flex-end\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"value\":\"Powered by <a target=\\\"_blank\\\" href=\\\"https://rokt.com\\\">Rokt</a> - <a target=\\\"_blank\\\" href=\\\"https://rokt.com/privacy-policy/\\\">Privacy Policy</a>\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":11,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"right\"},\"spacing\":{\"margin\":null,\"padding\":null}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#007db2\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}]},\"type\":\"Row\"}]}},{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":1}}],\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":44,\"fontWeight\":\"500\"},\"spacing\":{\"margin\":\"100 16 16 16\",\"padding\":\"4\"}}}]}},\"value\":\"Payment complete\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#006340\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"32\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Finish\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}}]}},{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":-1}}],\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":44,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#f00\"}},\"spacing\":{\"margin\":\"50 16 16 16\",\"padding\":\"4\"}}}]}},\"value\":\"Payment Failed!!!\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#ff1240\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"32\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Finish\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}}]}}],\"allowBackdropToClose\":false},\"type\":\"Overlay\"},\"display\":\"FULLSCREEN\",\"breakpoints\":{}}",
-          "layoutSchemaVersion": "2.0",
-          "token": ""
-        }
-      },
-      "fonts": []
-    }
-  ],
-  "options": {
-    "useDiagnosticEvents": false
-  },
-  "success": true
-}
+                "layoutVariant": {
+                  "layoutVariantId": "3353172846080032865",
+                  "moduleName": "standard-marketing",
+                  "layoutVariantSchema": "{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"overflow\":\"visible\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\",\"gap\":8},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"percentage\",\"value\":100},\"minHeight\":600}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"padding\":\"0 0 0 40\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderWidth\":\"0 0 1 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Success! Your order has been placed.\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":16,\"fontWeight\":\"500\",\"lineHeight\":26},\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"A confirmation was sent to %^ATTRIBUTE.rokt.email|^%.\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":12,\"fontWeight\":\"400\",\"lineHeight\":20},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}}}}]}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^ATTRIBUTE.rokt.firstname|^%, before you go\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#1A1A1A\"},\"fontSize\":20,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"600\",\"lineHeight\":24},\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}}}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"padding\":\"12 8\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"value\":\"Exclusive offer from our partner! Expires soon!!\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#C82C19\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"400\",\"lineHeight\":19,\"fontStyle\":\"normal\",\"letterSpacing\":0.064}}}]}}}}]}}]}},{\"type\":\"CatalogCombinedCollection\",\"node\":{\"template\":{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"justifyContent\":\"center\",\"gap\":32}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"spacing\":{\"padding\":\"0 16\"}}}]}},\"children\":[{\"type\":\"CatalogImageGallery\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"flexChild\":{\"alignSelf\":\"center\"},\"container\":{\"gap\":12}}}],\"mainImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":343}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1\",\"borderStyle\":\"solid\",\"borderColor\":{\"light\":\"#CFCFCF\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"thumbnailImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":96},\"height\":{\"type\":\"fixed\",\"value\":96}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1\",\"borderStyle\":\"solid\",\"borderColor\":{\"light\":\"#CFCFCF\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"selectedThumbnailImage\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":96},\"height\":{\"type\":\"fixed\",\"value\":96}},\"border\":{\"borderRadius\":16,\"borderWidth\":\"1 1 2 1\",\"borderColor\":{\"light\":\"#0F0F0F\"}},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"thumbnailList\":[{\"default\":{\"spacing\":{\"margin\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"justifyContent\":\"center\",\"alignItems\":\"center\"}}}]}}}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100}},\"container\":{\"gap\":24},\"spacing\":{\"margin\":\"24 0 0 0\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":12}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\"},\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.supplierName^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#5F5F5F\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"500\",\"lineHeight\":19.25,\"letterSpacing\":0.064}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.title^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#444444\"},\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"lineHeight\":30}}}]}}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"flex-start\",\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.priceFormatted|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":31.2}}}]}}}},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.originalPriceFormatted|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":24,\"fontWeight\":\"500\",\"textColor\":{\"light\":\"#A6A6A6\"},\"textDecoration\":\"strike-through\",\"lineHeight\":31.2}}}]}}}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#fecdca\"},\"borderWidth\":\"1\",\"borderRadius\":4},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"container\":{\"alignItems\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":20},\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.discountLabel|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":12,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":18},\"spacing\":{\"padding\":\"3 4\"}}}]}}}}]}}]}}]}},{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Product Details\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#242424\"},\"fontSize\":14,\"fontFamily\":\"Source Sans Pro\",\"fontWeight\":\"500\",\"lineHeight\":19.25,\"letterSpacing\":0.064}}}]}}}},{\"type\":\"RichText\",\"node\":{\"value\":\"%^DATA.catalogItem.description|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"lineHeight\":20,\"letterSpacing\":0.064,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#5F5F5F\"},\"fontSize\":14}}}]}}}}]}},{\"type\":\"CatalogDropdown\",\"node\":{\"validatorFieldConfig\":{\"validationFieldKey\":\"dropDownSelection\",\"validators\":[\"required\"]},\"openTemplate\":{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.variationTitle|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":14,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#242424\"},\"lineHeight\":18.2},\"flexChild\":{\"weight\":1}}}]}}}}]}},\"closedTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#fff\"}},\"spacing\":{\"margin\":\"5\",\"padding\":\"8\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderRadius\":8,\"borderWidth\":\"1\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.catalogItem.copy.provider.variationTitle|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontWeight\":\"600\",\"lineHeight\":18.2,\"textColor\":{\"light\":\"#1A202C\"}},\"flexChild\":{\"weight\":1}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMAYHCfoI2zrN8AAAGXSURBVHja7dqxaQRADAXRFW7AYFSCcztwfi0ctvpvxQVMtOzy4WCmACFe/JeZmZmZmZmZmZmZmZmZmZmZmZmZmdmr9L02+1hXe5v3tVXN17rZzzzXVj2/dwFmj6BmQHAGMHsEPQOCM4A9gpoBwSHAHkHPgOAMAAQIACA4AgABAgAITgBAgAAAgiMAECAAgOAEAAQIACA4AgABAgAITgBAgABwkeBzBgQIABcJekCwATB/6ygefG4+/FhhAgKECQiQJSBAmIAAWQIChAkIkCUgQIAgAUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQIA5AgDUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQgQJiAAGECAKQJABAgyAKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwJkC2IkC4BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4erg0NDMzMzMzMzMzMzMzMzMzMzMzMzMzM7PD/gG1fy54kgWKcgAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"maxHeight\":15,\"maxWidth\":15},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"3\"}}}]}}}}]}},\"closedDefaultTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fixed\",\"value\":44}},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8},\"background\":{\"backgroundColor\":{\"light\":\"#F4F3F1\"}},\"spacing\":{\"margin\":\"5\",\"padding\":\"8\"},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderRadius\":8,\"borderWidth\":\"1\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Please select\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontFamily\":\"Source Sans Pro\",\"fontSize\":14,\"fontWeight\":\"400\",\"lineHeight\":18.2,\"textColor\":{\"light\":\"#717680\"}},\"flexChild\":{\"weight\":1}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMAYHCfoI2zrN8AAAGXSURBVHja7dqxaQRADAXRFW7AYFSCcztwfi0ctvpvxQVMtOzy4WCmACFe/JeZmZmZmZmZmZmZmZmZmZmZmZmZmdmr9L02+1hXe5v3tVXN17rZzzzXVj2/dwFmj6BmQHAGMHsEPQOCM4A9gpoBwSHAHkHPgOAMAAQIACA4AgABAgAITgBAgAAAgiMAECAAgOAEAAQIACA4AgABAgAITgBAgABwkeBzBgQIABcJekCwATB/6ygefG4+/FhhAgKECQiQJSBAmIAAWQIChAkIkCUgQIAgAUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQIA5AgDUCCMAAJ0gAkCAOQIA1AgjAACdIAJAgDkCANQIIwAAnSACQgQJiAAGECAKQJABAgyAKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwzgKwCgOwJkC2IkC4BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4AkC6BkC4erg0NDMzMzMzMzMzMzMzMzMzMzMzMzMzM7PD/gG1fy54kgWKcgAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"maxHeight\":15,\"maxWidth\":15},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"3\"}}}]}}}}]}},\"requiredSelectionErrorTemplate\":{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"6 0 0 8\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Please choose an option to continue\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontWeight\":\"400\",\"textColor\":{\"light\":\"#D92D20\"}}}}]}}}}]}},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"alignSelf\":\"center\"}}}],\"dropDownListItem\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\"}},\"border\":{\"borderColor\":{\"light\":\"#CFCFCF\"},\"borderStyle\":\"solid\",\"borderWidth\":\"0 0 1 0\"},\"spacing\":{\"padding\":\"12 12\"},\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":44}},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"flex-start\",\"gap\":8}}}],\"dropDownSelectedItem\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#CFCFCF\"}},\"spacing\":{\"padding\":\"12 12\"}}}],\"dropDownListContainer\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D0D5DD\"},\"borderRadius\":8,\"borderStyle\":\"solid\",\"borderWidth\":\"1\"},\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"spacing\":{\"margin\":\"0 4\"},\"container\":{\"overflow\":\"visible\"}}}]}}}}]}},{\"type\":\"CatalogDevicePayButton\",\"node\":{\"customStateKey\":\"PaymentCompleted\",\"validatorTriggerConfig\":{\"validatorFieldKeys\":[\"dropDownSelection\"]},\"provider\":\"ApplePay\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#006340\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Buy with \",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}},{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":20},\"height\":{\"type\":\"fixed\",\"value\":20}}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAV1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////+ORg7oAAAAHHRSTlMAECAwP0BPUF9gb3B/gI+Qn6CvsL/Az9Df4O/wQqu59AAABX9JREFUeNrt3e2SojwQBeDTyWQQgQFE5CN9/9f5Vr37o2u3VmXG6BqPzwVY5FTS6QRLkRP3WXfHk4KS23ez/gI+sj+pCSCzO6ihC0D2sypvAFKvqsQB2PApAyhm/Stw8EdV5gD2qzIHIEc9a2FY/aueNxIUf72kxYuTTi+q8NrkpIawDfCzXiF4ZTLrFRPn/Dct+fi1IBg/bQno9LoBr6vSDUq8rKBbCMEGSLoCOuVeAYUaxqOwrGoYD0KtbhEFL8qpoWyDj+QTIOgmzXsCcE+AknwCTCCfAB6vqievgKJbLIJXVZIvAJy4DwFw+r4IYywAZtSroscLYx9/wbkBmGbTEYC4BMSA17ZuW/+sffDiYQhPgqPg1VWcB0DTXJz+1AG0AuYAJg8OvRoTKxi+PmipBIZuCSwlDF0AsfUAbQBTX4CK3YhO49AEwdvb2yUfv0gGz7mv63r38eGRht/Vx5OqWY/HeveBZyMf9eGov1mP9afcFmd91HNO3d7hScjn10nPmLtP/IjsDquaBB+emj2oXnHYSeoPNYd/m8Hn4Q6PaaPfZP1y+DeknnWztfPYwnerftsh4PHc16rfM+9lw69F/Mwx4LGk05/oAs4LnZonj6Be9YfmM7uX2896oy/Bg4RZb3HcyZmqf6N1h0eQBA973FtJdDb6mx0Ed1esmsR87OpdXR9mTWktcGdf+uS+cE/upPeSxTLwq2bg5HAnpeZh9Xdb/tQJdKrUCXSq1Al0mpeTJB8/dQKV5qcj2P8uq5CK1zx5pCGr5mkWJHHSTC0eKTSaqVaQQtA8xYAkZNYsTYI0Ws1SD8O4AEoYwh0gFtQtsEaPVGTlHj8a8vHLmuX4uSdAgXSc5qcE9wRokdKquRkB6mugRWAYm8CAlAJ5AUDPeQA2K/cCQKGZ6cG9AqKAewU04F4BCxJrOV+DmZm8AjjyCoBS8yJIbODsAcxMeQ1kRLMSkVrI8RhIfBkWwF0DI8hr4IDkyNtgOM2KZ98EkFzF+TLANOw1cNScNOwBFOwBBBjKC1HH3gfhHcA7AO5OGOSd8IT3UeAdwDuAdwDMAYR3AO8A3nei1AG07AGM7AGsSG7RrAj5lZgG9gAapDawV8FG8yLsAZTkvbD27AGsSExUyTdCzcxA2ggYl74R4O6FGiUvg4UqdyvgNTcz0lIlrwKT5mYVpNSzT4FK8+M5TwPmhJRUyRfBqOSLoNUMnYSzFzQH0isB05K2QqYkbYWM5ywCZvVIQ5Q9gZE9gUYNZSX0yp5A1Hx1pBuhOTnOjdCsBd0aSP/3g4PmbQ64Tam5OzjOZtCstSRYA7wRFKrkEUR9CZy9kBmSvB4gPRksmr8oqV+RMX2Jzmn+CnC3AgvnkdA0MJRl0MEwlsERN5LIWQJNz1kCjSMtgWbg7AJNIO0CzZj1Hkg9BXr296QBaQTSJsiMnBPABNIJYEbOCWAC6QQwA/m3x+FIewDTcjaBRiL7rypUpP+9aCbO7wybQLoFmj67LZC2Dra4j4K0Apoho0MA8SJoYRgXQRQYxkVQ4J5k4VwAJpDuAKYl3QHMRHAIvMjHzH5qnuhgHD0M415YwjDuhQMexZPugKbK6RKA5XKkwiPJlNd7gPRc1KcyCQxhIYwOD1eSFkDTZNABkWwFFUCdQA9QJ9AD1An0QJ4JxHFsm/+14xgTjD+jBKa2DPidhKpfnvAKKP0lYewLwRmuGhLsfw9Xxu+MHpdJNelmi8dT8JNuMpWCDXwfdZNR8CSk1et6j62kWvSqWOKJhEUvWhrBtxTjtTwFz6WKetZQ4PtcG/Ws3uHpSLOoMVPl8EPF36tBbB2eU/nnA8ehcrhJaEf9zdIWeGahGcaoqss4NqVHEj40TdOPQ9NUSV/9/Qc0PG7kIez+3QAAAABJRU5ErkJggg==\"}}},{\"type\":\"BasicText\",\"node\":{\"value\":\" Pay\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#e6e6e6\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"10\",\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"No Thanks\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#006340\"},\"fontSize\":16,\"fontWeight\":\"500\"}}}]}}}}]},\"type\":\"DismissInstantPurchaseButton\"},{\"type\":\"BasicText\",\"node\":{\"value\":\"%^DATA.creativeLink.termsAndConditions|^% and %^DATA.creativeLink.privacyPolicy|^% and %^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}}}]}}]}}"
+                },
+                "token": ""
+              }
+            ],
+            "instanceGuid": "8b97de56-1fc3-4647-a57f-ee885529c821",
+            "outerLayoutSchema": "{\"layout\":{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"container\":{\"shadow\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}},\"flexChild\":{\"alignSelf\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}],\"wrapper\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":null}}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":0}}],\"transition\":{\"outTransition\":[{\"type\":\"FadeOut\",\"settings\":{\"duration\":300}}]},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"12 16 12 16\"},\"container\":{\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"value\":\"Purchase complete. Order #: \",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"fontStyle\":null,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}]},\"type\":\"Row\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"6 0 6 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#00000000\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":null},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==\"},\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":16},\"height\":{\"type\":\"fixed\",\"value\":16}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}}},\"type\":\"StaticImage\"}]},\"type\":\"CloseButton\"}]},\"type\":\"Row\"},{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 16 0 16\",\"padding\":\"0 0 0 0\"},\"container\":{\"overflow\":\"visible\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":null}}}]}},\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}},\"type\":\"OneByOneDistribution\"}]}},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D7D7D7\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":\"1 0 0 0\",\"borderRadius\":null},\"spacing\":{\"margin\":\"10 16 10 16\",\"padding\":\"12 0 12 0\"},\"container\":{\"justifyContent\":\"flex-end\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"value\":\"Powered by <a target=\\\"_blank\\\" href=\\\"https://rokt.com\\\">Rokt</a> - <a target=\\\"_blank\\\" href=\\\"https://rokt.com/privacy-policy/\\\">Privacy Policy</a>\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":11,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"right\"},\"spacing\":{\"margin\":null,\"padding\":null}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#007db2\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}]},\"type\":\"Row\"}]}},{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":-1}}],\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":24,\"fontWeight\":\"500\",\"horizontalTextAlign\":\"center\"},\"spacing\":{\"margin\":\"300 16 16 16\",\"padding\":\"4\"}}}]}},\"value\":\"Thanks for your purchase!\"}},{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"fontWeight\":\"400\",\"horizontalTextAlign\":\"center\"},\"spacing\":{\"margin\":\"0 16 32 16\",\"padding\":\"4\"}}}]}},\"value\":\"%^DATA.catalogItem.copy.provider.supplierName|^% will email you your order confirmation shortly. You can return to your Rent the Runway order summary below\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#006340\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"250 32 50 32\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Take me there\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}}]}},{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"CustomState\",\"predicate\":{\"key\":\"PaymentCompleted\",\"condition\":\"is\",\"value\":1}}],\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":24,\"fontWeight\":\"500\",\"horizontalTextAlign\":\"center\"},\"spacing\":{\"margin\":\"300 16 16 16\",\"padding\":\"4\"}}}]}},\"value\":\"Oops—something didn't go through\"}},{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"fontWeight\":\"400\",\"horizontalTextAlign\":\"center\"},\"spacing\":{\"margin\":\"0 16 32 16\",\"padding\":\"4\"}}}]}},\"value\":\"We weren't able to process this add-on order. You haven't been charged for it, and your original order is still on its way.\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"percentage\",\"value\":100},\"height\":{\"type\":\"fixed\",\"value\":44}},\"background\":{\"backgroundColor\":{\"light\":\"#006340\"}},\"border\":{\"borderRadius\":100},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"spacing\":{\"padding\":\"5\",\"margin\":\"220 32 50 32\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"I Understand\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"textColor\":{\"light\":\"#FFFFFF\"},\"fontWeight\":\"700\"}}}]}}}}]}}]}}],\"allowBackdropToClose\":false},\"type\":\"Overlay\"},\"display\":\"FULLSCREEN\",\"breakpoints\":{}}",
+            "layoutSchemaVersion": "2.0",
+            "token": ""
+          }
+        },
+        "fonts": []
+      }
+    ],
+    "options": {
+      "useDiagnosticEvents": false
+    },
+    "success": true
+  }
+  
+  
+  
+
+
