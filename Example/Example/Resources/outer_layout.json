@@ -1,0 +1,619 @@
+{
+  "layout": {
+    "node": {
+      "styles": {
+        "elements": {
+          "own": [
+            {
+              "default": {
+                "border": {
+                  "borderColor": null,
+                  "borderStyle": null,
+                  "borderWidth": null,
+                  "borderRadius": null
+                },
+                "container": { "shadow": null },
+                "dimension": {
+                  "width": { "type": "fit", "value": "fit-width" },
+                  "height": { "type": "fit", "value": "fit-height" }
+                },
+                "flexChild": { "alignSelf": "center" },
+                "background": {
+                  "backgroundColor": { "light": "#FFFFFF", "dark": null }
+                }
+              }
+            }
+          ],
+          "wrapper": [
+            {
+              "default": {
+                "container": {
+                  "alignItems": "center",
+                  "justifyContent": "center"
+                },
+                "background": {
+                  "backgroundColor": { "light": "#80000000", "dark": null }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "CustomState",
+                "predicate": {
+                  "key": "PaymentCompleted",
+                  "condition": "is",
+                  "value": 0
+                }
+              }
+            ],
+            "transition": {
+              "outTransition": [
+                { "type": "FadeOut", "settings": { "duration": 300 } }
+              ]
+            },
+            "children": [
+              {
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "border": {
+                              "borderColor": null,
+                              "borderStyle": null,
+                              "borderWidth": null,
+                              "borderRadius": null
+                            },
+                            "spacing": {
+                              "margin": "0 0 10 0",
+                              "padding": "12 16 12 16"
+                            },
+                            "container": { "alignItems": "center" },
+                            "dimension": {
+                              "width": { "type": "fit", "value": "fit-width" },
+                              "height": {
+                                "type": "fit",
+                                "value": "wrap-content"
+                              }
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#222222",
+                                "dark": null
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              { "default": { "flexChild": { "weight": 1 } } }
+                            ]
+                          }
+                        },
+                        "children": [
+                          {
+                            "node": {
+                              "value": "Purchase complete. Order #: ",
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "text": {
+                                          "fontSize": 16,
+                                          "fontStyle": null,
+                                          "textColor": {
+                                            "light": "#FFFFFF",
+                                            "dark": null
+                                          },
+                                          "fontFamily": null,
+                                          "fontWeight": "700",
+                                          "lineHeight": null,
+                                          "textTransform": null,
+                                          "textDecoration": null,
+                                          "horizontalTextAlign": "left"
+                                        },
+                                        "spacing": {
+                                          "margin": null,
+                                          "padding": null
+                                        },
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fit",
+                                            "value": "fit-width"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "RichText"
+                          }
+                        ]
+                      },
+                      "type": "Row"
+                    },
+                    {
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "border": {
+                                    "borderColor": null,
+                                    "borderStyle": null,
+                                    "borderWidth": null,
+                                    "borderRadius": null
+                                  },
+                                  "spacing": {
+                                    "margin": "0 0 0 0",
+                                    "padding": "6 0 6 0"
+                                  },
+                                  "container": {
+                                    "alignItems": "center",
+                                    "justifyContent": "center"
+                                  },
+                                  "dimension": {
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "wrap-content"
+                                    }
+                                  },
+                                  "background": {
+                                    "backgroundColor": {
+                                      "light": "#00000000",
+                                      "dark": null
+                                    }
+                                  }
+                                },
+                                "pressed": {
+                                  "border": { "borderColor": null },
+                                  "background": { "backgroundColor": null }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "children": [
+                          {
+                            "node": {
+                              "url": {
+                                "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==",
+                                "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg=="
+                              },
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fixed",
+                                            "value": 16
+                                          },
+                                          "height": {
+                                            "type": "fixed",
+                                            "value": 16
+                                          }
+                                        },
+                                        "flexChild": { "alignSelf": "center" }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "type": "StaticImage"
+                          }
+                        ]
+                      },
+                      "type": "CloseButton"
+                    }
+                  ]
+                },
+                "type": "Row"
+              },
+              {
+                "type": "ScrollableColumn",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [{ "default": { "flexChild": { "weight": 1 } } }]
+                    }
+                  },
+                  "children": [
+                    {
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "border": {
+                                    "borderColor": null,
+                                    "borderStyle": null,
+                                    "borderWidth": null,
+                                    "borderRadius": null
+                                  },
+                                  "spacing": {
+                                    "margin": "0 16 0 16",
+                                    "padding": "0 0 0 0"
+                                  },
+                                  "container": { "overflow": "visible" },
+                                  "dimension": {
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "wrap-content"
+                                    }
+                                  },
+                                  "background": { "backgroundColor": null }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "transition": {
+                          "type": "FadeInOut",
+                          "settings": { "duration": 200 }
+                        }
+                      },
+                      "type": "OneByOneDistribution"
+                    }
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "border": {
+                              "borderColor": {
+                                "light": "#D7D7D7",
+                                "dark": null
+                              },
+                              "borderStyle": null,
+                              "borderWidth": "1 0 0 0",
+                              "borderRadius": null
+                            },
+                            "spacing": {
+                              "margin": "10 16 10 16",
+                              "padding": "12 0 12 0"
+                            },
+                            "container": { "justifyContent": "flex-end" },
+                            "dimension": {
+                              "width": { "type": "fit", "value": "fit-width" }
+                            },
+                            "background": { "backgroundColor": null }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "node": {
+                        "value": "Powered by <a target=\"_blank\" href=\"https://rokt.com\">Rokt</a> - <a target=\"_blank\" href=\"https://rokt.com/privacy-policy/\">Privacy Policy</a>",
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "text": {
+                                    "fontSize": 11,
+                                    "fontStyle": null,
+                                    "textColor": {
+                                      "light": "#757575",
+                                      "dark": null
+                                    },
+                                    "fontFamily": null,
+                                    "fontWeight": null,
+                                    "lineHeight": null,
+                                    "textTransform": null,
+                                    "textDecoration": null,
+                                    "horizontalTextAlign": "right"
+                                  },
+                                  "spacing": { "margin": null, "padding": null }
+                                }
+                              }
+                            ],
+                            "link": [
+                              {
+                                "default": {
+                                  "text": {
+                                    "fontSize": null,
+                                    "fontStyle": null,
+                                    "textColor": {
+                                      "light": "#007db2",
+                                      "dark": null
+                                    },
+                                    "fontFamily": null,
+                                    "fontWeight": null,
+                                    "textDecoration": "underline"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "openLinks": "externally"
+                      },
+                      "type": "RichText"
+                    }
+                  ]
+                },
+                "type": "Row"
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "CustomState",
+                "predicate": {
+                  "key": "PaymentCompleted",
+                  "condition": "is",
+                  "value": -1
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "text": {
+                              "fontSize": 24,
+                              "fontWeight": "500",
+                              "horizontalTextAlign": "center"
+                            },
+                            "spacing": {
+                              "margin": "300 16 16 16",
+                              "padding": "4"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Thanks for your purchase!"
+                }
+              },
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "text": {
+                              "fontSize": 16,
+                              "fontWeight": "400",
+                              "horizontalTextAlign": "center"
+                            },
+                            "spacing": {
+                              "margin": "0 16 32 16",
+                              "padding": "4"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "%^DATA.catalogItem.copy.provider.supplierName|^% will email you your order confirmation shortly. You can return to your Rent the Runway order summary below"
+                }
+              },
+              {
+                "type": "CloseButton",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": { "type": "percentage", "value": 100 },
+                              "height": { "type": "fixed", "value": 44 }
+                            },
+                            "background": {
+                              "backgroundColor": { "light": "#006340" }
+                            },
+                            "border": { "borderRadius": 100 },
+                            "container": {
+                              "alignItems": "center",
+                              "justifyContent": "center"
+                            },
+                            "spacing": {
+                              "padding": "5",
+                              "margin": "250 32 50 32"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "type": "BasicText",
+                      "node": {
+                        "value": "Take me there",
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "text": {
+                                    "fontSize": 16,
+                                    "textColor": { "light": "#FFFFFF" },
+                                    "fontWeight": "700"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "CustomState",
+                "predicate": {
+                  "key": "PaymentCompleted",
+                  "condition": "is",
+                  "value": 1
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "text": {
+                              "fontSize": 24,
+                              "fontWeight": "500",
+                              "horizontalTextAlign": "center"
+                            },
+                            "spacing": {
+                              "margin": "300 16 16 16",
+                              "padding": "4"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Oops—something didn't go through"
+                }
+              },
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "text": {
+                              "fontSize": 16,
+                              "fontWeight": "400",
+                              "horizontalTextAlign": "center"
+                            },
+                            "spacing": {
+                              "margin": "0 16 32 16",
+                              "padding": "4"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "We weren't able to process this add-on order. You haven't been charged for it, and your original order is still on its way."
+                }
+              },
+              {
+                "type": "CloseButton",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": { "type": "percentage", "value": 100 },
+                              "height": { "type": "fixed", "value": 44 }
+                            },
+                            "background": {
+                              "backgroundColor": { "light": "#006340" }
+                            },
+                            "border": { "borderRadius": 100 },
+                            "container": {
+                              "alignItems": "center",
+                              "justifyContent": "center"
+                            },
+                            "spacing": {
+                              "padding": "5",
+                              "margin": "220 32 50 32"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "type": "BasicText",
+                      "node": {
+                        "value": "I Understand",
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "text": {
+                                    "fontSize": 16,
+                                    "textColor": { "light": "#FFFFFF" },
+                                    "fontWeight": "700"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "allowBackdropToClose": false
+    },
+    "type": "Overlay"
+  },
+  "display": "FULLSCREEN",
+  "breakpoints": {}
+}
