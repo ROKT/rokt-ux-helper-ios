@@ -69,7 +69,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
                         case .success:
                             self.layoutState?.setGlobalCustomState(key: customStateKey, value: 1)
                         case .failure, .retry:
-                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: 0)
+                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: -1)
                         }
                     } else {
                         // When no custom state key, always close the layout regardless of status
