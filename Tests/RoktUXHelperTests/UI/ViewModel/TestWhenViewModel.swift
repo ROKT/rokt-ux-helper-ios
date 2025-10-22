@@ -743,6 +743,64 @@ final class TestWhenViewModel: XCTestCase {
         XCTAssertFalse(shouldApply)
     }
 
+    // MARK: - Placeholder
+
+    func test_shouldApply_placeholderTextValue_equalsTrue() {
+        let predicate = WhenPredicate.placeholder(
+            .textValue(
+                DynamicStringPredicate(
+                    condition: .is,
+                    input: "%^DATA.creativeCopy.hasDiscount|false^%",
+                    value: "true")))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["hasDiscount": "true"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_shouldNotApply_placeholderTextValue_equalsFalse() {
+        let predicate = WhenPredicate.placeholder(
+            .textValue(
+                DynamicStringPredicate(
+                    condition: .is,
+                    input: "%^DATA.creativeCopy.hasDiscount|false^%",
+                    value: "true")))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["hasDiscount": "false"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply)
+    }
+
+    func test_shouldApply_placeholderTextLength_isAbove() {
+        let predicate = WhenPredicate.placeholder(
+            .textLength(
+                DynamicIntegerPredicate(
+                    condition: .isAbove,
+                    input: "%^DATA.creativeCopy.copyValue|default^%",
+                    value: 2)))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["copyValue": "abcd"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_shouldApply_placeholderNumeric_isBelow() {
+        let predicate = WhenPredicate.placeholder(
+            .numeric(
+                DynamicIntegerPredicate(
+                    condition: .isBelow,
+                    input: "%^DATA.creativeCopy.priority|5^%",
+                    value: 10)))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["priority": "3"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
     // MARK: Combination
     
     // Test multiple predicates together
