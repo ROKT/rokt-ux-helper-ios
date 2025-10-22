@@ -148,7 +148,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         eventService.cartItemDevicePayCompletionCallback?(.failure)
 
-        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), 0)
+        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), -1)
         XCTAssertFalse(didClose)
     }
 
@@ -189,7 +189,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         eventService.cartItemDevicePayCompletionCallback?(.retry)
 
-        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), 0)
+        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), -1)
         XCTAssertFalse(didClose)
     }
 
