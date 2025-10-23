@@ -389,8 +389,13 @@ extension PredicateHandling {
                     matched = false
                     return
                 }
-                guard let expectedInt = placeholderResolver.resolveInt(placeholder: String(lengthPredicate.value),
-                                                                       context: context) else {
+                // Try resolving as placeholder first, fallback to parsing as int literal
+                let expectedInt: Int
+                if let resolved = placeholderResolver.resolveInt(placeholder: lengthPredicate.value, context: context) {
+                    expectedInt = resolved
+                } else if let literal = Int(lengthPredicate.value) {
+                    expectedInt = literal
+                } else {
                     matched = false
                     return
                 }
@@ -410,20 +415,25 @@ extension PredicateHandling {
                     matched = false
                     return
                 }
-                guard let resolvedValueDecimal = placeholderResolver.resolveDecimal(placeholder: String(numericPredicate.value),
-                                                                                    context: context) else {
+                // Try resolving as placeholder first, fallback to parsing as decimal literal
+                let expectedDecimal: Decimal
+                if let resolved = placeholderResolver.resolveDecimal(placeholder: numericPredicate.value, context: context) {
+                    expectedDecimal = resolved
+                } else if let literal = Decimal(string: numericPredicate.value) {
+                    expectedDecimal = literal
+                } else {
                     matched = false
                     return
                 }
                 switch numericPredicate.condition {
                 case .is:
-                    matched = matched && resolvedInputDecimal == resolvedValueDecimal
+                    matched = matched && resolvedInputDecimal == expectedDecimal
                 case .isNot:
-                    matched = matched && resolvedInputDecimal != resolvedValueDecimal
+                    matched = matched && resolvedInputDecimal != expectedDecimal
                 case .isAbove:
-                    matched = matched && resolvedInputDecimal > resolvedValueDecimal
+                    matched = matched && resolvedInputDecimal > expectedDecimal
                 case .isBelow:
-                    matched = matched && resolvedInputDecimal < resolvedValueDecimal
+                    matched = matched && resolvedInputDecimal < expectedDecimal
                 }
             }
         }
