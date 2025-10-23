@@ -389,37 +389,41 @@ extension PredicateHandling {
                     matched = false
                     return
                 }
-                let expected = Int(lengthPredicate.value)
+                guard let expectedInt = placeholderResolver.resolveInt(placeholder: String(lengthPredicate.value),
+                                                                       context: context) else {
+                    matched = false
+                    return
+                }
                 switch lengthPredicate.condition {
                 case .is:
-                    matched = matched && resolvedLength == expected
+                    matched = matched && resolvedLength == expectedInt
                 case .isNot:
-                    matched = matched && resolvedLength != expected
+                    matched = matched && resolvedLength != expectedInt
                 case .isAbove:
-                    matched = matched && resolvedLength > expected
+                    matched = matched && resolvedLength > expectedInt
                 case .isBelow:
-                    matched = matched && resolvedLength < expected
+                    matched = matched && resolvedLength < expectedInt
                 }
             case .numeric(let numericPredicate):
-                guard let resolvedString = placeholderResolver.resolveString(placeholder: numericPredicate.input,
-                                                                             context: context) else {
+                guard let resolvedInputDecimal = placeholderResolver.resolveDecimal(placeholder: numericPredicate.input,
+                                                                                    context: context) else {
                     matched = false
                     return
                 }
-                guard let resolvedValue = Int(resolvedString) else {
+                guard let resolvedValueDecimal = placeholderResolver.resolveDecimal(placeholder: String(numericPredicate.value),
+                                                                                    context: context) else {
                     matched = false
                     return
                 }
-                let expected = Int(numericPredicate.value)
                 switch numericPredicate.condition {
                 case .is:
-                    matched = matched && resolvedValue == expected
+                    matched = matched && resolvedInputDecimal == resolvedValueDecimal
                 case .isNot:
-                    matched = matched && resolvedValue != expected
+                    matched = matched && resolvedInputDecimal != resolvedValueDecimal
                 case .isAbove:
-                    matched = matched && resolvedValue > expected
+                    matched = matched && resolvedInputDecimal > resolvedValueDecimal
                 case .isBelow:
-                    matched = matched && resolvedValue < expected
+                    matched = matched && resolvedInputDecimal < resolvedValueDecimal
                 }
             }
         }

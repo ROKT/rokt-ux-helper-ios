@@ -22,7 +22,11 @@ final class TestWhenViewModel: XCTestCase {
                              transition: WhenTransition? = nil,
                              copy: [String: String] = [String: String](),
                              breakPoint: BreakPoint? = nil,
-                             layoutState: LayoutState = LayoutState()) -> WhenViewModel {
+                             layoutState: LayoutState = LayoutState(),
+                             catalogItem: CatalogItem? = nil) -> WhenViewModel {
+        if let catalogItem = catalogItem {
+            layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+        }
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
@@ -788,13 +792,56 @@ final class TestWhenViewModel: XCTestCase {
     }
 
     func test_shouldApply_placeholderNumeric_isBelow() {
+        let catalogItem = CatalogItem.mock(
+            catalogItemId: "item1",
+            images: nil)
         let predicate = WhenPredicate.placeholder(
             .numeric(
                 DynamicIntegerPredicate(
                     condition: .isBelow,
-                    input: "%^DATA.creativeCopy.priority|5^%",
-                    value: 10)))
-        let whenVM = get_when_view_model(predicates: [predicate], copy: ["priority": "3"])
+                    input: "%^DATA.catalogItem.price^%",
+                    value: 20)))
+        let whenVM = get_when_view_model(predicates: [predicate], catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_shouldApply_placeholderNumeric_placeholderInValue() {
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: Decimal(24),
+            priceFormatted: "$24",
+            originalPrice: Decimal(30),
+            originalPriceFormatted: "$30",
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: catalogItem.copy,
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+        let predicate = WhenPredicate.placeholder(
+            .numeric(
+                DynamicIntegerPredicate(
+                    condition: .isBelow,
+                    input: "%^DATA.catalogItem.price^%",
+                    value: 30)))
+        let whenVM = get_when_view_model(predicates: [predicate], catalogItem: catalogItem)
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
