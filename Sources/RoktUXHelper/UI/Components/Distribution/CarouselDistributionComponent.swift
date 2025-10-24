@@ -178,6 +178,7 @@ struct CarouselDistributionComponent: View {
                                  imageLoader: model.imageLoader)
             .onLoad {
                 model.setupLayoutState()
+                setupLayoutState()
                 shouldFocusAccessibility = true
             }
             .onChange(of: model.currentLeadingOfferIndex) { newValue in
@@ -185,8 +186,9 @@ struct CarouselDistributionComponent: View {
                 model.sendViewableImpressionEvents(currentLeadingOffer: newValue)
                 shouldFocusAccessibility = true
             }
-            .onChange(of: model.currentPage) { _ in
+            .onChange(of: model.currentPage) { v in
                 UIAccessibility.post(notification: .announcement, argument: accessibilityAnnouncement)
+                currentPage = v
             }
             .onChange(of: model.customStateMap) { _ in
                 model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
@@ -200,6 +202,12 @@ struct CarouselDistributionComponent: View {
             // workaround to set dynamic height otherwise GeometryReader fills available space
             .frame(height: getContentHeight())
         }
+    }
+
+    @State var currentPage: Int = 0
+
+    func setupLayoutState() {
+        model.layoutState?.items[LayoutState.currentProgressKey] = $currentPage
     }
 
     func build(page: [LayoutSchemaViewModel],
