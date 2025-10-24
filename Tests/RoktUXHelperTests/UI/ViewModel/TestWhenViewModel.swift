@@ -22,11 +22,15 @@ final class TestWhenViewModel: XCTestCase {
                              transition: WhenTransition? = nil,
                              copy: [String: String] = [String: String](),
                              breakPoint: BreakPoint? = nil,
-                             layoutState: LayoutState = LayoutState()) -> WhenViewModel {
+                             layoutState: LayoutState = LayoutState(),
+                             catalogItem: CatalogItem? = nil) -> WhenViewModel {
+        if let catalogItem = catalogItem {
+            layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+        }
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
-                             offers: [get_slot_offer(copy: copy)],
+                             offers: [get_slot_offer(copy: copy, catalogItems: catalogItem.map { [$0] })],
                              globalBreakPoints: breakPoint,
                              layoutState: layoutState)
     }
@@ -743,6 +747,107 @@ final class TestWhenViewModel: XCTestCase {
         XCTAssertFalse(shouldApply)
     }
 
+    // MARK: - Placeholder
+
+    func test_shouldApply_placeholderTextValue_equalsTrue() {
+        let predicate = WhenPredicate.placeholder(
+            .textValue(
+                DynamicStringPredicate(
+                    condition: .is,
+                    input: "%^DATA.creativeCopy.hasDiscount|false^%",
+                    value: "true")))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["hasDiscount": "true"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
+    func test_shouldNotApply_placeholderTextValue_equalsFalse() {
+        let predicate = WhenPredicate.placeholder(
+            .textValue(
+                DynamicStringPredicate(
+                    condition: .is,
+                    input: "%^DATA.creativeCopy.hasDiscount|false^%",
+                    value: "true")))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["hasDiscount": "false"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply)
+    }
+
+    func test_shouldApply_placeholderTextLength_isAbove() {
+        let predicate = WhenPredicate.placeholder(
+            .textLength(
+                DynamicIntegerPredicate(
+                    condition: .isAbove,
+                    input: "%^DATA.creativeCopy.copyValue|default^%",
+                    value: "2")))
+        let whenVM = get_when_view_model(predicates: [predicate], copy: ["copyValue": "abcd"])
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
+    func skip_test_shouldApply_placeholderNumeric_isBelow() {
+        let catalogItem = CatalogItem.mock(
+            catalogItemId: "item1",
+            images: nil)
+        let predicate = WhenPredicate.placeholder(
+            .numeric(
+                DynamicIntegerPredicate(
+                    condition: .isBelow,
+                    input: "%^DATA.catalogItem.price^%",
+                    value: "20")))
+        let whenVM = get_when_view_model(predicates: [predicate], catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply, "Should apply when price (14.99) < 20")
+    }
+
+    func skip_test_shouldApply_placeholderNumeric_placeholderInValue() {
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: Decimal(24),
+            priceFormatted: "$24",
+            originalPrice: Decimal(30),
+            originalPriceFormatted: "$30",
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: catalogItem.copy,
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+        let predicate = WhenPredicate.placeholder(
+            .numeric(
+                DynamicIntegerPredicate(
+                    condition: .isBelow,
+                    input: "%^DATA.catalogItem.price^%",
+                    value: "%^DATA.catalogItem.originalPrice^%")))
+        let whenVM = get_when_view_model(predicates: [predicate], catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply)
+    }
+
     // MARK: Combination
     
     // Test multiple predicates together
@@ -873,13 +978,18 @@ final class TestWhenViewModel: XCTestCase {
         XCTAssertEqual(fadeOutDuration, 0.3)
     }
     
-    private func get_slot_offer(copy: [String: String]) -> OfferModel {
-        .mock(
+    private func get_slot_offer(copy: [String: String], catalogItems: [CatalogItem]? = nil) -> OfferModel {
+        OfferModel(
             campaignId: "campaign1",
-            referralCreativeId: "referralCreativeId1",
-            instanceGuid: "instanceGuid",
-            copy: copy,
-            token: "jwtToken1")
+            creative: CreativeModel(
+                referralCreativeId: "referralCreativeId1",
+                instanceGuid: "instanceGuid",
+                copy: copy,
+                images: nil,
+                links: nil,
+                responseOptionsMap: nil,
+                jwtToken: "jwtToken1"),
+            catalogItems: catalogItems)
     }
     
     func get_shared_data_with_breakpoints() -> BreakPoint {

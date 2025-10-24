@@ -34,13 +34,15 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         responseKey: String?,
         from data: CatalogItem?
     ) throws -> DataBinding<U> {
-        guard dataValidator.isValid(data: propertyChain) else { return .value(propertyChain as! U) }
+        guard dataValidator.isValid(data: propertyChain) else {
+            return .value(propertyChain as! U)
+        }
 
         let placeholder = parser.parse(propertyChain: propertyChain)
 
         var isStateType = false
 
-        var mappedData: String?
+        var mappedData: Any?
 
         for keyAndNamespace in placeholder.parseableChains {
             switch keyAndNamespace.namespace {
@@ -76,14 +78,10 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         // return empty if the mapped data is not found
         guard let mappedData else { return .value("" as! U) }
 
-        if isStateType {
-            return .state(mappedData as! U)
-        } else {
-            return .value(mappedData as! U)
-        }
+        return castData(mappedData, as: type, isState: isStateType)
     }
 
-    private func catalogItemValue(for keyAndNamespace: BNFKeyAndNamespace, in data: CatalogItem) -> String? {
+    private func catalogItemValue(for keyAndNamespace: BNFKeyAndNamespace, in data: CatalogItem) -> Any? {
         let keys = keyAndNamespace.key.split(separator: ".").map(String.init)
         guard let firstKey = keys.first else { return nil }
 
@@ -100,12 +98,51 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
                 keys: keys
             )
 
-            return reflectedValue as? String
+            return reflectedValue
         }
 
         return Mirror(reflecting: data)
             .children
             .first { $0.label == firstKey }
-            .map(\.value) as? String
+            .map(\.value)
+    }
+
+    private func castData<U>(_ value: Any, as type: U.Type, isState: Bool) -> DataBinding<U> {
+        let casted: U
+
+        if let typed = value as? U {
+            casted = typed
+        } else if let stringValue = value as? String, U.self == Int.self, let intValue = Int(stringValue) {
+            casted = intValue as! U
+        } else if let decimalValue = value as? Decimal {
+            if U.self == Decimal.self {
+                casted = decimalValue as! U
+            } else if U.self == Double.self {
+                casted = NSDecimalNumber(decimal: decimalValue).doubleValue as! U
+            } else if U.self == Int.self {
+                casted = NSDecimalNumber(decimal: decimalValue).intValue as! U
+            } else if U.self == String.self {
+                casted = NSDecimalNumber(decimal: decimalValue).stringValue as! U
+            } else if U.self == Any.self {
+                let stateBinding: DataBinding<U> = isState ? .state(decimalValue as! U) : .value(decimalValue as! U)
+                return stateBinding
+            } else {
+                casted = NSDecimalNumber(decimal: decimalValue).stringValue as! U
+            }
+        } else if let stringValue = value as? String, U.self == Double.self, let doubleValue = Double(stringValue) {
+            casted = doubleValue as! U
+        } else if let stringValue = value as? String, U.self == Decimal.self, let decimalValue = Decimal(string: stringValue) {
+            casted = decimalValue as! U
+        } else if let boolValue = value as? Bool, U.self == String.self {
+            casted = String(boolValue) as! U
+        } else if let stringValue = value as? CustomStringConvertible, U.self == String.self {
+            casted = stringValue.description as! U
+        } else if let stringValue = value as? String {
+            casted = stringValue as! U
+        } else {
+            casted = value as! U
+        }
+
+        return isState ? .state(casted) : .value(casted)
     }
 }
