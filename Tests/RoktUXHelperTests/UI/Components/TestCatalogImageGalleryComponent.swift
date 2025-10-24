@@ -20,7 +20,12 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
 
     func test_catalogImageGallery_rendersExpectedThumbnails() throws {
         let view = try TestPlaceHolder.make(
-            layoutMaker: LayoutSchemaViewModel.makeCatalogImageGallery(layoutState:eventService:)
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogImageGallery(
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
         )
 
         let component = try view.inspect().view(TestPlaceHolder.self)
@@ -45,7 +50,12 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
 
     func test_catalogImageGallery_thumbnailTapUpdatesSelection() throws {
         let view = try TestPlaceHolder.make(
-            layoutMaker: LayoutSchemaViewModel.makeCatalogImageGallery(layoutState:eventService:)
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogImageGallery(
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
         )
 
         let component = try view.inspect().view(TestPlaceHolder.self)
@@ -69,13 +79,79 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
         XCTAssertEqual(sut.model.selectedIndex, 1)
         XCTAssertTrue(sut.model.selectedImage === sut.model.images[1])
     }
+
+    func test_catalogImageGallery_hidesThumbnailsWhenStyleMissing() throws {
+        let view = try TestPlaceHolder.make { layoutState, eventService in
+            try LayoutSchemaViewModel.makeCatalogImageGallery(
+                layoutState: layoutState,
+                eventService: eventService,
+                includeThumbnailRow: false
+            )
+        }
+
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogImageGalleryComponent.self)
+
+        let sut = try component.actualView()
+
+        XCTAssertFalse(sut.model.showThumbnails)
+        XCTAssertThrowsError(try component.find(ViewType.ScrollViewReader.self))
+    }
+
+    func test_catalogImageGallery_indicatorHiddenWithoutContainer() throws {
+        let view = try TestPlaceHolder.make { layoutState, eventService in
+            try LayoutSchemaViewModel.makeCatalogImageGallery(
+                layoutState: layoutState,
+                eventService: eventService,
+                includeIndicatorContainer: false
+            )
+        }
+
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogImageGalleryComponent.self)
+
+        let sut = try component.actualView()
+
+        XCTAssertFalse(sut.model.showIndicator)
+        let rowComponents = try component.findAll(ViewType.View<RowComponent>.self)
+        XCTAssertEqual(rowComponents.count, 0)
+    }
+
+    func test_catalogImageGallery_indicatorAlignSelfFromStyles() throws {
+        let view = try TestPlaceHolder.make { layoutState, eventService in
+            try LayoutSchemaViewModel.makeCatalogImageGallery(
+                layoutState: layoutState,
+                eventService: eventService,
+                indicatorAlignSelf: .flexEnd
+            )
+        }
+
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogImageGalleryComponent.self)
+
+        let sut = try component.actualView()
+
+        XCTAssertEqual(sut.model.indicatorAlignSelf(for: 0), .flexEnd)
+    }
 }
 
 @available(iOS 15.0, *)
 extension LayoutSchemaViewModel {
     static func makeCatalogImageGallery(
         layoutState: LayoutState,
-        eventService: EventService
+        eventService: EventService,
+        includeThumbnailRow: Bool = true,
+        includeIndicatorContainer: Bool = true,
+        indicatorAlignSelf: FlexAlignment? = nil
     ) throws -> Self {
         let catalogItem = CatalogItem.mock(
             images: [
@@ -106,8 +182,79 @@ extension LayoutSchemaViewModel {
             eventService: eventService
         )
 
+        let thumbnailList = includeThumbnailRow ? [BasicStateStylingBlock<RowStyle>(
+            default: RowStyle(
+                container: ContainerStylingProperties(
+                    justifyContent: .center,
+                    alignItems: .center,
+                    shadow: nil,
+                    overflow: nil,
+                    gap: 8,
+                    blur: nil
+                ),
+                background: nil,
+                border: nil,
+                dimension: nil,
+                flexChild: nil,
+                spacing: nil
+            ),
+            pressed: nil,
+            hovered: nil,
+            disabled: nil
+        )] : nil
+
+        let indicatorContainer = includeIndicatorContainer ? [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>(
+            default: CatalogImageGalleryIndicatorStyles(
+                container: ContainerStylingProperties(
+                    justifyContent: .center,
+                    alignItems: .center,
+                    shadow: nil,
+                    overflow: nil,
+                    gap: 4,
+                    blur: nil
+                ),
+                background: nil,
+                border: nil,
+                dimension: nil,
+                flexChild: indicatorAlignSelf.map {
+                    FlexChildStylingProperties(weight: nil, order: nil, alignSelf: $0)
+                },
+                spacing: nil
+            ),
+            pressed: nil,
+            hovered: nil,
+            disabled: nil
+        )] : nil
+
+        let galleryElements = CatalogImageGalleryElements(
+            own: [
+                BasicStateStylingBlock(
+                    default: CatalogImageGalleryStyles(
+                        container: nil,
+                        background: nil,
+                        border: nil,
+                        dimension: nil,
+                        flexChild: nil,
+                        spacing: nil
+                    ),
+                    pressed: nil,
+                    hovered: nil,
+                    disabled: nil
+                )
+            ],
+            mainImage: nil,
+            thumbnailImage: nil,
+            selectedThumbnailImage: nil,
+            thumbnailList: thumbnailList,
+            scrollIconButton: nil,
+            indicator: nil,
+            activeIndicator: nil,
+            seenIndicator: nil,
+            progressIndicatorContainer: indicatorContainer
+        )
+
         let galleryModel = CatalogImageGalleryModel<WhenPredicate>(
-            styles: nil,
+            styles: LayoutStyle(elements: galleryElements, conditionalTransitions: nil),
             scrollGradientLength: nil,
             leftScrollIconTemplate: nil,
             rightScrollIconTemplate: nil

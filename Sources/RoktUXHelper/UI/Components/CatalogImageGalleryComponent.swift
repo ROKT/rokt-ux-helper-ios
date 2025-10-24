@@ -71,7 +71,9 @@ struct CatalogImageGalleryComponent: View {
             spacing: CGFloat(containerStyle?.gap ?? 16)
         ) {
             mainImageView
-            thumbnailsView
+            if model.showThumbnails {
+                thumbnailsView
+            }
         }
         .applyLayoutModifier(
             verticalAlignmentProperty: verticalAlignment,
@@ -106,7 +108,8 @@ struct CatalogImageGalleryComponent: View {
     }
 
     private var mainImageView: some View {
-        ZStack {
+        let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
+        return ZStack {
             if let currentImage = model.selectedImage {
                 DataImageViewComponent(
                     config: config.updateParent(.column),
@@ -146,6 +149,9 @@ struct CatalogImageGalleryComponent: View {
                             }
                     }
                 )
+                .overlay(alignment: overlayAlignment) {
+                    indicatorOverlay(alignment: overlayAlignment)
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -214,6 +220,35 @@ struct CatalogImageGalleryComponent: View {
             .onChange(of: model.selectedIndex) { newIndex in
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
+        }
+    }
+
+    private func indicatorOverlayAlignment(for breakpointIndex: Int) -> Alignment {
+        guard let alignSelf = model.indicatorAlignSelf(for: breakpointIndex) else {
+            return .bottom
+        }
+        let horizontal = HorizontalAlignment.center
+        let vertical = alignSelf.asVerticalAlignment.asVerticalType ?? .bottom
+        return Alignment(horizontal: horizontal, vertical: vertical)
+    }
+
+    @ViewBuilder
+    private func indicatorOverlay(alignment: Alignment) -> some View {
+        if model.showIndicator,
+           let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
+            RowComponent(
+                config: config,
+                model: containerViewModel,
+                parentWidth: $availableWidth,
+                parentHeight: $availableHeight,
+                styleState: .constant(.default),
+                parentOverride: ComponentParentOverride(
+                    parentVerticalAlignment: alignment.asVerticalType ?? .center,
+                    parentHorizontalAlignment: alignment.asHorizontalType ?? .center,
+                    parentBackgroundStyle: passableBackgroundStyle,
+                    stretchChildren: false
+                )
+            )
         }
     }
 

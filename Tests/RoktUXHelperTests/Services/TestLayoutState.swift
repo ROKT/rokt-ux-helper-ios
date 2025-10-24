@@ -15,20 +15,29 @@ import Foundation
 import XCTest
 @testable import RoktUXHelper
 import DcuiSchema
+import Combine
 
 class TestLayoutState: XCTestCase {
 
     private var layoutState: LayoutState!
+    private var cancellables: Set<AnyCancellable> = []
+
+    override func tearDown() {
+        cancellables.removeAll()
+        layoutState = nil
+        super.tearDown()
+    }
 
     func testReceiveUpdateWhenItemsChange() {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test publisher")
-        let cancellable = layoutState.itemsPublisher
-            .dropFirst()
-            .sink { newItems in
-                XCTAssertEqual(newItems["test"] as? Int, 1)
+        layoutState.itemsPublisher
+            .compactMap { $0["test"] as? Int }
+            .sink { value in
+                XCTAssertEqual(value, 1)
                 expectation.fulfill()
             }
+            .store(in: &cancellables)
         layoutState.items["test"] = 1
         wait(for: [expectation], timeout: 1)
     }
@@ -37,14 +46,15 @@ class TestLayoutState: XCTestCase {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test layout type")
         var fulfilled = false
-        let cancellable = layoutState.itemsPublisher
-            .dropFirst()
-            .sink { newItems in
-                if !fulfilled, newItems[LayoutState.layoutType] as? RoktUXPlacementLayoutCode == .overlayLayout {
+        layoutState.itemsPublisher
+            .compactMap { $0[LayoutState.layoutType] as? RoktUXPlacementLayoutCode }
+            .sink { layoutType in
+                if !fulfilled, layoutType == .overlayLayout {
                     fulfilled = true
                     expectation.fulfill()
                 }
             }
+            .store(in: &cancellables)
         layoutState.items[LayoutState.layoutType] = RoktUXPlacementLayoutCode.overlayLayout
         wait(for: [expectation], timeout: 1)
         XCTAssertEqual(layoutState.layoutType(), .overlayLayout)
