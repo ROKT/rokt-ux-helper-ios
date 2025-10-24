@@ -1,0 +1,86 @@
+{
+  "layout": {
+    "node": {
+      "styles": {
+        "elements": {
+          "own": [
+            {
+              "default": {
+                "dimension": {
+                  "width": {
+                    "type": "fit",
+                    "value": "fit-width"
+                  },
+                  "height": {
+                    "type": "fit",
+                    "value": "fit-height"
+                  }
+                },
+                "background": {
+                  "backgroundColor": {
+                    "light": "#FFFFFF"
+                  }
+                }
+              }
+            }
+          ],
+          "wrapper": [
+            {
+              "default": {
+                "container": {
+                  "alignItems": "center",
+                  "justifyContent": "center"
+                },
+                "background": {
+                  "backgroundColor": {
+                    "light": "#80000000"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "node": {
+            "styles": {
+              "elements": {
+                "own": [
+                  {
+                    "default": {
+                      "spacing": {
+                        "margin": "0 16 0 16"
+                      },
+                      "dimension": {
+                        "height": {
+                          "type": "fit",
+                          "value": "fit-height"
+                        },
+                        "width": {
+                          "type": "fit",
+                          "value": "fit-width"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "transition": {
+              "type": "FadeInOut",
+              "settings": {
+                "duration": 200
+              }
+            }
+          },
+          "type": "OneByOneDistribution"
+        }
+      ],
+      "allowBackdropToClose": false
+    },
+    "type": "Overlay"
+  },
+  "display": "FULLSCREEN",
+  "breakpoints": {}
+}
