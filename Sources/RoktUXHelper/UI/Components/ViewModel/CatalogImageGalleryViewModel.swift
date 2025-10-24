@@ -164,6 +164,10 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         )
     }
 
+    func indicatorAlignSelf(for breakpointIndex: Int) -> FlexAlignment? {
+        progressIndicatorContainerBlocks?[safe: breakpointIndex]?.default.flexChild?.alignSelf
+    }
+
     func thumbnailDimension(
         for state: StyleState = .default,
         breakpointIndex: Int = 0
