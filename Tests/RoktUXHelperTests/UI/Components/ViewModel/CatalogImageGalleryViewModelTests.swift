@@ -1,4 +1,5 @@
 import XCTest
+import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
@@ -72,6 +73,10 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
             scrollGradientLength: nil,
             leftScrollIcon: nil,
             rightScrollIcon: nil,
+            indicatorStyle: nil,
+            activeIndicatorStyle: nil,
+            seenIndicatorStyle: nil,
+            progressIndicatorContainer: nil,
             layoutState: nil
         )
 
@@ -92,7 +97,47 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.selectedImage === viewModel.images.first)
     }
 
-    private func makeViewModel(imageCount: Int) -> CatalogImageGalleryViewModel {
+    func test_showThumbnails_isTrueWhenThumbnailRowProvided() {
+        let rowStyle = basicRowStyle()
+        let viewModel = makeViewModel(
+            imageCount: 1,
+            thumbnailRowStyle: [rowStyle]
+        )
+
+        XCTAssertTrue(viewModel.showThumbnails)
+    }
+
+    func test_showThumbnails_isFalseWhenThumbnailRowMissing() {
+        let viewModel = makeViewModel(imageCount: 1)
+
+        XCTAssertFalse(viewModel.showThumbnails)
+    }
+
+    func test_showIndicator_isTrueWhenProgressContainerProvided() {
+        let progressContainer = basicIndicatorStyle()
+        let viewModel = makeViewModel(
+            imageCount: 1,
+            progressIndicatorContainer: progressContainer
+        )
+
+        XCTAssertTrue(viewModel.showIndicator)
+    }
+
+    func test_indicatorAlignSelf_usesProgressContainerAlignment() {
+        let progressContainer = basicIndicatorStyle(alignSelf: .flexEnd)
+        let viewModel = makeViewModel(
+            imageCount: 1,
+            progressIndicatorContainer: progressContainer
+        )
+
+        XCTAssertEqual(viewModel.indicatorAlignSelf(for: 0), .flexEnd)
+    }
+
+    private func makeViewModel(
+        imageCount: Int,
+        thumbnailRowStyle: [BasicStateStylingBlock<RowStyle>]? = nil,
+        progressIndicatorContainer: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]? = nil
+    ) -> CatalogImageGalleryViewModel {
         let images = (0..<imageCount).map { _ in
             DataImageViewModel(
                 image: nil,
@@ -109,11 +154,52 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
             defaultStyle: nil,
             thumbnailStyle: nil,
             selectedThumbnailStyle: nil,
-            thumbnailRowStyle: nil,
+            thumbnailRowStyle: thumbnailRowStyle,
             scrollGradientLength: nil,
             leftScrollIcon: nil,
             rightScrollIcon: nil,
+            indicatorStyle: nil,
+            activeIndicatorStyle: nil,
+            seenIndicatorStyle: nil,
+            progressIndicatorContainer: progressIndicatorContainer,
             layoutState: nil
         )
+    }
+
+    private func basicRowStyle() -> BasicStateStylingBlock<RowStyle> {
+        BasicStateStylingBlock(
+            default: RowStyle(
+                container: nil,
+                background: nil,
+                border: nil,
+                dimension: nil,
+                flexChild: nil,
+                spacing: nil
+            ),
+            pressed: nil,
+            hovered: nil,
+            disabled: nil
+        )
+    }
+
+    private func basicIndicatorStyle(alignSelf: FlexAlignment? = nil)
+        -> [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>] {
+        let flexChild = alignSelf.map { FlexChildStylingProperties(weight: nil, order: nil, alignSelf: $0) }
+        let style = CatalogImageGalleryIndicatorStyles(
+            container: nil,
+            background: nil,
+            border: nil,
+            dimension: nil,
+            flexChild: flexChild,
+            spacing: nil
+        )
+        return [
+            BasicStateStylingBlock(
+                default: style,
+                pressed: nil,
+                hovered: nil,
+                disabled: nil
+            )
+        ]
     }
 }
