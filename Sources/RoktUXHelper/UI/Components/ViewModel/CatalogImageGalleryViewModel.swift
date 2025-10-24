@@ -37,6 +37,11 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     let leftScrollIcon: StaticImageViewModel?
     let rightScrollIcon: StaticImageViewModel?
 
+    private let indicatorStyleBlocks: [BasicStateStylingBlock<BaseStyles>]?
+    private let activeIndicatorStyleBlocks: [BasicStateStylingBlock<BaseStyles>]?
+    private let seenIndicatorStyleBlocks: [BasicStateStylingBlock<BaseStyles>]?
+    private let progressIndicatorContainerBlocks: [BasicStateStylingBlock<BaseStyles>]?
+
     init(
         images: [DataImageViewModel],
         defaultStyle: [CatalogImageGalleryStyles]?,
@@ -46,6 +51,10 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         scrollGradientLength: Double?,
         leftScrollIcon: StaticImageViewModel?,
         rightScrollIcon: StaticImageViewModel?,
+        indicatorStyle: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
+        activeIndicatorStyle: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
+        seenIndicatorStyle: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
+        progressIndicatorContainer: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
         layoutState: (any LayoutStateRepresenting)?
     ) {
         self.layoutState = layoutState
@@ -57,6 +66,10 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         self.scrollGradientLength = scrollGradientLength
         self.leftScrollIcon = leftScrollIcon
         self.rightScrollIcon = rightScrollIcon
+        self.indicatorStyleBlocks = indicatorStyle?.mapToBaseStyles(BaseStyles.init)
+        self.activeIndicatorStyleBlocks = activeIndicatorStyle?.mapToBaseStyles(BaseStyles.init)
+        self.seenIndicatorStyleBlocks = seenIndicatorStyle?.mapToBaseStyles(BaseStyles.init)
+        self.progressIndicatorContainerBlocks = progressIndicatorContainer?.mapToBaseStyles(BaseStyles.init)
         clampSelectedIndex()
     }
 
@@ -66,6 +79,14 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
 
     var selectedImage: DataImageViewModel? {
         images[safe: selectedIndex]
+    }
+
+    var showThumbnails: Bool {
+        thumbnailRowStyleBlock != nil
+    }
+
+    var showIndicator: Bool {
+        progressIndicatorContainerBlocks != nil
     }
 
     var canSelectNextImage: Bool {
@@ -89,6 +110,58 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     func selectPreviousImage() {
         guard canSelectPreviousImage else { return }
         selectedIndex -= 1
+    }
+
+    func dotViewModel(for index: Int, breakpointIndex: Int) -> RowViewModel {
+        let style: BaseStyles? = {
+            if index == selectedIndex {
+                return activeIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+            } else if index < selectedIndex {
+                return seenIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+                    ?? indicatorStyleBlocks?[safe: breakpointIndex]?.default
+            } else {
+                return indicatorStyleBlocks?[safe: breakpointIndex]?.default
+            }
+        }()
+
+        let stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = style.map {
+            [
+                BasicStateStylingBlock(
+                    default: $0,
+                    pressed: nil,
+                    hovered: nil,
+                    disabled: nil
+                )
+            ]
+        }
+
+        return RowViewModel(
+            children: nil,
+            stylingProperties: stylingProperties,
+            animatableStyle: nil,
+            accessibilityGrouped: false,
+            layoutState: layoutState,
+            predicates: nil,
+            globalBreakPoints: nil,
+            offers: []
+        )
+    }
+
+    func indicatorContainerViewModel(for breakpointIndex: Int) -> RowViewModel? {
+        guard let containerBlocks = progressIndicatorContainerBlocks else { return nil }
+        let children = images.indices.map { index in
+            LayoutSchemaViewModel.row(dotViewModel(for: index, breakpointIndex: breakpointIndex))
+        }
+        return RowViewModel(
+            children: children,
+            stylingProperties: containerBlocks,
+            animatableStyle: nil,
+            accessibilityGrouped: false,
+            layoutState: layoutState,
+            predicates: nil,
+            globalBreakPoints: nil,
+            offers: []
+        )
     }
 
     func thumbnailDimension(

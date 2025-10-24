@@ -898,6 +898,11 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         let leftScrollIcon = try model.leftScrollIconTemplate.map { try getStaticImage($0) }
         let rightScrollIcon = try model.rightScrollIconTemplate.map { try getStaticImage($0) }
 
+        let indicatorStyle = elements?.indicator
+        let activeIndicatorStyle = elements?.activeIndicator
+        let seenIndicatorStyle = elements?.seenIndicator
+        let progressIndicatorContainer = elements?.progressIndicatorContainer
+
         return CatalogImageGalleryViewModel(
             images: images,
             defaultStyle: defaultStyle.compactMap { $0.default },
@@ -907,6 +912,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             scrollGradientLength: model.scrollGradientLength,
             leftScrollIcon: leftScrollIcon,
             rightScrollIcon: rightScrollIcon,
+            indicatorStyle: indicatorStyle,
+            activeIndicatorStyle: activeIndicatorStyle,
+            seenIndicatorStyle: seenIndicatorStyle,
+            progressIndicatorContainer: progressIndicatorContainer,
             layoutState: layoutState
         )
     }

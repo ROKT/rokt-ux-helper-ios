@@ -71,7 +71,9 @@ struct CatalogImageGalleryComponent: View {
             spacing: CGFloat(containerStyle?.gap ?? 16)
         ) {
             mainImageView
-            thumbnailsView
+            if model.showThumbnails {
+                thumbnailsView
+            }
         }
         .applyLayoutModifier(
             verticalAlignmentProperty: verticalAlignment,
@@ -146,6 +148,7 @@ struct CatalogImageGalleryComponent: View {
                             }
                     }
                 )
+                .overlay(indicatorOverlay, alignment: .bottom)
             }
         }
         .frame(maxWidth: .infinity)
@@ -214,6 +217,26 @@ struct CatalogImageGalleryComponent: View {
             .onChange(of: model.selectedIndex) { newIndex in
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var indicatorOverlay: some View {
+        if model.showIndicator,
+           let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
+            RowComponent(
+                config: config,
+                model: containerViewModel,
+                parentWidth: $availableWidth,
+                parentHeight: $availableHeight,
+                styleState: .constant(.default),
+                parentOverride: ComponentParentOverride(
+                    parentVerticalAlignment: .center,
+                    parentHorizontalAlignment: .center,
+                    parentBackgroundStyle: passableBackgroundStyle,
+                    stretchChildren: false
+                )
+            )
         }
     }
 
