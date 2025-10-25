@@ -11,6 +11,7 @@
 
 import DcuiSchema
 import Foundation
+import SwiftUI
 
 @available(iOS 15, *)
 class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
@@ -30,6 +31,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let disabledStyle: [CatalogDevicePayButtonStyles]?
     let validatorTriggerConfig: ValidationTriggerConfig?
     let customStateKey: String?
+    var position: Int?
 
     init(
         catalogItem: CatalogItem?,
@@ -64,17 +66,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
                 paymentProvider: provider,
                 completion: { [weak self] status in
                     guard let self else { return }
-                    if let customStateKey = self.customStateKey, !customStateKey.isEmpty {
-                        switch status {
-                        case .success:
-                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: 1)
-                        case .failure, .retry:
-                            self.layoutState?.setGlobalCustomState(key: customStateKey, value: -1)
-                        }
-                    } else {
-                        // When no custom state key, always close the layout regardless of status
-                        self.layoutState?.actionCollection[.close](nil)
-                    }
+                    self.handleDevicePayCompletion(status: status)
                 }
             )
         }
@@ -92,5 +84,40 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             return true
         }
         return coordinator.validate(fields: triggerConfig.validatorFieldKeys)
+    }
+
+    private func handleDevicePayCompletion(status: DevicePayStatus) {
+        guard let customStateKey = customStateKey, !customStateKey.isEmpty else {
+            layoutState?.actionCollection[.close](nil)
+            return
+        }
+
+        let value: Int
+        switch status {
+        case .success:
+            value = 1
+        case .failure, .retry:
+            value = -1
+        }
+
+        setLayoutVariantCustomState(key: customStateKey, value: value)
+    }
+
+    private func setLayoutVariantCustomState(key: String, value: Int) {
+        guard
+            let layoutState,
+            let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
+        else {
+            return
+        }
+
+        let identifier = CustomStateIdentifiable(position: position, key: key)
+
+        DispatchQueue.main.async {
+            var map = binding.wrappedValue ?? [:]
+            map[identifier] = value
+            binding.wrappedValue = map
+            layoutState.publishStateChange()
+        }
     }
 }

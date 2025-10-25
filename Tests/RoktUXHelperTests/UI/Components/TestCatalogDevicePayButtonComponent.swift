@@ -180,7 +180,6 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let mockEventService = MockEventService()
         let layoutState = LayoutState()
 
-        // Create a mock action collection to track close calls
         var closeActionCalled = false
         layoutState.actionCollection[.close] = { _ in
             closeActionCalled = true
@@ -216,6 +215,84 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         // Verify completion callback WAS called (layout should close on failure when no custom state key)
         XCTAssertTrue(closeActionCalled)
         XCTAssertNil(mockEventService.cartItemDevicePayCompletionCallback) // Should be cleared after failure
+    }
+
+    func test_cartItemDevicePay_setsCustomStateOnSuccessWhenKeyProvided() throws {
+        let mockEventService = MockEventService()
+        var closeActionCalled = false
+        var customStateMap: RoktUXCustomStateMap? = [:]
+
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, _ in
+                layoutState.actionCollection[.close] = { _ in
+                    closeActionCalled = true
+                }
+                layoutState.items[LayoutState.customStateMap] = Binding(
+                    get: { customStateMap },
+                    set: { customStateMap = $0 }
+                )
+
+                return try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService,
+                    customStateKey: "devicePayStatus"
+                )
+            }
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        sut.model.cartItemDevicePay()
+        mockEventService.cartItemDevicePaySuccess(itemId: "testItemId")
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+
+        let identifier = CustomStateIdentifiable(position: sut.config.position, key: "devicePayStatus")
+        XCTAssertEqual(customStateMap?[identifier], 1)
+        XCTAssertFalse(closeActionCalled)
+    }
+
+    func test_cartItemDevicePay_setsCustomStateOnFailureWhenKeyProvided() throws {
+        let mockEventService = MockEventService()
+        var closeActionCalled = false
+        var customStateMap: RoktUXCustomStateMap? = [:]
+
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, _ in
+                layoutState.actionCollection[.close] = { _ in
+                    closeActionCalled = true
+                }
+                layoutState.items[LayoutState.customStateMap] = Binding(
+                    get: { customStateMap },
+                    set: { customStateMap = $0 }
+                )
+
+                return try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService,
+                    customStateKey: "devicePayStatus"
+                )
+            }
+        )
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        sut.model.cartItemDevicePay()
+        mockEventService.cartItemDevicePayFailure(itemId: "testItemId")
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+
+        let identifier = CustomStateIdentifiable(position: sut.config.position, key: "devicePayStatus")
+        XCTAssertEqual(customStateMap?[identifier], -1)
+        XCTAssertFalse(closeActionCalled)
     }
 }
 

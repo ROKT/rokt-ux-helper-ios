@@ -37,6 +37,8 @@ struct CatalogDevicePayButtonComponent: View {
         _parentHeight = parentHeight
 
         self.parentOverride = parentOverride
+
+        self.model.position = config.position
     }
 
     @State var styleState: StyleState = .default
