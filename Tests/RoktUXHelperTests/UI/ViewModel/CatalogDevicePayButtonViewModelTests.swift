@@ -70,7 +70,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
     }
 
-    func test_devicePaySuccess_setsGlobalState_whenCustomStateKeyProvided() {
+    func test_devicePaySuccess_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         var isValid = true
@@ -100,18 +100,26 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
             customStateKey: "paymentResult"
         )
+        sut.position = 0
 
         sut.handleTap()
 
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
 
+        let expectation = expectation(description: "State is set")
         eventService.cartItemDevicePayCompletionCallback?(.success)
 
-        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), 1)
+        DispatchQueue.main.async {
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), 1)
         XCTAssertFalse(didClose)
     }
 
-    func test_devicePayFailure_setsGlobalStateToZero_whenCustomStateKeyProvided() {
+    func test_devicePayFailure_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         let isValid = true
@@ -141,18 +149,26 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
             customStateKey: "paymentResult"
         )
+        sut.position = 0
 
         sut.handleTap()
 
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
 
+        let expectation = expectation(description: "State is set")
         eventService.cartItemDevicePayCompletionCallback?(.failure)
 
-        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), -1)
+        DispatchQueue.main.async {
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), -1)
         XCTAssertFalse(didClose)
     }
 
-    func test_devicePayRetry_setsGlobalStateToZero_whenCustomStateKeyProvided() {
+    func test_devicePayRetry_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         let isValid = true
@@ -182,14 +198,22 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
             customStateKey: "paymentResult"
         )
+        sut.position = 0
 
         sut.handleTap()
 
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
 
+        let expectation = expectation(description: "State is set")
         eventService.cartItemDevicePayCompletionCallback?(.retry)
 
-        XCTAssertEqual(layoutState.globalCustomStateValue(for: "paymentResult"), -1)
+        DispatchQueue.main.async {
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), -1)
         XCTAssertFalse(didClose)
     }
 
