@@ -18,6 +18,7 @@ class MockLayoutState: LayoutStateRepresenting {
     var shouldCloseOnComplete: Bool = false
     var mockBreakpointIndex: Int = 0
     private var globalStates: RoktUXCustomStateMap = [:]
+    private var layoutVariantStates: RoktUXCustomStateMap = [:]
 
     init() {
         items[LayoutState.globalCustomStateMapKey] = Binding<RoktUXCustomStateMap?>(
@@ -27,6 +28,16 @@ class MockLayoutState: LayoutStateRepresenting {
             },
             set: { [weak self] newValue in
                 self?.globalStates = newValue ?? [:]
+            }
+        )
+
+        items[LayoutState.customStateMap] = Binding<RoktUXCustomStateMap?>(
+            get: { [weak self] in
+                guard let self else { return nil }
+                return self.layoutVariantStates.isEmpty ? nil : self.layoutVariantStates
+            },
+            set: { [weak self] newValue in
+                self?.layoutVariantStates = newValue ?? [:]
             }
         )
     }
@@ -70,6 +81,11 @@ class MockLayoutState: LayoutStateRepresenting {
     func globalCustomStateValue(for key: String) -> Int? {
         let identifier = CustomStateIdentifiable(position: nil, key: key)
         return globalStates[identifier]
+    }
+
+    func layoutVariantCustomStateValue(for key: String, position: Int?) -> Int? {
+        let identifier = CustomStateIdentifiable(position: position, key: key)
+        return layoutVariantStates[identifier]
     }
 
     // MARK: - Hashable
