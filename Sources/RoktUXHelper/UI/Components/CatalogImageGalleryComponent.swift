@@ -40,6 +40,7 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
+    @GestureState private var dragState: DragState = .inactive
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -109,52 +110,57 @@ struct CatalogImageGalleryComponent: View {
 
     private var mainImageView: some View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
-        return ZStack {
-            if let currentImage = model.selectedImage {
-                DataImageViewComponent(
-                    config: config.updateParent(.column),
-                    model: currentImage,
-                    parentWidth: $availableWidth,
-                    parentHeight: $availableHeight,
-                    styleState: $styleState,
-                    parentOverride: ComponentParentOverride(
-                        parentVerticalAlignment: .center,
-                        parentHorizontalAlignment: .center,
-                        parentBackgroundStyle: passableBackgroundStyle,
-                        stretchChildren: false
-                    ),
-                    expandsToContainerOnSelfAlign: false
-                )
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 30)
-                        .onEnded { value in
-                            handleSwipe(translation: value.translation)
-                        }
-                )
-                .overlay(
-                    HStack(spacing: 0) {
-                        // Left tap area - go to previous
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                goToPreviousImage()
-                            }
+        let width = galleryWidth
 
-                        // Right tap area - go to next
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                goToNextImage()
-                            }
-                    }
-                )
-                .overlay(alignment: overlayAlignment) {
-                    indicatorOverlay(alignment: overlayAlignment)
-                }
+        let dragGesture = DragGesture(minimumDistance: 10)
+            .updating($dragState) { value, state, _ in
+                state = .dragging(translation: adjustedTranslation(value.translation.width, width: width))
+            }
+            .onEnded { value in
+                let translation = adjustedTranslation(value.translation.width, width: width)
+                settleDrag(translation: translation, width: width)
+            }
+
+        return ZStack {
+            if let previousImage = model.images[safe: model.selectedIndex - 1] {
+                imageViewComponent(for: previousImage, styleBinding: .constant(.default))
+                    .offset(x: dragTranslation - width)
+                    .allowsHitTesting(false)
+            }
+
+            if let currentImage = model.selectedImage {
+                imageViewComponent(for: currentImage, styleBinding: $styleState)
+                    .offset(x: dragTranslation)
+            }
+
+            if let nextImage = model.images[safe: model.selectedIndex + 1] {
+                imageViewComponent(for: nextImage, styleBinding: .constant(.default))
+                    .offset(x: dragTranslation + width)
+                    .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity)
+        .clipped()
+        .overlay(
+            HStack(spacing: 0) {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        goToPreviousImage()
+                    }
+
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        goToNextImage()
+                    }
+            }
+        )
+        .overlay(alignment: overlayAlignment) {
+            indicatorOverlay(alignment: overlayAlignment)
+        }
+        .highPriorityGesture(dragGesture)
+        .animation(carouselAnimation, value: dragState)
     }
 
     private var thumbnailsView: some View {
@@ -258,24 +264,14 @@ struct CatalogImageGalleryComponent: View {
         return CGFloat(frame.left + frame.right)/2
     }
 
-    private func handleSwipe(translation: CGSize) {
-        if translation.width < -50 {
-            // Swipe left - go to next image
-            goToNextImage()
-        } else if translation.width > 50 {
-            // Swipe right - go to previous image
-            goToPreviousImage()
-        }
-    }
-
     private func goToNextImage() {
-        withAnimation(.easeInOut) {
+        withAnimation(carouselAnimation) {
             model.selectNextImage()
         }
     }
 
     private func goToPreviousImage() {
-        withAnimation(.easeInOut) {
+        withAnimation(carouselAnimation) {
             model.selectPreviousImage()
         }
     }
@@ -283,6 +279,70 @@ struct CatalogImageGalleryComponent: View {
     private func scrollToThumbnail(at index: Int, proxy: ScrollViewProxy) {
         withAnimation(.easeInOut) {
             proxy.scrollTo(index, anchor: .center)
+        }
+    }
+
+    private func imageViewComponent(for viewModel: DataImageViewModel,
+                                    styleBinding: Binding<StyleState>) -> some View {
+        DataImageViewComponent(
+            config: config.updateParent(.column),
+            model: viewModel,
+            parentWidth: $availableWidth,
+            parentHeight: $availableHeight,
+            styleState: styleBinding,
+            parentOverride: ComponentParentOverride(
+                parentVerticalAlignment: .center,
+                parentHorizontalAlignment: .center,
+                parentBackgroundStyle: passableBackgroundStyle,
+                stretchChildren: false
+            ),
+            expandsToContainerOnSelfAlign: false
+        )
+    }
+
+    private func adjustedTranslation(_ raw: CGFloat, width: CGFloat) -> CGFloat {
+        var translation = raw
+        if translation > 0 && !model.canSelectPreviousImage {
+            translation /= 3
+        }
+        if translation < 0 && !model.canSelectNextImage {
+            translation /= 3
+        }
+        return max(min(translation, width), -width)
+    }
+
+    private func settleDrag(translation: CGFloat, width: CGFloat) {
+        let threshold = width * 0.2
+        if translation <= -threshold {
+            goToNextImage()
+        } else if translation >= threshold {
+            goToPreviousImage()
+        }
+    }
+
+    private var dragTranslation: CGFloat {
+        dragState.translation
+    }
+
+    private var carouselAnimation: Animation {
+        .interactiveSpring(response: 0.35, dampingFraction: 0.82, blendDuration: 0.15)
+    }
+
+    private var galleryWidth: CGFloat {
+        max(availableWidth ?? parentWidth ?? UIScreen.main.bounds.width, 1)
+    }
+
+    private enum DragState: Equatable {
+        case inactive
+        case dragging(translation: CGFloat)
+
+        var translation: CGFloat {
+            switch self {
+            case .inactive:
+                return 0
+            case .dragging(let translation):
+                return translation
+            }
         }
     }
 }

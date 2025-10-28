@@ -142,6 +142,57 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
 
         XCTAssertEqual(sut.model.indicatorAlignSelf(for: 0), .flexEnd)
     }
+
+    func test_catalogImageGallery_selectNextImageAdvancesIndex() throws {
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogImageGallery(
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
+        )
+
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogImageGalleryComponent.self)
+
+        let sut = try component.actualView()
+        XCTAssertEqual(sut.model.selectedIndex, 0)
+        XCTAssertTrue(sut.model.canSelectNextImage)
+
+        sut.model.selectNextImage()
+
+        XCTAssertEqual(sut.model.selectedIndex, 1)
+        XCTAssertTrue(sut.model.selectedImage === sut.model.images[1])
+    }
+
+    func test_catalogImageGallery_selectPreviousImageAtFirstIndexDoesNotMove() throws {
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogImageGallery(
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
+        )
+
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogImageGalleryComponent.self)
+
+        let sut = try component.actualView()
+        XCTAssertEqual(sut.model.selectedIndex, 0)
+        XCTAssertFalse(sut.model.canSelectPreviousImage)
+
+        sut.model.selectPreviousImage()
+
+        XCTAssertEqual(sut.model.selectedIndex, 0)
+    }
 }
 
 @available(iOS 15.0, *)
