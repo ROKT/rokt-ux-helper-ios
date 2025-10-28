@@ -286,9 +286,10 @@ extension PredicateHandling {
 
             switch predicate.condition {
             case .exists:
-                matched = matched && !(getCreativeCopy(offerPosition)[value] ?? "").isEmpty
+                matched = matched &&
+                    (!(getCreativeCopy(offerPosition)[value] ?? "").isEmpty || !(getCatalogCopy()[value] ?? "").isEmpty)
             case .notExists:
-                matched = matched && getCreativeCopy(offerPosition)[value] == nil
+                matched = matched && (getCreativeCopy(offerPosition)[value] == nil && getCatalogCopy()[value] == nil)
             }
         }
 
@@ -298,6 +299,10 @@ extension PredicateHandling {
     private func getCreativeCopy(_ offerPosition: Int) -> [String: String] {
         guard offers.count > offerPosition else { return [:] }
         return offers[offerPosition]?.creative.copy ?? [:]
+    }
+
+    private func getCatalogCopy() -> [String: String] {
+        return activeCatalogItem?.copy ?? [:]
     }
 
     private func staticStringPredicatesMatched() -> Bool? {
