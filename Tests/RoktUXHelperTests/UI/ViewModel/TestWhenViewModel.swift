@@ -554,7 +554,273 @@ final class TestWhenViewModel: XCTestCase {
 
         XCTAssertTrue(shouldApply)
     }
-    
+
+    // MARK: - CreativeCopy with CatalogCopy Fallback
+
+    func test_shouldApply_whenCatalogCopy_exists_creativeNotExists() {
+        // When creative copy doesn't have the key but catalog copy does
+        let layoutState = LayoutState()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "key1"))
+        let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState, catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply, "Should apply when catalog copy contains the key even if creative copy doesn't")
+    }
+
+    func test_shouldApply_whenCreativeCopy_exists_catalogNotExists() {
+        // When creative copy has the key but catalog copy doesn't
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: catalogItem.price,
+            priceFormatted: catalogItem.priceFormatted,
+            originalPrice: catalogItem.originalPrice,
+            originalPriceFormatted: catalogItem.originalPriceFormatted,
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: [:], // Empty catalog copy
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: ["creative.title": "Awesome offer"],
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply, "Should apply when creative copy contains the key even if catalog copy doesn't")
+    }
+
+    func test_shouldApply_whenBoth_creativeCopy_and_catalogCopy_exist() {
+        // When both creative and catalog copy have the key
+        let layoutState = LayoutState()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "key1"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: ["key1": "creative value"],
+            layoutState: layoutState,
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply, "Should apply when both creative and catalog copy contain the key")
+    }
+
+    func test_shouldNotApply_whenNeither_creativeCopy_nor_catalogCopy_exist() {
+        // When neither creative nor catalog copy have the key
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: catalogItem.price,
+            priceFormatted: catalogItem.priceFormatted,
+            originalPrice: catalogItem.originalPrice,
+            originalPriceFormatted: catalogItem.originalPriceFormatted,
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: [:], // Empty catalog copy
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "nonexistent.key"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: [:], // Empty creative copy
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply, "Should not apply when neither creative nor catalog copy contain the key")
+    }
+
+    func test_shouldApply_whenCatalogCopy_exists_withEmptyString_shouldNotApply() {
+        // When catalog copy has the key but with empty value
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: catalogItem.price,
+            priceFormatted: catalogItem.priceFormatted,
+            originalPrice: catalogItem.originalPrice,
+            originalPriceFormatted: catalogItem.originalPriceFormatted,
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: ["key1": ""], // Empty string value
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "key1"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: [:],
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply, "Should not apply when catalog copy value is empty string")
+    }
+
+    // MARK: - CreativeCopy notExists with CatalogCopy
+
+    func test_shouldApply_whenCreativeCopy_notExists_catalogCopy_notExists() {
+        // When neither creative nor catalog copy have the key
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: catalogItem.price,
+            priceFormatted: catalogItem.priceFormatted,
+            originalPrice: catalogItem.originalPrice,
+            originalPriceFormatted: catalogItem.originalPriceFormatted,
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: [:], // Empty catalog copy
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "nonexistent.key"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: [:],
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertTrue(shouldApply, "Should apply when key doesn't exist in both creative and catalog copy")
+    }
+
+    func test_shouldNotApply_whenCreativeCopy_exists_notExists_condition() {
+        // When creative copy has the key but condition is notExists
+        var catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        catalogItem = CatalogItem(
+            images: catalogItem.images,
+            catalogItemId: catalogItem.catalogItemId,
+            cartItemId: catalogItem.cartItemId,
+            instanceGuid: catalogItem.instanceGuid,
+            title: catalogItem.title,
+            description: catalogItem.description,
+            price: catalogItem.price,
+            priceFormatted: catalogItem.priceFormatted,
+            originalPrice: catalogItem.originalPrice,
+            originalPriceFormatted: catalogItem.originalPriceFormatted,
+            currency: catalogItem.currency,
+            signalType: catalogItem.signalType,
+            url: catalogItem.url,
+            minItemCount: catalogItem.minItemCount,
+            maxItemCount: catalogItem.maxItemCount,
+            preSelectedQuantity: catalogItem.preSelectedQuantity,
+            providerData: catalogItem.providerData,
+            urlBehavior: catalogItem.urlBehavior,
+            positiveResponseText: catalogItem.positiveResponseText,
+            negativeResponseText: catalogItem.negativeResponseText,
+            addOns: catalogItem.addOns,
+            copy: [:], // Empty catalog copy
+            linkedProductId: catalogItem.linkedProductId,
+            token: catalogItem.token)
+
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "creative.title"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: ["creative.title": "Awesome offer"],
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply, "Should not apply when creative copy contains the key with notExists condition")
+    }
+
+    func test_shouldNotApply_whenCatalogCopy_exists_notExists_condition() {
+        // When catalog copy has the key but condition is notExists
+        let layoutState = LayoutState()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "key1"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: [:],
+            layoutState: layoutState,
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(shouldApply, "Should not apply when catalog copy contains the key with notExists condition")
+    }
+
+    func test_shouldNotApply_whenBoth_exist_notExists_condition() {
+        // When both creative and catalog copy have the key but condition is notExists
+        let layoutState = LayoutState()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1", images: nil)
+        let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "key1"))
+        let whenVM = get_when_view_model(
+            predicates: [predicate],
+            copy: ["key1": "creative value"],
+            layoutState: layoutState,
+            catalogItem: catalogItem)
+
+        let shouldApply = whenVM.shouldApply(get_mock_uistate())
+
+        XCTAssertFalse(
+            shouldApply,
+            "Should not apply when both creative and catalog copy contain the key with notExists condition")
+    }
+
     // MARK: - StaticString
 
     func test_shouldApply_whenConditionEqualsIs_inputEqualsTest_valueEqualsTest() {

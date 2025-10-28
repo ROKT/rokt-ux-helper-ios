@@ -299,7 +299,7 @@
                                                 },
                                                 "background": {
                                                   "backgroundColor": {
-                                                    "light": "#BFFFFFFF"
+                                                    "light": "#40FFFFFF"
                                                   }
                                                 },
                                                 "spacing": {
@@ -523,67 +523,83 @@
                                                       }
                                                     },
                                                     {
-                                                      "type": "Row",
+                                                      "type": "When",
                                                       "node": {
-                                                        "styles": {
-                                                          "elements": {
-                                                            "own": [
-                                                              {
-                                                                "default": {
-                                                                  "spacing": {
-                                                                    "margin": "3 0 0 0"
-                                                                  },
-                                                                  "border": {
-                                                                    "borderRadius": 4
-                                                                  },
-                                                                  "background": {
-                                                                    "backgroundColor": {
-                                                                      "light": "#CFD5FA"
-                                                                    }
-                                                                  },
-                                                                  "container": {
-                                                                    "alignItems": "center"
-                                                                  },
-                                                                  "dimension": {
-                                                                    "height": {
-                                                                      "type": "fixed",
-                                                                      "value": 20
-                                                                    },
-                                                                    "width": {
-                                                                      "type": "fit",
-                                                                      "value": "wrap-content"
-                                                                    }
-                                                                  }
-                                                                }
-                                                              }
-                                                            ]
+                                                        "predicates": [
+                                                          {
+                                                            "type": "CreativeCopy",
+                                                            "predicate": {
+                                                              "condition": "exists",
+                                                              "value": "provider.discountPercent"
+                                                            }
                                                           }
-                                                        },
+                                                        ],
                                                         "children": [
                                                           {
-                                                            "type": "BasicText",
+                                                            "type": "Row",
                                                             "node": {
-                                                              "value": "%^DATA.catalogItem.copy.provider.discountLabel|^%",
                                                               "styles": {
                                                                 "elements": {
                                                                   "own": [
                                                                     {
                                                                       "default": {
-                                                                        "text": {
-                                                                          "fontSize": 12,
-                                                                          "fontWeight": "600",
-                                                                          "textColor": {
-                                                                            "light": "#000000"
+                                                                        "spacing": {
+                                                                          "margin": "3 0 0 0"
+                                                                        },
+                                                                        "border": {
+                                                                          "borderRadius": 4
+                                                                        },
+                                                                        "background": {
+                                                                          "backgroundColor": {
+                                                                            "light": "#CFD5FA"
                                                                           }
                                                                         },
-                                                                        "spacing": {
-                                                                          "padding": "3 5"
+                                                                        "container": {
+                                                                          "alignItems": "center"
+                                                                        },
+                                                                        "dimension": {
+                                                                          "height": {
+                                                                            "type": "fixed",
+                                                                            "value": 20
+                                                                          },
+                                                                          "width": {
+                                                                            "type": "fit",
+                                                                            "value": "wrap-content"
+                                                                          }
                                                                         }
                                                                       }
                                                                     }
                                                                   ]
                                                                 }
-                                                              }
+                                                              },
+                                                              "children": [
+                                                                {
+                                                                  "type": "BasicText",
+                                                                  "node": {
+                                                                    "value": "Save %^DATA.catalogItem.copy.provider.discountPercent|^%%",
+                                                                    "styles": {
+                                                                      "elements": {
+                                                                        "own": [
+                                                                          {
+                                                                            "default": {
+                                                                              "text": {
+                                                                                "fontSize": 12,
+                                                                                "fontWeight": "600",
+                                                                                "textColor": {
+                                                                                  "light": "#000000"
+                                                                                }
+                                                                              },
+                                                                              "spacing": {
+                                                                                "padding": "3 5"
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              ]
                                                             }
                                                           }
                                                         ]
@@ -659,11 +675,11 @@
                                                                     "fontWeight": "500",
                                                                     "textColor": {
                                                                       "light": "#192C51"
-                                                                    },
-                                                                    "textDecoration": "underline"
+                                                                    }
                                                                   },
                                                                   "spacing": {
-                                                                    "margin": "0 0 8 0"
+                                                                    "margin": "0 0 8 0",
+                                                                    "padding": "3 3 3 0"
                                                                   }
                                                                 }
                                                               }
@@ -741,11 +757,11 @@
                                                                     "fontWeight": "500",
                                                                     "textColor": {
                                                                       "light": "#192C51"
-                                                                    },
-                                                                    "textDecoration": "underline"
+                                                                    }
                                                                   },
                                                                   "spacing": {
-                                                                    "margin": "0 0 8 0"
+                                                                    "margin": "0 0 8 0",
+                                                                    "padding": "3 3 3 0"
                                                                   }
                                                                 }
                                                               }
