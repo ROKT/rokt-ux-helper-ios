@@ -890,12 +890,36 @@
                                                             "fontSize": 14,
                                                             "fontWeight": "400",
                                                             "textColor": {
-                                                              "light": "#242424"
+                                                              "light": "#838383"
                                                             },
                                                             "textDecoration": "strike-through"
                                                           },
                                                           "flexChild": {
                                                             "weight": 1
+                                                          }
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "type": "BasicText",
+                                              "node": {
+                                                "value": "Out of stock",
+                                                "styles": {
+                                                  "elements": {
+                                                    "own": [
+                                                      {
+                                                        "default": {
+                                                          "text": {
+                                                            "fontSize": 14,
+                                                            "fontWeight": "400",
+                                                            "textColor": {
+                                                              "light": "#838383"
+                                                            },
+                                                            "fontStyle": "italic"
                                                           }
                                                         }
                                                       }
@@ -1722,6 +1746,202 @@
                                           "type": "BasicText",
                                           "node": {
                                             "value": "%^DATA.catalogItem.copy.provider.supplierName^% will email your order confirmation shortly. You can return to your Rent the Runway order summary below.",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "spacing": {
+                                                        "margin": "16 0 0 0"
+                                                      },
+                                                      "text": {
+                                                        "fontSize": 16,
+                                                        "fontWeight": "400",
+                                                        "textColor": {
+                                                          "light": "#1A202C"
+                                                        },
+                                                        "horizontalTextAlignment": "center"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "type": "CloseButton",
+                                    "node": {
+                                      "styles": {
+                                        "elements": {
+                                          "own": [
+                                            {
+                                              "default": {
+                                                "dimension": {
+                                                  "width": {
+                                                    "type": "fit",
+                                                    "value": "fit-width"
+                                                  },
+                                                  "height": {
+                                                    "type": "fixed",
+                                                    "value": 42
+                                                  }
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "center"
+                                                },
+                                                "background": {
+                                                  "backgroundColor": {
+                                                    "light": "#3A0922"
+                                                  }
+                                                },
+                                                "border": {
+                                                  "borderRadius": 40
+                                                },
+                                                "spacing": {
+                                                  "margin": "0 0 16 0"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "Take me there",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "text": {
+                                                        "fontSize": 16,
+                                                        "fontWeight": "700",
+                                                        "textColor": {
+                                                          "light": "#FFFFFF"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "type": "When",
+                        "node": {
+                          "predicates": [
+                            {
+                              "type": "CustomState",
+                              "predicate": {
+                                "key": "PaymentCompleted",
+                                "condition": "is",
+                                "value": -1
+                              }
+                            }
+                          ],
+                          "children": [
+                            {
+                              "type": "Column",
+                              "node": {
+                                "styles": {
+                                  "elements": {
+                                    "own": [
+                                      {
+                                        "default": {
+                                          "dimension": {
+                                            "width": {
+                                              "type": "fit",
+                                              "value": "fit-width"
+                                            },
+                                            "height": {
+                                              "type": "fit",
+                                              "value": "fit-height"
+                                            }
+                                          },
+                                          "background": {
+                                            "backgroundColor": {
+                                              "light": "#FFFFFF"
+                                            }
+                                          },
+                                          "container": {
+                                            "alignItems": "center",
+                                            "justifyContent": "center"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "children": [
+                                  {
+                                    "type": "Column",
+                                    "node": {
+                                      "styles": {
+                                        "elements": {
+                                          "own": [
+                                            {
+                                              "default": {
+                                                "flexChild": {
+                                                  "weight": 1
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "center"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "Oops! Something didn't go through.",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "spacing": {
+                                                        "margin": "16 0 0 0"
+                                                      },
+                                                      "text": {
+                                                        "fontSize": 20,
+                                                        "fontWeight": "600",
+                                                        "textColor": {
+                                                          "light": "#1A1A1A"
+                                                        },
+                                                        "horizontalTextAlignment": "center"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "We weren't able to process this add-on order. You haven't been charged for it, and your original order is still on its way.",
                                             "styles": {
                                               "elements": {
                                                 "own": [
