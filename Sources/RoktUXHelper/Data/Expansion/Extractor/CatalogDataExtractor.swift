@@ -78,7 +78,11 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         // return empty if the mapped data is not found
         guard let mappedData else { return .value("" as! U) }
 
-        return castData(mappedData, as: type, isState: isStateType)
+        guard let normalizedData = unwrapOptional(mappedData) else {
+            return .value("" as! U)
+        }
+
+        return castData(normalizedData, as: type, isState: isStateType)
     }
 
     private func catalogItemValue(for keyAndNamespace: BNFKeyAndNamespace, in data: CatalogItem) -> Any? {
@@ -98,13 +102,13 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
                 keys: keys
             )
 
-            return reflectedValue
+            return unwrapOptional(reflectedValue)
         }
 
         return Mirror(reflecting: data)
             .children
             .first { $0.label == firstKey }
-            .map(\.value)
+            .flatMap { unwrapOptional($0.value) }
     }
 
     private func castData<U>(_ value: Any, as type: U.Type, isState: Bool) -> DataBinding<U> {
@@ -144,5 +148,20 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         }
 
         return isState ? .state(casted) : .value(casted)
+    }
+
+    private func unwrapOptional(_ value: Any) -> Any? {
+        var currentValue = value
+        var mirror = Mirror(reflecting: currentValue)
+
+        while mirror.displayStyle == .optional {
+            guard let child = mirror.children.first else {
+                return nil
+            }
+            currentValue = child.value
+            mirror = Mirror(reflecting: currentValue)
+        }
+
+        return currentValue
     }
 }

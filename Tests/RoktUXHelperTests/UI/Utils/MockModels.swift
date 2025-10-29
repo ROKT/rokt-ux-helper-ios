@@ -86,7 +86,8 @@ extension OfferModel {
         copy: [String: String] = [:],
         images: [String: CreativeImage]? = nil,
         responseOptionList: ResponseOptionList? = nil,
-        token: String = ""
+        token: String = "",
+        catalogItems: [CatalogItem]? = nil
     ) -> Self {
         .init(
             campaignId: campaignId,
@@ -99,7 +100,7 @@ extension OfferModel {
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),
-            catalogItems: nil
+            catalogItems: catalogItems
         )
     }
 }
@@ -107,7 +108,8 @@ extension OfferModel {
 extension CatalogItem {
     static func mock(
         catalogItemId: String = "catalogItemId",
-        images: [String: CreativeImage]? = nil
+        images: [String: CreativeImage]? = nil,
+        inventoryStatus: String? = nil
     ) -> Self {
         let imageMap = images ?? [
             "catalogItemImage0": CreativeImage(
@@ -140,6 +142,7 @@ extension CatalogItem {
             negativeResponseText: "Dismiss",
             addOns: ["addon1", "addon2"],
             copy: ["key1": "value1", "key2": "value2"],
+            inventoryStatus: inventoryStatus,
             linkedProductId: "linked",
             token: "catalog1Token"
         )

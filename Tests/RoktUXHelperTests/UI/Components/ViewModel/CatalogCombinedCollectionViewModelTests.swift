@@ -111,6 +111,7 @@ final class CatalogCombinedCollectionViewModelTests: XCTestCase {
             negativeResponseText: "negative",
             addOns: nil,
             copy: nil,
+            inventoryStatus: nil,
             linkedProductId: nil,
             token: "token-\(id)"
         )

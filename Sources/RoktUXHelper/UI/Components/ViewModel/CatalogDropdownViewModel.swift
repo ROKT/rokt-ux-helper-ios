@@ -23,6 +23,8 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let dropDownListItemPressedStyle: [CatalogDropdownStyles]?
     let dropDownSelectedItemDefaultStyle: [CatalogDropdownStyles]?
     let dropDownSelectedItemPressedStyle: [CatalogDropdownStyles]?
+    let dropDownDisabledItemDefaultStyle: [CatalogDropdownStyles]?
+    let dropDownDisabledItemPressedStyle: [CatalogDropdownStyles]?
     let dropDownListContainerDefaultStyle: [CatalogDropdownStyles]?
     let dropDownListContainerPressedStyle: [CatalogDropdownStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
@@ -52,6 +54,8 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          pressedStyle: [CatalogDropdownStyles]?,
          dropDownListItemDefaultStyle: [CatalogDropdownStyles]?,
          dropDownListItemPressedStyle: [CatalogDropdownStyles]?,
+         dropDownDisabledItemDefaultStyle: [CatalogDropdownStyles]?,
+         dropDownDisabledItemPressedStyle: [CatalogDropdownStyles]?,
          dropDownSelectedItemDefaultStyle: [CatalogDropdownStyles]?,
          dropDownSelectedItemPressedStyle: [CatalogDropdownStyles]?,
          dropDownListContainerDefaultStyle: [CatalogDropdownStyles]?,
@@ -69,6 +73,8 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.pressedStyle = pressedStyle
         self.dropDownListItemDefaultStyle = dropDownListItemDefaultStyle
         self.dropDownListItemPressedStyle = dropDownListItemPressedStyle
+        self.dropDownDisabledItemDefaultStyle = dropDownDisabledItemDefaultStyle
+        self.dropDownDisabledItemPressedStyle = dropDownDisabledItemPressedStyle
         self.dropDownSelectedItemDefaultStyle = dropDownSelectedItemDefaultStyle
         self.dropDownSelectedItemPressedStyle = dropDownSelectedItemPressedStyle
         self.dropDownListContainerDefaultStyle = dropDownListContainerDefaultStyle
@@ -83,5 +89,16 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.validatorFieldKey = validatorFieldKey
         self.validatorRules = validatorRules
         self.validateOnChange = validateOnChange
+    }
+
+    func isItemDisabled(at index: Int) -> Bool {
+        guard index >= 0, index < catalogItems.count else { return false }
+        return catalogItems[index].isOutOfStock
+    }
+}
+
+private extension CatalogItem {
+    var isOutOfStock: Bool {
+        inventoryStatus?.caseInsensitiveCompare("OutOfStock") == .orderedSame
     }
 }
