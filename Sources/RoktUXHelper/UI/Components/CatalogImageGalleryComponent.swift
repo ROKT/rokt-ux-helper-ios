@@ -292,6 +292,7 @@ struct CatalogImageGalleryComponent: View {
                 .padding(.horizontal, horizontalInset)
             }
             .onChange(of: model.selectedIndex) { newIndex in
+                page = model.selectedIndex ?? 0
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
         }
