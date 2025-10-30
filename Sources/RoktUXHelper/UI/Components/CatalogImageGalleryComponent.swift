@@ -48,7 +48,7 @@ struct HSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
     let content: Content
-    @GestureState private var dragState: CatalogImageGalleryComponent.DragState = .inactive
+    @GestureState private var dragState: CGFloat = 0
 
     init(page: Binding<Int>, pages: Int, @ViewBuilder content: () -> Content) {
         self._page = page
@@ -60,7 +60,7 @@ struct HSPageView<Content: View>: View {
         GeometryReader { geo in
             let dragGesture = DragGesture(minimumDistance: 10)
                  .updating($dragState) { value, state, _ in
-                     state = .dragging(translation: value.translation.width)
+                     state = value.translation.width
                  }
                  .onEnded { value in
                      let threshold = geo.size.width/2
@@ -96,7 +96,7 @@ struct HSPageView<Content: View>: View {
     struct HSStackPager: _VariadicView_UnaryViewRoot {
         let width: CGFloat
         let page: Int
-        let dragState: CatalogImageGalleryComponent.DragState
+        let dragState: CGFloat
 
         func body(children: _VariadicView.Children) -> some View {
             HStack(spacing: 0) {
@@ -104,16 +104,7 @@ struct HSPageView<Content: View>: View {
                     child.frame(width: width)
                 }
             }
-            .offset(x: -CGFloat(page) * width + dragOffset())
-        }
-
-        private func dragOffset() -> CGFloat {
-            switch dragState {
-            case .dragging(let translation):
-                return translation
-            default:
-                return 0
-            }
+            .offset(x: -CGFloat(page) * width + CGFloat(dragState))
         }
     }
 }
@@ -146,7 +137,7 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @GestureState private var dragState: DragState = .inactive
+    @GestureState private var dragState: CGFloat = 0
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -365,29 +356,11 @@ struct CatalogImageGalleryComponent: View {
         )
     }
 
-    private var dragTranslation: CGFloat {
-        dragState.translation
-    }
-
     private var carouselAnimation: Animation {
         .interactiveSpring(response: 0.35, dampingFraction: 0.82, blendDuration: 0.15)
     }
 
     private var galleryWidth: CGFloat {
         max(availableWidth ?? parentWidth ?? UIScreen.main.bounds.width, 1)
-    }
-
-    enum DragState: Equatable {
-        case inactive
-        case dragging(translation: CGFloat)
-
-        var translation: CGFloat {
-            switch self {
-            case .inactive:
-                return 0
-            case .dragging(let translation):
-                return translation
-            }
-        }
     }
 }
