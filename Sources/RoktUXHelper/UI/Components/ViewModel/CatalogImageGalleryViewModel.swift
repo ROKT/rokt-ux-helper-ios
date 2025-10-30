@@ -85,31 +85,9 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         thumbnailRowStyleBlock != nil
     }
 
-    var showIndicator: Bool {
-        progressIndicatorContainerBlocks != nil
-    }
-
-    var canSelectNextImage: Bool {
-        selectedIndex < images.count - 1
-    }
-
-    var canSelectPreviousImage: Bool {
-        selectedIndex > 0
-    }
-
     func selectImage(at index: Int) {
         guard images.indices.contains(index), index != selectedIndex else { return }
         selectedIndex = index
-    }
-
-    func selectNextImage() {
-        guard canSelectNextImage else { return }
-        selectedIndex += 1
-    }
-
-    func selectPreviousImage() {
-        guard canSelectPreviousImage else { return }
-        selectedIndex -= 1
     }
 
     func dotViewModel(for index: Int, breakpointIndex: Int) -> RowViewModel {
@@ -232,7 +210,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     }
 
     private func clampSelectedIndex() {
-        guard !images.isEmpty else {
+        if images.isEmpty {
             selectedIndex = 0
             return
         }

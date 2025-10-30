@@ -306,8 +306,7 @@ struct CatalogImageGalleryComponent: View {
 
     @ViewBuilder
     private func indicatorOverlay(alignment: Alignment) -> some View {
-        if model.showIndicator,
-           let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
+        if let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
             RowComponent(
                 config: config,
                 model: containerViewModel,
