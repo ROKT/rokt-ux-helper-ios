@@ -178,15 +178,6 @@ struct CatalogImageGalleryComponent: View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
         let width = galleryWidth
 
-//        let dragGesture = DragGesture(minimumDistance: 10)
-//            .updating($dragState) { value, state, _ in
-//                state = .dragging(translation: adjustedTranslation(value.translation.width, width: width))
-//            }
-//            .onEnded { value in
-//                let translation = adjustedTranslation(value.translation.width, width: width)
-//                settleDrag(translation: translation, width: width)
-//            }
-
         return ZStack {
             imageViewComponent(for: model.images[0], styleBinding: $styleState).opacity(0.0)
             HSPageView(page: $page, pages: model.images.count) {
@@ -195,45 +186,12 @@ struct CatalogImageGalleryComponent: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-
-//            if let previousImage = model.images[safe: model.selectedIndex - 1] {
-//                imageViewComponent(for: previousImage, styleBinding: .constant(.default))
-//                    .offset(x: dragTranslation - width)
-//                    .allowsHitTesting(false)
-//            }
-//
-//            if let currentImage = model.selectedImage {
-//                imageViewComponent(for: currentImage, styleBinding: $styleState)
-//                    .offset(x: dragTranslation)
-//            }
-//
-//            if let nextImage = model.images[safe: model.selectedIndex + 1] {
-//                imageViewComponent(for: nextImage, styleBinding: .constant(.default))
-//                    .offset(x: dragTranslation + width)
-//                    .allowsHitTesting(false)
-//            }
         }
         .frame(maxWidth: .infinity)
         .clipped()
-//        .overlay(
-//            HStack(spacing: 0) {
-//                Color.clear
-//                    .contentShape(Rectangle())
-//                    .onTapGesture {
-//                        goToPreviousImage()
-//                    }
-//
-//                Color.clear
-//                    .contentShape(Rectangle())
-//                    .onTapGesture {
-//                        goToNextImage()
-//                    }
-//            }
-//        )
         .overlay(alignment: overlayAlignment) {
             indicatorOverlay(alignment: overlayAlignment)
         }
-//        .highPriorityGesture(dragGesture)
         .animation(carouselAnimation, value: dragState)
     }
 
