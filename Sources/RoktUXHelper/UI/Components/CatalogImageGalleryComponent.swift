@@ -12,6 +12,37 @@
 import SwiftUI
 import DcuiSchema
 
+struct PassthroughTapView: UIViewRepresentable {
+    var onTap: (CGPoint) -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+
+        view.addGestureRecognizer(UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap(_:))
+        ))
+
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onTap: onTap)
+    }
+
+    class Coordinator: NSObject {
+        let onTap: (CGPoint) -> Void
+        init(onTap: @escaping (CGPoint) -> Void) { self.onTap = onTap }
+
+        @objc func handleTap(_ sender: UITapGestureRecognizer) {
+            let location = sender.location(in: sender.view)
+            onTap(location)
+        }
+    }
+}
+
 @available(iOS 15, *)
 struct HSPageView<Content: View>: View {
     @Binding var page: Int
@@ -47,7 +78,19 @@ struct HSPageView<Content: View>: View {
             _VariadicView.Tree(HSStackPager(width: geo.size.width, page: page, dragState: dragState), content: { content })
                 .animation(.easeOut(duration: 0.25), value: page)
                 .animation(.easeOut(duration: 0.25), value: dragState)
-                .highPriorityGesture(dragGesture)
+
+            PassthroughTapView { point in
+                let isLeft = point.x < geo.size.width/2
+                print("Tapped at \(point.x), \(point.y) — \(isLeft ? "LEFT" : "RIGHT")")
+
+                if isLeft {
+                    page = max(page - 1, 0)
+                } else {
+                    page = min(page + 1, pages - 1)
+                }
+            }
+            .highPriorityGesture(dragGesture)
+            .allowsHitTesting(true)
         }
     }
 
