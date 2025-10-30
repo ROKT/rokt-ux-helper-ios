@@ -137,7 +137,6 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @GestureState private var dragState: CGFloat = 0
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -209,7 +208,6 @@ struct CatalogImageGalleryComponent: View {
 
     private var mainImageView: some View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
-        let width = galleryWidth
 
         return ZStack {
             imageViewComponent(for: model.images[0], styleBinding: $styleState).opacity(0.0)
@@ -225,7 +223,6 @@ struct CatalogImageGalleryComponent: View {
         .overlay(alignment: overlayAlignment) {
             indicatorOverlay(alignment: overlayAlignment)
         }
-        .animation(carouselAnimation, value: dragState)
         .onChange(of: page) { newValue in
             model.selectedIndex = newValue
         }
@@ -355,13 +352,5 @@ struct CatalogImageGalleryComponent: View {
             ),
             expandsToContainerOnSelfAlign: false
         )
-    }
-
-    private var carouselAnimation: Animation {
-        .interactiveSpring(response: 0.35, dampingFraction: 0.82, blendDuration: 0.15)
-    }
-
-    private var galleryWidth: CGFloat {
-        max(availableWidth ?? parentWidth ?? UIScreen.main.bounds.width, 1)
     }
 }
