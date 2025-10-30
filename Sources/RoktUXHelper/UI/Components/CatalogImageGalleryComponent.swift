@@ -81,7 +81,6 @@ struct HSPageView<Content: View>: View {
 
             PassthroughTapView { point in
                 let isLeft = point.x < geo.size.width/2
-                print("Tapped at \(point.x), \(point.y) — \(isLeft ? "LEFT" : "RIGHT")")
 
                 if isLeft {
                     page = max(page - 1, 0)
@@ -236,6 +235,9 @@ struct CatalogImageGalleryComponent: View {
             indicatorOverlay(alignment: overlayAlignment)
         }
         .animation(carouselAnimation, value: dragState)
+        .onChange(of: page) { newValue in
+            model.selectedIndex = newValue
+        }
     }
 
     private var thumbnailsView: some View {

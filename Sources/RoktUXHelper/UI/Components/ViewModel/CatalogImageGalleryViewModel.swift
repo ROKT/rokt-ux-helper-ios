@@ -26,7 +26,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         }
     }
 
-    @Published private(set) var selectedIndex: Int = 0
+    @Published var selectedIndex: Int = 0
 
     let defaultStyle: [CatalogImageGalleryStyles]?
     private let thumbnailStyleBlock: [BasicStateStylingBlock<DataImageStyles>]?
