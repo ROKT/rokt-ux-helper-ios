@@ -341,24 +341,6 @@ struct CatalogImageGalleryComponent: View {
         return CGFloat(frame.left + frame.right)/2
     }
 
-    private func goToNextImage() {
-        withAnimation(.easeInOut(duration: 300.0/1000.0)) {
-            page += 1
-        }
-        withAnimation(carouselAnimation) {
-            model.selectNextImage()
-        }
-    }
-
-    private func goToPreviousImage() {
-        withAnimation(.easeInOut(duration: 300.0/1000.0)) {
-            page -= 1
-        }
-        withAnimation(carouselAnimation) {
-            model.selectPreviousImage()
-        }
-    }
-
     private func scrollToThumbnail(at index: Int, proxy: ScrollViewProxy) {
         withAnimation(.easeInOut) {
             proxy.scrollTo(index, anchor: .center)
@@ -381,26 +363,6 @@ struct CatalogImageGalleryComponent: View {
             ),
             expandsToContainerOnSelfAlign: false
         )
-    }
-
-    private func adjustedTranslation(_ raw: CGFloat, width: CGFloat) -> CGFloat {
-        var translation = raw
-        if translation > 0 && !model.canSelectPreviousImage {
-            translation /= 3
-        }
-        if translation < 0 && !model.canSelectNextImage {
-            translation /= 3
-        }
-        return max(min(translation, width), -width)
-    }
-
-    private func settleDrag(translation: CGFloat, width: CGFloat) {
-        let threshold = width * 0.2
-        if translation <= -threshold {
-            goToNextImage()
-        } else if translation >= threshold {
-            goToPreviousImage()
-        }
     }
 
     private var dragTranslation: CGFloat {
