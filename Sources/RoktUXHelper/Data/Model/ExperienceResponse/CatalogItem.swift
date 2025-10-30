@@ -34,6 +34,7 @@ struct CatalogItem: Codable {
     let negativeResponseText: String
     let addOns: [String]?
     let copy: [String: String]?
+    let inventoryStatus: String?
     let linkedProductId: String?
     let token: String
 }

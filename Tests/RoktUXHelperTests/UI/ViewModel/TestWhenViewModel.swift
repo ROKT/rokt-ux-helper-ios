@@ -595,6 +595,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: [:], // Empty catalog copy
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
 
@@ -651,6 +652,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: [:], // Empty catalog copy
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
 
@@ -691,6 +693,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: ["key1": ""], // Empty string value
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
 
@@ -733,6 +736,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: [:], // Empty catalog copy
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
 
@@ -773,6 +777,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: [:], // Empty catalog copy
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
 
@@ -1099,6 +1104,7 @@ final class TestWhenViewModel: XCTestCase {
             negativeResponseText: catalogItem.negativeResponseText,
             addOns: catalogItem.addOns,
             copy: catalogItem.copy,
+            inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
             token: catalogItem.token)
         let predicate = WhenPredicate.placeholder(

@@ -837,10 +837,15 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
 
         // Create openDropdownChildren array - one template per catalog item from the full offer
         let openDropdownChildren: [LayoutSchemaViewModel] = try fullOffer.catalogItems?.map { catalogItemFromOffer in
-            try transform(model.openTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
+            if catalogItemFromOffer.inventoryStatus?.caseInsensitiveCompare("OutOfStock") == .orderedSame {
+                return try transform(model.openDisabledTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
+            } else {
+                return try transform(model.openTemplate, context: .inner(.addToCart(catalogItemFromOffer)))
+            }
         } ?? []
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
         let dropdownListItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListItem)
+        let dropdownDisabledItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownDisabledItem)
         let dropdownSelectedItemStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownSelectedItem)
         let dropdownListContainerStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.dropDownListContainer)
         let validatorFieldKey = model.validatorFieldConfig?.validationFieldKey
@@ -851,6 +856,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                                         pressedStyle: updateStyles.compactMap { $0.pressed },
                                         dropDownListItemDefaultStyle: dropdownListItemStyles.compactMap { $0.default },
                                         dropDownListItemPressedStyle: dropdownListItemStyles.compactMap { $0.pressed },
+                                        dropDownDisabledItemDefaultStyle: dropdownDisabledItemStyles.compactMap { $0.default },
+                                        dropDownDisabledItemPressedStyle: dropdownDisabledItemStyles.compactMap { $0.pressed },
                                         dropDownSelectedItemDefaultStyle: dropdownSelectedItemStyles.compactMap { $0.default },
                                         dropDownSelectedItemPressedStyle: dropdownSelectedItemStyles.compactMap { $0.pressed },
                                         dropDownListContainerDefaultStyle: dropdownListContainerStyles.compactMap { $0.default },

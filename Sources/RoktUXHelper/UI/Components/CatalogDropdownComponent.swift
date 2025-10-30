@@ -189,7 +189,13 @@ struct CatalogDropdownComponent: View {
         }
     }
 
-    private func dropdownItemStyle(isSelected: Bool) -> CatalogDropdownStyles? {
+    private func dropdownItemStyle(for index: Int, isSelected: Bool) -> CatalogDropdownStyles? {
+        if isItemDisabled(at: index) {
+            return style(for: .default,
+                         defaultStyles: model.dropDownDisabledItemDefaultStyle,
+                         pressedStyles: model.dropDownDisabledItemPressedStyle)
+        }
+
         if isSelected,
            let selectedStyle = style(for: styleState,
                                      defaultStyles: model.dropDownSelectedItemDefaultStyle,
@@ -200,6 +206,10 @@ struct CatalogDropdownComponent: View {
         return style(for: styleState,
                      defaultStyles: model.dropDownListItemDefaultStyle,
                      pressedStyles: model.dropDownListItemPressedStyle)
+    }
+
+    private func isItemDisabled(at index: Int) -> Bool {
+        model.isItemDisabled(at: index)
     }
 
     private func verticalAlignment(for container: ContainerStylingProperties?) -> VerticalAlignmentProperty {
@@ -484,7 +494,7 @@ struct CatalogDropdownComponent: View {
     @ViewBuilder
     private func dropdownItemView(for index: Int) -> some View {
         let isSelected = persistedSelectedIndex == index
-        let itemStyle = dropdownItemStyle(isSelected: isSelected)
+        let itemStyle = dropdownItemStyle(for: index, isSelected: isSelected)
         let itemContainerStyle = itemStyle?.container
         let itemDimensionStyle = itemStyle?.dimension
         let itemFlexStyle = itemStyle?.flexChild
@@ -533,12 +543,17 @@ struct CatalogDropdownComponent: View {
             spacing: CGFloat(dropdownListContainerContainerStyle?.gap ?? 0)
         ) {
             ForEach(0..<model.openDropdownChildren.count, id: \.self) { index in
-                Button {
-                    selectItem(at: index)
-                } label: {
+                if isItemDisabled(at: index) {
                     dropdownItemView(for: index)
+                        .allowsHitTesting(false)
+                } else {
+                    Button {
+                        selectItem(at: index)
+                    } label: {
+                        dropdownItemView(for: index)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
         .applyLayoutModifier(
@@ -750,7 +765,8 @@ struct CatalogDropdownComponent: View {
 
     private func selectItem(at index: Int) {
         guard index >= 0,
-              index < model.openDropdownChildren.count else { return }
+              index < model.openDropdownChildren.count,
+              !isItemDisabled(at: index) else { return }
 
         selectedItemIndex = index
         isExpanded = false
@@ -772,6 +788,15 @@ struct CatalogDropdownComponent: View {
                     selectedItemIndex = nil
                     notifyValidationOfSelectionChange()
                 }
+                return
+            }
+
+            if isItemDisabled(at: persistedIndex) {
+                persistSelectedIndex(nil)
+                if selectedItemIndex != nil {
+                    selectedItemIndex = nil
+                }
+                notifyValidationOfSelectionChange()
                 return
             }
 
@@ -797,8 +822,18 @@ struct CatalogDropdownComponent: View {
         }
 
         if let index = model.catalogItems.firstIndex(where: { $0.catalogItemId == activeItem.catalogItemId }) {
-            selectedItemIndex = index
-            notifyValidationOfSelectionChange()
+            if isItemDisabled(at: index) {
+                persistSelectedIndex(nil)
+                if selectedItemIndex != nil {
+                    selectedItemIndex = nil
+                    notifyValidationOfSelectionChange()
+                }
+            } else {
+                if selectedItemIndex != index {
+                    selectedItemIndex = index
+                    notifyValidationOfSelectionChange()
+                }
+            }
         } else {
             if selectedItemIndex != nil {
                 selectedItemIndex = nil

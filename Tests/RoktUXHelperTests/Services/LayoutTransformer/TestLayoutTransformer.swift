@@ -55,6 +55,62 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
     }
 
+    func test_catalog_dropdown_uses_disabled_template_for_out_of_stock_items() throws {
+        // Arrange
+        let enabledItem = CatalogItem.mock(catalogItemId: "enabled", inventoryStatus: "InStock")
+        let disabledItem = CatalogItem.mock(
+            catalogItemId: "disabled", inventoryStatus: "OutOfStock")
+        let offer = OfferModel.mock(catalogItems: [enabledItem, disabledItem])
+        let slot = SlotModel(
+            instanceGuid: nil,
+            offer: offer,
+            layoutVariant: nil,
+            jwtToken: "slot-token")
+        let layoutState = LayoutState()
+        layoutState.items[LayoutState.fullOfferKey] = offer
+
+        let layoutTransformer = LayoutTransformer(
+            layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]),
+            layoutState: layoutState)
+
+        let openTemplate = LayoutSchemaModel.basicText(
+            BasicTextModel<WhenPredicate>(styles: nil, value: "enabled"))
+        let openDisabledTemplate = LayoutSchemaModel.basicText(
+            BasicTextModel<WhenPredicate>(styles: nil, value: "disabled"))
+        let closedTemplate = LayoutSchemaModel.basicText(
+            BasicTextModel<WhenPredicate>(styles: nil, value: "closed"))
+        let dropdownModel: CatalogDropdownModel<LayoutSchemaModel, WhenPredicate> =
+            CatalogDropdownModel(
+                openTemplate: openTemplate,
+                openDisabledTemplate: openDisabledTemplate,
+                closedTemplate: closedTemplate,
+                closedDefaultTemplate: closedTemplate,
+                requiredSelectionErrorTemplate: nil,
+                validatorFieldConfig: nil,
+                a11yLabel: nil,
+                styles: nil)
+
+        // Act
+        let dropdownViewModel = try layoutTransformer.getCatalogDropdownModel(
+            model: dropdownModel,
+            context: .inner(.addToCart(enabledItem)))
+
+        // Assert
+        XCTAssertEqual(dropdownViewModel.openDropdownChildren.count, 2)
+
+        if case .basicText(let firstChild) = dropdownViewModel.openDropdownChildren[0] {
+            XCTAssertEqual(firstChild.boundValue, "enabled")
+        } else {
+            XCTFail("Expected first dropdown child to be basic text")
+        }
+
+        if case .basicText(let secondChild) = dropdownViewModel.openDropdownChildren[1] {
+            XCTAssertEqual(secondChild.boundValue, "disabled")
+        } else {
+            XCTFail("Expected second dropdown child to be basic text")
+        }
+    }
+
     func test_creative_response_includes_positive_response_option_with_external_action() throws {
         // Arrange
         guard let model = ModelTestData.CreativeResponseData.positive() else {
@@ -324,7 +380,7 @@ final class TestLayoutTransformer: XCTestCase {
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(
             model, context: .inner(.generic(nil)))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
-        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+        guard case .state(let stateLabel) = layoutSchemaUIModel.dataBinding else {
             XCTFail("Failed to get indicator state")
             return
         }
@@ -339,7 +395,7 @@ final class TestLayoutTransformer: XCTestCase {
         let layoutSchemaUIModel = try layoutTransformer.getProgressIndicatorUIModel(
             model, context: .outer([]))
         XCTAssertEqual(layoutSchemaUIModel.indicator, "%^STATE.IndicatorPosition^%")
-        guard case let .state(stateLabel) = layoutSchemaUIModel.dataBinding else {
+        guard case .state(let stateLabel) = layoutSchemaUIModel.dataBinding else {
             XCTFail("Failed to get indicator state")
             return
         }
@@ -475,7 +531,7 @@ final class TestLayoutTransformer: XCTestCase {
 
         let transformedUIModel = try layoutTransformer.transform()
 
-        guard case let .overlay(outerVM) = transformedUIModel else {
+        guard case .overlay(let outerVM) = transformedUIModel else {
             XCTFail("Could not get outer layout")
             return
         }
@@ -930,6 +986,7 @@ final class TestLayoutTransformer: XCTestCase {
             negativeResponseText: "Dismiss",
             addOns: ["addon1", "addon2"],
             copy: ["key1": "value1", "key2": "value2"],
+            inventoryStatus: nil,
             linkedProductId: "linked",
             token: "catalog1Token")
     }

@@ -687,6 +687,34 @@
                                                           }
                                                         }
                                                       }
+                                                    },
+                                                    {
+                                                      "type": "StaticImage",
+                                                      "node": {
+                                                        "url": {
+                                                          "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAHCAYAAAA8sqwkAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAFxJREFUeNpjmLFoy/0ZSzb1M+AB05evVwCpm7loUwHD9MWbFsxYtPn/jCVb5uNTDFIzc/GmALAgpiZMxdMXbUqAiWNowqcYQxPE6s3rCSjG1ISuGL+mhZsbcCkGAEl7Yjwk7S3uAAAAAElFTkSuQmCC"
+                                                        },
+                                                        "styles": {
+                                                          "elements": {
+                                                            "own": [
+                                                              {
+                                                                "default": {
+                                                                  "dimension": {
+                                                                    "maxHeight": 10,
+                                                                    "maxWidth": 10
+                                                                  },
+                                                                  "flexChild": {
+                                                                    "alignSelf": "center"
+                                                                  },
+                                                                  "spacing": {
+                                                                    "margin": "3"
+                                                                  }
+                                                                }
+                                                              }
+                                                            ]
+                                                          }
+                                                        }
+                                                      }
                                                     }
                                                   ]
                                                 }
@@ -769,6 +797,32 @@
                                                           }
                                                         }
                                                       }
+                                                    },
+                                                    {
+                                                      "type": "StaticImage",
+                                                      "node": {
+                                                        "url": {
+                                                          "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAHCAYAAAA8sqwkAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAFxJREFUeNpjmLFoy/0ZSzb1M+AB05evVwCpm7loUwHD9MWbFsxYtPn/jCVb5uNTDFIzc/GmALAgpiZMxdMXbUqAiWNowqcYQxPE6s3rCSjG1ISuGL+mhZsbcCkGAEl7Yjwk7S3uAAAAAElFTkSuQmCC"
+                                                        },
+                                                        "styles": {
+                                                          "elements": {
+                                                            "own": [
+                                                              {
+                                                                "default": {
+                                                                  "dimension": {
+                                                                    "maxHeight": 10,
+                                                                    "maxWidth": 10,
+                                                                    "rotateZ": 180
+                                                                  },
+                                                                  "spacing": {
+                                                                    "margin": "3"
+                                                                  }
+                                                                }
+                                                              }
+                                                            ]
+                                                          }
+                                                        }
+                                                      }
                                                     }
                                                   ]
                                                 }
@@ -800,16 +854,72 @@
                                                       {
                                                         "default": {
                                                           "text": {
-                                                            "fontFamily": "Source Sans Pro",
                                                             "fontSize": 14,
                                                             "fontWeight": "400",
                                                             "textColor": {
                                                               "light": "#242424"
-                                                            },
-                                                            "lineHeight": 18.2
+                                                            }
                                                           },
                                                           "flexChild": {
                                                             "weight": 1
+                                                          }
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "openDisabledTemplate": {
+                                        "type": "Row",
+                                        "node": {
+                                          "children": [
+                                            {
+                                              "type": "BasicText",
+                                              "node": {
+                                                "value": "%^DATA.catalogItem.copy.provider.variationTitle|^%",
+                                                "styles": {
+                                                  "elements": {
+                                                    "own": [
+                                                      {
+                                                        "default": {
+                                                          "text": {
+                                                            "fontSize": 14,
+                                                            "fontWeight": "400",
+                                                            "textColor": {
+                                                              "light": "#838383"
+                                                            },
+                                                            "textDecoration": "strike-through"
+                                                          },
+                                                          "flexChild": {
+                                                            "weight": 1
+                                                          }
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "type": "BasicText",
+                                              "node": {
+                                                "value": "Out of stock",
+                                                "styles": {
+                                                  "elements": {
+                                                    "own": [
+                                                      {
+                                                        "default": {
+                                                          "text": {
+                                                            "fontSize": 14,
+                                                            "fontWeight": "400",
+                                                            "textColor": {
+                                                              "light": "#838383"
+                                                            },
+                                                            "fontStyle": "italic"
                                                           }
                                                         }
                                                       }
@@ -1081,6 +1191,38 @@
                                               }
                                             }
                                           ],
+                                          "dropDownDisabledItem": [
+                                            {
+                                              "default": {
+                                                "background": {
+                                                  "backgroundColor": {
+                                                    "light": "#FFFFFF"
+                                                  }
+                                                },
+                                                "border": {
+                                                  "borderColor": {
+                                                    "light": "#CFCFCF"
+                                                  },
+                                                  "borderStyle": "solid",
+                                                  "borderWidth": "0 0 1 0"
+                                                },
+                                                "spacing": {
+                                                  "padding": "12 12"
+                                                },
+                                                "dimension": {
+                                                  "height": {
+                                                    "type": "fixed",
+                                                    "value": 44
+                                                  }
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "flex-start",
+                                                  "gap": 8
+                                                }
+                                              }
+                                            }
+                                          ],
                                           "dropDownListItem": [
                                             {
                                               "default": {
@@ -1251,9 +1393,9 @@
                                                 }
                                               },
                                               {
-                                                "type": "BasicText",
+                                                "type": "RichText",
                                                 "node": {
-                                                  "value": "This item is sold and shipped by %^DATA.catalogItem.copy.provider.supplierName^%. A separate charge will appear on your statement.",
+                                                  "value": "This item is sold and shipped by %^DATA.catalogItem.copy.provider.supplierName^%. By purchasing, you agree to the <a href=\"%^DATA.catalogItem.copy.provider.links.termsOfSale^%\">Terms of Sale</a> and <a href=\"https://www.rokt.com/policies/privacy-policy\">Privacy Policy</a>",
                                                   "styles": {
                                                     "elements": {
                                                       "own": [
@@ -1268,6 +1410,20 @@
                                                             },
                                                             "spacing": {
                                                               "margin": "4 0 0 0"
+                                                            }
+                                                          }
+                                                        }
+                                                      ],
+                                                      "link": [
+                                                        {
+                                                          "default": {
+                                                            "text": {
+                                                              "fontSize": 12,
+                                                              "fontWeight": "400",
+                                                              "textColor": {
+                                                                "light": "#475467"
+                                                              },
+                                                              "textDecoration": "underline"
                                                             }
                                                           }
                                                         }
@@ -1590,6 +1746,202 @@
                                           "type": "BasicText",
                                           "node": {
                                             "value": "%^DATA.catalogItem.copy.provider.supplierName^% will email your order confirmation shortly. You can return to your Rent the Runway order summary below.",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "spacing": {
+                                                        "margin": "16 0 0 0"
+                                                      },
+                                                      "text": {
+                                                        "fontSize": 16,
+                                                        "fontWeight": "400",
+                                                        "textColor": {
+                                                          "light": "#1A202C"
+                                                        },
+                                                        "horizontalTextAlignment": "center"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "type": "CloseButton",
+                                    "node": {
+                                      "styles": {
+                                        "elements": {
+                                          "own": [
+                                            {
+                                              "default": {
+                                                "dimension": {
+                                                  "width": {
+                                                    "type": "fit",
+                                                    "value": "fit-width"
+                                                  },
+                                                  "height": {
+                                                    "type": "fixed",
+                                                    "value": 42
+                                                  }
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "center"
+                                                },
+                                                "background": {
+                                                  "backgroundColor": {
+                                                    "light": "#3A0922"
+                                                  }
+                                                },
+                                                "border": {
+                                                  "borderRadius": 40
+                                                },
+                                                "spacing": {
+                                                  "margin": "0 0 16 0"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "Take me there",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "text": {
+                                                        "fontSize": 16,
+                                                        "fontWeight": "700",
+                                                        "textColor": {
+                                                          "light": "#FFFFFF"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "type": "When",
+                        "node": {
+                          "predicates": [
+                            {
+                              "type": "CustomState",
+                              "predicate": {
+                                "key": "PaymentCompleted",
+                                "condition": "is",
+                                "value": -1
+                              }
+                            }
+                          ],
+                          "children": [
+                            {
+                              "type": "Column",
+                              "node": {
+                                "styles": {
+                                  "elements": {
+                                    "own": [
+                                      {
+                                        "default": {
+                                          "dimension": {
+                                            "width": {
+                                              "type": "fit",
+                                              "value": "fit-width"
+                                            },
+                                            "height": {
+                                              "type": "fit",
+                                              "value": "fit-height"
+                                            }
+                                          },
+                                          "background": {
+                                            "backgroundColor": {
+                                              "light": "#FFFFFF"
+                                            }
+                                          },
+                                          "container": {
+                                            "alignItems": "center",
+                                            "justifyContent": "center"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "children": [
+                                  {
+                                    "type": "Column",
+                                    "node": {
+                                      "styles": {
+                                        "elements": {
+                                          "own": [
+                                            {
+                                              "default": {
+                                                "flexChild": {
+                                                  "weight": 1
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "center"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "Oops! Something didn't go through.",
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "spacing": {
+                                                        "margin": "16 0 0 0"
+                                                      },
+                                                      "text": {
+                                                        "fontSize": 20,
+                                                        "fontWeight": "600",
+                                                        "textColor": {
+                                                          "light": "#1A1A1A"
+                                                        },
+                                                        "horizontalTextAlignment": "center"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "BasicText",
+                                          "node": {
+                                            "value": "We weren't able to process this add-on order. You haven't been charged for it, and your original order is still on its way.",
                                             "styles": {
                                               "elements": {
                                                 "own": [
