@@ -90,19 +90,24 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         selectedIndex = index
     }
 
-    func dotViewModel(for index: Int, breakpointIndex: Int) -> RowViewModel {
-        let style: BaseStyles? = {
-            if index == selectedIndex {
-                return activeIndicatorStyleBlocks?[safe: breakpointIndex]?.default
-            } else if index < selectedIndex {
-                return seenIndicatorStyleBlocks?[safe: breakpointIndex]?.default
-                    ?? indicatorStyleBlocks?[safe: breakpointIndex]?.default
-            } else {
-                return indicatorStyleBlocks?[safe: breakpointIndex]?.default
-            }
-        }()
+    func dotStyle(for index: Int, breakpointIndex: Int) -> BaseStyles? {
+        let activeIndicatorStyle = activeIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+        let seenIndicatorStyle = seenIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+        let indicatorStyle = indicatorStyleBlocks?[safe: breakpointIndex]?.default
 
-        let stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = style.map {
+        if index == selectedIndex {
+            return activeIndicatorStyle
+        } else if index < selectedIndex {
+            return seenIndicatorStyle ?? indicatorStyle
+        } else {
+            return indicatorStyle
+        }
+    }
+
+    func dotViewModel(for index: Int, breakpointIndex: Int) -> RowViewModel {
+        let style = dotStyle(for: index, breakpointIndex: breakpointIndex)
+
+        let stylingProperties = style.map {
             [
                 BasicStateStylingBlock(
                     default: $0,
@@ -113,16 +118,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
             ]
         }
 
-        return RowViewModel(
-            children: nil,
-            stylingProperties: stylingProperties,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
-            layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
-        )
+        return .build(stylingProperties: stylingProperties, layoutState: layoutState)
     }
 
     func indicatorContainerViewModel(for breakpointIndex: Int) -> RowViewModel? {
@@ -130,16 +126,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         let children = images.indices.map { index in
             LayoutSchemaViewModel.row(dotViewModel(for: index, breakpointIndex: breakpointIndex))
         }
-        return RowViewModel(
-            children: children,
-            stylingProperties: containerBlocks,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
-            layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
-        )
+        return .build(children: children, stylingProperties: containerBlocks, layoutState: layoutState)
     }
 
     func indicatorAlignSelf(for breakpointIndex: Int) -> FlexAlignment? {
@@ -147,14 +134,12 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     }
 
     func thumbnailDimension(for state: StyleState, breakpointIndex: Int) -> DimensionStylingProperties? {
-        thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).dimension
+        thumbnailStyleBlock?.dimension(state, breakpointIndex)
     }
 
     func borderForThumbnail(isSelected: Bool, state: StyleState, breakpointIndex: Int) -> BorderStylingProperties? {
-        if isSelected {
-            return selectedThumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).border
-        }
-        return thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).border
+        let block = isSelected ? selectedThumbnailStyleBlock : thumbnailStyleBlock
+        return block?.border(state, breakpointIndex)
     }
 
     func backgroundForThumbnail(
@@ -199,5 +184,40 @@ extension BasicStateStylingBlock<DataImageStyles> {
         default:
             return self.default
         }
+    }
+}
+
+@available(iOS 15, *)
+extension RowViewModel {
+    static func build(
+        children: [LayoutSchemaViewModel]? = nil,
+        stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = nil,
+        animatableStyle: AnimationStyle? = nil,
+        accessibilityGrouped: Bool = false,
+        layoutState: (any LayoutStateRepresenting)? = nil,
+        predicates: [WhenPredicate]? = nil,
+        globalBreakPoints: BreakPoint? = nil,
+        offers: [OfferModel?] = []
+    ) -> RowViewModel {
+        RowViewModel(
+            children: children,
+            stylingProperties: stylingProperties,
+            animatableStyle: animatableStyle,
+            accessibilityGrouped: accessibilityGrouped,
+            layoutState: layoutState,
+            predicates: predicates,
+            globalBreakPoints: globalBreakPoints,
+            offers: offers
+        )
+    }
+}
+
+fileprivate extension Collection where Element == BasicStateStylingBlock<DataImageStyles> {
+    func border(_ state: StyleState, _ index: Self.Index) -> BorderStylingProperties? {
+        self[safe: index]?.defaultStyle(state: state).border
+    }
+
+    func dimension(_ state: StyleState, _ index: Self.Index) -> DimensionStylingProperties? {
+        self[safe: index]?.defaultStyle(state: state).dimension
     }
 }
