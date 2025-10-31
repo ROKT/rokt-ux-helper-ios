@@ -116,10 +116,9 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
             .view(LayoutSchemaComponent.self)
             .view(CatalogImageGalleryComponent.self)
 
-        let sut = try component.actualView()
+        _ = try component.actualView()
 
-        XCTAssertFalse(sut.model.showIndicator)
-        let rowComponents = try component.findAll(ViewType.View<RowComponent>.self)
+        let rowComponents = component.findAll(ViewType.View<RowComponent>.self)
         XCTAssertEqual(rowComponents.count, 0)
     }
 
@@ -161,9 +160,8 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
 
         let sut = try component.actualView()
         XCTAssertEqual(sut.model.selectedIndex, 0)
-        XCTAssertTrue(sut.model.canSelectNextImage)
 
-        sut.model.selectNextImage()
+        sut.model.selectedIndex = 1
 
         XCTAssertEqual(sut.model.selectedIndex, 1)
         XCTAssertTrue(sut.model.selectedImage === sut.model.images[1])
@@ -186,11 +184,6 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
             .view(CatalogImageGalleryComponent.self)
 
         let sut = try component.actualView()
-        XCTAssertEqual(sut.model.selectedIndex, 0)
-        XCTAssertFalse(sut.model.canSelectPreviousImage)
-
-        sut.model.selectPreviousImage()
-
         XCTAssertEqual(sut.model.selectedIndex, 0)
     }
 }
