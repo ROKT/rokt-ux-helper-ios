@@ -146,59 +146,26 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         progressIndicatorContainerBlocks?[safe: breakpointIndex]?.default.flexChild?.alignSelf
     }
 
-    func thumbnailDimension(
-        for state: StyleState = .default,
-        breakpointIndex: Int = 0
-    ) -> DimensionStylingProperties? {
-        style(for: state, breakpointIndex: breakpointIndex)?.dimension
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.dimension
+    func thumbnailDimension(for state: StyleState, breakpointIndex: Int) -> DimensionStylingProperties? {
+        thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).dimension
     }
 
-    func borderForThumbnail(
-        isSelected: Bool,
-        state: StyleState = .default,
-        breakpointIndex: Int = 0
-    ) -> BorderStylingProperties? {
+    func borderForThumbnail(isSelected: Bool, state: StyleState, breakpointIndex: Int) -> BorderStylingProperties? {
         if isSelected {
-            return style(for: state, in: selectedThumbnailStyleBlock, breakpointIndex: breakpointIndex)?.border
-                ?? selectedThumbnailStyleBlock?[safe: breakpointIndex]?.default.border
+            return selectedThumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).border
         }
-        return style(for: state, breakpointIndex: breakpointIndex)?.border
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.border
+        return thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).border
     }
 
     func backgroundForThumbnail(
         state: StyleState = .default,
         breakpointIndex: Int = 0
     ) -> BackgroundStylingProperties? {
-        style(for: state, breakpointIndex: breakpointIndex)?.background
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.background
+        thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).background
     }
 
     func thumbnailSpacing(breakpointIndex: Int = 0) -> SpacingStylingProperties? {
         thumbnailRowStyleBlock?[safe: breakpointIndex]?.default.spacing
-    }
-
-    private func style(for state: StyleState, breakpointIndex: Int = 0) -> DataImageStyles? {
-        style(for: state, in: thumbnailStyleBlock, breakpointIndex: breakpointIndex)
-    }
-
-    private func style(
-        for state: StyleState,
-        in block: [BasicStateStylingBlock<DataImageStyles>]?,
-        breakpointIndex: Int = 0
-    ) -> DataImageStyles? {
-        guard let block, let styleBlock = block[safe: breakpointIndex] else { return nil }
-        switch state {
-        case .hovered:
-            return styleBlock.hovered ?? styleBlock.default
-        case .pressed:
-            return styleBlock.pressed ?? styleBlock.default
-        case .disabled:
-            return styleBlock.disabled ?? styleBlock.default
-        default:
-            return styleBlock.default
-        }
     }
 
     func hash(into hasher: inout Hasher) {
@@ -216,6 +183,21 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         }
         if selectedIndex > images.count - 1 {
             selectedIndex = images.count - 1
+        }
+    }
+}
+
+extension BasicStateStylingBlock<DataImageStyles> {
+    func defaultStyle(state: StyleState) -> DataImageStyles {
+        switch state {
+        case .hovered:
+            return hovered ?? self.default
+        case .pressed:
+            return pressed ?? self.default
+        case .disabled:
+            return disabled ?? self.default
+        default:
+            return self.default
         }
     }
 }
