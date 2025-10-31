@@ -12,6 +12,103 @@
 import SwiftUI
 import DcuiSchema
 
+struct PassthroughTapView: UIViewRepresentable {
+    var onTap: (CGPoint) -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+
+        view.addGestureRecognizer(UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap(_:))
+        ))
+
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onTap: onTap)
+    }
+
+    class Coordinator: NSObject {
+        let onTap: (CGPoint) -> Void
+        init(onTap: @escaping (CGPoint) -> Void) { self.onTap = onTap }
+
+        @objc func handleTap(_ sender: UITapGestureRecognizer) {
+            let location = sender.location(in: sender.view)
+            onTap(location)
+        }
+    }
+}
+
+@available(iOS 15, *)
+struct HSPageView<Content: View>: View {
+    @Binding var page: Int
+    let pages: Int
+    let content: Content
+    @GestureState private var dragState: CGFloat = 0
+
+    init(page: Binding<Int>, pages: Int, @ViewBuilder content: () -> Content) {
+        self._page = page
+        self.pages = pages
+        self.content = content()
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let dragGesture = DragGesture(minimumDistance: 10)
+                 .updating($dragState) { value, state, _ in
+                     state = value.translation.width
+                 }
+                 .onEnded { value in
+                     let threshold = geo.size.width/2
+                     var newPage = page
+
+                     if value.translation.width < -threshold {
+                         newPage += 1
+                     } else if value.translation.width > threshold {
+                         newPage -= 1
+                     }
+
+                     page = max(min(newPage, pages - 1), 0)
+                 }
+
+            _VariadicView.Tree(HSStackPager(width: geo.size.width, page: page, dragState: dragState), content: { content })
+                .animation(.easeOut(duration: 0.25), value: page)
+                .animation(.easeOut(duration: 0.25), value: dragState)
+
+            PassthroughTapView { point in
+                let isLeft = point.x < geo.size.width/2
+
+                if isLeft {
+                    page = max(page - 1, 0)
+                } else {
+                    page = min(page + 1, pages - 1)
+                }
+            }
+            .highPriorityGesture(dragGesture)
+            .allowsHitTesting(true)
+        }
+    }
+
+    struct HSStackPager: _VariadicView_UnaryViewRoot {
+        let width: CGFloat
+        let page: Int
+        let dragState: CGFloat
+
+        func body(children: _VariadicView.Children) -> some View {
+            HStack(spacing: 0) {
+                ForEach(Array(children.enumerated()), id: \.offset) { _, child in
+                    child.frame(width: width)
+                }
+            }
+            .offset(x: -CGFloat(page) * width + CGFloat(dragState))
+        }
+    }
+}
+
 @available(iOS 15, *)
 struct CatalogImageGalleryComponent: View {
     @EnvironmentObject private var globalScreenSize: GlobalScreenSize
@@ -40,7 +137,6 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
-    @GestureState private var dragState: DragState = .inactive
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -108,59 +204,28 @@ struct CatalogImageGalleryComponent: View {
         }
     }
 
+    @State var page = 0
+
     private var mainImageView: some View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
-        let width = galleryWidth
-
-        let dragGesture = DragGesture(minimumDistance: 10)
-            .updating($dragState) { value, state, _ in
-                state = .dragging(translation: adjustedTranslation(value.translation.width, width: width))
-            }
-            .onEnded { value in
-                let translation = adjustedTranslation(value.translation.width, width: width)
-                settleDrag(translation: translation, width: width)
-            }
 
         return ZStack {
-            if let previousImage = model.images[safe: model.selectedIndex - 1] {
-                imageViewComponent(for: previousImage, styleBinding: .constant(.default))
-                    .offset(x: dragTranslation - width)
-                    .allowsHitTesting(false)
+            imageViewComponent(for: model.images[0], styleBinding: $styleState).opacity(0.0)
+            HSPageView(page: $page, pages: model.images.count) {
+                ForEach(0..<model.images.count, id: \.self) { index in
+                    imageViewComponent(for: model.images[index], styleBinding: $styleState)
+                }
             }
-
-            if let currentImage = model.selectedImage {
-                imageViewComponent(for: currentImage, styleBinding: $styleState)
-                    .offset(x: dragTranslation)
-            }
-
-            if let nextImage = model.images[safe: model.selectedIndex + 1] {
-                imageViewComponent(for: nextImage, styleBinding: .constant(.default))
-                    .offset(x: dragTranslation + width)
-                    .allowsHitTesting(false)
-            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
         .frame(maxWidth: .infinity)
         .clipped()
-        .overlay(
-            HStack(spacing: 0) {
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        goToPreviousImage()
-                    }
-
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        goToNextImage()
-                    }
-            }
-        )
         .overlay(alignment: overlayAlignment) {
             indicatorOverlay(alignment: overlayAlignment)
         }
-        .highPriorityGesture(dragGesture)
-        .animation(carouselAnimation, value: dragState)
+        .onChange(of: page) { newValue in
+            model.selectedIndex = newValue
+        }
     }
 
     private var thumbnailsView: some View {
@@ -224,6 +289,7 @@ struct CatalogImageGalleryComponent: View {
                 .padding(.horizontal, horizontalInset)
             }
             .onChange(of: model.selectedIndex) { newIndex in
+                page = model.selectedIndex ?? 0
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
         }
@@ -240,8 +306,7 @@ struct CatalogImageGalleryComponent: View {
 
     @ViewBuilder
     private func indicatorOverlay(alignment: Alignment) -> some View {
-        if model.showIndicator,
-           let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
+        if let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
             RowComponent(
                 config: config,
                 model: containerViewModel,
@@ -262,18 +327,6 @@ struct CatalogImageGalleryComponent: View {
         guard let padding = spacingStyle?.padding else { return 0 }
         let frame = FrameAlignmentProperty.getFrameAlignment(padding)
         return CGFloat(frame.left + frame.right)/2
-    }
-
-    private func goToNextImage() {
-        withAnimation(carouselAnimation) {
-            model.selectNextImage()
-        }
-    }
-
-    private func goToPreviousImage() {
-        withAnimation(carouselAnimation) {
-            model.selectPreviousImage()
-        }
     }
 
     private func scrollToThumbnail(at index: Int, proxy: ScrollViewProxy) {
@@ -298,51 +351,5 @@ struct CatalogImageGalleryComponent: View {
             ),
             expandsToContainerOnSelfAlign: false
         )
-    }
-
-    private func adjustedTranslation(_ raw: CGFloat, width: CGFloat) -> CGFloat {
-        var translation = raw
-        if translation > 0 && !model.canSelectPreviousImage {
-            translation /= 3
-        }
-        if translation < 0 && !model.canSelectNextImage {
-            translation /= 3
-        }
-        return max(min(translation, width), -width)
-    }
-
-    private func settleDrag(translation: CGFloat, width: CGFloat) {
-        let threshold = width * 0.2
-        if translation <= -threshold {
-            goToNextImage()
-        } else if translation >= threshold {
-            goToPreviousImage()
-        }
-    }
-
-    private var dragTranslation: CGFloat {
-        dragState.translation
-    }
-
-    private var carouselAnimation: Animation {
-        .interactiveSpring(response: 0.35, dampingFraction: 0.82, blendDuration: 0.15)
-    }
-
-    private var galleryWidth: CGFloat {
-        max(availableWidth ?? parentWidth ?? UIScreen.main.bounds.width, 1)
-    }
-
-    private enum DragState: Equatable {
-        case inactive
-        case dragging(translation: CGFloat)
-
-        var translation: CGFloat {
-            switch self {
-            case .inactive:
-                return 0
-            case .dragging(let translation):
-                return translation
-            }
-        }
     }
 }

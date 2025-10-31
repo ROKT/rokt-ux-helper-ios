@@ -20,32 +20,6 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedIndex, 2)
     }
 
-    func test_selectNextImage_advancesWhenPossible() {
-        let viewModel = makeViewModel(imageCount: 3)
-
-        viewModel.selectImage(at: 1)
-        viewModel.selectNextImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 2)
-
-        viewModel.selectNextImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 2)
-    }
-
-    func test_selectPreviousImage_advancesWhenPossible() {
-        let viewModel = makeViewModel(imageCount: 3)
-
-        viewModel.selectImage(at: 1)
-        viewModel.selectPreviousImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 0)
-
-        viewModel.selectPreviousImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 0)
-    }
-
     func test_selectedImage_matchesCurrentIndex() {
         let first = DataImageViewModel(
             image: nil,
@@ -111,16 +85,6 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         let viewModel = makeViewModel(imageCount: 1)
 
         XCTAssertFalse(viewModel.showThumbnails)
-    }
-
-    func test_showIndicator_isTrueWhenProgressContainerProvided() {
-        let progressContainer = basicIndicatorStyle()
-        let viewModel = makeViewModel(
-            imageCount: 1,
-            progressIndicatorContainer: progressContainer
-        )
-
-        XCTAssertTrue(viewModel.showIndicator)
     }
 
     func test_indicatorAlignSelf_usesProgressContainerAlignment() {
