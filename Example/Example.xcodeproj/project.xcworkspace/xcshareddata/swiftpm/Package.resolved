@@ -1,22 +1,13 @@
 {
-  "originHash" : "0e192e6b460ac1b3024cba8adcb7e585a52c6f27b671001bcb29f75e6975967a",
+  "originHash" : "09fac9aded906a23b3eb7e8f7d38ee705307e3b9497d24958370d0951bc69771",
   "pins" : [
     {
       "identity" : "dcui-swift-schema",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ROKT/dcui-swift-schema.git",
       "state" : {
-        "revision" : "9f3d65f75034ad4739e4850653d11df587037f21",
-        "version" : "2.1.0"
-      }
-    },
-    {
-      "identity" : "rokt-ux-helper-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ROKT/rokt-ux-helper-ios",
-      "state" : {
-        "branch" : "main",
-        "revision" : "484fef6aa60c1e9f70716c5ab348de84749ab19f"
+        "revision" : "c632f25aa777e80512aa3a16c820dbb203b48ff6",
+        "version" : "2.3.0-ppu-alpha-16"
       }
     }
   ],

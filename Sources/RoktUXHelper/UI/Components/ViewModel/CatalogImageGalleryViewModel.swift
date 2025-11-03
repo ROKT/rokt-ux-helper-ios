@@ -26,7 +26,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         }
     }
 
-    @Published private(set) var selectedIndex: Int = 0
+    @Published var selectedIndex: Int = 0
 
     let defaultStyle: [CatalogImageGalleryStyles]?
     private let thumbnailStyleBlock: [BasicStateStylingBlock<DataImageStyles>]?
@@ -85,46 +85,29 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         thumbnailRowStyleBlock != nil
     }
 
-    var showIndicator: Bool {
-        progressIndicatorContainerBlocks != nil
-    }
-
-    var canSelectNextImage: Bool {
-        selectedIndex < images.count - 1
-    }
-
-    var canSelectPreviousImage: Bool {
-        selectedIndex > 0
-    }
-
     func selectImage(at index: Int) {
         guard images.indices.contains(index), index != selectedIndex else { return }
         selectedIndex = index
     }
 
-    func selectNextImage() {
-        guard canSelectNextImage else { return }
-        selectedIndex += 1
-    }
+    func dotStyle(for index: Int, breakpointIndex: Int) -> BaseStyles? {
+        let activeIndicatorStyle = activeIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+        let seenIndicatorStyle = seenIndicatorStyleBlocks?[safe: breakpointIndex]?.default
+        let indicatorStyle = indicatorStyleBlocks?[safe: breakpointIndex]?.default
 
-    func selectPreviousImage() {
-        guard canSelectPreviousImage else { return }
-        selectedIndex -= 1
+        if index == selectedIndex {
+            return activeIndicatorStyle
+        } else if index < selectedIndex {
+            return seenIndicatorStyle ?? indicatorStyle
+        } else {
+            return indicatorStyle
+        }
     }
 
     func dotViewModel(for index: Int, breakpointIndex: Int) -> RowViewModel {
-        let style: BaseStyles? = {
-            if index == selectedIndex {
-                return activeIndicatorStyleBlocks?[safe: breakpointIndex]?.default
-            } else if index < selectedIndex {
-                return seenIndicatorStyleBlocks?[safe: breakpointIndex]?.default
-                    ?? indicatorStyleBlocks?[safe: breakpointIndex]?.default
-            } else {
-                return indicatorStyleBlocks?[safe: breakpointIndex]?.default
-            }
-        }()
+        let style = dotStyle(for: index, breakpointIndex: breakpointIndex)
 
-        let stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = style.map {
+        let stylingProperties = style.map {
             [
                 BasicStateStylingBlock(
                     default: $0,
@@ -135,16 +118,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
             ]
         }
 
-        return RowViewModel(
-            children: nil,
-            stylingProperties: stylingProperties,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
-            layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
-        )
+        return .build(stylingProperties: stylingProperties, layoutState: layoutState)
     }
 
     func indicatorContainerViewModel(for breakpointIndex: Int) -> RowViewModel? {
@@ -152,75 +126,31 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         let children = images.indices.map { index in
             LayoutSchemaViewModel.row(dotViewModel(for: index, breakpointIndex: breakpointIndex))
         }
-        return RowViewModel(
-            children: children,
-            stylingProperties: containerBlocks,
-            animatableStyle: nil,
-            accessibilityGrouped: false,
-            layoutState: layoutState,
-            predicates: nil,
-            globalBreakPoints: nil,
-            offers: []
-        )
+        return .build(children: children, stylingProperties: containerBlocks, layoutState: layoutState)
     }
 
     func indicatorAlignSelf(for breakpointIndex: Int) -> FlexAlignment? {
         progressIndicatorContainerBlocks?[safe: breakpointIndex]?.default.flexChild?.alignSelf
     }
 
-    func thumbnailDimension(
-        for state: StyleState = .default,
-        breakpointIndex: Int = 0
-    ) -> DimensionStylingProperties? {
-        style(for: state, breakpointIndex: breakpointIndex)?.dimension
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.dimension
+    func thumbnailDimension(for state: StyleState, breakpointIndex: Int) -> DimensionStylingProperties? {
+        thumbnailStyleBlock?.dimension(state, breakpointIndex)
     }
 
-    func borderForThumbnail(
-        isSelected: Bool,
-        state: StyleState = .default,
-        breakpointIndex: Int = 0
-    ) -> BorderStylingProperties? {
-        if isSelected {
-            return style(for: state, in: selectedThumbnailStyleBlock, breakpointIndex: breakpointIndex)?.border
-                ?? selectedThumbnailStyleBlock?[safe: breakpointIndex]?.default.border
-        }
-        return style(for: state, breakpointIndex: breakpointIndex)?.border
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.border
+    func borderForThumbnail(isSelected: Bool, state: StyleState, breakpointIndex: Int) -> BorderStylingProperties? {
+        let block = isSelected ? selectedThumbnailStyleBlock : thumbnailStyleBlock
+        return block?.border(state, breakpointIndex)
     }
 
     func backgroundForThumbnail(
         state: StyleState = .default,
         breakpointIndex: Int = 0
     ) -> BackgroundStylingProperties? {
-        style(for: state, breakpointIndex: breakpointIndex)?.background
-            ?? thumbnailStyleBlock?[safe: breakpointIndex]?.default.background
+        thumbnailStyleBlock?[safe: breakpointIndex]?.defaultStyle(state: state).background
     }
 
     func thumbnailSpacing(breakpointIndex: Int = 0) -> SpacingStylingProperties? {
         thumbnailRowStyleBlock?[safe: breakpointIndex]?.default.spacing
-    }
-
-    private func style(for state: StyleState, breakpointIndex: Int = 0) -> DataImageStyles? {
-        style(for: state, in: thumbnailStyleBlock, breakpointIndex: breakpointIndex)
-    }
-
-    private func style(
-        for state: StyleState,
-        in block: [BasicStateStylingBlock<DataImageStyles>]?,
-        breakpointIndex: Int = 0
-    ) -> DataImageStyles? {
-        guard let block, let styleBlock = block[safe: breakpointIndex] else { return nil }
-        switch state {
-        case .hovered:
-            return styleBlock.hovered ?? styleBlock.default
-        case .pressed:
-            return styleBlock.pressed ?? styleBlock.default
-        case .disabled:
-            return styleBlock.disabled ?? styleBlock.default
-        default:
-            return styleBlock.default
-        }
     }
 
     func hash(into hasher: inout Hasher) {
@@ -232,12 +162,62 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     }
 
     private func clampSelectedIndex() {
-        guard !images.isEmpty else {
+        if images.isEmpty {
             selectedIndex = 0
             return
         }
         if selectedIndex > images.count - 1 {
             selectedIndex = images.count - 1
         }
+    }
+}
+
+extension BasicStateStylingBlock<DataImageStyles> {
+    func defaultStyle(state: StyleState) -> DataImageStyles {
+        switch state {
+        case .hovered:
+            return hovered ?? self.default
+        case .pressed:
+            return pressed ?? self.default
+        case .disabled:
+            return disabled ?? self.default
+        default:
+            return self.default
+        }
+    }
+}
+
+@available(iOS 15, *)
+extension RowViewModel {
+    static func build(
+        children: [LayoutSchemaViewModel]? = nil,
+        stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = nil,
+        animatableStyle: AnimationStyle? = nil,
+        accessibilityGrouped: Bool = false,
+        layoutState: (any LayoutStateRepresenting)? = nil,
+        predicates: [WhenPredicate]? = nil,
+        globalBreakPoints: BreakPoint? = nil,
+        offers: [OfferModel?] = []
+    ) -> RowViewModel {
+        RowViewModel(
+            children: children,
+            stylingProperties: stylingProperties,
+            animatableStyle: animatableStyle,
+            accessibilityGrouped: accessibilityGrouped,
+            layoutState: layoutState,
+            predicates: predicates,
+            globalBreakPoints: globalBreakPoints,
+            offers: offers
+        )
+    }
+}
+
+extension Collection where Element == BasicStateStylingBlock<DataImageStyles> {
+    func border(_ state: StyleState, _ index: Self.Index) -> BorderStylingProperties? {
+        self[safe: index]?.defaultStyle(state: state).border
+    }
+
+    func dimension(_ state: StyleState, _ index: Self.Index) -> DimensionStylingProperties? {
+        self[safe: index]?.defaultStyle(state: state).dimension
     }
 }
