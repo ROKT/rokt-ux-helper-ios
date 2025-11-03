@@ -312,3 +312,54 @@ extension LayoutSchemaViewModel {
         )
     }
 }
+
+final class PassthroughTapViewTests: XCTestCase {
+
+    func test_coordinator_handleTap_callsOnTapClosure() {
+        // Given
+        var capturedPoint: CGPoint?
+        let coordinator = PassthroughTapView.Coordinator { point in
+            capturedPoint = point
+        }
+        
+        let mockView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
+        let expectedLocation = CGPoint(x: 75, y: 125)
+        
+        let mockGesture = MockTapGestureRecognizer(
+            target: coordinator,
+            action: #selector(PassthroughTapView.Coordinator.handleTap(_:))
+        )
+        mockGesture.mockLocation = expectedLocation
+        mockGesture.mockView = mockView
+        
+        // When
+        coordinator.handleTap(mockGesture)
+        
+        // Then
+        XCTAssertNotNil(capturedPoint)
+        XCTAssertEqual(capturedPoint, expectedLocation)
+    }
+
+    func test_makeCoordinator_returnsCoordinator() {
+        // Given
+        let sut = PassthroughTapView { _ in }
+        
+        // When
+        let coordinator = sut.makeCoordinator()
+        
+        // Then
+        XCTAssertNotNil(coordinator)
+        XCTAssertTrue(coordinator is PassthroughTapView.Coordinator)
+    }
+}
+
+// MARK: - Mock Helpers
+
+private class MockTapGestureRecognizer: UITapGestureRecognizer {
+    var mockLocation: CGPoint = .zero
+    var mockView: UIView?
+    
+    override func location(in view: UIView?) -> CGPoint {
+        return mockLocation
+    }
+}
