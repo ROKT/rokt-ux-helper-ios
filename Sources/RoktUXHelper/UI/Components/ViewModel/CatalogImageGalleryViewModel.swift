@@ -212,7 +212,7 @@ extension RowViewModel {
     }
 }
 
-fileprivate extension Collection where Element == BasicStateStylingBlock<DataImageStyles> {
+extension Collection where Element == BasicStateStylingBlock<DataImageStyles> {
     func border(_ state: StyleState, _ index: Self.Index) -> BorderStylingProperties? {
         self[safe: index]?.defaultStyle(state: state).border
     }

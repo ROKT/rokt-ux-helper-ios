@@ -167,3 +167,44 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         ]
     }
 }
+
+// MARK: - Extension Tests
+
+@available(iOS 15, *)
+@MainActor
+final class CollectionDataImageStylesExtensionTests: XCTestCase {
+    
+    func test_border_returnsBorderForValidIndex() {
+        let border = BorderStylingProperties(
+            borderRadius: 1,
+            borderColor: .init(
+                light: "#FFFFFF",
+                dark: nil
+            ),
+            borderWidth: nil,
+            borderStyle: nil
+        )
+        let style = DataImageStyles(background: nil, border: border, dimension: nil, flexChild: nil, spacing: nil)
+        let block = BasicStateStylingBlock<DataImageStyles>(default: style, pressed: nil, hovered: nil, disabled: nil)
+        let collection = [block]
+        
+        let result = collection.border(.default, 0)
+        
+        XCTAssertEqual(result, border)
+    }
+    
+    func test_border_returnsDimensionForValidIndex() {
+        let dimension = DimensionStylingProperties(
+            minWidth: nil, maxWidth: nil, width: nil,
+            minHeight: nil, maxHeight: nil, height: nil,
+            rotateZ: nil
+        )
+        let style = DataImageStyles(background: nil, border: nil, dimension: dimension, flexChild: nil, spacing: nil)
+        let block = BasicStateStylingBlock<DataImageStyles>(default: style, pressed: nil, hovered: nil, disabled: nil)
+        let collection = [block]
+        
+        let result = collection.dimension(.default, 0)
+        
+        XCTAssertEqual(result, dimension)
+    }
+}
