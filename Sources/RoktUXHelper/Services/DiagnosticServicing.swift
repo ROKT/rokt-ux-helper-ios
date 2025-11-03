@@ -28,6 +28,7 @@ protocol DiagnosticServicing: AnyObject {
         parentGuid: String,
         extraMetadata: [RoktEventNameValue],
         eventData: [String: String],
+        objectData: [String: String]?,
         jwtToken: String
     )
 
@@ -57,6 +58,7 @@ extension DiagnosticServicing {
                 kErrorStackTrace: callStack,
                 kErrorSeverity: severity.rawValue
             ],
+            objectData: [:],
             jwtToken: pluginConfigJWTToken
         )
     }

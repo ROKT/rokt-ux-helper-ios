@@ -42,6 +42,17 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalCartItemInstantPurchaseFailure
     /// Triggered when an instant purchase offer is explicitly dismissed.
     case SignalInstantPurchaseDismissal
+    /// Triggered when the user interacts with the offer.
+    case SignalUserInteraction
     /// Not applicable
     case CaptureAttributes
+}
+
+enum UserInteraction: String, Codable, CaseIterable {
+    case ValidationTriggerFailed
+    case DevicePayValidationTriggerFailed
+}
+
+enum UserInteractionContext: String, Codable, CaseIterable {
+    case CustomStateValidationTriggerButton
 }
