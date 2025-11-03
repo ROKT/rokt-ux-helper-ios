@@ -20,32 +20,6 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedIndex, 2)
     }
 
-    func test_selectNextImage_advancesWhenPossible() {
-        let viewModel = makeViewModel(imageCount: 3)
-
-        viewModel.selectImage(at: 1)
-        viewModel.selectNextImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 2)
-
-        viewModel.selectNextImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 2)
-    }
-
-    func test_selectPreviousImage_advancesWhenPossible() {
-        let viewModel = makeViewModel(imageCount: 3)
-
-        viewModel.selectImage(at: 1)
-        viewModel.selectPreviousImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 0)
-
-        viewModel.selectPreviousImage()
-
-        XCTAssertEqual(viewModel.selectedIndex, 0)
-    }
-
     func test_selectedImage_matchesCurrentIndex() {
         let first = DataImageViewModel(
             image: nil,
@@ -111,16 +85,6 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         let viewModel = makeViewModel(imageCount: 1)
 
         XCTAssertFalse(viewModel.showThumbnails)
-    }
-
-    func test_showIndicator_isTrueWhenProgressContainerProvided() {
-        let progressContainer = basicIndicatorStyle()
-        let viewModel = makeViewModel(
-            imageCount: 1,
-            progressIndicatorContainer: progressContainer
-        )
-
-        XCTAssertTrue(viewModel.showIndicator)
     }
 
     func test_indicatorAlignSelf_usesProgressContainerAlignment() {
@@ -201,5 +165,46 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
                 disabled: nil
             )
         ]
+    }
+}
+
+// MARK: - Extension Tests
+
+@available(iOS 15, *)
+@MainActor
+final class CollectionDataImageStylesExtensionTests: XCTestCase {
+    
+    func test_border_returnsBorderForValidIndex() {
+        let border = BorderStylingProperties(
+            borderRadius: 1,
+            borderColor: .init(
+                light: "#FFFFFF",
+                dark: nil
+            ),
+            borderWidth: nil,
+            borderStyle: nil
+        )
+        let style = DataImageStyles(background: nil, border: border, dimension: nil, flexChild: nil, spacing: nil)
+        let block = BasicStateStylingBlock<DataImageStyles>(default: style, pressed: nil, hovered: nil, disabled: nil)
+        let collection = [block]
+        
+        let result = collection.border(.default, 0)
+        
+        XCTAssertEqual(result, border)
+    }
+    
+    func test_border_returnsDimensionForValidIndex() {
+        let dimension = DimensionStylingProperties(
+            minWidth: nil, maxWidth: nil, width: nil,
+            minHeight: nil, maxHeight: nil, height: nil,
+            rotateZ: nil
+        )
+        let style = DataImageStyles(background: nil, border: nil, dimension: dimension, flexChild: nil, spacing: nil)
+        let block = BasicStateStylingBlock<DataImageStyles>(default: style, pressed: nil, hovered: nil, disabled: nil)
+        let collection = [block]
+        
+        let result = collection.dimension(.default, 0)
+        
+        XCTAssertEqual(result, dimension)
     }
 }

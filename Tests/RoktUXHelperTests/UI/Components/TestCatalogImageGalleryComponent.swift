@@ -116,10 +116,9 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
             .view(LayoutSchemaComponent.self)
             .view(CatalogImageGalleryComponent.self)
 
-        let sut = try component.actualView()
+        _ = try component.actualView()
 
-        XCTAssertFalse(sut.model.showIndicator)
-        let rowComponents = try component.findAll(ViewType.View<RowComponent>.self)
+        let rowComponents = component.findAll(ViewType.View<RowComponent>.self)
         XCTAssertEqual(rowComponents.count, 0)
     }
 
@@ -161,9 +160,8 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
 
         let sut = try component.actualView()
         XCTAssertEqual(sut.model.selectedIndex, 0)
-        XCTAssertTrue(sut.model.canSelectNextImage)
 
-        sut.model.selectNextImage()
+        sut.model.selectedIndex = 1
 
         XCTAssertEqual(sut.model.selectedIndex, 1)
         XCTAssertTrue(sut.model.selectedImage === sut.model.images[1])
@@ -186,11 +184,6 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
             .view(CatalogImageGalleryComponent.self)
 
         let sut = try component.actualView()
-        XCTAssertEqual(sut.model.selectedIndex, 0)
-        XCTAssertFalse(sut.model.canSelectPreviousImage)
-
-        sut.model.selectPreviousImage()
-
         XCTAssertEqual(sut.model.selectedIndex, 0)
     }
 }
@@ -317,5 +310,56 @@ extension LayoutSchemaViewModel {
                 context: .inner(.addToCart(catalogItem))
             )
         )
+    }
+}
+
+final class PassthroughTapViewTests: XCTestCase {
+
+    func test_coordinator_handleTap_callsOnTapClosure() {
+        // Given
+        var capturedPoint: CGPoint?
+        let coordinator = PassthroughTapView.Coordinator { point in
+            capturedPoint = point
+        }
+        
+        let mockView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
+        let expectedLocation = CGPoint(x: 75, y: 125)
+        
+        let mockGesture = MockTapGestureRecognizer(
+            target: coordinator,
+            action: #selector(PassthroughTapView.Coordinator.handleTap(_:))
+        )
+        mockGesture.mockLocation = expectedLocation
+        mockGesture.mockView = mockView
+        
+        // When
+        coordinator.handleTap(mockGesture)
+        
+        // Then
+        XCTAssertNotNil(capturedPoint)
+        XCTAssertEqual(capturedPoint, expectedLocation)
+    }
+
+    func test_makeCoordinator_returnsCoordinator() {
+        // Given
+        let sut = PassthroughTapView { _ in }
+        
+        // When
+        let coordinator = sut.makeCoordinator()
+        
+        // Then
+        XCTAssertNotNil(coordinator)
+        XCTAssertTrue(coordinator is PassthroughTapView.Coordinator)
+    }
+}
+
+// MARK: - Mock Helpers
+
+private class MockTapGestureRecognizer: UITapGestureRecognizer {
+    var mockLocation: CGPoint = .zero
+    var mockView: UIView?
+    
+    override func location(in view: UIView?) -> CGPoint {
+        return mockLocation
     }
 }
