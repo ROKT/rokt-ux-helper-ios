@@ -25,6 +25,10 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemUserInteractionCalled = false
+    var lastUserInteractionItemId: String?
+    var lastUserInteractionAction: UserInteraction?
+    var lastUserInteractionContext: UserInteractionContext?
     var diagnosticsSent: [(message: String, callStack: String, severity: Severity)] = []
     var fontDiagnosticsSent: [String] = []
     var eventsSent: [(
@@ -119,6 +123,13 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCompletionCallback = nil
     }
 
+    func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
+        cartItemUserInteractionCalled = true
+        lastUserInteractionItemId = itemId
+        lastUserInteractionAction = action
+        lastUserInteractionContext = context
+    }
+
     func sendEvent(
         _ eventType: RoktUXEventType,
         parentGuid: String,
@@ -176,6 +187,10 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemUserInteractionCalled = false
+        lastUserInteractionItemId = nil
+        lastUserInteractionAction = nil
+        lastUserInteractionContext = nil
         cartItemDevicePayCompletionCallback = nil
         dismissOption = nil
         diagnosticsSent = []

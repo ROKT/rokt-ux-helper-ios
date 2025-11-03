@@ -95,6 +95,17 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         guard index >= 0, index < catalogItems.count else { return false }
         return catalogItems[index].isOutOfStock
     }
+
+    func handleItemSelection(at index: Int) {
+        guard index >= 0, index < catalogItems.count else { return }
+        let selectedItem = catalogItems[index]
+
+        eventService?.cartItemUserInteraction(
+            itemId: selectedItem.catalogItemId,
+            action: .DropDownItemSelected,
+            context: .CatalogDropDown
+        )
+    }
 }
 
 private extension CatalogItem {

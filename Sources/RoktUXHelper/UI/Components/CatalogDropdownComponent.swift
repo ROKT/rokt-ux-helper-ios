@@ -778,6 +778,8 @@ struct CatalogDropdownComponent: View {
         model.layoutState?.items[LayoutState.activeCatalogItemKey] = selectedItem
         model.layoutState?.publishStateChange()
         notifyValidationOfSelectionChange()
+
+        model.handleItemSelection(at: index)
     }
 
     private func syncSelectedItemFromLayoutState() {
