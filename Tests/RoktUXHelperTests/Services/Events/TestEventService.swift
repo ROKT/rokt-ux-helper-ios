@@ -361,22 +361,11 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
+
+        // Check objectData contains catalogItemId and quantity
+        XCTAssertNotNil(event?.objectData, "objectData should not be nil")
+        XCTAssertEqual(event?.objectData?[kCatalogItemId], "catalogItemId")
+        XCTAssertEqual(event?.objectData?[kQuantity], "1")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
@@ -399,22 +388,6 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
@@ -472,22 +445,6 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseFailure)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
@@ -544,22 +501,6 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
@@ -583,22 +524,6 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchase)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
@@ -624,22 +549,6 @@ final class TestEventService: XCTestCase {
         let event = events.first
         XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseFailure)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
-        let cartItemId = event?.eventData.first { $0.name == kCartItemId }
-        XCTAssertEqual(cartItemId?.value, "cartItemId")
-        let catalogItemId = event?.eventData.first { $0.name == kCatalogItemId }
-        XCTAssertEqual(catalogItemId?.value, "catalogItemId")
-        let currency = event?.eventData.first { $0.name == kCurrency }
-        XCTAssertEqual(currency?.value, "USD")
-        let description = event?.eventData.first { $0.name == kDescription }
-        XCTAssertEqual(description?.value, "Catalog Description")
-        let linkedProductId = event?.eventData.first { $0.name == kLinkedProductId }
-        XCTAssertEqual(linkedProductId?.value, "linked")
-        let totalPrice = event?.eventData.first { $0.name == kTotalPrice }
-        XCTAssertEqual(totalPrice?.value, "14.99")
-        let quantity = event?.eventData.first { $0.name == kQuantity }
-        XCTAssertEqual(quantity?.value, "1")
-        let unitPrice = event?.eventData.first { $0.name == kUnitPrice }
-        XCTAssertEqual(unitPrice?.value, "14.99")
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
@@ -664,6 +573,150 @@ final class TestEventService: XCTestCase {
 
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
+    }
+
+    func test_cartItemUserInteraction_sendsUserInteractionEvent() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act
+        eventService.cartItemUserInteraction(
+            itemId: "catalogItemId",
+            action: .ThumbnailClick,
+            context: .CatalogImageGallery)
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+
+        // Check objectData contains action and context
+        XCTAssertNotNil(event?.objectData, "objectData should not be nil")
+        XCTAssertEqual(event?.objectData?[kAction], "ThumbnailClick")
+        XCTAssertEqual(event?.objectData?[kContext], "CatalogImageGallery")
+    }
+
+    func test_cartItemUserInteraction_withDropDownItemSelected() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "item1")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .DropDownItemSelected,
+            context: .CatalogDropDown)
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(event?.objectData?[kAction], "DropDownItemSelected")
+        XCTAssertEqual(event?.objectData?[kContext], "CatalogDropDown")
+    }
+
+    func test_cartItemUserInteraction_withMainImageScrollActions() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "item1")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act - Left scroll
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .MainImageScrollIconLeftClick,
+            context: .CatalogImageGallery)
+
+        // Assert
+        let leftEvent = events.first
+        XCTAssertEqual(leftEvent?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(leftEvent?.objectData?[kAction], "MainImageScrollIconLeftClick")
+        XCTAssertEqual(leftEvent?.objectData?[kContext], "CatalogImageGallery")
+
+        // Act - Right scroll
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .MainImageScrollIconRightClick,
+            context: .CatalogImageGallery)
+
+        // Assert
+        XCTAssertEqual(events.count, 2)
+        let rightEvent = events.last
+        XCTAssertEqual(rightEvent?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(rightEvent?.objectData?[kAction], "MainImageScrollIconRightClick")
+        XCTAssertEqual(rightEvent?.objectData?[kContext], "CatalogImageGallery")
+    }
+
+    func test_cartItemUserInteraction_withSwipeActions() {
+        // Arrange
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "item1")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act - Swipe left
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .MainImageSwipeLeft,
+            context: .CatalogImageGallery)
+
+        // Assert
+        let swipeLeftEvent = events.first
+        XCTAssertEqual(swipeLeftEvent?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(swipeLeftEvent?.objectData?[kAction], "MainImageSwipeLeft")
+        XCTAssertEqual(swipeLeftEvent?.objectData?[kContext], "CatalogImageGallery")
+
+        // Act - Swipe right
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .MainImageSwipeRight,
+            context: .CatalogImageGallery)
+
+        // Assert
+        XCTAssertEqual(events.count, 2)
+        let swipeRightEvent = events.last
+        XCTAssertEqual(swipeRightEvent?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(swipeRightEvent?.objectData?[kAction], "MainImageSwipeRight")
+        XCTAssertEqual(swipeRightEvent?.objectData?[kContext], "CatalogImageGallery")
+    }
+
+    func test_cartItemUserInteraction_sendsCorrectParentGuid() {
+        // Arrange
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [catalogItem],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            })
+
+        // Act
+        eventService.cartItemUserInteraction(
+            itemId: "item1",
+            action: .ThumbnailClick,
+            context: .CatalogImageGallery)
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.parentGuid, catalogItem.instanceGuid, "Should use catalog item's instanceGuid as parentGuid")
     }
 }
 

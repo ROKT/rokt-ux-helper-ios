@@ -36,6 +36,7 @@ class MockEventService: EventDiagnosticServicing {
         parentGuid: String,
         extraMetadata: [RoktEventNameValue],
         eventData: [String: String],
+        objectData: [String: String]?,
         jwtToken: String
     )] = []
     var cartItemDevicePayCompletionCallback: ((_ status: DevicePayStatus) -> Void)? = nil
@@ -135,9 +136,10 @@ class MockEventService: EventDiagnosticServicing {
         parentGuid: String,
         extraMetadata: [RoktEventNameValue],
         eventData: [String: String],
+        objectData: [String: String]?,
         jwtToken: String
     ) {
-        eventsSent.append((eventType, parentGuid, extraMetadata, eventData, jwtToken))
+        eventsSent.append((eventType, parentGuid, extraMetadata, eventData, objectData, jwtToken))
     }
 
     func sendDiagnostics(
