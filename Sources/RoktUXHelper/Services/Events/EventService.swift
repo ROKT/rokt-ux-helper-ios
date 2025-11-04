@@ -153,6 +153,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         parentGuid: String,
         extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [:],
+        objectData: [String: String]? = nil,
         jwtToken: String
     ) {
         processor.handle(
@@ -162,6 +163,7 @@ class EventService: Hashable, EventDiagnosticServicing {
                 parentGuid: parentGuid,
                 extraMetadata: extraMetadata,
                 eventData: eventData,
+                objectData: objectData,
                 pageInstanceGuid: pageInstanceGuid,
                 jwtToken: jwtToken
             )
@@ -203,10 +205,23 @@ class EventService: Hashable, EventDiagnosticServicing {
         paymentProvider: PaymentProvider,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     ) {
-        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
+        let objectData = [
+            kCatalogItemId: catalogItem.catalogItemId,
+            kQuantity: "1"
+        ]
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem, objectData: objectData)
         uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
 
         self.devicePayCompletion = completion
+    }
+
+    func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        let objectData = [
+            kAction: action.rawValue,
+            kContext: context.rawValue
+        ]
+        sendCartItemEvent(eventType: .SignalUserInteraction, catalogItem: catalogItem, objectData: objectData)
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
@@ -225,20 +240,11 @@ class EventService: Hashable, EventDiagnosticServicing {
         devicePayCompletion = nil
     }
 
-    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
+    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem, objectData: [String: String]? = nil) {
         sendEvent(
             eventType,
             parentGuid: catalogItem.instanceGuid,
-            eventData: [
-                kCartItemId: catalogItem.cartItemId,
-                kCatalogItemId: catalogItem.catalogItemId,
-                kCurrency: catalogItem.currency,
-                kDescription: catalogItem.description,
-                kLinkedProductId: catalogItem.linkedProductId ?? "",
-                kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
-                kQuantity: "1",
-                kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
-            ],
+            objectData: objectData,
             jwtToken: catalogItem.token
         )
     }

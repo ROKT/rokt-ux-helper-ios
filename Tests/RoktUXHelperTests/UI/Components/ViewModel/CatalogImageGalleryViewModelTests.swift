@@ -51,7 +51,8 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
             activeIndicatorStyle: nil,
             seenIndicatorStyle: nil,
             progressIndicatorContainer: nil,
-            layoutState: nil
+            layoutState: nil,
+            eventService: nil
         )
 
         XCTAssertTrue(viewModel.selectedImage === first)
@@ -97,10 +98,156 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.indicatorAlignSelf(for: 0), .flexEnd)
     }
 
+    func test_handleThumbnailClick_sendsThumbnailClickEvent() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleThumbnailClick(at: 1)
+
+        // Assert
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled, "Should call cartItemUserInteraction")
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1", "Should send correct item ID")
+        XCTAssertEqual(eventService.lastUserInteractionAction, .ThumbnailClick, "Should send ThumbnailClick action")
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogImageGallery, "Should send CatalogImageGallery context")
+        XCTAssertEqual(viewModel.selectedIndex, 1, "Should update selected index")
+    }
+
+    func test_handleThumbnailClick_updatesSelectedIndex() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleThumbnailClick(at: 2)
+
+        // Assert
+        XCTAssertEqual(viewModel.selectedIndex, 2)
+    }
+
+    func test_handleMainImageScrollLeft_sendsLeftScrollEvent() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleMainImageScrollLeft()
+
+        // Assert
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled, "Should call cartItemUserInteraction")
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1", "Should send correct item ID")
+        XCTAssertEqual(
+            eventService.lastUserInteractionAction,
+            .MainImageScrollIconLeftClick,
+            "Should send MainImageScrollIconLeftClick action"
+        )
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogImageGallery, "Should send CatalogImageGallery context")
+    }
+
+    func test_handleMainImageScrollRight_sendsRightScrollEvent() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleMainImageScrollRight()
+
+        // Assert
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled, "Should call cartItemUserInteraction")
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1", "Should send correct item ID")
+        XCTAssertEqual(
+            eventService.lastUserInteractionAction,
+            .MainImageScrollIconRightClick,
+            "Should send MainImageScrollIconRightClick action"
+        )
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogImageGallery, "Should send CatalogImageGallery context")
+    }
+
+    func test_handleMainImageSwipeLeft_sendsSwipeLeftEvent() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleMainImageSwipeLeft()
+
+        // Assert
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled, "Should call cartItemUserInteraction")
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1", "Should send correct item ID")
+        XCTAssertEqual(eventService.lastUserInteractionAction, .MainImageSwipeLeft, "Should send MainImageSwipeLeft action")
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogImageGallery, "Should send CatalogImageGallery context")
+    }
+
+    func test_handleMainImageSwipeRight_sendsSwipeRightEvent() {
+        // Arrange
+        let layoutState = LayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item1")
+        layoutState.items[LayoutState.activeCatalogItemKey] = catalogItem
+
+        let viewModel = makeViewModel(
+            imageCount: 3,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.handleMainImageSwipeRight()
+
+        // Assert
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled, "Should call cartItemUserInteraction")
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1", "Should send correct item ID")
+        XCTAssertEqual(eventService.lastUserInteractionAction, .MainImageSwipeRight, "Should send MainImageSwipeRight action")
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogImageGallery, "Should send CatalogImageGallery context")
+    }
+
     private func makeViewModel(
         imageCount: Int,
         thumbnailRowStyle: [BasicStateStylingBlock<RowStyle>]? = nil,
-        progressIndicatorContainer: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]? = nil
+        progressIndicatorContainer: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]? = nil,
+        layoutState: LayoutState? = nil,
+        eventService: EventDiagnosticServicing? = nil
     ) -> CatalogImageGalleryViewModel {
         let images = (0..<imageCount).map { _ in
             DataImageViewModel(
@@ -126,7 +273,8 @@ final class CatalogImageGalleryViewModelTests: XCTestCase {
             activeIndicatorStyle: nil,
             seenIndicatorStyle: nil,
             progressIndicatorContainer: progressIndicatorContainer,
-            layoutState: nil
+            layoutState: layoutState,
+            eventService: eventService
         )
     }
 

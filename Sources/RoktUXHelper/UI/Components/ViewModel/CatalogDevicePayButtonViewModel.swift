@@ -73,7 +73,16 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     func handleTap() {
-        guard shouldProceedAfterValidation() else { return }
+        guard shouldProceedAfterValidation() else {
+            if let catalogItem {
+                eventService?.cartItemUserInteraction(
+                    itemId: catalogItem.catalogItemId,
+                    action: UserInteraction.ValidationTriggerFailed,
+                    context: UserInteractionContext.CustomStateValidationTriggerButton
+                )
+            }
+            return
+        }
         cartItemDevicePay()
     }
 

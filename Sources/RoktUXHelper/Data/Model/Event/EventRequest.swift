@@ -21,6 +21,7 @@ public struct RoktEventRequest: Codable, Hashable {
     public let eventTime: String
     public let eventData: [RoktEventNameValue]
     public let metadata: [RoktEventNameValue]
+    public let objectData: [String: String]?
     public let pageInstanceGuid: String
     public let jwtToken: String
 
@@ -32,6 +33,7 @@ public struct RoktEventRequest: Codable, Hashable {
         case eventTime
         case eventData
         case metadata
+        case objectData
         case pageInstanceGuid
         case jwtToken = "token"
     }
@@ -44,9 +46,29 @@ public struct RoktEventRequest: Codable, Hashable {
         eventTime = try container.decode(String.self, forKey: .eventTime)
         eventData = try container.decode([RoktEventNameValue].self, forKey: .eventData)
         metadata = try container.decode([RoktEventNameValue].self, forKey: .metadata)
+        objectData = try container.decodeIfPresent([String: String].self, forKey: .objectData)
         pageInstanceGuid = try container.decode(String.self, forKey: .pageInstanceGuid)
         jwtToken = try container.decode(String.self, forKey: .jwtToken)
         uuid = try container.decode(String.self, forKey: .uuid)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(uuid, forKey: .uuid)
+        try container.encode(sessionId, forKey: .sessionId)
+        try container.encode(eventType, forKey: .eventType)
+        try container.encode(parentGuid, forKey: .parentGuid)
+        try container.encode(eventTime, forKey: .eventTime)
+        try container.encode(eventData, forKey: .eventData)
+        try container.encode(metadata, forKey: .metadata)
+
+        // Only encode objectData if it's not nil and not empty
+        if let objectData = objectData, !objectData.isEmpty {
+            try container.encode(objectData, forKey: .objectData)
+        }
+
+        try container.encode(pageInstanceGuid, forKey: .pageInstanceGuid)
+        try container.encode(jwtToken, forKey: .jwtToken)
     }
 
     public init(
@@ -56,6 +78,7 @@ public struct RoktEventRequest: Codable, Hashable {
         eventTime: Date = Date(),
         extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [String: String](),
+        objectData: [String: String]? = nil,
         pageInstanceGuid: String = "",
         jwtToken: String
     ) {
@@ -65,6 +88,7 @@ public struct RoktEventRequest: Codable, Hashable {
         self.parentGuid = parentGuid
         self.eventTime = EventDateFormatter.getDateString(eventTime)
         self.eventData = RoktEventRequest.convertDictionaryToNameValue(eventData)
+        self.objectData = objectData
         self.pageInstanceGuid = pageInstanceGuid
         self.metadata = [RoktEventNameValue(name: BE_CLIENT_TIME_STAMP,
                                             value: EventDateFormatter.getDateString(eventTime)),
@@ -78,7 +102,7 @@ public struct RoktEventRequest: Codable, Hashable {
     }
 
     public func getLog() -> String {
-        let params: [String: Any] = [
+        var params: [String: Any] = [
             BE_SESSION_ID_KEY: sessionId,
             BE_PARENT_GUID_KEY: parentGuid,
             BE_PAGE_INSTANCE_GUID_KEY: pageInstanceGuid,
@@ -86,6 +110,11 @@ public struct RoktEventRequest: Codable, Hashable {
             BE_METADATA_KEY: getNameValueDictionary(metadata),
             BE_EVENT_DATA_KEY: getNameValueDictionary(eventData)
         ]
+
+        // Only include objectData if it's not nil and not empty
+        if let objectData = objectData, !objectData.isEmpty {
+            params[BE_OBJECT_DATA_KEY] = objectData
+        }
 
         guard let theJSONData = try? JSONSerialization.data(withJSONObject: params,
                                                             options: []),

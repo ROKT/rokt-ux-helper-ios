@@ -19,6 +19,7 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
 
     let id: UUID = UUID()
     weak var layoutState: (any LayoutStateRepresenting)?
+    weak var eventService: EventDiagnosticServicing?
 
     @Published var images: [DataImageViewModel] {
         didSet {
@@ -55,9 +56,11 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         activeIndicatorStyle: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
         seenIndicatorStyle: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
         progressIndicatorContainer: [BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>]?,
-        layoutState: (any LayoutStateRepresenting)?
+        layoutState: (any LayoutStateRepresenting)?,
+        eventService: EventDiagnosticServicing? = nil
     ) {
         self.layoutState = layoutState
+        self.eventService = eventService
         self.images = images
         self.defaultStyle = defaultStyle
         self.thumbnailStyleBlock = thumbnailStyle
@@ -88,6 +91,61 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
     func selectImage(at index: Int) {
         guard images.indices.contains(index), index != selectedIndex else { return }
         selectedIndex = index
+    }
+
+    func handleThumbnailClick(at index: Int) {
+        guard images.indices.contains(index) else { return }
+        selectImage(at: index)
+        sendThumbnailClickEvent()
+    }
+
+    func handleMainImageScrollLeft() {
+        sendMainImageScrollEvent(direction: .left, isSwipe: false)
+    }
+
+    func handleMainImageScrollRight() {
+        sendMainImageScrollEvent(direction: .right, isSwipe: false)
+    }
+
+    func handleMainImageSwipeLeft() {
+        sendMainImageScrollEvent(direction: .left, isSwipe: true)
+    }
+
+    func handleMainImageSwipeRight() {
+        sendMainImageScrollEvent(direction: .right, isSwipe: true)
+    }
+
+    private func sendThumbnailClickEvent() {
+        guard let catalogItem = getActiveCatalogItem() else { return }
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: .ThumbnailClick,
+            context: .CatalogImageGallery
+        )
+    }
+
+    private func sendMainImageScrollEvent(direction: ScrollDirection, isSwipe: Bool) {
+        guard let catalogItem: CatalogItem = getActiveCatalogItem() else { return }
+        let action: UserInteraction
+        if isSwipe {
+            action = direction == .left ? .MainImageSwipeLeft : .MainImageSwipeRight
+        } else {
+            action = direction == .left ? .MainImageScrollIconLeftClick : .MainImageScrollIconRightClick
+        }
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: action,
+            context: .CatalogImageGallery
+        )
+    }
+
+    private func getActiveCatalogItem() -> CatalogItem? {
+        layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
+    }
+
+    private enum ScrollDirection {
+        case left
+        case right
     }
 
     func dotStyle(for index: Int, breakpointIndex: Int) -> BaseStyles? {
