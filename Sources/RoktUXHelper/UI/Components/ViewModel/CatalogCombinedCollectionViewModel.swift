@@ -21,6 +21,7 @@ final class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSi
     @Published var children: [LayoutSchemaViewModel]?
     let defaultStyle: [CatalogCombinedCollectionStyles]?
     weak var layoutState: (any LayoutStateRepresenting)?
+    weak var eventService: EventServicing?
     private let childBuilder: ((CatalogItem) -> [LayoutSchemaViewModel]?)?
 
     var imageLoader: RoktUXImageLoader? {
@@ -30,11 +31,13 @@ final class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSi
         children: [LayoutSchemaViewModel]?,
         defaultStyle: [CatalogCombinedCollectionStyles]?,
         layoutState: any LayoutStateRepresenting,
+        eventService: EventServicing? = nil,
         childBuilder: ((CatalogItem) -> [LayoutSchemaViewModel]?)? = nil
     ) {
         self.children = children
         self.defaultStyle = defaultStyle
         self.layoutState = layoutState
+        self.eventService = eventService
         self.childBuilder = childBuilder
     }
 
@@ -51,6 +54,12 @@ final class CatalogCombinedCollectionViewModel: Identifiable, Hashable, ScreenSi
         }
 
         children = newChildren
+
+        eventService?.sendSlotImpressionEvent(
+            instanceGuid: catalogItem.instanceGuid,
+            jwtToken: catalogItem.token
+        )
+
         return true
     }
 

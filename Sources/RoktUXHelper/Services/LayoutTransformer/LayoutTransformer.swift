@@ -759,6 +759,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             children: initialChildren,
             defaultStyle: updateStyles.compactMap { $0.default },
             layoutState: layoutState,
+            eventService: eventService,
             childBuilder: childBuilder
         )
     }
