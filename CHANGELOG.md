@@ -15,12 +15,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for CatalogCombinedCollection
 
-## [0.7.4] - 2025-09-23
+## [0.7.4] - 2025-10-24
 
 ### Added
 
 - `CatalogDevicePayButton` node supported
 - `CartItemDevicePay` UX event supported
+- Add support of new animation style for DataImageCarousel
+- Add support of new style for ImageCarouselIndicator
+
+### Fixed
+
+- Fix visualization ImageCarouselIndicator
+- Fix ProgressIndicator behavior when the page changes inside CarouselDistribution
 
 ## [0.7.3] - 2025-09-18
 
@@ -125,7 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...HEAD
+[0.7.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.3...0.7.4
 [0.7.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.2...0.7.3
 [0.7.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...0.7.2
 [0.7.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.0...0.7.1
