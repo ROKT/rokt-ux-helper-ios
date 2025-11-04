@@ -923,7 +923,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             activeIndicatorStyle: activeIndicatorStyle,
             seenIndicatorStyle: seenIndicatorStyle,
             progressIndicatorContainer: progressIndicatorContainer,
-            layoutState: layoutState
+            layoutState: layoutState,
+            eventService: eventService
         )
     }
 

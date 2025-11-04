@@ -48,11 +48,13 @@ struct HSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
     let content: Content
+    let onSwipe: ((Bool) -> Void)? // true for right swipe, false for left swipe
     @GestureState private var dragState: CGFloat = 0
 
-    init(page: Binding<Int>, pages: Int, @ViewBuilder content: () -> Content) {
+    init(page: Binding<Int>, pages: Int, onSwipe: ((Bool) -> Void)? = nil, @ViewBuilder content: () -> Content) {
         self._page = page
         self.pages = pages
+        self.onSwipe = onSwipe
         self.content = content()
     }
 
@@ -65,11 +67,18 @@ struct HSPageView<Content: View>: View {
                  .onEnded { value in
                      let threshold = geo.size.width/2
                      var newPage = page
+                     var swipeDirection: Bool?
 
                      if value.translation.width < -threshold {
                          newPage += 1
+                         swipeDirection = true // Swipe right (content moves left)
                      } else if value.translation.width > threshold {
                          newPage -= 1
+                         swipeDirection = false // Swipe left (content moves right)
+                     }
+
+                     if let direction = swipeDirection {
+                         onSwipe?(direction)
                      }
 
                      page = max(min(newPage, pages - 1), 0)
@@ -137,6 +146,9 @@ struct CatalogImageGalleryComponent: View {
     @State private var frameChangeIndex: Int = 0
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
+    @State private var previousPage: Int = 0
+    @State private var isUpdatingFromSelectedIndex: Bool = false
+    @State private var isUpdatingFromSwipe: Bool = false
 
     private var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -211,11 +223,23 @@ struct CatalogImageGalleryComponent: View {
 
         return ZStack {
             imageViewComponent(for: model.images[0], styleBinding: $styleState).opacity(0.0)
-            HSPageView(page: $page, pages: model.images.count) {
-                ForEach(0..<model.images.count, id: \.self) { index in
-                    imageViewComponent(for: model.images[index], styleBinding: $styleState)
+            HSPageView(
+                page: $page,
+                pages: model.images.count,
+                onSwipe: { isRightSwipe in
+                    isUpdatingFromSwipe = true
+                    if isRightSwipe {
+                        model.handleMainImageSwipeRight()
+                    } else {
+                        model.handleMainImageSwipeLeft()
+                    }
+                },
+                content: {
+                    ForEach(0..<model.images.count, id: \.self) { index in
+                        imageViewComponent(for: model.images[index], styleBinding: $styleState)
+                    }
                 }
-            }
+            )
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
         .frame(maxWidth: .infinity)
@@ -224,7 +248,22 @@ struct CatalogImageGalleryComponent: View {
             indicatorOverlay(alignment: overlayAlignment)
         }
         .onChange(of: page) { newValue in
+            let oldValue = previousPage
+            previousPage = newValue
             model.selectedIndex = newValue
+
+            // Detect scroll direction and send appropriate event
+            // Skip if the change came from selectedIndex update (e.g., thumbnail click)
+            // Skip if the change came from swipe (handled in onSwipe callback)
+            if !isUpdatingFromSelectedIndex && !isUpdatingFromSwipe {
+                if newValue > oldValue {
+                    model.handleMainImageScrollRight()
+                } else if newValue < oldValue {
+                    model.handleMainImageScrollLeft()
+                }
+            }
+            isUpdatingFromSelectedIndex = false
+            isUpdatingFromSwipe = false
         }
     }
 
@@ -280,7 +319,7 @@ struct CatalogImageGalleryComponent: View {
                         .id(index)
                         .onTapGesture {
                             withAnimation(.easeInOut) {
-                                model.selectImage(at: index)
+                                model.handleThumbnailClick(at: index)
                                 scrollToThumbnail(at: index, proxy: scrollProxy)
                             }
                         }
@@ -289,7 +328,10 @@ struct CatalogImageGalleryComponent: View {
                 .padding(.horizontal, horizontalInset)
             }
             .onChange(of: model.selectedIndex) { newIndex in
-                page = model.selectedIndex ?? 0
+                let newPage = model.selectedIndex ?? 0
+                previousPage = page
+                isUpdatingFromSelectedIndex = true
+                page = newPage
                 scrollToThumbnail(at: newIndex, proxy: scrollProxy)
             }
         }
