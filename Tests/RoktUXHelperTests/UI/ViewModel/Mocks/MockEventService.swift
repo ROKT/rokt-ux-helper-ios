@@ -14,6 +14,8 @@ class MockEventService: EventDiagnosticServicing {
     var signalActivationEventCalled = false
     var eventsOnLoadCalled = false
     var slotImpressionEventCalled = false
+    var lastSlotImpressionInstanceGuid: String?
+    var lastSlotImpressionJwtToken: String?
     var signalViewedEventCalled = false
     var signalResponseEventCalled = false
     var gatedSignalResponseEventCalled = false
@@ -68,6 +70,8 @@ class MockEventService: EventDiagnosticServicing {
 
     func sendSlotImpressionEvent(instanceGuid: String, jwtToken: String) {
         slotImpressionEventCalled = true
+        lastSlotImpressionInstanceGuid = instanceGuid
+        lastSlotImpressionJwtToken = jwtToken
     }
 
     func sendSignalViewedEvent(instanceGuid: String, jwtToken: String) {
@@ -178,6 +182,8 @@ class MockEventService: EventDiagnosticServicing {
         signalActivationEventCalled = false
         eventsOnLoadCalled = false
         slotImpressionEventCalled = false
+        lastSlotImpressionInstanceGuid = nil
+        lastSlotImpressionJwtToken = nil
         signalViewedEventCalled = false
         signalResponseEventCalled = false
         gatedSignalResponseEventCalled = false

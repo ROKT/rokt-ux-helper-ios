@@ -87,6 +87,84 @@ final class CatalogCombinedCollectionViewModelTests: XCTestCase {
         XCTAssertIdentical(sut.imageLoader as AnyObject?, mockImageLoader as AnyObject?)
     }
 
+    func test_rebuildChildren_sendsImpressionEventWhenSuccessful() {
+        // Arrange
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        let catalogItem = makeCatalogItem(id: "item1")
+
+        let builder: (CatalogItem) -> [LayoutSchemaViewModel]? = { _ in [.empty] }
+
+        let sut = CatalogCombinedCollectionViewModel(
+            children: [],
+            defaultStyle: nil,
+            layoutState: layoutState,
+            eventService: eventService,
+            childBuilder: builder
+        )
+
+        // Act
+        let result = sut.rebuildChildren(for: catalogItem)
+
+        // Assert
+        XCTAssertTrue(result, "rebuildChildren should return true")
+        XCTAssertTrue(eventService.slotImpressionEventCalled, "Should send impression event")
+        XCTAssertEqual(eventService.lastSlotImpressionInstanceGuid, "instance-item1", "Should use catalog item instanceGuid")
+        XCTAssertEqual(eventService.lastSlotImpressionJwtToken, "token-item1", "Should use catalog item token")
+    }
+
+    func test_rebuildChildren_sendsImpressionEventForDifferentCatalogItems() {
+        // Arrange
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        let firstItem = makeCatalogItem(id: "item1")
+        let secondItem = makeCatalogItem(id: "item2")
+
+        let builder: (CatalogItem) -> [LayoutSchemaViewModel]? = { _ in [.empty] }
+
+        let sut = CatalogCombinedCollectionViewModel(
+            children: [],
+            defaultStyle: nil,
+            layoutState: layoutState,
+            eventService: eventService,
+            childBuilder: builder
+        )
+
+        // Act
+        sut.rebuildChildren(for: firstItem)
+        eventService.reset()
+        sut.rebuildChildren(for: secondItem)
+
+        // Assert
+        XCTAssertTrue(eventService.slotImpressionEventCalled, "Should send impression event for second item")
+        XCTAssertEqual(eventService.lastSlotImpressionInstanceGuid, "instance-item2", "Should use second item instanceGuid")
+        XCTAssertEqual(eventService.lastSlotImpressionJwtToken, "token-item2", "Should use second item token")
+    }
+
+    func test_rebuildChildren_doesNotSendImpressionEventWhenBuilderReturnsNil() {
+        // Arrange
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        let catalogItem = makeCatalogItem(id: "item1")
+
+        let builder: (CatalogItem) -> [LayoutSchemaViewModel]? = { _ in nil }
+
+        let sut = CatalogCombinedCollectionViewModel(
+            children: [.empty],
+            defaultStyle: nil,
+            layoutState: layoutState,
+            eventService: eventService,
+            childBuilder: builder
+        )
+
+        // Act
+        let result = sut.rebuildChildren(for: catalogItem)
+
+        // Assert
+        XCTAssertFalse(result, "rebuildChildren should return false when builder returns nil")
+        XCTAssertFalse(eventService.slotImpressionEventCalled, "Should not send impression event when rebuild fails")
+    }
+
     private func makeCatalogItem(id: String) -> CatalogItem {
         CatalogItem(
             images: [:],
