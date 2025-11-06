@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		253E5E7E2CF02CA40071583B /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 253E5E7D2CF02CA40071583B /* RoktUXHelper */; };
+		35A9975E2EBCFE8E00DA5F50 /* 1.json in Resources */ = {isa = PBXBuildFile; fileRef = 35A9975D2EBCFE8800DA5F50 /* 1.json */; };
 		B81DDBF92CC9B28C00B3D090 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBF82CC9B28C00B3D090 /* HomeView.swift */; };
 		B81DDBFB2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFA2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift */; };
 		B81DDBFD2CC9B2C800B3D090 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFC2CC9B2C800B3D090 /* Font+Extensions.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		35A9975D2EBCFE8800DA5F50 /* 1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1.json; sourceTree = "<group>"; };
 		B81DDBF82CC9B28C00B3D090 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		B81DDBFA2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonDefaultOutlined.swift; sourceTree = "<group>"; };
 		B81DDBFC2CC9B2C800B3D090 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 		B8B9FFD32CBF39FC00C61F88 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				35A9975D2EBCFE8800DA5F50 /* 1.json */,
 				B8B9FFD52CBF3A3C00C61F88 /* experience.json */,
 				B8B9FFC72CBF32F400C61F88 /* Assets.xcassets */,
 			);
@@ -185,6 +188,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8B9FFC82CBF32F400C61F88 /* Assets.xcassets in Resources */,
+				35A9975E2EBCFE8E00DA5F50 /* 1.json in Resources */,
 				B8B9FFD62CBF3A3C00C61F88 /* experience.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
