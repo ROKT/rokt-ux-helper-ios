@@ -1476,7 +1476,9 @@
                                           "node": {
                                             "customStateKey": "PaymentCompleted",
                                             "validatorTriggerConfig": {
-                                        "validatorFieldKeys": ["dropDownSelection"]
+                                              "validatorFieldKeys": [
+                                                "dropDownSelection"
+                                              ]
                                             },
                                             "provider": "ApplePay",
                                             "styles": {
@@ -1526,7 +1528,7 @@
                                               {
                                                 "type": "BasicText",
                                                 "node": {
-                                            "value": "Buy with \uF8FFPay",
+                                                  "value": "Buy with \uF8FFPay",
                                                   "styles": {
                                                     "elements": {
                                                       "own": [
