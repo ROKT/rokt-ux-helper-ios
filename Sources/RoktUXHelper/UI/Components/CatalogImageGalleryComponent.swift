@@ -44,7 +44,7 @@ struct PassthroughTapView: UIViewRepresentable {
 }
 
 @available(iOS 15, *)
-struct HSPageView<Content: View>: View {
+struct CatalogHSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
     let content: Content
@@ -84,7 +84,7 @@ struct HSPageView<Content: View>: View {
                      page = max(min(newPage, pages - 1), 0)
                  }
 
-            _VariadicView.Tree(HSStackPager(width: geo.size.width, page: page, dragState: dragState), content: { content })
+            _VariadicView.Tree(CatalogHSStackPager(width: geo.size.width, page: page, dragState: dragState), content: { content })
                 .animation(.easeOut(duration: 0.25), value: page)
                 .animation(.easeOut(duration: 0.25), value: dragState)
 
@@ -102,7 +102,7 @@ struct HSPageView<Content: View>: View {
         }
     }
 
-    struct HSStackPager: _VariadicView_UnaryViewRoot {
+    struct CatalogHSStackPager: _VariadicView_UnaryViewRoot {
         let width: CGFloat
         let page: Int
         let dragState: CGFloat
@@ -223,7 +223,7 @@ struct CatalogImageGalleryComponent: View {
 
         return ZStack {
             imageViewComponent(for: model.images[0], styleBinding: $styleState).opacity(0.0)
-            HSPageView(
+            CatalogHSPageView(
                 page: $page,
                 pages: model.images.count,
                 onSwipe: { isRightSwipe in
