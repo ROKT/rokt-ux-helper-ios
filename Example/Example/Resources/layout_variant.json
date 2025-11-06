@@ -1106,7 +1106,8 @@
                                                   }
                                                 }
                                               }
-                                            }, {
+                                            },
+                                            {
                                               "type": "StaticImage",
                                               "node": {
                                                 "url": {
@@ -1443,44 +1444,10 @@
                                     "node": {
                                       "value": "%^DATA.creativeLink.termsAndConditions|^% and %^DATA.creativeLink.privacyPolicy|^% and %^DATA.creativeCopy.creative.disclaimer|^%"
                                     }
-                                  }
-                                ]
-                              }
-                            },
-                            {
-                              "type": "Column",
-                              "node": {
-                                "styles": {
-                                  "elements": {
-                                    "own": [
-                                      {
-                                        "default": {
-                                          "dimension": {
-                                            "width": {
-                                              "type": "fit",
-                                              "value": "fit-width"
-                                            }
-                                          },
-                                          "border": {
-                                            "borderColor": {
-                                              "light": "#D0D5DD"
-                                            },
-                                            "borderWidth": "1 0 0 0"
-                                          }
-                                        }
-                                      }
-                                    ]
-                                  }
-                                },
-                                "children": [
+                                  },
                                   {
-                                    "type": "CatalogDevicePayButton",
+                                    "type": "Column",
                                     "node": {
-                                      "customStateKey": "PaymentCompleted",
-                                      "validatorTriggerConfig": {
-                                        "validatorFieldKeys": ["dropDownSelection"]
-                                      },
-                                      "provider": "ApplePay",
                                       "styles": {
                                         "elements": {
                                           "own": [
@@ -1490,34 +1457,13 @@
                                                   "width": {
                                                     "type": "fit",
                                                     "value": "fit-width"
-                                                  },
-                                                  "height": {
-                                                    "type": "fixed",
-                                                    "value": 54
-                                                  }
-                                                },
-                                                "background": {
-                                                  "backgroundColor": {
-                                                    "light": "#000000"
                                                   }
                                                 },
                                                 "border": {
-                                                  "borderRadius": 6
-                                                },
-                                                "container": {
-                                                  "alignItems": "center",
-                                                  "justifyContent": "center"
-                                                },
-                                                "spacing": {
-                                                  "padding": "5",
-                                                  "margin": "16 0 0 0"
-                                                }
-                                              },
-                                              "pressed": {
-                                                "background": {
-                                                  "backgroundColor": {
-                                                    "light": "#333333"
-                                                  }
+                                                  "borderColor": {
+                                                    "light": "#D0D5DD"
+                                                  },
+                                                  "borderWidth": "1 0 0 0"
                                                 }
                                               }
                                             }
@@ -1526,92 +1472,147 @@
                                       },
                                       "children": [
                                         {
-                                          "type": "BasicText",
+                                          "type": "CatalogDevicePayButton",
                                           "node": {
-                                            "value": "Buy with \uF8FFPay",
+                                            "customStateKey": "PaymentCompleted",
+                                            "validatorTriggerConfig": {
+                                        "validatorFieldKeys": ["dropDownSelection"]
+                                            },
+                                            "provider": "ApplePay",
                                             "styles": {
                                               "elements": {
                                                 "own": [
                                                   {
                                                     "default": {
-                                                      "text": {
-                                                        "fontSize": 18,
-                                                        "textColor": {
-                                                          "light": "#FFFFFF"
+                                                      "dimension": {
+                                                        "width": {
+                                                          "type": "fit",
+                                                          "value": "fit-width"
                                                         },
-                                                        "fontWeight": "600"
+                                                        "height": {
+                                                          "type": "fixed",
+                                                          "value": 54
+                                                        }
+                                                      },
+                                                      "background": {
+                                                        "backgroundColor": {
+                                                          "light": "#000000"
+                                                        }
+                                                      },
+                                                      "border": {
+                                                        "borderRadius": 6
+                                                      },
+                                                      "container": {
+                                                        "alignItems": "center",
+                                                        "justifyContent": "center"
+                                                      },
+                                                      "spacing": {
+                                                        "padding": "5",
+                                                        "margin": "16 0 0 0"
+                                                      }
+                                                    },
+                                                    "pressed": {
+                                                      "background": {
+                                                        "backgroundColor": {
+                                                          "light": "#333333"
+                                                        }
                                                       }
                                                     }
                                                   }
                                                 ]
                                               }
-                                            }
+                                            },
+                                            "children": [
+                                              {
+                                                "type": "BasicText",
+                                                "node": {
+                                            "value": "Buy with \uF8FFPay",
+                                                  "styles": {
+                                                    "elements": {
+                                                      "own": [
+                                                        {
+                                                          "default": {
+                                                            "text": {
+                                                              "fontSize": 18,
+                                                              "textColor": {
+                                                                "light": "#FFFFFF"
+                                                              },
+                                                              "fontWeight": "600"
+                                                            }
+                                                          }
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
                                           }
+                                        },
+                                        {
+                                          "node": {
+                                            "styles": {
+                                              "elements": {
+                                                "own": [
+                                                  {
+                                                    "default": {
+                                                      "dimension": {
+                                                        "width": {
+                                                          "type": "fit",
+                                                          "value": "fit-width"
+                                                        },
+                                                        "height": {
+                                                          "type": "fixed",
+                                                          "value": 44
+                                                        }
+                                                      },
+                                                      "background": {
+                                                        "backgroundColor": {
+                                                          "light": "#ffffff"
+                                                        }
+                                                      },
+                                                      "container": {
+                                                        "alignItems": "center",
+                                                        "justifyContent": "center"
+                                                      },
+                                                      "spacing": {
+                                                        "padding": "10"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            "children": [
+                                              {
+                                                "type": "BasicText",
+                                                "node": {
+                                                  "value": "Dismiss",
+                                                  "styles": {
+                                                    "elements": {
+                                                      "own": [
+                                                        {
+                                                          "default": {
+                                                            "text": {
+                                                              "textColor": {
+                                                                "light": "#000000"
+                                                              },
+                                                              "fontSize": 16,
+                                                              "fontWeight": "500"
+                                                            }
+                                                          }
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          "type": "DismissInstantPurchaseButton"
                                         }
                                       ]
                                     }
-                                  },
-                                  {
-                                    "node": {
-                                      "styles": {
-                                        "elements": {
-                                          "own": [
-                                            {
-                                              "default": {
-                                                "dimension": {
-                                                  "width": {
-                                                    "type": "fit",
-                                                    "value": "fit-width"
-                                                  },
-                                                  "height": {
-                                                    "type": "fixed",
-                                                    "value": 44
-                                                  }
-                                                },
-                                                "background": {
-                                                  "backgroundColor": {
-                                                    "light": "#ffffff"
-                                                  }
-                                                },
-                                                "container": {
-                                                  "alignItems": "center",
-                                                  "justifyContent": "center"
-                                                },
-                                                "spacing": {
-                                                  "padding": "10"
-                                                }
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      },
-                                      "children": [
-                                        {
-                                          "type": "BasicText",
-                                          "node": {
-                                            "value": "Dismiss",
-                                            "styles": {
-                                              "elements": {
-                                                "own": [
-                                                  {
-                                                    "default": {
-                                                      "text": {
-                                                        "textColor": {
-                                                          "light": "#000000"
-                                                        },
-                                                        "fontSize": 16,
-                                                        "fontWeight": "500"
-                                                      }
-                                                    }
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "type": "DismissInstantPurchaseButton"
                                   }
                                 ]
                               }
