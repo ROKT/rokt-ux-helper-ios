@@ -44,6 +44,7 @@ struct ScrollableColumnComponent: View {
     @State var breakpointIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
+    var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
 
     let parentOverride: ComponentParentOverride?
@@ -75,6 +76,18 @@ struct ScrollableColumnComponent: View {
                                   horizontalAlignment: horizontalAlignment.getAlignment())
     }
 
+    var dimensionMaxHeight: CGFloat? {
+        let heightModifier = HeightModifier(
+            heightProperty: dimensionStyle?.height,
+            minimum: dimensionStyle?.minHeight,
+            maximum: dimensionStyle?.maxHeight,
+            alignment: verticalAlignment.getAlignment(),
+            defaultHeight: .wrapContent,
+            parentHeight: parentHeight
+        )
+        return heightModifier.frameMaxHeight
+    }
+
     var body: some View {
         ScrollView(.vertical) {
             ColumnComponent(config: config,
@@ -84,11 +97,21 @@ struct ScrollableColumnComponent: View {
                             styleState: $styleState,
                             parentOverride: parentOverride)
             .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment in
-                if let newMaxHeight = newSizeWithMax.maxHeight {
-                    contentMaxHeight = newMaxHeight
+                // Prioritize dimension maxHeight over weight maxHeight
+                if let dimensionMax = dimensionMaxHeight {
+                    contentMaxHeight = dimensionMax
+                } else if let weightMaxHeight = newSizeWithMax.maxHeight {
+                    contentMaxHeight = weightMaxHeight
                 } else {
-                    contentHeight = newSizeWithMax.size.height
+                    contentMaxHeight = nil
                 }
+
+                if contentMaxHeight == nil {
+                    contentHeight = newSizeWithMax.size.height
+                } else {
+                    contentHeight = nil
+                }
+
                 contentAlignment = newAlignment
             }
         }

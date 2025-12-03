@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix ScrollableColumn and ScrollableRow ignoring dimension maxHeight/maxWidth constraints when weight is set
+
 ## [0.7.4] - 2025-10-24
 
 ### Added
