@@ -391,6 +391,64 @@ final class TestEventProcessor: XCTestCase {
         XCTAssertEqual(receivedPayload?.count, 4, "Should have 4 events total")
     }
 
+    func testSignalCartItemInstantPurchaseInitiatedNotDeduplicated() {
+        let expectation = expectation(description: "test SignalCartItemInstantPurchaseInitiated not deduplicated")
+        var receivedPayload: [RoktEventRequest]?
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            guard let self else {
+                XCTFail("Fail self")
+                return
+            }
+            receivedPayload = deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        let date = Date()
+
+        // Create identical SignalCartItemInstantPurchaseInitiated events
+        // These should NOT be deduplicated even though they have identical properties
+        let devicePayEvent = mockEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value"]
+        )
+
+        // Send the same event multiple times
+        sut.handle(event: devicePayEvent)
+        sut.handle(event: devicePayEvent) // Exact duplicate - should NOT be deduplicated
+        sut.handle(event: devicePayEvent) // Another duplicate - should NOT be deduplicated
+
+        // For comparison, send a SignalViewed event that should be deduplicated
+        let viewedEvent = mockEvent(
+            eventType: .SignalViewed,
+            date: date,
+            sessionId: "session1",
+            parentGuid: "parent1",
+            pageInstanceGuid: "page1",
+            eventData: ["key": "value"]
+        )
+        sut.handle(event: viewedEvent)
+        sut.handle(event: viewedEvent) // Duplicate - should be deduplicated
+
+        wait(for: [expectation], timeout: 1)
+
+        // Verify results
+        XCTAssertNotNil(receivedPayload, "Payload should not be nil")
+
+        // SignalCartItemInstantPurchaseInitiated events should all pass through (3 events)
+        let devicePayEvents = receivedPayload?.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }
+        XCTAssertEqual(devicePayEvents?.count, 3, "SignalCartItemInstantPurchaseInitiated events should not be deduplicated")
+
+        // SignalViewed event should be deduplicated (1 event)
+        let viewedEvents = receivedPayload?.filter { $0.eventType == .SignalViewed }
+        XCTAssertEqual(viewedEvents?.count, 1, "SignalViewed events should be deduplicated")
+
+        // Total should be 4 events (3 SignalCartItemInstantPurchaseInitiated + 1 SignalViewed)
+        XCTAssertEqual(receivedPayload?.count, 4, "Should have 4 events total")
+    }
+
     func testDelayProcessorDeallocation() {
         let expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?

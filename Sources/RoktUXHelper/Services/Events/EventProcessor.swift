@@ -31,7 +31,8 @@ class EventProcessor: EventProcessing {
 
     /// Event types that should bypass deduplication logic
     private static let excludedFromDeduplication: Set<RoktUXEventType> = [
-        .SignalUserInteraction
+        .SignalUserInteraction,
+        .SignalCartItemInstantPurchaseInitiated
     ]
 
     init(
