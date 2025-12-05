@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.5] - 2025-12-05
+
 ### Fixed
 
 - Fix ScrollableColumn and ScrollableRow ignoring dimension maxHeight/maxWidth constraints when weight is set
@@ -128,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.5...HEAD
+[0.7.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...0.7.5
 [0.7.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.3...0.7.4
 [0.7.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.2...0.7.3
 [0.7.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...0.7.2
