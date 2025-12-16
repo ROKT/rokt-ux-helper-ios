@@ -22,14 +22,13 @@ runs:
         model: iPhone 16
         os: iOS
         os_version: ">=18.0"
-        erase_before_boot: true
         wait_for_boot: true
         shutdown_after_job: true
 
     - name: Run unit tests
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.UDID }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.udid }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
 
