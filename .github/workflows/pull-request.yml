@@ -40,6 +40,7 @@ jobs:
 
       - name: Run unit tests
         uses: ./.github/composite_actions/run_xcodebuild_tests
+        timeout-minutes: 15
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
