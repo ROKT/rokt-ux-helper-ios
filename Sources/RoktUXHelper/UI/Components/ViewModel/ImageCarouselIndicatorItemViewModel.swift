@@ -84,7 +84,8 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
             offers: []
         )
 
-        let whenSeen = whenNode(index: index, condition: .isBelow, style: seenStyle, layoutState: layoutState)
+        // imageCarouselPosition is the current progress; "seen" means current progress > this index.
+        let whenSeen = whenNode(index: index, condition: .isAbove, style: seenStyle, layoutState: layoutState)
         let whenActive = whenNode(
             index: index,
             condition: .is,
@@ -92,7 +93,8 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
             layoutState: layoutState,
             child: progressViewModel
         )
-        let whenNotSeen = whenNode(index: index, condition: .isAbove, style: indicatorStyle, layoutState: layoutState)
+        // "not seen" means current progress < this index.
+        let whenNotSeen = whenNode(index: index, condition: .isBelow, style: indicatorStyle, layoutState: layoutState)
 
         super.init(
             children: [whenSeen, whenActive, whenNotSeen],
