@@ -100,7 +100,15 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
             children: [whenSeen, whenActive, whenNotSeen],
             stylingProperties: [
                 .init(
-                    default: .wrapContentStyle,
+                    default: BaseStyles(
+                        background: BackgroundStylingProperties(backgroundColor: nil, backgroundImage: nil),
+                        border: nil,
+                        container: nil,
+                        dimension: BaseStyles.wrapContentStyle.dimension,
+                        flexChild: nil,
+                        spacing: nil,
+                        text: nil
+                    ),
                     pressed: nil,
                     hovered: nil,
                     disabled: nil
