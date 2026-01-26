@@ -11,7 +11,6 @@ This is a Swift Package Manager (SPM) project for iOS that provides SDK function
 - **Sources/RoktUXHelper/**: Main library source code
 - **Tests/RoktUXHelperTests/**: Unit tests and test resources
 - **Example/**: Example app demonstrating library usage
-- **fastlane/**: CI/CD automation
 - **.github/**: GitHub Actions workflows
 
 ## Key Technologies
