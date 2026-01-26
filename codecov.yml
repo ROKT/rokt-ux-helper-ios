@@ -12,7 +12,6 @@ coverage:
 ignore:
   - Example/**
   - Tests/**
-  - fastlane/**
   - .github/**
   - DerivedData/**
   - .swiftpm/**
@@ -20,7 +19,6 @@ ignore:
   - "*.yml"
   - "*.yaml"
   - "*.lock"
-  - Gemfile*
   - Package.resolved
   - VERSION
   - LICENSE.md
