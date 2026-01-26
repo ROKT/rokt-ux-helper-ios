@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix inverted DataImageCarousel indicator colors (seen vs not-seen styles)
+- Fix ImageCarouselIndicator item inheriting background color from container instead of using transparent background
+
 ## [0.7.5] - 2025-12-10
 
 ### Fixed
