@@ -15,10 +15,20 @@ runs:
       with:
         xcode-version: 16.4.0
 
+    - name: Setup iOS Simulator
+      uses: futureware-tech/simulator-action@v4
+      id: simulator
+      with:
+        model: iPhone 16
+        os: iOS
+        os_version: ">=18.0"
+        wait_for_boot: true
+        shutdown_after_job: true
+
     - name: Run unit tests
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.udid }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
 

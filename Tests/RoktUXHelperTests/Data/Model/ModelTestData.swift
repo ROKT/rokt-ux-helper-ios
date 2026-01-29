@@ -130,6 +130,10 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_accessibility_grouped_row")
             return try! JSONDecoder().decode(AccessibilityGroupedModel<AccessibilityGroupedLayoutChildren>.self, from: data)
         }
+        static func scrollableRowWithMaxWidth() -> RowModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_row_with_max_width")
+            return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
     }
     enum ColumnData {
         static func columnWithBasicText() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
@@ -146,6 +150,10 @@ class ModelTestData: NSObject {
         }
         static func columnWithOffset() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_column_with_offset")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableColumnWithMaxHeight() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_with_max_height")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }

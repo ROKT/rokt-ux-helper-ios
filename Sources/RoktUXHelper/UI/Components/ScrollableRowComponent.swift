@@ -43,6 +43,7 @@ struct ScrollableRowComponent: View {
     @State var breakpointIndex: Int = 0
 
     var containerStyle: ContainerStylingProperties? { style?.container }
+    var dimensionStyle: DimensionStylingProperties? { style?.dimension }
     var flexStyle: FlexChildStylingProperties? { style?.flexChild }
 
     let parentOverride: ComponentParentOverride?
@@ -74,6 +75,18 @@ struct ScrollableRowComponent: View {
                                   horizontalAlignment: horizontalAlignment.getAlignment())
     }
 
+    var dimensionMaxWidth: CGFloat? {
+        let widthModifier = WidthModifier(
+            widthProperty: dimensionStyle?.width,
+            minimum: dimensionStyle?.minWidth,
+            maximum: dimensionStyle?.maxWidth,
+            alignment: horizontalAlignment.getAlignment(),
+            defaultWidth: .wrapContent,
+            parentWidth: parentWidth
+        )
+        return widthModifier.frameMaxWidth
+    }
+
     var body: some View {
         ScrollView(.horizontal) {
             RowComponent(config: config,
@@ -83,7 +96,13 @@ struct ScrollableRowComponent: View {
                          styleState: $styleState,
                          parentOverride: parentOverride)
             .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment in
-                contentMaxWidth = newSizeWithMax.maxWidth ?? newSizeWithMax.size.width
+                if let dimensionMax = dimensionMaxWidth {
+                    contentMaxWidth = dimensionMax
+                } else if let weightMaxWidth = newSizeWithMax.maxWidth {
+                    contentMaxWidth = weightMaxWidth
+                } else {
+                    contentMaxWidth = newSizeWithMax.size.width
+                }
                 contentAlignment = newAlignment
             }
         }

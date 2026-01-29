@@ -9,7 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.5] - 2025-09-24
+## [0.7.6] - 2026-01-26
+
+### Fixed
+
+- Fix inverted DataImageCarousel indicator colors (seen vs not-seen styles)
+- Fix ImageCarouselIndicator item inheriting background color from container instead of using transparent background
+
+## [0.7.5] - 2025-12-10
+
+### Fixed
+
+- Fix ScrollableColumn and ScrollableRow ignoring dimension maxHeight/maxWidth constraints when weight is set
 
 ### Added
 
@@ -132,7 +143,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.6...HEAD
+[0.7.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.5...0.7.6
+[0.7.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...0.7.5
 [0.7.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.3...0.7.4
 [0.7.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.2...0.7.3
 [0.7.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.1...0.7.2
