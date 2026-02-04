@@ -157,8 +157,7 @@ struct ProgressIndicatorComponent: View {
                     availableHeight = size.height
                 }
                 .onChange(of: globalScreenSize.width) { newSize in
-                    // run it in background thread for smooth transition
-                    DispatchQueue.background.async {
+                    DispatchQueue.main.async {
                         // update breakpoint index
                         let index = min(model.layoutState?.getGlobalBreakpointIndex(newSize) ?? 0,
                                         (model.defaultStyle?.count ?? 1) - 1)
