@@ -143,7 +143,7 @@ extension RoktLayoutUIView: LayoutLoader {
         addSubview(swiftUIView)
         addEmbeddedLayoutConstraints(embeddedView: swiftUIView)
         vc.didMove(toParent: parentViewControllers)
-        config?.debugLog("Rokt: Embedded view attached to the screen")
+        RoktUXLogger.shared.debug("Embedded view attached to the screen")
     }
 
     /// Updates the size of the embedded view.
@@ -151,7 +151,7 @@ extension RoktLayoutUIView: LayoutLoader {
     public func updateEmbeddedSize(_ size: CGFloat) {
         if roktEmbeddedSwiftUIView != nil {
             heightConstraint.constant = size
-            config?.debugLog("Rokt: Embedded height resized to \(size)")
+            RoktUXLogger.shared.debug("Embedded height resized to \(size)")
         }
     }
 
@@ -164,6 +164,6 @@ extension RoktLayoutUIView: LayoutLoader {
         roktEmbeddedSwiftUIView = nil
         // notify the changes
         onEmbeddedSizeChange?(0)
-        config?.debugLog("Rokt: User journey ended on Embedded view")
+        RoktUXLogger.shared.debug("User journey ended on Embedded view")
     }
 }

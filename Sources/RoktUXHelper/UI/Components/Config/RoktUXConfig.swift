@@ -92,11 +92,3 @@ public struct RoktUXConfig {
         }
     }
 }
-
-extension RoktUXConfig {
-    func debugLog(_ message: String) {
-        if logLevel != .none {
-            RoktUXLogger.shared.debug(message)
-        }
-    }
-}
