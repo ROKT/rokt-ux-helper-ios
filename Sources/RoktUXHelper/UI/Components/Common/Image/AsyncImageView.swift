@@ -86,7 +86,7 @@ struct AsyncImageView: View {
     }
 
     func setImageAsInvalid() {
-        DispatchQueue.background.async {
+        DispatchQueue.main.async {
             isImageValid = false
         }
     }
