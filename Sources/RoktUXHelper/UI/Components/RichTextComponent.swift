@@ -133,16 +133,12 @@ struct RichTextComponent: View {
                     imageLoader: model.imageLoader
                 )
                 .onChange(of: globalScreenSize.width) { newSize in
-                    // run it in background thread for smooth transition
-                    DispatchQueue.background.async {
+                    DispatchQueue.main.async {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
                         breakpointLinkIndex = model.updateBreakpointLinkIndex(for: newSize)
-
-                        DispatchQueue.main.async {
-                            model.breakpointIndex = breakpointIndex
-                            model.breakpointLinkIndex = breakpointLinkIndex
-                            model.updateAttributedString(colorScheme)
-                        }
+                        model.breakpointIndex = breakpointIndex
+                        model.breakpointLinkIndex = breakpointLinkIndex
+                        model.updateAttributedString(colorScheme)
                     }
                 }
                 .onChange(of: colorScheme) { newSchema in
