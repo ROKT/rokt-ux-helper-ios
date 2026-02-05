@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add configurable log levels via `RoktUX.setLogLevel(_:)` and `RoktUXConfig.Builder.logLevel(_:)`
+
+### Deprecated
+
+- Deprecate `RoktUXConfig.Builder.enableLogging(_:)` in favor of `logLevel(_:)`
+
 ### Fixed
 
 - Fix crash when HTML to AttributedString conversion occurs on background thread

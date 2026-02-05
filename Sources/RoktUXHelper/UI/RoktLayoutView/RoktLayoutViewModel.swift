@@ -61,7 +61,7 @@ extension RoktLayoutViewModel: LayoutLoader {
     ///   - injectedView: A closure returning the SwiftUI view to embed.
     public func load<Content: View>(onSizeChanged: @escaping ((CGFloat) -> Void),
                                     @ViewBuilder injectedView: @escaping () -> Content) {
-        config?.debugLog("Rokt: Embedded view attached to the screen")
+        RoktUXLogger.shared.debug("Embedded view attached to the screen")
         state = .ready(AnyView(injectedView()))
     }
 
@@ -69,11 +69,11 @@ extension RoktLayoutViewModel: LayoutLoader {
     public func closeEmbedded() {
         updateEmbeddedSize(0)
         state = .empty
-        config?.debugLog("Rokt: User journey ended on Embedded view")
+        RoktUXLogger.shared.debug("User journey ended on Embedded view")
     }
 
     public func updateEmbeddedSize(_ size: CGFloat) {
         height = size
-        config?.debugLog("Rokt: Embedded height resized to \(size)")
+        RoktUXLogger.shared.debug("Embedded height resized to \(size)")
     }
 }
