@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix crash when HTML to AttributedString conversion occurs on background thread
+
 ## [0.7.6] - 2026-01-26
 
 ### Fixed
