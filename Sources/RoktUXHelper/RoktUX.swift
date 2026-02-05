@@ -52,6 +52,9 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
+        if let configLogLevel = config?.logLevel, configLogLevel != .none {
+            RoktUXLogger.shared.logLevel = configLogLevel
+        }
         RoktUXLogger.shared.verbose("loadLayout called with S2S integration type")
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
@@ -128,6 +131,9 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
+        if let configLogLevel = config?.logLevel, configLogLevel != .none {
+            RoktUXLogger.shared.logLevel = configLogLevel
+        }
         RoktUXLogger.shared.verbose("loadLayout called with SDK integration type")
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType,
