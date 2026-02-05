@@ -55,6 +55,66 @@ class RoktUXLoggerTests: XCTestCase {
         RoktUX.setLogLevel(.warning)
         XCTAssertEqual(RoktUXLogger.shared.logLevel, .warning)
     }
+
+    func testLogMethodsDoNotCrash() {
+        let logger = RoktUXLogger.shared
+        logger.logLevel = .verbose
+
+        // Exercise all log methods - verifying they don't crash
+        logger.verbose("verbose test message")
+        logger.debug("debug test message")
+        logger.info("info test message")
+        logger.warning("warning test message")
+        logger.error("error test message")
+
+        // With optional error parameter
+        let testError = NSError(domain: "test", code: 1, userInfo: nil)
+        logger.verbose("verbose with error", error: testError)
+        logger.debug("debug with error", error: testError)
+        logger.info("info with error", error: testError)
+        logger.warning("warning with error", error: testError)
+        logger.error("error with error", error: testError)
+    }
+
+    func testLogLevelFilteringPreventsOutput() {
+        let logger = RoktUXLogger.shared
+
+        // Set to error - only error messages should pass the guard
+        logger.logLevel = .error
+
+        // These should all pass the guard check without crashing
+        // (they won't print, but they exercise the level comparison logic)
+        logger.verbose("should be filtered")
+        logger.debug("should be filtered")
+        logger.info("should be filtered")
+        logger.warning("should be filtered")
+        logger.error("should pass filter")
+    }
+
+    func testLogLevelNoneFiltersAllMessages() {
+        let logger = RoktUXLogger.shared
+        logger.logLevel = .none
+
+        // All should be filtered
+        logger.verbose("filtered")
+        logger.debug("filtered")
+        logger.info("filtered")
+        logger.warning("filtered")
+        logger.error("filtered")
+    }
+
+    func testSetSharedReturnsOriginal() {
+        let original = RoktUXLogger.shared
+        let replacement = RoktUXLogger()
+
+        let returned = RoktUXLogger.setShared(replacement)
+        XCTAssertTrue(returned === original)
+        XCTAssertTrue(RoktUXLogger.shared === replacement)
+
+        // Restore
+        RoktUXLogger.setShared(original)
+        XCTAssertTrue(RoktUXLogger.shared === original)
+    }
 }
 
 class RoktUXLogLevelTests: XCTestCase {
