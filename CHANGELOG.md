@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix potential crashes from Combine subscriptions not being properly cancelled in ViewModels
 - Fix crashes caused by SwiftUI state updates occurring on background threads
 
 ## [0.7.6] - 2026-01-26

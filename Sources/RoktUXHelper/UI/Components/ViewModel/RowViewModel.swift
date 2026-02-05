@@ -63,4 +63,9 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling
                 animate = shouldApply() && !animatableStyle.isNil
             }
     }
+
+    deinit {
+        cancellable?.cancel()
+        cancellable = nil
+    }
 }
