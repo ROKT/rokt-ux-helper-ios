@@ -83,10 +83,16 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
         self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         updateBoundValueWithStyling()
-        cancellable = layoutState?.itemsPublisher.sink { newValue in
+        cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
+            guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
             self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         }
+    }
+
+    deinit {
+        cancellable?.cancel()
+        cancellable = nil
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
@@ -157,17 +163,30 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
 
-        guard let htmlTransformedValue = try? valueToTransform.htmlToAttributedString(
-            textColorHex: breakpointDefaultStyle.text?.textColor?.getAdaptiveColor(colorScheme),
-            uiFont: breakpointDefaultStyle.text?.styledUIFont,
-            linkStyles: breakpointLinkStyle?.text,
-            colorScheme: colorScheme
-        ) else {
-            attributedString = NSAttributedString(string: valueToTransform)
-            return
+        // Ensure HTML parsing runs on main thread
+        let performTransformation = { [weak self] in
+            guard let self else { return }
+
+            guard let htmlTransformedValue = try? valueToTransform.htmlToAttributedString(
+                textColorHex: breakpointDefaultStyle.text?.textColor?.getAdaptiveColor(colorScheme),
+                uiFont: breakpointDefaultStyle.text?.styledUIFont,
+                linkStyles: breakpointLinkStyle?.text,
+                colorScheme: colorScheme
+            ) else {
+                self.attributedString = NSAttributedString(string: valueToTransform)
+                return
+            }
+
+            self.attributedString = htmlTransformedValue
         }
 
-        attributedString = htmlTransformedValue
+        if Thread.isMainThread {
+            performTransformation()
+        } else {
+            DispatchQueue.main.async {
+                performTransformation()
+            }
+        }
     }
 
     func updateAttributedString(_ colorScheme: ColorScheme) {

@@ -533,7 +533,7 @@ struct EqualStretchModifier: ViewModifier {
                     .onChange(of: frameChangeIndex) { newChange in
                         // No need to change for the first time
                         if newChange > 1 {
-                            DispatchQueue.background.async {
+                            DispatchQueue.main.async {
                                 verticalFixSize = false
                                 horizontalFixSize = false
                                 show = false
@@ -544,7 +544,7 @@ struct EqualStretchModifier: ViewModifier {
                 content
                     .onAppear {
                         // To bring fixedSize back after resizing
-                        DispatchQueue.background.async {
+                        DispatchQueue.main.async {
                             show = true
                             verticalFixSize = vertical
                             horizontalFixSize = horizontal
