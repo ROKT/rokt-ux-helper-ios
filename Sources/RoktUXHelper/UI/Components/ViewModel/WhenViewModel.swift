@@ -72,4 +72,9 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling, ObservableObject
             }
         }?.first ?? 0
     }
+
+    deinit {
+        cancellable?.cancel()
+        cancellable = nil
+    }
 }
