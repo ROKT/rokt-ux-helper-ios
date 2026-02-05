@@ -21,6 +21,12 @@ public class RoktUX: UXEventsDelegate {
      */
     public static var integrationInfo: RoktIntegrationInfo { RoktIntegrationInfo.shared }
 
+    /// Sets the log level for RoktUXHelper console output.
+    /// - Parameter logLevel: The minimum log level to display. Default is `.none`.
+    public static func setLogLevel(_ logLevel: RoktUXLogLevel) {
+        RoktUXLogger.shared.logLevel = logLevel
+    }
+
     private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
     private var eventServices: [String: EventService] = [:]
 
@@ -46,6 +52,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
+        RoktUXLogger.shared.verbose("loadLayout called with S2S integration type")
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -55,6 +62,7 @@ public class RoktUX: UXEventsDelegate {
                                                    processor: processor)
 
             if let layoutPlugins = layoutPage.layoutPlugins {
+                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = layoutLoaders?.first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
@@ -76,6 +84,7 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                RoktUXLogger.shared.warning("No layouts found in experience response")
                 config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
@@ -83,6 +92,7 @@ public class RoktUX: UXEventsDelegate {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            RoktUXLogger.shared.error("Failed to parse experience response", error: error)
             config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
@@ -120,6 +130,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
+        RoktUXLogger.shared.verbose("loadLayout called with SDK integration type")
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
@@ -130,6 +141,7 @@ public class RoktUX: UXEventsDelegate {
                                                    processor: processor)
 
             if let layoutPlugins = layoutPage.layoutPlugins {
+                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                         .first { $0.key == layoutPlugin.targetElementSelector }?
@@ -156,6 +168,7 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
+                RoktUXLogger.shared.warning("No layouts found in experience response")
                 config?.debugLog("Rokt: No Layouts")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
@@ -163,6 +176,7 @@ public class RoktUX: UXEventsDelegate {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
+            RoktUXLogger.shared.error("Failed to parse experience response", error: error)
             config?.debugLog("Rokt: Invalid schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }

@@ -19,17 +19,17 @@ public struct RoktUXConfig {
     let colorMode: ColorMode
     /// Optional image loader for the UX.
     let imageLoader: RoktUXImageLoader?
-    /// A Boolean value that determines whether debug logging is enabled.
-    let loggingEnabled: Bool
+    /// The log level for this configuration instance.
+    let logLevel: RoktUXLogLevel
 
     private init(
         colorMode: ColorMode,
         imageLoader: RoktUXImageLoader?,
-        loggingEnabled: Bool
+        logLevel: RoktUXLogLevel
     ) {
         self.colorMode = colorMode
         self.imageLoader = imageLoader
-        self.loggingEnabled = loggingEnabled
+        self.logLevel = logLevel
     }
 
     /// Enum representing the color modes available.
@@ -46,7 +46,7 @@ public struct RoktUXConfig {
     public class Builder: NSObject {
         var colorMode: ColorMode?
         weak var imageLoader: RoktUXImageLoader?
-        var loggingEnabled: Bool?
+        var logLevel: RoktUXLogLevel?
 
         /// Sets the color mode for the configuration.
         /// - Parameter colorMode: The color mode to be set.
@@ -67,8 +67,17 @@ public struct RoktUXConfig {
         /// Enables or disables debug logging for the RoktUXConfig.
         /// - Parameter enable: A Boolean value indicating whether debug logging should be enabled.
         /// - Returns: The Builder instance with the updated logging configuration.
+        @available(*, deprecated, message: "Use logLevel(_:) instead")
         public func enableLogging(_ enable: Bool) -> Builder {
-            self.loggingEnabled = enable
+            self.logLevel = enable ? .debug : RoktUXLogLevel.none
+            return self
+        }
+
+        /// Sets the log level for the RoktUXConfig.
+        /// - Parameter logLevel: The log level to be set.
+        /// - Returns: The Builder instance with the updated log level configuration.
+        public func logLevel(_ logLevel: RoktUXLogLevel) -> Builder {
+            self.logLevel = logLevel
             return self
         }
 
@@ -78,7 +87,7 @@ public struct RoktUXConfig {
             RoktUXConfig(
                 colorMode: colorMode ?? .system,
                 imageLoader: imageLoader,
-                loggingEnabled: loggingEnabled ?? false
+                logLevel: logLevel ?? .none
             )
         }
     }
@@ -86,8 +95,8 @@ public struct RoktUXConfig {
 
 extension RoktUXConfig {
     func debugLog(_ message: String) {
-        if loggingEnabled {
-            debugPrint(message)
+        if logLevel != .none {
+            RoktUXLogger.shared.debug(message)
         }
     }
 }
