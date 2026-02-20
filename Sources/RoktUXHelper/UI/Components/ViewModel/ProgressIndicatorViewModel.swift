@@ -64,10 +64,16 @@ class ProgressIndicatorViewModel: Identifiable, Hashable {
         self.viewableItems = layoutState.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
         self.currentIndex = layoutState.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
 
-        cancellable = layoutState.itemsPublisher.sink { newValue in
+        cancellable = layoutState.itemsPublisher.sink { [weak self] newValue in
+            guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
             self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         }
+    }
+
+    deinit {
+        cancellable?.cancel()
+        cancellable = nil
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {

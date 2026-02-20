@@ -94,8 +94,7 @@ struct ImageCarouselIndicator: View {
                 model.shouldUpdate(size)
             }
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
-                DispatchQueue.background.async {
+                DispatchQueue.main.async {
                     // update breakpoint index
                     model.shouldUpdateBreakpoint(newSize)
                 }
