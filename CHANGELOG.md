@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-02-05
+
+### Added
+
+- Add configurable log levels via `RoktUX.setLogLevel(_:)` and `RoktUXConfig.Builder.logLevel(_:)`
+
+### Deprecated
+
+- Deprecate `RoktUXConfig.Builder.enableLogging(_:)` in favor of `logLevel(_:)`
+
+### Fixed
+
+- Fix crash when HTML to AttributedString conversion occurs on background thread
+- Fix potential crashes from Combine subscriptions not being properly cancelled in ViewModels
+- Fix crashes caused by SwiftUI state updates occurring on background threads
+
 ## [0.7.6] - 2026-01-26
 
 ### Fixed
@@ -143,7 +159,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.6...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.6...0.8.0
 [0.7.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.5...0.7.6
 [0.7.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...0.7.5
 [0.7.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.3...0.7.4

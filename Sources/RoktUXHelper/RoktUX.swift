@@ -22,6 +22,12 @@ public class RoktUX: UXEventsDelegate {
      */
     public static var integrationInfo: RoktIntegrationInfo { RoktIntegrationInfo.shared }
 
+    /// Sets the log level for RoktUXHelper console output.
+    /// - Parameter logLevel: The minimum log level to display. Default is `.none`.
+    public static func setLogLevel(_ logLevel: RoktUXLogLevel) {
+        RoktUXLogger.shared.logLevel = logLevel
+    }
+
     private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
     private var eventServices: [String: EventService] = [:]
 
@@ -47,6 +53,10 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void
     ) {
+        if let configLogLevel = config?.logLevel, configLogLevel != .none {
+            RoktUXLogger.shared.logLevel = configLogLevel
+        }
+        RoktUXLogger.shared.verbose("loadLayout called with S2S integration type")
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -56,6 +66,7 @@ public class RoktUX: UXEventsDelegate {
                                                    processor: processor)
 
             if let layoutPlugins = layoutPage.layoutPlugins {
+                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = layoutLoaders?.first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
@@ -77,14 +88,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
-                config?.debugLog("Rokt: No Layouts")
+                RoktUXLogger.shared.warning("No layouts found in experience response")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
-            config?.debugLog("Rokt: Invalid schema")
+            RoktUXLogger.shared.error("Failed to parse experience response", error: error)
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -121,6 +132,10 @@ public class RoktUX: UXEventsDelegate {
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
         onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
     ) {
+        if let configLogLevel = config?.logLevel, configLogLevel != .none {
+            RoktUXLogger.shared.logLevel = configLogLevel
+        }
+        RoktUXLogger.shared.verbose("loadLayout called with SDK integration type")
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
@@ -131,6 +146,7 @@ public class RoktUX: UXEventsDelegate {
                                                    processor: processor)
 
             if let layoutPlugins = layoutPage.layoutPlugins {
+                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                         .first { $0.key == layoutPlugin.targetElementSelector }?
@@ -157,14 +173,14 @@ public class RoktUX: UXEventsDelegate {
                 sendDiagnostics(code: kAPIExecuteErrorCode,
                                 callStack: kEmptyResponse,
                                 processor: processor)
-                config?.debugLog("Rokt: No Layouts")
+                RoktUXLogger.shared.warning("No layouts found in experience response")
                 onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
             }
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
                             processor: processor)
-            config?.debugLog("Rokt: Invalid schema")
+            RoktUXLogger.shared.error("Failed to parse experience response", error: error)
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
     }
@@ -354,13 +370,13 @@ public class RoktUX: UXEventsDelegate {
             // invalid color error
             eventService.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kColorInvalid + color)
-            config?.debugLog("Rokt: Invalid color in schema")
+            RoktUXLogger.shared.error("Invalid color in schema: \(color)")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         } catch {
             // generic validation error
             eventService.sendDiagnostics(message: kValidationErrorCode,
                                          callStack: kLayoutInvalid)
-            config?.debugLog("Rokt: Invalid schema")
+            RoktUXLogger.shared.error("Invalid layout schema")
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
         }
     }
@@ -405,7 +421,7 @@ public class RoktUX: UXEventsDelegate {
                     eventService?.sendDiagnostics(message: kAPIExecuteErrorCode,
                                                   callStack: kEmbeddedLayoutDoesntExistMessage
                                                     + targetElement + kLocationDoesNotExist)
-                    config?.debugLog("Rokt: Embedded layout doesn't exist")
+                    RoktUXLogger.shared.warning("Embedded layout doesn't exist for target: \(targetElement)")
                     onUnload()
                     self.onRoktEvent?(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId))
                 }

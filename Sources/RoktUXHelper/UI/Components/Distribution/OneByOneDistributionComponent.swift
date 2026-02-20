@@ -141,8 +141,7 @@ struct OneByOneDistributionComponent: View {
                     model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
                 }
                 .onChange(of: globalScreenSize.width) { newSize in
-                    // run it in background thread for smooth transition
-                    DispatchQueue.background.async {
+                    DispatchQueue.main.async {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
                         frameChangeIndex += 1
                     }
@@ -222,11 +221,8 @@ struct OneByOneDistributionComponent: View {
             }
 
             // Wait to complete fade out of previous offer
-            // Must not run on `main` as that prevents `@State` from changing
-            DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                DispatchQueue.main.async {
-                    incrementCurrentOffer()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                incrementCurrentOffer()
             }
         default:
             incrementCurrentOffer()
@@ -242,11 +238,8 @@ struct OneByOneDistributionComponent: View {
             }
 
             // Wait to complete fade out of previous offer
-            // Must not run on `main` as that prevents `@State` from changing
-            DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                DispatchQueue.main.async {
-                    decrementCurrentOffer()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                decrementCurrentOffer()
             }
         default:
             decrementCurrentOffer()

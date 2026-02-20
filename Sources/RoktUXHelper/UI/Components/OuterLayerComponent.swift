@@ -86,10 +86,9 @@ struct OuterLayerComponent: View {
                 .readSize(spacing: spacingStyle) { size in
                     availableWidth = size.width
                     availableHeight = size.height
-                    DispatchQueue.background.async {
+                    DispatchQueue.main.async {
                         notifyHeightChanged(size.height)
                     }
-
                 }
                 .onLoad {
                     viewModel.sendOnLoadEvents()

@@ -107,9 +107,8 @@ struct RowComponent: View {
                 availableHeight = size.height
             }
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
                 model.width = newSize ?? 0
-                DispatchQueue.background.async {
+                DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
                     updateStyle()

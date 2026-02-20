@@ -175,8 +175,7 @@ struct GroupedDistributionComponent: View {
                     model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
                 }
                 .onChange(of: globalScreenSize.width) { newSize in
-                    // run it in background thread for smooth transition
-                    DispatchQueue.background.async {
+                    DispatchQueue.main.async {
                         breakpointIndex = model.updateBreakpointIndex(for: newSize)
                         frameChangeIndex += 1
                         setViewableItemsForBreakpoint(newSize)
@@ -297,11 +296,8 @@ struct GroupedDistributionComponent: View {
             }
 
             // Wait to complete fade out of previous offer
-            // Must not run on `main` as that prevents `@State` from changing
-            DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                DispatchQueue.main.async {
-                    incrementCurrentGroup()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                incrementCurrentGroup()
             }
         default:
             incrementCurrentGroup()
@@ -317,11 +313,8 @@ struct GroupedDistributionComponent: View {
             }
 
             // Wait to complete fade out of previous offer
-            // Must not run on `main` as that prevents `@State` from changing
-            DispatchQueue.background.asyncAfter(deadline: .now() + duration) {
-                DispatchQueue.main.async {
-                    decrementCurrentGroup()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                decrementCurrentGroup()
             }
         default:
             decrementCurrentGroup()

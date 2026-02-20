@@ -114,7 +114,7 @@ struct CatalogCombinedCollectionComponent: View {
                 availableHeight = size.height
             }
             .onChange(of: globalScreenSize.width) { newSize in
-                DispatchQueue.background.async {
+                DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
                 }

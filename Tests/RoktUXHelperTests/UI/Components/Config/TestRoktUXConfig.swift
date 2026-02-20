@@ -20,7 +20,7 @@ class RoktUXConfigTests: XCTestCase {
         let config = RoktUXConfig.Builder().build()
         XCTAssertEqual(config.colorMode, .system)
         XCTAssertNil(config.imageLoader)
-        XCTAssertFalse(config.loggingEnabled)
+        XCTAssertEqual(config.logLevel, .none)
     }
 
     func testCustomColorMode() {
@@ -39,11 +39,32 @@ class RoktUXConfigTests: XCTestCase {
         XCTAssertTrue(config.imageLoader === mockImageLoader)
     }
 
-    func testEnableLogging() {
+    func testLogLevel() {
+        let config = RoktUXConfig.Builder()
+            .logLevel(.debug)
+            .build()
+        XCTAssertEqual(config.logLevel, .debug)
+    }
+
+    func testLogLevelVerbose() {
+        let config = RoktUXConfig.Builder()
+            .logLevel(.verbose)
+            .build()
+        XCTAssertEqual(config.logLevel, .verbose)
+    }
+
+    func testDeprecatedEnableLogging() {
         let config = RoktUXConfig.Builder()
             .enableLogging(true)
             .build()
-        XCTAssertTrue(config.loggingEnabled)
+        XCTAssertEqual(config.logLevel, .debug)
+    }
+
+    func testDeprecatedEnableLoggingFalse() {
+        let config = RoktUXConfig.Builder()
+            .enableLogging(false)
+            .build()
+        XCTAssertEqual(config.logLevel, .none)
     }
 }
 

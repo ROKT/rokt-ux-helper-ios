@@ -165,8 +165,7 @@ struct ToggleButtonComponent: View {
     func build() -> some View {
         createContainer()
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
-                DispatchQueue.background.async {
+                DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
                 }

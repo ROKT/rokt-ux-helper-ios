@@ -94,10 +94,16 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
 
-        cancellable = layoutState?.itemsPublisher.sink { newValue in
+        cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
+            guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
             self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         }
+    }
+
+    deinit {
+        cancellable?.cancel()
+        bag.removeAll()
     }
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
