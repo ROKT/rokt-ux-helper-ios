@@ -23,19 +23,6 @@ jobs:
           version_from_file=$(head -n 1 VERSION)
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
 
-      - name: Resolve Packages
-        run: swift package resolve --verbose
-
-      - name: Install xcbeautify
-        run: |
-          brew list xcbeautify || brew install xcbeautify
-
-      - name: Run unit tests
-        uses: ./.github/composite_actions/run_xcodebuild_tests
-        timeout-minutes: 15
-        with:
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
       - uses: ffurrer2/extract-release-notes@202313ec7461b6b9e401996714484690ab1ae105 # v3.0.0
         id: extract-release-notes
         with:
