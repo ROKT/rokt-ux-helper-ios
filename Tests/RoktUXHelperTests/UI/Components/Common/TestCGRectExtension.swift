@@ -112,4 +112,19 @@ class TestCGRectExtension: XCTestCase {
         let result = rect1.intersectPercentWithFrame(rect2)
         XCTAssertEqual(result, 0.125, "Should return 0.125 when rect2 covers exactly 1/8 of rect1")
     }
+
+    func testIntersectPercentWithFrame_DependsOnReceiverArea() {
+        let screenRect = CGRect(x: 0, y: 0, width: 400, height: 800)
+        let viewRect = CGRect(x: 0, y: 0, width: 200, height: 200)
+
+        let visiblePercentOfView = viewRect.intersectPercentWithFrame(screenRect)
+        let coveredPercentOfScreen = screenRect.intersectPercentWithFrame(viewRect)
+
+        XCTAssertEqual(visiblePercentOfView, 1.0, "Using the view rect as receiver should measure visible percent of the view")
+        XCTAssertEqual(
+            coveredPercentOfScreen,
+            0.125,
+            "Using the screen rect as receiver should measure covered percent of the screen"
+        )
+    }
 }
