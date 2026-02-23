@@ -161,7 +161,7 @@ private struct BecomingViewedModifier: ViewModifier {
                 let proxySize = proxy.size
                 let proxyFrame = proxy.frame(in: .global)
                 visibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-                    let currentIntersect = UIScreen.main.bounds.intersectPercentWithFrame(proxyFrame)
+                    let currentIntersect = proxyFrame.intersectPercentWithFrame(UIScreen.main.bounds)
                     if currentIntersect > 0.5 {
                         let info = ComponentVisibilityInfo(
                             isVisible: true,

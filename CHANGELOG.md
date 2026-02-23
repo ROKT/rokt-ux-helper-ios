@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `SignalViewed` visibility timer check so offers emit viewed events at 50%+ visibility without requiring interaction.
+
 ## [0.8.0] - 2026-02-05
 
 ### Added
