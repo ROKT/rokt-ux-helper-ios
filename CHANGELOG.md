@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-02-23
+
 ### Fixed
 
 - Fix `SignalViewed` visibility timer check so offers emit viewed events at 50%+ visibility without requiring interaction.
@@ -157,7 +159,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.1...HEAD
+[0.8.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.6...0.8.0
 [0.7.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.5...0.7.6
 [0.7.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.4...0.7.5
