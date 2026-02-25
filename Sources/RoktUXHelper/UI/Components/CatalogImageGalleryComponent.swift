@@ -12,33 +12,82 @@
 import SwiftUI
 import DcuiSchema
 
-struct PassthroughTapView: UIViewRepresentable {
+struct GalleryGestureView: UIViewRepresentable {
     var onTap: (CGPoint) -> Void
+    var onPanChanged: ((CGFloat) -> Void)?
+    var onPanEnded: ((CGFloat) -> Void)?
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
 
-        view.addGestureRecognizer(UITapGestureRecognizer(
+        let tap = UITapGestureRecognizer(
             target: context.coordinator,
             action: #selector(Coordinator.handleTap(_:))
-        ))
+        )
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+
+        let pan = UIPanGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handlePan(_:))
+        )
+        pan.delegate = context.coordinator
+        view.addGestureRecognizer(pan)
 
         return view
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onTap: onTap)
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.onTap = onTap
+        context.coordinator.onPanChanged = onPanChanged
+        context.coordinator.onPanEnded = onPanEnded
     }
 
-    class Coordinator: NSObject {
-        let onTap: (CGPoint) -> Void
-        init(onTap: @escaping (CGPoint) -> Void) { self.onTap = onTap }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onTap: onTap, onPanChanged: onPanChanged, onPanEnded: onPanEnded)
+    }
+
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onTap: (CGPoint) -> Void
+        var onPanChanged: ((CGFloat) -> Void)?
+        var onPanEnded: ((CGFloat) -> Void)?
+
+        init(onTap: @escaping (CGPoint) -> Void,
+             onPanChanged: ((CGFloat) -> Void)?,
+             onPanEnded: ((CGFloat) -> Void)?) {
+            self.onTap = onTap
+            self.onPanChanged = onPanChanged
+            self.onPanEnded = onPanEnded
+        }
 
         @objc func handleTap(_ sender: UITapGestureRecognizer) {
             let location = sender.location(in: sender.view)
             onTap(location)
+        }
+
+        @objc func handlePan(_ sender: UIPanGestureRecognizer) {
+            let translation = sender.translation(in: sender.view).x
+            switch sender.state {
+            case .changed:
+                onPanChanged?(translation)
+            case .ended, .cancelled:
+                onPanEnded?(translation)
+            default:
+                break
+            }
+        }
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
+            let velocity = pan.velocity(in: pan.view)
+            return abs(velocity.x) > abs(velocity.y)
+        }
+
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
+        ) -> Bool {
+            true
         }
     }
 }
@@ -48,8 +97,8 @@ struct CatalogHSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
     let content: Content
-    let onSwipe: ((Bool) -> Void)? // true for right swipe, false for left swipe
-    @GestureState private var dragState: CGFloat = 0
+    let onSwipe: ((Bool) -> Void)?
+    @State private var dragOffset: CGFloat = 0
 
     init(page: Binding<Int>, pages: Int, onSwipe: ((Bool) -> Void)? = nil, @ViewBuilder content: () -> Content) {
         self._page = page
@@ -60,52 +109,53 @@ struct CatalogHSPageView<Content: View>: View {
 
     var body: some View {
         GeometryReader { geo in
-            let dragGesture = DragGesture(minimumDistance: 10)
-                 .updating($dragState) { value, state, _ in
-                     state = value.translation.width
-                 }
-                 .onEnded { value in
-                     let threshold = geo.size.width/2
-                     var newPage = page
-                     var swipeDirection: Bool?
+            _VariadicView.Tree(
+                CatalogHSStackPager(width: geo.size.width, page: page, dragOffset: dragOffset),
+                content: { content }
+            )
+            .animation(.easeOut(duration: 0.25), value: page)
+            .animation(.easeOut(duration: 0.25), value: dragOffset)
 
-                     if value.translation.width < -threshold {
-                         newPage += 1
-                         swipeDirection = true // Swipe right (content moves left)
-                     } else if value.translation.width > threshold {
-                         newPage -= 1
-                         swipeDirection = false // Swipe left (content moves right)
-                     }
+            GalleryGestureView(
+                onTap: { point in
+                    let isLeft = point.x < geo.size.width/2
+                    if isLeft {
+                        page = max(page - 1, 0)
+                    } else {
+                        page = min(page + 1, pages - 1)
+                    }
+                },
+                onPanChanged: { translation in
+                    dragOffset = translation
+                },
+                onPanEnded: { translation in
+                    let threshold = geo.size.width/2
+                    var newPage = page
+                    var swipeDirection: Bool?
 
-                     if let direction = swipeDirection {
-                         onSwipe?(direction)
-                     }
+                    if translation < -threshold {
+                        newPage += 1
+                        swipeDirection = true
+                    } else if translation > threshold {
+                        newPage -= 1
+                        swipeDirection = false
+                    }
 
-                     page = max(min(newPage, pages - 1), 0)
-                 }
+                    if let direction = swipeDirection {
+                        onSwipe?(direction)
+                    }
 
-            _VariadicView.Tree(CatalogHSStackPager(width: geo.size.width, page: page, dragState: dragState), content: { content })
-                .animation(.easeOut(duration: 0.25), value: page)
-                .animation(.easeOut(duration: 0.25), value: dragState)
-
-            PassthroughTapView { point in
-                let isLeft = point.x < geo.size.width/2
-
-                if isLeft {
-                    page = max(page - 1, 0)
-                } else {
-                    page = min(page + 1, pages - 1)
+                    dragOffset = 0
+                    page = max(min(newPage, pages - 1), 0)
                 }
-            }
-            .highPriorityGesture(dragGesture)
-            .allowsHitTesting(true)
+            )
         }
     }
 
     struct CatalogHSStackPager: _VariadicView_UnaryViewRoot {
         let width: CGFloat
         let page: Int
-        let dragState: CGFloat
+        let dragOffset: CGFloat
 
         func body(children: _VariadicView.Children) -> some View {
             HStack(spacing: 0) {
@@ -113,7 +163,7 @@ struct CatalogHSPageView<Content: View>: View {
                     child.frame(width: width)
                 }
             }
-            .offset(x: -CGFloat(page) * width + CGFloat(dragState))
+            .offset(x: -CGFloat(page) * width + dragOffset)
         }
     }
 }
