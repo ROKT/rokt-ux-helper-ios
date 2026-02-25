@@ -1498,7 +1498,8 @@
                                                       },
                                                       "background": {
                                                         "backgroundColor": {
-                                                          "light": "#000000"
+                                                          "light": "#000000",
+                                                          "dark": "#FFFFFF"
                                                         }
                                                       },
                                                       "border": {
@@ -1512,42 +1513,12 @@
                                                         "padding": "5",
                                                         "margin": "16 0 0 0"
                                                       }
-                                                    },
-                                                    "pressed": {
-                                                      "background": {
-                                                        "backgroundColor": {
-                                                          "light": "#333333"
-                                                        }
-                                                      }
                                                     }
                                                   }
                                                 ]
                                               }
                                             },
                                             "children": [
-                                              {
-                                                "type": "BasicText",
-                                                "node": {
-                                                  "value": "Buy with \uF8FFPay",
-                                                  "styles": {
-                                                    "elements": {
-                                                      "own": [
-                                                        {
-                                                          "default": {
-                                                            "text": {
-                                                              "fontSize": 18,
-                                                              "textColor": {
-                                                                "light": "#FFFFFF"
-                                                              },
-                                                              "fontWeight": "600"
-                                                            }
-                                                          }
-                                                        }
-                                                      ]
-                                                    }
-                                                  }
-                                                }
-                                              }
                                             ]
                                           }
                                         },

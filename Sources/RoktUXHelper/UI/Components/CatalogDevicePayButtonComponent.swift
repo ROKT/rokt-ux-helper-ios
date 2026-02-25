@@ -8,8 +8,10 @@
 //  You may not use this file except in compliance with the License.
 //
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
+//
 
 import SwiftUI
+import PassKit
 import DcuiSchema
 
 @available(iOS 15, *)
@@ -21,8 +23,6 @@ struct CatalogDevicePayButtonComponent: View {
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
-    @State private var availableWidth: CGFloat?
-    @State private var availableHeight: CGFloat?
 
     init(
         config: ComponentConfig,
@@ -42,9 +42,6 @@ struct CatalogDevicePayButtonComponent: View {
     }
 
     @State var styleState: StyleState = .default
-    @State var isHovered: Bool = false
-    @State var isPressed: Bool = false
-    @State var isDisabled: Bool = false
 
     var style: CatalogDevicePayButtonStyles? {
         switch styleState {
@@ -105,10 +102,6 @@ struct CatalogDevicePayButtonComponent: View {
 
     var body: some View {
         build()
-            .onHover { isHovered in
-                self.isHovered = isHovered
-                updateStyleState()
-            }
             .applyLayoutModifier(
                 verticalAlignmentProperty: verticalAlignment,
                 horizontalAlignmentProperty: horizontalAlignment,
@@ -145,79 +138,33 @@ struct CatalogDevicePayButtonComponent: View {
                        applyAlignSelf: true)
             // margin must apply after the touchable area and before readSize
             .margin(spacing: spacingStyle, applyMargin: true)
-            .readSize(spacing: spacingStyle) { size in
-                availableWidth = size.width
-                availableHeight = size.height
-            }
-            .onTapGesture {
-                handleButtonTapped()
-            }
-            .simultaneousGesture(
-                LongPressGesture(minimumDuration: 0, maximumDistance: 44)
-                    .onChanged { _ in
-                        if !isPressed {
-                            isPressed = true
-                            updateStyleState()
-                        }
-                    }
-                    .onEnded { _ in
-                        if isPressed {
-                            isPressed = false
-                            updateStyleState()
-                        }
-                    }
-            )
     }
 
+    @ViewBuilder
     func build() -> some View {
-        createContainer()
-            .accessibilityAddTraits(.isButton)
+        if #available(iOS 16.0, *) {
+            // For now use .buy. Will add custom mapping from DCUI property later
+            PayWithApplePayButton(.buy, action: {
+                handleButtonTapped()
+            })
+            .payWithApplePayButtonStyle(colorScheme == .dark ? .white : .black)
             .onChange(of: globalScreenSize.width) { newSize in
-                // run it in background thread for smooth transition
                 DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
                     frameChangeIndex += 1
                 }
             }
-    }
-
-    func createContainer() -> some View {
-        return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems), spacing: 0) {
-            if let children = model.children {
-                ForEach(children, id: \.self) { child in
-                    LayoutSchemaComponent(config: config.updateParent(.row),
-                                          layout: child,
-                                          parentWidth: $availableWidth,
-                                          parentHeight: $availableHeight,
-                                          styleState: $styleState,
-                                          parentOverride:
-                                            ComponentParentOverride(
-                                                parentVerticalAlignment: rowPerpendicularAxisAlignment(
-                                                    alignItems: containerStyle?.alignItems
-                                                ),
-                                                parentHorizontalAlignment: rowPrimaryAxisAlignment(
-                                                    justifyContent: containerStyle?.justifyContent
-                                                ).asHorizontalType,
-                                                parentBackgroundStyle: passableBackgroundStyle,
-                                                stretchChildren: containerStyle?.alignItems == .stretch
-                                            ),
-                                          expandsToContainerOnSelfAlign: shouldExpandToContainerOnSelfAlign())
+        } else {
+            LegacyApplePayButton(colorScheme: colorScheme, action: {
+                handleButtonTapped()
+            })
+            .id(colorScheme)
+            .onChange(of: globalScreenSize.width) { newSize in
+                DispatchQueue.main.async {
+                    breakpointIndex = model.updateBreakpointIndex(for: newSize)
+                    frameChangeIndex += 1
                 }
             }
-        }
-    }
-
-    // if height = fixed or percentage, we need to allow the children to expand. `expandsToContainerOnSelfAlign` will let them use maxHeight=.infinity
-    //   since it will only take up its container's finite height
-    // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
-    private func shouldExpandToContainerOnSelfAlign() -> Bool {
-        guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
-
-        switch heightType {
-        case .fixed, .percentage:
-            return true
-        default:
-            return false
         }
     }
 
@@ -225,18 +172,35 @@ struct CatalogDevicePayButtonComponent: View {
         model.handleTap()
     }
 
-    private func updateStyleState() {
-        if isDisabled {
-            styleState = .disabled
-        } else {
-            if isPressed {
-                styleState = .pressed
-            } else if isHovered {
-                styleState = .hovered
-            } else {
-                styleState = .default
-            }
-        }
+}
+
+@available(iOS 15.0, *)
+struct LegacyApplePayButton: UIViewRepresentable {
+    var colorScheme: ColorScheme
+    var action: () -> Void
+
+    func makeUIView(context: Context) -> PKPaymentButton {
+        // For now use .buy. Will add custom mapping from DCUI property later
+        let button = PKPaymentButton(paymentButtonType: .buy, paymentButtonStyle: colorScheme == .dark ? .white : .black)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.buttonTapped), for: .touchUpInside)
+        return button
     }
 
+    func updateUIView(_ uiView: PKPaymentButton, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    class Coordinator: NSObject {
+        var action: () -> Void
+
+        init(action: @escaping () -> Void) {
+            self.action = action
+        }
+
+        @objc func buttonTapped() {
+            action()
+        }
+    }
 }
