@@ -101,7 +101,9 @@ struct CatalogDevicePayButtonComponent: View {
     }
 
     var body: some View {
-        build()
+        Group {
+            build()
+        }
             .applyLayoutModifier(
                 verticalAlignmentProperty: verticalAlignment,
                 horizontalAlignmentProperty: horizontalAlignment,
