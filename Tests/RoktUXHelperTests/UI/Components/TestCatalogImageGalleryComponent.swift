@@ -313,21 +313,21 @@ extension LayoutSchemaViewModel {
     }
 }
 
-final class PassthroughTapViewTests: XCTestCase {
+final class GalleryGestureViewTests: XCTestCase {
 
     func test_coordinator_handleTap_callsOnTapClosure() {
         // Given
         var capturedPoint: CGPoint?
-        let coordinator = PassthroughTapView.Coordinator { point in
+        let coordinator = GalleryGestureView.Coordinator(onTap: { point in
             capturedPoint = point
-        }
+        }, onPanChanged: nil, onPanEnded: nil)
         
         let mockView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
         let expectedLocation = CGPoint(x: 75, y: 125)
         
         let mockGesture = MockTapGestureRecognizer(
             target: coordinator,
-            action: #selector(PassthroughTapView.Coordinator.handleTap(_:))
+            action: #selector(GalleryGestureView.Coordinator.handleTap(_:))
         )
         mockGesture.mockLocation = expectedLocation
         mockGesture.mockView = mockView
@@ -342,14 +342,14 @@ final class PassthroughTapViewTests: XCTestCase {
 
     func test_makeCoordinator_returnsCoordinator() {
         // Given
-        let sut = PassthroughTapView { _ in }
+        let sut = GalleryGestureView(onTap: { _ in }, onPanChanged: nil, onPanEnded: nil)
         
         // When
         let coordinator = sut.makeCoordinator()
         
         // Then
         XCTAssertNotNil(coordinator)
-        XCTAssertTrue(coordinator is PassthroughTapView.Coordinator)
+        XCTAssertTrue(coordinator is GalleryGestureView.Coordinator)
     }
 }
 

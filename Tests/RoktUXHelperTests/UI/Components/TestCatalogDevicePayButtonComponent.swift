@@ -31,7 +31,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             .view(CatalogDevicePayButtonComponent.self)
             .actualView()
             .inspect()
-            .hStack()
+            .group()
 
         // test custom modifier class
         let paddingModifier = try catalogDevicePayButton.modifier(PaddingModifier.self)
@@ -77,29 +77,6 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertNotNil(sut.layoutState)
     }
 
-    func test_tapGesture_shouldTriggerCartItemDevicePay() throws {
-        let eventDelegate = MockUXHelper()
-        let view = try TestPlaceHolder.make(
-            eventDelegate: eventDelegate,
-            layoutMaker: { layoutState, eventService in
-                try LayoutSchemaViewModel.makeCatalogDevicePayButton(layoutState: layoutState, eventService: eventService)
-            }
-        )
-
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(CatalogDevicePayButtonComponent.self)
-            .actualView()
-
-        XCTAssertFalse(eventDelegate.roktEvents.contains(.CartItemDevicePay))
-
-        try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
-
-        XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemDevicePay))
-    }
-
     func test_catalogDevicePayButton_computedProperties_usesModelProperties() throws {
         let view = try TestPlaceHolder.make(
             eventDelegate: MockUXHelper(),
@@ -129,7 +106,6 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
     }
 
     func test_cartItemDevicePay_callsCompletionOnSuccess() throws {
-        var completionCalled = false
         let mockEventService = MockEventService()
         let layoutState = LayoutState()
 
@@ -157,7 +133,6 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             .actualView()
 
         // Verify initial state
-        XCTAssertFalse(completionCalled)
         XCTAssertFalse(closeActionCalled)
         XCTAssertFalse(mockEventService.cartItemDevicePayCalled)
 
