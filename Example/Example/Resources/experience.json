@@ -180,7 +180,7 @@
                       "provider.pricing.totalPrice": "26.72",
                       "provider.discountPercent": "25"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": "test-token-abc"
                   },
                   {
                     "images": {
@@ -242,7 +242,7 @@
                       "provider.pricing.totalPrice": "26.72",
                       "provider.discountPercent": "20"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": "test-token-abc"
                   },
                   {
                     "images": {
@@ -303,7 +303,7 @@
                       "provider.pricing.salesTax": "1.94",
                       "provider.pricing.totalPrice": "26.72"
                     },
-                    "token": "eyJraWQiOiJ0ZW1wLWtleS1pZCIsInR5cCI6IkpXVCIsImFsZyI6IkhTMjU2In0.eyJ2ZXJzaW9uIjoiMS4wLjAiLCJleHAiOjE3MzU3NTk3MTMsImluc3RhbmNlR3VpZCI6IjRmMmIxZjU1LTI2MWQtNGQxMi05NWI1LWI0OTRkZjM4MmIwMiIsInNlc3Npb25JZCI6ImIyM2EwMTQwLWUzMGQtNGYzZi04YzM4LTc1MmYzYTc2YTEzNSIsInBhZ2VJbnN0YW5jZUd1aWQiOiJiMjNhMDE0MC1mNDI4LTQxZDctODlmNS1iY2E2MDJmYjYxODUifQ.DJAKGAujIEhSthdfbyoTyiufhAoq_FVtHPsQLLl8frk"
+                    "token": "test-token-abc"
                   }
                 ],
                 "metadata": {}
