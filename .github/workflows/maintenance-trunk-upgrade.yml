@@ -1,4 +1,4 @@
-name: Run trunk upgrade
+name: Maintenance – Trunk Upgrade
 
 on:
   workflow_call:

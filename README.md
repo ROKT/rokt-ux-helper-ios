@@ -118,7 +118,7 @@ There are main branches coresponding to each version : **Main**, **Release branc
 To create a new release version:
 
 1. Navigate to the "Actions" tab in the GitHub repository
-2. Select the "Create draft release from main" workflow
+2. Select the "Release – Draft" workflow
 3. Click "Run workflow" and use the dropdown to bump the version
 4. Click "Run workflow" to start the process
 

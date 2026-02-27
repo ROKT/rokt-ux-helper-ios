@@ -1,4 +1,4 @@
-name: Create patch branch for old release
+name: Release – Patch
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7

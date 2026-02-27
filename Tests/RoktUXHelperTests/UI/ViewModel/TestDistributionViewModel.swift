@@ -55,6 +55,37 @@ final class TestDistributionViewModel: XCTestCase {
         XCTAssertEqual(events.first?.parentGuid, "instanceGuid")
         XCTAssertEqual(events.first?.jwtToken, "jwtToken1")
     }
+
+    func test_creative_viewed_event() throws {
+        // Arrange
+        let viewModel = getDistributionViewModel(eventService: eventService, layoutState: layoutState)
+
+        // Act
+        viewModel.sendCreativeViewedEvent(currentOffer: 0)
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalViewed)
+        XCTAssertEqual(events.first?.parentGuid, "instanceGuid")
+        XCTAssertEqual(events.first?.jwtToken, "jwtToken1")
+    }
+
+    func test_creative_viewed_event_for_next_offer_after_transition() throws {
+        // Arrange
+        let viewModel = getDistributionViewModelWithTwoSlots(eventService: eventService, layoutState: layoutState)
+
+        // Act
+        viewModel.sendCreativeViewedEvent(currentOffer: 0)
+        viewModel.sendCreativeViewedEvent(currentOffer: 1)
+
+        // Assert
+        XCTAssertEqual(events.count, 2)
+        XCTAssertEqual(events[0].eventType, .SignalViewed)
+        XCTAssertEqual(events[0].parentGuid, "instanceGuid")
+        XCTAssertEqual(events[0].jwtToken, "jwtToken1")
+        XCTAssertEqual(events[1].eventType, .SignalViewed)
+        XCTAssertEqual(events[1].parentGuid, "instanceGuid2")
+        XCTAssertEqual(events[1].jwtToken, "jwtToken2")
+    }
     
     func test_dismissal_no_more_offer_event() throws {
         // Arrange
@@ -98,6 +129,17 @@ final class TestDistributionViewModel: XCTestCase {
             layoutState: layoutState
         )
     }
+
+    private func getDistributionViewModelWithTwoSlots(
+        eventService: EventService,
+        layoutState: LayoutState = LayoutState()
+    ) -> DistributionViewModel {
+        DistributionViewModel(
+            eventService: eventService,
+            slots: [getSlot(), getSlot2()],
+            layoutState: layoutState
+        )
+    }
     
     private func getSlot() -> SlotModel {
         SlotModel(
@@ -110,6 +152,20 @@ final class TestDistributionViewModel: XCTestCase {
             ),
             layoutVariant: nil,
             jwtToken: "JwtToken0"
+        )
+    }
+
+    private func getSlot2() -> SlotModel {
+        SlotModel(
+            instanceGuid: "Slot2",
+            offer: .mock(
+                campaignId: "Campaign2",
+                referralCreativeId: "referralCreativeId2",
+                instanceGuid: "instanceGuid2",
+                token: "jwtToken2"
+            ),
+            layoutVariant: nil,
+            jwtToken: "JwtToken1"
         )
     }
 }

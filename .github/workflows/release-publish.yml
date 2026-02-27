@@ -1,4 +1,4 @@
-name: Release iOS UX Helper
+name: Release – Publish
 
 on:
   push:
