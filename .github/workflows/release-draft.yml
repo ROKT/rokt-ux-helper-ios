@@ -1,16 +1,16 @@
-name: Create draft release from main
+name: Release – Draft
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
-        description: Specify if the version should be bumped as major, minor, patch
+        description: Specify if the version should be bumped as patch, minor, or major
         required: true
         type: choice
         options:
-          - major
-          - minor
           - patch
+          - minor
+          - major
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
