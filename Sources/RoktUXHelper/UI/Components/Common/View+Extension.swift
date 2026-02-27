@@ -1,14 +1,3 @@
-//
-//  View+Extension.swift
-//  RoktUXHelper
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import SwiftUI
 import DcuiSchema
 
@@ -127,46 +116,49 @@ private struct BecomingViewedModifier: ViewModifier {
 
     @State private var visibilityTimer: Timer?
     @State private var lastTriggeredOffer: Int?
+    @State private var latestIntersectPercent: CGFloat = 0
+    @State private var latestProxySize: CGSize = .zero
 
     func body(content: Content) -> some View {
         content
             .background(
                 GeometryReader { proxy in
                     let intersectPercent = UIScreen.main.bounds.intersectPercent(proxy)
+                    let proxySize = proxy.size
                     Color.clear
                         .onAppear {
-                            handleVisibilityChange(intersectPercent: intersectPercent, proxy: proxy)
+                            handleVisibilityChange(intersectPercent: intersectPercent, proxySize: proxySize)
                         }
                         .onChange(of: intersectPercent) { newValue in
-                            handleVisibilityChange(intersectPercent: newValue, proxy: proxy)
+                            handleVisibilityChange(intersectPercent: newValue, proxySize: proxySize)
                         }
                         .onChange(of: currentOffer) { _ in
                             // Reset once per offer gate and cancel any pending timer when the offer changes
                             cancelTimer()
                             lastTriggeredOffer = nil
-                            handleVisibilityChange(intersectPercent: intersectPercent, proxy: proxy)
+                            handleVisibilityChange(intersectPercent: intersectPercent, proxySize: proxySize)
                         }
                         .onDisappear { cancelTimer() }
                 }
             )
     }
 
-    private func handleVisibilityChange(intersectPercent: CGFloat, proxy: GeometryProxy) {
+    private func handleVisibilityChange(intersectPercent: CGFloat, proxySize: CGSize) {
+        latestIntersectPercent = intersectPercent
+        latestProxySize = proxySize
         let aboveThreshold = intersectPercent > 0.5
 
         if aboveThreshold {
             guard shouldTriggerForCurrentOffer() else { return }
 
             if visibilityTimer == nil {
-                let proxySize = proxy.size
-                let proxyFrame = proxy.frame(in: .global)
                 visibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-                    let currentIntersect = UIScreen.main.bounds.intersectPercentWithFrame(proxyFrame)
+                    let currentIntersect = latestIntersectPercent
                     if currentIntersect > 0.5 {
                         let info = ComponentVisibilityInfo(
                             isVisible: true,
                             isObscured: currentIntersect < 1.0,
-                            incorrectlySized: proxySize.width <= 0 || proxySize.height <= 0
+                            incorrectlySized: latestProxySize.width <= 0 || latestProxySize.height <= 0
                         )
                         execute?(info)
                         if info.isInViewAndCorrectSize {
