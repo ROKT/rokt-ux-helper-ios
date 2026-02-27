@@ -163,7 +163,9 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
 
-        // Ensure HTML parsing runs on main thread
+        // HTML parsing uses WebKit (NSHTMLReader) which can crash when invoked from certain
+        // main-thread contexts (e.g. timer callbacks, layout, nested run loop sources).
+        // Always defer to the next main queue work item so we never run WebKit in those contexts.
         let performTransformation = { [weak self] in
             guard let self else { return }
 
@@ -180,12 +182,8 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             self.attributedString = htmlTransformedValue
         }
 
-        if Thread.isMainThread {
+        DispatchQueue.main.async {
             performTransformation()
-        } else {
-            DispatchQueue.main.async {
-                performTransformation()
-            }
         }
     }
 
