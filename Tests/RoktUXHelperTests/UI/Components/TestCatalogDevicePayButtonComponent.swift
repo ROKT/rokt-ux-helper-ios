@@ -269,6 +269,61 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertEqual(customStateMap?[identifier], -1)
         XCTAssertFalse(closeActionCalled)
     }
+
+    func test_catalogDevicePayButton_rendersApplePay_whenProviderIsApplePay() throws {
+        let mockEventService = MockEventService()
+        let layoutState = LayoutState()
+
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { _, _ in
+                let model = try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService
+                )
+                if case let .catalogDevicePayButton(viewModel) = model {
+                    viewModel.provider = .applePay
+                }
+                return model
+            }
+        )
+
+        let catalogDevicePayButton = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        let buildGroup = try catalogDevicePayButton.inspect().group()
+        XCTAssertThrowsError(try buildGroup.emptyView(0), "Should not render EmptyView for ApplePay")
+    }
+
+    func test_catalogDevicePayButton_rendersEmptyView_whenProviderIsNotApplePay() throws {
+        let mockEventService = MockEventService()
+        let layoutState = LayoutState()
+
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { _, _ in
+                let model = try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    layoutState: layoutState,
+                    eventService: mockEventService
+                )
+                if case let .catalogDevicePayButton(viewModel) = model {
+                    viewModel.provider = .stripe
+                }
+                return model
+            }
+        )
+
+        let catalogDevicePayButton = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CatalogDevicePayButtonComponent.self)
+            .actualView()
+
+        XCTAssertNoThrow(try catalogDevicePayButton.inspect().group().emptyView(0), "Should render EmptyView for Stripe")
+    }
 }
 
 @available(iOS 15.0, *)
