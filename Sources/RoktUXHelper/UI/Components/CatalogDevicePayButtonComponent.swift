@@ -144,6 +144,17 @@ struct CatalogDevicePayButtonComponent: View {
 
     @ViewBuilder
     func build() -> some View {
+        switch model.provider {
+        case .applePay:
+            buildApplePay()
+        default:
+            // Add support for other payment providers
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private func buildApplePay() -> some View {
         if #available(iOS 16.0, *) {
             // For now use .buy. Will add custom mapping from DCUI property later
             PayWithApplePayButton(.buy, action: {
