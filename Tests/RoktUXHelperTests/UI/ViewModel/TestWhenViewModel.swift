@@ -11,11 +11,29 @@
 
 import XCTest
 import SwiftUI
+import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
 
 @available(iOS 15, *)
 final class TestWhenViewModel: XCTestCase {
+
+    /// When condition is false (e.g. darkMode .is true but we're in light mode), view stays in tree but hidden (appearance-crash fix).
+    func test_when_component_inactive_state_hidden() throws {
+        let predicate = WhenPredicate.darkMode(DarkModePredicate(condition: .is, value: true))
+        let whenVM = get_when_view_model(children: [.empty], predicates: [predicate])
+        let view = TestPlaceHolder(layout: .when(whenVM))
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(WhenComponent.self)
+            .actualView()
+            .inspect()
+        let group = try component.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
+    }
     
     func get_when_view_model(children: [LayoutSchemaViewModel]? = [],
                              predicates: [WhenPredicate]? = [],

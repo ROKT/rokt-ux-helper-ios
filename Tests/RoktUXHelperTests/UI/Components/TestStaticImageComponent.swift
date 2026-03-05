@@ -50,19 +50,21 @@ final class TestStaticImageComponent: XCTestCase {
     }
     
     func test_static_image_empty() throws {
-        
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(try get_model(.emptyUrl)))
-        
-        let image = try view.inspect().view(TestPlaceHolder.self)
+        let component = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
             .view(LayoutSchemaComponent.self)
             .view(StaticImageViewComponent.self)
             .actualView()
-
-        // test custom modifiers are removed with image
-        XCTAssertEqual(image.padding() as? EdgeInsets, nil)
-        
+            .inspect()
+        // With appearance-crash fix: empty URL keeps view in tree but hidden (opacity 0, no hit testing).
+        let group = try component.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertEqual(try group.zIndex(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
+        // Custom modifiers are on the inner content; when empty the outer Group has no padding.
+        XCTAssertNil(try? component.padding())
     }
     
     func test_static_image_with_alt() throws {

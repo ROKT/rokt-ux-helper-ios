@@ -18,6 +18,52 @@ import DcuiSchema
 @available(iOS 15.0, *)
 final class TestCreativeResponseComponent: XCTestCase {
 
+    func test_backgroundImageModifier_no_image_has_opacity_zero() throws {
+        // When there is no background image, AsyncImageView stays in hierarchy with opacity 0 (appearance-crash fix).
+        let view = Color.clear.backgroundImage(backgroundImage: nil, imageLoader: nil)
+        let asyncImageView = try view.inspect().find(AsyncImageView.self)
+        XCTAssertEqual(try asyncImageView.opacity(), 0)
+    }
+
+    func test_creative_response_external_action_hidden() throws {
+        // When responseOptions.action == .external, content is hidden but kept in tree (appearance-crash fix).
+        let externalOption = RoktUXResponseOption(
+            id: "",
+            action: .external,
+            instanceGuid: "test",
+            signalType: nil,
+            shortLabel: nil,
+            longLabel: nil,
+            shortSuccessLabel: nil,
+            isPositive: nil,
+            url: nil,
+            responseJWTToken: "token"
+        )
+        let viewModel = CreativeResponseViewModel(
+            children: nil,
+            responseKey: .positive,
+            responseOptions: externalOption,
+            openLinks: nil,
+            layoutState: nil,
+            eventService: nil,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil
+        )
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(viewModel))
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(CreativeResponseComponent.self)
+            .actualView()
+            .inspect()
+        let group = try component.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
+    }
+
     func test_creative_response() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
         
