@@ -428,13 +428,11 @@ struct ColorModeModifier: ViewModifier {
         }
     }
     func body(content: Content) -> some View {
-        if let colorMode, colorMode != .system {
-            content
-                .environment(\.colorScheme, configColorScheme)
-                .preferredColorScheme(configColorScheme)
-        } else {
-            content
-        }
+        // Apply the same modifier chain always to avoid SwiftUI _AppearanceActionModifier
+        // teardown crashes when the modifier is conditionally present/absent.
+        content
+            .environment(\.colorScheme, configColorScheme)
+            .preferredColorScheme(colorMode != nil && colorMode != .system ? configColorScheme : nil)
     }
 }
 

@@ -72,13 +72,20 @@ struct WhenComponent: View {
         model.componentConfig = config
     }
 
+    /// When true, content is shown (possibly with transition); when false, content is hidden but kept in hierarchy to avoid SwiftUI _AppearanceActionModifier teardown crashes.
+    private var isContentActive: Bool {
+        visible == true || shouldApply
+    }
+
     var body: some View {
         Group {
-            if visible == true || shouldApply {
-                buildComponent()
-            }
+            buildComponent()
         }
-        .opacity(getOpacity)
+        .opacity(isContentActive ? getOpacity : 0)
+        .zIndex(isContentActive ? 1 : 0)
+        .allowsHitTesting(isContentActive)
+        // When inactive, collapse to zero size so layout matches original conditional-removal behavior (no gap).
+        .frame(width: isContentActive ? nil : 0, height: isContentActive ? nil : 0)
         .onChange(of: shouldApply) { newValue in
             if newValue {
                 transitionIn()

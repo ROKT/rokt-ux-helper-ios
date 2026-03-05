@@ -95,6 +95,11 @@ struct RichTextComponent: View {
         }
     }
 
+    /// When true, content is shown; when false, content is hidden but kept in hierarchy to avoid SwiftUI _AppearanceActionModifier teardown crashes.
+    private var isContentVisible: Bool {
+        !model.stateReplacedText.isEmpty
+    }
+
     init(
         config: ComponentConfig,
         model: RichTextViewModel,
@@ -114,7 +119,7 @@ struct RichTextComponent: View {
     }
 
     var body: some View {
-        if !model.stateReplacedText.isEmpty {
+        Group {
             build()
                 .applyLayoutModifier(
                     verticalAlignmentProperty: verticalAlignment,
@@ -158,6 +163,11 @@ struct RichTextComponent: View {
                     model.onAppear(textStyle: style)
                 }
         }
+        .opacity(isContentVisible ? 1 : 0)
+        .zIndex(isContentVisible ? 1 : 0)
+        .allowsHitTesting(isContentVisible)
+        // When hidden, collapse to zero size so layout matches original implicit EmptyView() behavior (no gap).
+        .frame(width: isContentVisible ? nil : 0, height: isContentVisible ? nil : 0)
     }
 
     func build() -> some View {

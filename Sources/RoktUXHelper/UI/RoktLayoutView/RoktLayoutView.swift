@@ -51,7 +51,9 @@ public struct RoktLayoutView: View {
                     .frame(height: viewModel.height)
                     .frame(maxWidth: .infinity)
             case .empty:
-                EmptyView()
+                // Use Color.clear (zero-size) instead of EmptyView to avoid conditional view removal teardown; layout unchanged.
+                Color.clear
+                    .frame(width: 0, height: 0)
             }
         }
         .onAppear {
