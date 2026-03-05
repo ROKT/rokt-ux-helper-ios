@@ -28,7 +28,7 @@ final class TestCreativeResponseComponent: XCTestCase {
             .view(CreativeResponseComponent.self)
             .actualView()
             .inspect()
-            .hStack()
+            .find(ViewType.HStack.self)
         
         // test custom modifier class
         let paddingModifier = try creativeResponse.modifier(PaddingModifier.self)

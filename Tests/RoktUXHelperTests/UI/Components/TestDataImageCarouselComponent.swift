@@ -90,11 +90,17 @@ final class TestDataImageCarouselComponent: XCTestCase {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImageCarousel(
             .mock()
         ))
-        
-        let emptyView = try view.inspectComponent(DataImageCarouselComponent.self)
-            .find(ViewType.EmptyView.self)
-        
-        XCTAssertNotNil(emptyView)
+        // With appearance-crash fix: we no longer use EmptyView when images are empty;
+        // we keep the component in the tree (Group > ZStack) and hide it with opacity/zero frame.
+        let carousel = try view.inspectComponent(DataImageCarouselComponent.self)
+        let zStack = try carousel.find(ViewType.ZStack.self)
+        XCTAssertNotNil(zStack)
+        let group = try carousel.group()
+        XCTAssertNotNil(group)
+        // Assert visibility modifiers so the hidden state matches our safe-UI pattern (no teardown crash).
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertEqual(try group.zIndex(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
     }
     
     func test_images_rendersHSPageView() throws {
@@ -103,7 +109,7 @@ final class TestDataImageCarouselComponent: XCTestCase {
         ))
         
         let zStack = try view.inspectComponent(DataImageCarouselComponent.self)
-            .zStack()
+            .find(ViewType.ZStack.self)
 
         XCTAssertNotNil(try zStack.find(AsyncImageView.self))
         XCTAssertNotNil(try zStack.find(HSPageView<AnyView>.self))
@@ -115,7 +121,7 @@ final class TestDataImageCarouselComponent: XCTestCase {
         ))
 
         let zStack = try view.inspectComponent(DataImageCarouselComponent.self)
-            .zStack()
+            .find(ViewType.ZStack.self)
 
         XCTAssertNotNil(try? zStack.find(AsyncImageView.self))
         XCTAssertNil(try? zStack.find(HSPageView<AnyView>.self))
@@ -127,7 +133,7 @@ final class TestDataImageCarouselComponent: XCTestCase {
         ))
 
         let zStack = try view.inspectComponent(DataImageCarouselComponent.self)
-            .zStack()
+            .find(ViewType.ZStack.self)
 
         let vStack = try zStack.find(ViewType.VStack.self)
         XCTAssertNotNil(try? vStack[0].find(ViewType.Spacer.self))

@@ -29,7 +29,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .inspect()
-            .text()
+            .find(ViewType.Text.self)
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
@@ -101,7 +101,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .inspect()
-            .text()
+            .find(ViewType.Text.self)
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
@@ -175,7 +175,7 @@ final class TestRichTextComponent: XCTestCase {
                 .view(RichTextComponent.self)
                 .actualView()
                 .inspect()
-                .text()
+                .find(ViewType.Text.self)
             
             // test custom modifier class
             let paddingModifier = try text.modifier(PaddingModifier.self)

@@ -49,8 +49,10 @@ final class TestDataImageComponent: XCTestCase {
             .view(DataImageViewComponent.self)
             .actualView()
             .inspect()
-        // Invalid Image should be removed from view
-        XCTAssertNil(try? image.find(AsyncImageView.self))
+        // With appearance-crash fix: invalid image keeps view in tree but hidden (opacity 0, no hit testing).
+        let group = try image.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
     }
 
     func test_data_image_with_fallback() throws {
