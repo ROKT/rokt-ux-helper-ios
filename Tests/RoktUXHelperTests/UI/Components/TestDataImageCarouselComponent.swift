@@ -99,7 +99,7 @@ final class TestDataImageCarouselComponent: XCTestCase {
         XCTAssertNotNil(group)
         // Assert visibility modifiers so the hidden state matches our safe-UI pattern (no teardown crash).
         XCTAssertEqual(try group.opacity(), 0)
-        XCTAssertEqual(try group.zIndex(), 0)
+        XCTAssertEqual(try group.zIndex(), -1)
         XCTAssertFalse(group.allowsHitTesting())
     }
     

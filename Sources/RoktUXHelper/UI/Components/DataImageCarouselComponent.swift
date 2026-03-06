@@ -249,7 +249,8 @@ struct DataImageCarouselComponent: View {
             }
         }
         .opacity(hasImages ? 1 : 0)
-        .zIndex(hasImages ? 1 : 0)
+        // Use 0 when visible (default stacking) so ZStack order is unchanged; -1 when hidden.
+        .zIndex(hasImages ? 0 : -1)
         .allowsHitTesting(hasImages)
         // When empty, collapse to zero size so layout matches original EmptyView() behavior (no gap).
         .frame(width: hasImages ? nil : 0, height: hasImages ? nil : 0)

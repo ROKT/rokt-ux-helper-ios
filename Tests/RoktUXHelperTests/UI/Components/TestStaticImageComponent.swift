@@ -61,7 +61,7 @@ final class TestStaticImageComponent: XCTestCase {
         // With appearance-crash fix: empty URL keeps view in tree but hidden (opacity 0, no hit testing).
         let group = try component.group()
         XCTAssertEqual(try group.opacity(), 0)
-        XCTAssertEqual(try group.zIndex(), 0)
+        XCTAssertEqual(try group.zIndex(), -1)
         XCTAssertFalse(group.allowsHitTesting())
         // Custom modifiers are on the inner content; when empty the outer Group has no padding.
         XCTAssertNil(try? component.padding())

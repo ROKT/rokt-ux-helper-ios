@@ -82,7 +82,8 @@ struct WhenComponent: View {
             buildComponent()
         }
         .opacity(isContentActive ? getOpacity : 0)
-        .zIndex(isContentActive ? 1 : 0)
+        // Use 0 when visible (default stacking) so ZStack order is unchanged; -1 when hidden.
+        .zIndex(isContentActive ? 0 : -1)
         .allowsHitTesting(isContentActive)
         // When inactive, collapse to zero size so layout matches original conditional-removal behavior (no gap).
         .frame(width: isContentActive ? nil : 0, height: isContentActive ? nil : 0)

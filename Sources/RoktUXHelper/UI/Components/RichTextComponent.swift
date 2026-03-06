@@ -160,11 +160,15 @@ struct RichTextComponent: View {
                     model.validateFont(textStyle: style?.text)
                 }
                 .onAppear {
-                    model.onAppear(textStyle: style)
+                    // Only run diagnostics when content is visible; avoid false telemetry for intentionally empty hidden nodes.
+                    if isContentVisible {
+                        model.onAppear(textStyle: style)
+                    }
                 }
         }
         .opacity(isContentVisible ? 1 : 0)
-        .zIndex(isContentVisible ? 1 : 0)
+        // Use 0 when visible (default stacking) so ZStack order is unchanged; -1 when hidden to keep behind.
+        .zIndex(isContentVisible ? 0 : -1)
         .allowsHitTesting(isContentVisible)
         // When hidden, collapse to zero size so layout matches original implicit EmptyView() behavior (no gap).
         .frame(width: isContentVisible ? nil : 0, height: isContentVisible ? nil : 0)
