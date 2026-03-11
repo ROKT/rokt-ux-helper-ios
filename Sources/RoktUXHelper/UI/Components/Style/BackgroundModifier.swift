@@ -62,12 +62,15 @@ struct BackgroundImageModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content.background(alignment: bgAlignment) {
-            hasBackgroundImage ?
-                AnyView(AsyncImageView(imageUrl: backgroundImage?.url,
-                                       scale: backgroundImage?.scale,
-                                       imageLoader: imageLoader,
-                                       isImageValid: $isImageValid)) :
-                AnyView(EmptyView())
+            // Keep image view in hierarchy and hide with opacity when no image to avoid SwiftUI _AppearanceActionModifier teardown crashes.
+            ZStack {
+                Color.clear
+                AsyncImageView(imageUrl: backgroundImage?.url,
+                               scale: backgroundImage?.scale,
+                               imageLoader: imageLoader,
+                               isImageValid: $isImageValid)
+                    .opacity(hasBackgroundImage ? 1 : 0)
+            }
         }
         .clipped()
     }

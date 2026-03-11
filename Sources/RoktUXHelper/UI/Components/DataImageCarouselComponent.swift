@@ -129,76 +129,84 @@ struct DataImageCarouselComponent: View {
         }
     }
 
-    var body: some View {
+    /// When true, content is shown; when false, content is hidden but kept in hierarchy to avoid SwiftUI _AppearanceActionModifier teardown crashes.
+    private var hasImages: Bool {
+        !model.images.isEmpty
+    }
 
-        if !model.images.isEmpty {
-            // Initialize opacities array if needed
+    var body: some View {
+        Group {
             ZStack(
                 alignment: .init(
                     horizontal: horizontalAlignment.getHorizontalAlignment(),
                     vertical: verticalAlignment.getVerticalAlignment()
                 )
             ) {
-                switch model.transition {
-                case let .slideInOut(duration):
-                    imageView(for: model.images[0]).opacity(0.0)
-                    HSPageView(page: $page) {
+                if hasImages {
+                    switch model.transition {
+                    case let .slideInOut(duration):
+                        imageView(for: model.images[0]).opacity(0.0)
+                        HSPageView(page: $page) {
+                            ForEach(0..<model.images.count, id: \.self) { index in
+                                imageView(for: model.images[index]).tag(index)
+                            }
+                            imageView(for: model.images[0]).tag(model.images.count)
+                        }
+                        .disabled(true)
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                        .onReceive(model.$pageIndex.dropFirst()) { pageIndex in
+                            DispatchQueue.main.async {
+                                var realPageIndex = 0
+                                if pageIndex == 0 {
+                                    realPageIndex = model.images.count
+                                } else if pageIndex == 1 {
+                                    page = 0
+                                    realPageIndex = pageIndex
+                                } else {
+                                    realPageIndex = pageIndex
+                                }
+
+                                withAnimation(.easeInOut(duration: duration/1000.0)) {
+                                    page = realPageIndex
+                                }
+                            }
+                        }
+                    case let .fadeInOut(duration):
                         ForEach(0..<model.images.count, id: \.self) { index in
-                            imageView(for: model.images[index]).tag(index)
+                            imageView(for: model.images[index])
+                                .opacity(index < opacities.count ? opacities[index] : 0)
                         }
-                        imageView(for: model.images[0]).tag(model.images.count)
-                    }
-                    .disabled(true)
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                    .onReceive(model.$pageIndex.dropFirst()) { pageIndex in
-                        DispatchQueue.main.async {
-                            var realPageIndex = 0
-                            if pageIndex == 0 {
-                                realPageIndex = model.images.count
-                            } else if pageIndex == 1 {
-                                page = 0
-                                realPageIndex = pageIndex
-                            } else {
-                                realPageIndex = pageIndex
-                            }
-
-                            withAnimation(.easeInOut(duration: duration/1000.0)) {
-                                page = realPageIndex
-                            }
-                        }
-                    }
-                case let .fadeInOut(duration):
-                    ForEach(0..<model.images.count, id: \.self) { index in
-                        imageView(for: model.images[index])
-                            .opacity(index < opacities.count ? opacities[index] : 0)
-                    }
-                    .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
-                        let newPosition = max(currentProgress - 1, 0)
-                        if currentImage != newPosition {
-                            advanceToNextImage(duration: duration)
-                        }
-                    }
-                }
-
-                if let indicatorViewModel = model.indicatorViewModel, model.requiresIndicator(colorScheme) {
-                    VStack(
-                        alignment: .center, spacing: 0
-                    ) {
-                        Spacer()
-                        ImageCarouselIndicator(
-                            config: config,
-                            model: indicatorViewModel,
-                            styleState: $styleState,
-                            parentWidth: $availableWidth,
-                            parentHeight: $availableHeight,
-                            parentOverride: parentOverride
-                        )
                         .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
-                            let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
-                            customStateMap?[positionKey] = currentProgress
-                            let key = CustomStateIdentifiable(position: config.position, key: .imageCarouselKey(key: model.key))
-                            customStateMap?[key] = currentProgress
-                            model.layoutState?.publishStateChange()
+                            let newPosition = max(currentProgress - 1, 0)
+                            if currentImage != newPosition {
+                                advanceToNextImage(duration: duration)
+                            }
+                        }
+                    }
+
+                    if let indicatorViewModel = model.indicatorViewModel, model.requiresIndicator(colorScheme) {
+                        VStack(
+                            alignment: .center, spacing: 0
+                        ) {
+                            Spacer()
+                            ImageCarouselIndicator(
+                                config: config,
+                                model: indicatorViewModel,
+                                styleState: $styleState,
+                                parentWidth: $availableWidth,
+                                parentHeight: $availableHeight,
+                                parentOverride: parentOverride
+                            )
+                            .onReceive(model.$currentProgress.dropFirst()) { currentProgress in
+                                let positionKey = CustomStateIdentifiable(position: config.position, key: .imageCarouselPosition)
+                                customStateMap?[positionKey] = currentProgress
+                                let key = CustomStateIdentifiable(
+                                    position: config.position,
+                                    key: .imageCarouselKey(key: model.key)
+                                )
+                                customStateMap?[key] = currentProgress
+                                model.layoutState?.publishStateChange()
+                            }
                         }
                     }
                 }
@@ -230,8 +238,7 @@ struct DataImageCarouselComponent: View {
                 availableHeight = size.height
             }
             .onLoad {
-                // Initialize opacities array with first image visible
-                if opacities.isEmpty {
+                if hasImages, opacities.isEmpty {
                     opacities = Array(repeating: 0.0, count: model.images.count)
                     opacities[0] = 1.0
                 }
@@ -240,9 +247,13 @@ struct DataImageCarouselComponent: View {
             .onDisappear {
                 model.onDisappear()
             }
-        } else {
-            EmptyView()
         }
+        .opacity(hasImages ? 1 : 0)
+        // Use 0 when visible (default stacking) so ZStack order is unchanged; -1 when hidden.
+        .zIndex(hasImages ? 0 : -1)
+        .allowsHitTesting(hasImages)
+        // When empty, collapse to zero size so layout matches original EmptyView() behavior (no gap).
+        .frame(width: hasImages ? nil : 0, height: hasImages ? nil : 0)
     }
 
     private func imageView(for image: CreativeImage) -> some View {
