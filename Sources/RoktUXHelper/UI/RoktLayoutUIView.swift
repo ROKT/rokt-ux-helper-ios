@@ -157,13 +157,12 @@ extension RoktLayoutUIView: LayoutLoader {
 
     /// Closes the embedded view and notifies the size change.
     public func closeEmbedded() {
-        // change the size to zero
         updateEmbeddedSize(0)
-        // remove view from superView
-        roktEmbeddedSwiftUIView?.removeFromSuperview()
+        let viewToRemove = roktEmbeddedSwiftUIView
         roktEmbeddedSwiftUIView = nil
-        // notify the changes
         onEmbeddedSizeChange?(0)
         RoktUXLogger.shared.debug("User journey ended on Embedded view")
+        // Defer removal so it does not run in the same run-loop iteration as a SwiftUI commit (avoids _AppearanceActionModifier / Binding teardown crash).
+        DispatchQueue.main.async { viewToRemove?.removeFromSuperview() }
     }
 }

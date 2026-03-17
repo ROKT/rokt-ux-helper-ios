@@ -45,16 +45,14 @@ public struct RoktLayoutView: View {
 
     public var body: some View {
         VStack {
-            switch viewModel.state {
-            case let .ready(view):
-                view
-                    .frame(height: viewModel.height)
-                    .frame(maxWidth: .infinity)
-            case .empty:
-                // Use Color.clear (zero-size) instead of EmptyView to avoid conditional view removal teardown; layout unchanged.
-                Color.clear
-                    .frame(width: 0, height: 0)
+            // Always render the same view (current or last when empty) so we never tear it down; hide when empty to avoid _AppearanceActionModifier / Binding.readValue crash.
+            Group {
+                (viewModel.state.optionalView ?? viewModel.lastViewForEmpty) ?? AnyView(Color.clear)
             }
+            .opacity(viewModel.state.isContentVisible ? 1 : 0)
+            .frame(height: viewModel.state.isContentVisible ? viewModel.height : 0)
+            .frame(maxWidth: .infinity)
+            .frame(width: viewModel.state.isContentVisible ? nil : 0)
         }
         .onAppear {
             viewModel.loadLayout()
