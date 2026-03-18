@@ -29,7 +29,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .inspect()
-            .text()
+            .find(ViewType.Text.self)
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
@@ -91,6 +91,30 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertEqual(rawText.lineHeight, 0)
     }
     
+    func test_rich_text_empty_state_hidden() throws {
+        // When stateReplacedText is empty, component keeps view in tree but hidden (appearance-crash fix).
+        let emptyModel = RichTextViewModel(
+            value: "",
+            defaultStyle: nil,
+            linkStyle: nil,
+            openLinks: nil,
+            stateDataExpansionClosure: nil,
+            layoutState: nil,
+            eventService: nil
+        )
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(emptyModel))
+        let component = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(RichTextComponent.self)
+            .actualView()
+            .inspect()
+        let group = try component.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
+    }
+
     func test_rich_text_with_state() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_state_model()))
         
@@ -101,7 +125,7 @@ final class TestRichTextComponent: XCTestCase {
             .view(RichTextComponent.self)
             .actualView()
             .inspect()
-            .text()
+            .find(ViewType.Text.self)
         
         // test custom modifier class
         let paddingModifier = try text.modifier(PaddingModifier.self)
@@ -175,7 +199,7 @@ final class TestRichTextComponent: XCTestCase {
                 .view(RichTextComponent.self)
                 .actualView()
                 .inspect()
-                .text()
+                .find(ViewType.Text.self)
             
             // test custom modifier class
             let paddingModifier = try text.modifier(PaddingModifier.self)

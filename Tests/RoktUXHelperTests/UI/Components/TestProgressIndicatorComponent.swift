@@ -31,7 +31,7 @@ final class TestProgressIndicatorComponent: XCTestCase {
             .view(ProgressIndicatorComponent.self)
             .actualView()
             .inspect()
-            .hStack()
+            .find(ViewType.HStack.self)
         
         // test custom modifier class
         let paddingModifier = try progressIndicator.modifier(PaddingModifier.self)
@@ -59,8 +59,10 @@ final class TestProgressIndicatorComponent: XCTestCase {
         let progressIndicatorView = try progressIndicatorComponent
             .inspect()
         
-        // test page indicator is empty view as startPosition=2
-        XCTAssertNotNil(try progressIndicatorView.emptyView())
+        // With appearance-crash fix: when at start position we keep the view in the tree but hidden (opacity 0, no hit testing).
+        let group = try progressIndicatorView.group()
+        XCTAssertEqual(try group.opacity(), 0)
+        XCTAssertFalse(group.allowsHitTesting())
         XCTAssertEqual(progressIndicatorComponent.startIndex, 1)
     }
     
@@ -77,7 +79,7 @@ final class TestProgressIndicatorComponent: XCTestCase {
             .view(ProgressIndicatorComponent.self)
             .actualView()
             .inspect()
-            .hStack()
+            .find(ViewType.HStack.self)
         
         XCTAssertEqual(try progressIndicator.accessibilityHidden(), true)
     }

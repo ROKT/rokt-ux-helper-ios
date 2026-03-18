@@ -107,8 +107,13 @@ struct CreativeResponseComponent: View {
         model.responseOptions?.action == .external
     }
 
+    /// When true, content is shown; when false, content is hidden but kept in hierarchy to avoid SwiftUI _AppearanceActionModifier teardown crashes.
+    private var isContentVisible: Bool {
+        !isExternalResponseOption
+    }
+
     var body: some View {
-        if !isExternalResponseOption {
+        Group {
             build()
                 .onHover { isHovered in
                     self.isHovered = isHovered
@@ -179,9 +184,13 @@ struct CreativeResponseComponent: View {
                     self.isPressed = isPressed
                     updateStyleState()
                 })
-        } else {
-            EmptyView()
         }
+        .opacity(isContentVisible ? 1 : 0)
+        // Use 0 when visible (default stacking) so ZStack order is unchanged; -1 when hidden.
+        .zIndex(isContentVisible ? 0 : -1)
+        .allowsHitTesting(isContentVisible)
+        // When hidden, collapse to zero size so layout matches original EmptyView() behavior (no gap).
+        .frame(width: isContentVisible ? nil : 0, height: isContentVisible ? nil : 0)
     }
 
     func build() -> some View {

@@ -19,8 +19,20 @@ class RoktLayoutViewModel: ObservableObject, LayoutLoader {
     enum State {
         case ready(AnyView)
         case empty
+
+        var optionalView: AnyView? {
+            if case let .ready(view) = self { return view }
+            return nil
+        }
+
+        var isContentVisible: Bool {
+            if case .ready = self { return true }
+            return false
+        }
     }
     @Published var state: State = .empty
+    /// Kept when transitioning to .empty so we don't tear down the view (avoids _AppearanceActionModifier / Binding teardown crash).
+    @Published var lastViewForEmpty: AnyView?
     @Published var height: CGFloat = 0
     private let experienceResponse: String
     private let location: String
@@ -62,10 +74,12 @@ extension RoktLayoutViewModel: LayoutLoader {
     public func load<Content: View>(onSizeChanged: @escaping ((CGFloat) -> Void),
                                     @ViewBuilder injectedView: @escaping () -> Content) {
         RoktUXLogger.shared.debug("Embedded view attached to the screen")
-        state = .ready(AnyView(injectedView()))
+        let view = AnyView(injectedView())
+        lastViewForEmpty = view
+        state = .ready(view)
     }
 
-    /// Closes the embedded view.
+    /// Closes the embedded view. Keeps lastViewForEmpty in the tree so the view is hidden, not torn down (avoids crash).
     public func closeEmbedded() {
         updateEmbeddedSize(0)
         state = .empty
