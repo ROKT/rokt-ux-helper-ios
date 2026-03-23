@@ -44,7 +44,7 @@ enum LayoutSchemaViewModel: Hashable {
 }
 
 @available(iOS 15, *)
-extension LayoutSchemaViewModel: Hashable {
+extension LayoutSchemaViewModel {
 
     static func == (lhs: LayoutSchemaViewModel, rhs: LayoutSchemaViewModel) -> Bool {
         switch (lhs, rhs) {

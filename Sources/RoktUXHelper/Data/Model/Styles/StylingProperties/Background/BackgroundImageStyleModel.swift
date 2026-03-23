@@ -71,7 +71,7 @@ enum ScaleStyleModel: String, Decodable, Hashable {
 }
 
 @available(iOS 13, *)
-extension BackgroundImagePosition: Hashable {
+extension BackgroundImagePosition {
     func getAlignment() -> Alignment {
         switch self {
         case .top:

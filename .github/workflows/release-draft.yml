@@ -46,6 +46,11 @@ jobs:
         run: |
           echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
 
+      - name: Update podspec version
+        run: |
+          version="${{ steps.bump-version.outputs.new_version }}"
+          sed -i "s/s\.version[[:space:]]*=[[:space:]]*'[0-9.]*'/s.version          = '${version}'/" RoktUXHelper.podspec
+
       - name: Update changelog
         uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
         with:
