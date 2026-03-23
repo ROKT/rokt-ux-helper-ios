@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add CocoaPods distribution support with `RoktUXHelper.podspec`
+
+### Fixed
+
+- Fix iOS deployment target in `Package.swift` from iOS 12 to iOS 15 to match actual requirement
+- Fix redundant protocol conformance declarations that caused CocoaPods build failures
+
 ## [0.8.1] - 2026-02-23
 
 ### Fixed

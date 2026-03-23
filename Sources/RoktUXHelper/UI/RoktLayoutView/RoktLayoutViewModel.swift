@@ -52,7 +52,7 @@ class RoktLayoutViewModel: ObservableObject, LayoutLoader {
 }
 
 @available(iOS 15, *)
-extension RoktLayoutViewModel: LayoutLoader {
+extension RoktLayoutViewModel {
 
     /// Loads the layout content with the specified view.
     /// Implementation of LayoutLoader.

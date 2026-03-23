@@ -36,6 +36,16 @@ dependencies: [
 ]
 ```
 
+### CocoaPods
+
+Add the following to your `Podfile`:
+
+```ruby
+pod 'RoktUXHelper', '~> 0.8'
+```
+
+Then run `pod install`.
+
 ## Architecture
 
 ```mermaid
