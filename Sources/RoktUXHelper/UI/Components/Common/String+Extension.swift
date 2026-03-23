@@ -10,6 +10,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 import SwiftUI
+import WebKit
 import DcuiSchema
 import CryptoKit
 
@@ -21,13 +22,46 @@ internal extension StringProtocol {
         linkStyles: InlineTextStylingProperties?,
         colorScheme: ColorScheme
     ) throws -> NSAttributedString {
+        let nsAttrStr = try Self.syncParseHTML(String(self), textColorHex: textColorHex)
+        return try applyHTMLPostProcessing(nsAttrStr, uiFont: uiFont, linkStyles: linkStyles, colorScheme: colorScheme)
+    }
+
+    func htmlToAttributedString(
+        textColorHex: String?,
+        uiFont: UIFont?,
+        linkStyles: InlineTextStylingProperties?,
+        colorScheme: ColorScheme,
+        completion: @escaping (NSAttributedString?) -> Void
+    ) {
         var convertedText = String(self)
 
         if let textColorHex {
             convertedText = "<font color=\(textColorHex)>" + self + "</font>"
         }
 
-        let nsAttrStr = try NSMutableAttributedString(
+        NSAttributedString.loadFromHTML(
+            data: Data(convertedText.utf8),
+            options: [.characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue)]
+        ) { [self] result, _, _ in
+            guard let rawAttrStr = result else {
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+            DispatchQueue.main.async {
+                let processed = try? self.applyHTMLPostProcessing(
+                    rawAttrStr, uiFont: uiFont, linkStyles: linkStyles, colorScheme: colorScheme
+                )
+                completion(processed)
+            }
+        }
+    }
+
+    private static func syncParseHTML(_ text: String, textColorHex: String?) throws -> NSMutableAttributedString {
+        var convertedText = text
+        if let textColorHex {
+            convertedText = "<font color=\(textColorHex)>" + text + "</font>"
+        }
+        return try NSMutableAttributedString(
             data: Data(convertedText.utf8),
             options: [
                 .documentType: NSAttributedString.DocumentType.html,
@@ -35,8 +69,17 @@ internal extension StringProtocol {
             ],
             documentAttributes: nil
         )
+    }
 
-        let attributedString = try AttributedString(nsAttrStr, including: \.uiKit)
+    private func applyHTMLPostProcessing(
+        _ nsAttrStr: NSAttributedString,
+        uiFont: UIFont?,
+        linkStyles: InlineTextStylingProperties?,
+        colorScheme: ColorScheme
+    ) throws -> NSAttributedString {
+        let attributedString = try AttributedString(
+            NSMutableAttributedString(attributedString: nsAttrStr), including: \.uiKit
+        )
 
         // add font weight here
         let morphedAttributeString = attributedString.transformingAttributes(
