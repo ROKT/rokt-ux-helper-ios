@@ -11,6 +11,7 @@
 
 import XCTest
 import SwiftUI
+import Combine
 import ViewInspector
 @testable import RoktUXHelper
 import DcuiSchema
@@ -218,7 +219,7 @@ final class TestRichTextComponent: XCTestCase {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
         richText.transformValueToAttributedString(.light)
-        waitForAttributedStringConversion(on: richText, timeout: 2.0)
+        waitForAttributedStringConversion(on: richText, timeout: 10.0)
         return richText
     }
 
@@ -226,16 +227,21 @@ final class TestRichTextComponent: XCTestCase {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextState(), context: .outer([]))
         richText.transformValueToAttributedString(.light)
-        waitForAttributedStringConversion(on: richText, timeout: 2.0)
+        waitForAttributedStringConversion(on: richText, timeout: 10.0)
         return richText
     }
 
-    /// Waits for the async HTML-to-attributed-string conversion to complete (runs main run loop).
+    /// Waits for the async HTML-to-attributed-string conversion to complete using XCTestExpectation.
     private func waitForAttributedStringConversion(on model: RichTextViewModel, timeout: TimeInterval) {
-        let deadline = Date().addingTimeInterval(timeout)
-        while model.attributedString.string.isEmpty && Date() < deadline {
-            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
-        }
+        guard model.attributedString.string.isEmpty else { return }
+        let exp = expectation(description: "attributedString populated")
+        var cancellable: AnyCancellable?
+        cancellable = model.$attributedString
+            .filter { !$0.string.isEmpty }
+            .first()
+            .sink { _ in exp.fulfill() }
+        waitForExpectations(timeout: timeout)
+        cancellable?.cancel()
     }
     
     func get_dark_config_model() throws -> LayoutSchemaViewModel? {
