@@ -20,51 +20,16 @@ internal extension StringProtocol {
         uiFont: UIFont?,
         linkStyles: InlineTextStylingProperties?,
         colorScheme: ColorScheme
-    ) throws -> NSAttributedString {
+    ) -> NSAttributedString {
         var convertedText = String(self)
 
         if let textColorHex {
             convertedText = "<font color=\(textColorHex)>" + self + "</font>"
         }
 
-        let nsAttrStr = try NSMutableAttributedString(
-            data: Data(convertedText.utf8),
-            options: [
-                .documentType: NSAttributedString.DocumentType.html,
-                .characterEncoding: String.Encoding.utf8.rawValue
-            ],
-            documentAttributes: nil
-        )
+        let parsed = LightweightHTMLParser.parse(html: convertedText, baseFont: uiFont)
 
-        let attributedString = try AttributedString(nsAttrStr, including: \.uiKit)
-
-        // add font weight here
-        let morphedAttributeString = attributedString.transformingAttributes(
-            AttributeScopes.UIKitAttributes.FontAttribute.self
-        ) { attrFont in
-            let isBold = (attrFont.value?.fontDescriptor.symbolicTraits.contains(.traitBold)) == true
-            let isItalic = (attrFont.value?.fontDescriptor.symbolicTraits.contains(.traitItalic)) == true
-
-            // remove font property override (TimesNewRoman)
-            attrFont.value = nil
-
-            guard var uiFont else { return }
-
-            if isBold, let boldFont = uiFont.including(symbolicTraits: .traitBold) {
-                uiFont = boldFont
-            }
-
-            if isItalic, let italicFont = uiFont.including(symbolicTraits: .traitItalic) {
-                uiFont = italicFont
-            }
-
-            attrFont.value = uiFont
-        }
-
-        // link styling must happen last
-        let mutableMorphed = NSMutableAttributedString(morphedAttributeString)
-
-        return updateLinkStyles(linkStyles, attrStr: mutableMorphed, colorScheme: colorScheme)
+        return updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
     }
 
     private func updateLinkStyles(_ linkStyles: InlineTextStylingProperties?,
