@@ -80,12 +80,13 @@ final class TestBasicTextComponent: XCTestCase {
         XCTAssertEqual(sut.stateReplacedValue, "ORDER Number: Uk171359906")
     }
 
+    /// Visual regression: BasicText with Arial 20pt, text color #AABBCC, pink background, fixed height 48px.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
             .frame(width: 350)
         
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
     }
     
     func get_model() throws -> BasicTextViewModel {

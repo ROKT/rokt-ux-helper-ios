@@ -26,11 +26,21 @@ runs:
         shutdown_after_job: true
 
     - name: Run unit tests
+      env:
+        SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/snapshot-failures
       run: >
         set -o pipefail &&
         xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.udid }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
+
+    - name: Upload snapshot failure diffs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: snapshot-failures
+        path: snapshot-failures/
+        if-no-files-found: ignore
 
     - name: Install xcresultparser
       if: ${{ inputs.codecov-token != '' }}
