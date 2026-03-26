@@ -135,3 +135,69 @@ waitForAttributedStringConversion(on: model, timeout: 2.0)
 ```
 
 This spins the main run loop until `model.attributedString.string` is non-empty or the timeout expires.
+
+### Snapshot Coverage Matrix
+
+This matrix tracks which visual scenarios have snapshot tests and which are known gaps. When adding a new feature or fixing a visual bug, check the relevant component below and add a snapshot for unchecked items where appropriate.
+
+#### BasicText
+
+- [x] Standard rendering -- font, text color, background, fixed height (`testSnapshot`)
+- [ ] Dark mode color adaptation
+- [ ] Text truncation with `lineLimit`
+- [ ] Min/max width constraints
+
+#### Column
+
+- [x] Standard rendering -- background color, centered child (`testSnapshot`)
+- [ ] Dark mode color adaptation
+- [ ] Border styling
+- [ ] Nested columns
+
+#### RichText
+
+- [x] Standard rendering -- bold, italic, underline, strikethrough with campaign font (`testSnapshot`)
+- [x] nil `defaultStyle` -- no styling provided, PR #220 regression guard (`testSnapshot_nilDefaultStyle`)
+- [x] nil text style -- style exists but no text properties, font-stripping guard (`testSnapshot_nilTextStyle`)
+- [ ] Link rendering with default blue underline
+- [ ] Custom link styling (campaign-configured colors/weight)
+- [ ] Dark mode with adapted text/link colors
+- [ ] Mixed HTML tags with `<br>` line breaks
+- [ ] Plain text with no HTML tags
+
+#### Row
+
+- [ ] Standard row layout with children
+- [ ] Row with spacing and alignment
+
+#### OneByOne (Distribution)
+
+- [ ] Embedded one-by-one layout (test exists but is commented out -- needs `perceptualPrecision` investigation)
+
+#### ScrollableColumn / ScrollableRow
+
+- [ ] Scrollable content rendering
+- [ ] Scroll indicator visibility
+
+#### Overlay
+
+- [ ] Overlay positioning and backdrop
+
+#### ToggleButton / CloseButton / CreativeResponse
+
+- [ ] Interactive component default states
+- [ ] Pressed/selected states
+
+#### StaticImage / DataImage
+
+- [ ] Image rendering with sizing constraints
+
+#### ZStack
+
+- [ ] Overlapping child layout
+
+#### ProgressIndicator / ProgressControl
+
+- [ ] Progress bar rendering at various states
+
+> **Contributing:** When you add a new snapshot test, check the box above and note the test method name. When you identify a new scenario worth covering, add an unchecked item.

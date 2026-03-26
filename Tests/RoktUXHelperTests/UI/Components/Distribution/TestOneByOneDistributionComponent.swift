@@ -88,9 +88,9 @@ final class TestOneByOneDistributionComponent: XCTestCase {
         XCTAssertFalse(SignalResponseCalled)
     }
 
+    /// Visual regression: Embedded one-by-one distribution layout rendered in a TestViewController.
+    /// Currently disabled pending investigation into perceptual precision usage.
     func testEmbeddedOneByOne() {
-        // Create a RoktLayoutUIView with TestViewController
-        // TODO: investigate perceptual precision usage.
 //        withSnapshotTesting(diffTool: .ksdiff) {
 //            waitForViewController("embedded_onebyone") { testViewController in
 //                assertSnapshot(of: testViewController, as: .image(on: .iPhone13Pro(.portrait)))
