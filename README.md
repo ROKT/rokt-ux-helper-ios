@@ -84,6 +84,24 @@ Open the `Package.swift` file with Xcode to start development.
 
 Press `command + U`, or `Product -> Test` from the menu bar.
 
+## Snapshot Testing
+
+Component tests use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) to catch visual regressions. Each snapshot test renders a component through the real SwiftUI view hierarchy (`EmbeddedComponent` → `LayoutSchemaComponent` → target component) into a `UIHostingController` and compares the result pixel-by-pixel against a reference PNG stored in `__Snapshots__/`.
+
+**How it works:**
+
+1. **First run** — no reference image exists, so the library records one and the test fails. Review the generated PNG, then commit it.
+2. **Subsequent runs** — the rendered output is compared against the committed reference. Any pixel difference fails the test.
+3. **Intentional changes** — delete the old snapshot (or set `isRecording = true`), re-run to record a new reference, review it, and commit.
+
+Reference images live alongside their test files at:
+
+```text
+Tests/RoktUXHelperTests/UI/Components/__Snapshots__/<TestClass>/<testMethod>.1.png
+```
+
+> **Tip:** Snapshots are environment-sensitive. Always record and compare on the same OS version and simulator device to avoid false failures from font-rendering differences.
+
 ## Key Dependencies & Gotchas
 
 ### SDK Dependencies
