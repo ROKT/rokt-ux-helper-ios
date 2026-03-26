@@ -59,7 +59,6 @@ final class TestZStackComponent: XCTestCase {
 
     // MARK: - Snapshots
 
-    /// Visual regression: ZStack with pink background, padding, and centered alignment.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(try get_model(.style)))
             .frame(width: 350, height: 350)

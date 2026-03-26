@@ -51,7 +51,6 @@ final class TestToggleButtonComponent: XCTestCase {
 
     // MARK: - Snapshots
 
-    /// Visual regression: ToggleButton default state with white/black adaptive background.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
             .frame(width: 350, height: 200)

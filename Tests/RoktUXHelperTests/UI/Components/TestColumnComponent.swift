@@ -60,7 +60,6 @@ final class TestColumnComponent: XCTestCase {
         XCTAssertEqual(alignment, .center)
     }
     
-    /// Visual regression: Column with pink background, centered BasicText child (Arial 12pt bold).
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(try get_model()))
             .frame(width: 350, height: 350)

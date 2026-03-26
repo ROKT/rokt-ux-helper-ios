@@ -130,7 +130,6 @@ final class TestScrollableColumn: XCTestCase {
 
     // MARK: - Snapshots
 
-    /// Visual regression: ScrollableColumn wrapping a Column with pink background and centered BasicText child.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
             .frame(width: 350, height: 350)

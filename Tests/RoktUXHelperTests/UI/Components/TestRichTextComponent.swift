@@ -206,63 +206,54 @@ final class TestRichTextComponent: XCTestCase {
         }
     }
     
-    /// Visual regression: RichText with HTML bold/italic/underline/strikethrough, Arial 20pt, text color #AABBCC.
+    // MARK: - Snapshots
+
     func testSnapshot() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_model()))
-            .frame(width: 350, height: 350)
-        
-        let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertRichTextSnapshot(try get_model(), width: 350, height: 350)
     }
 
-    // MARK: - Snapshot: nil defaultStyle (PR #220 regression guard)
-
-    /// Verifies HTML tags are parsed and rendered as styled text when defaultStyle is nil.
-    /// Without the fix from PR #220, this would show raw <b>, <i>, <a> tags as visible text.
     func testSnapshot_nilDefaultStyle() {
-        let html = "<b>Bold</b> and <i>italic</i> with <a href='https://rokt.com'>a link</a>"
         let model = RichTextViewModel(
-            value: html,
+            value: "<b>Bold</b> and <i>italic</i> with <a href='https://rokt.com'>a link</a>",
             defaultStyle: nil,
             openLinks: nil,
             layoutState: LayoutState(),
             eventService: nil
         )
-        model.transformValueToAttributedString(.light)
-        waitForAttributedStringConversion(on: model, timeout: 2.0)
-
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(model))
-            .frame(width: 350, height: 200)
-
-        let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertRichTextSnapshot(model)
     }
 
-    // MARK: - Snapshot: nil uiFont (font-stripping regression guard)
-
-    /// Verifies rendering when style exists but text properties are nil (no campaign font).
-    /// The WebKit morphing code strips the font in this case, losing bold/italic traits.
-    /// This snapshot documents the current behavior and will change when the lightweight parser lands (PR #219).
     func testSnapshot_nilTextStyle() {
-        let html = "<b>Bold</b> and <i>italic</i> text"
-        let style = RichTextStyle(dimension: nil, flexChild: nil, spacing: nil, background: nil, text: nil)
         let model = RichTextViewModel(
-            value: html,
-            defaultStyle: [style],
+            value: "<b>Bold</b> and <i>italic</i> text",
+            defaultStyle: [RichTextStyle(dimension: nil, flexChild: nil, spacing: nil, background: nil, text: nil)],
             openLinks: nil,
             layoutState: LayoutState(),
             eventService: nil
         )
-        model.transformValueToAttributedString(.light)
+        assertRichTextSnapshot(model)
+    }
+
+    // MARK: - Helpers
+
+    private func assertRichTextSnapshot(
+        _ model: RichTextViewModel,
+        colorMode: RoktUXConfig.ColorMode? = .light,
+        width: CGFloat = 350,
+        height: CGFloat = 200,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        model.transformValueToAttributedString(colorMode)
         waitForAttributedStringConversion(on: model, timeout: 2.0)
 
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(model))
-            .frame(width: 350, height: 200)
+            .frame(width: width, height: height)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, line: line)
     }
-    
+
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
@@ -279,7 +270,6 @@ final class TestRichTextComponent: XCTestCase {
         return richText
     }
 
-    /// Waits for the async HTML-to-attributed-string conversion to complete (runs main run loop).
     private func waitForAttributedStringConversion(on model: RichTextViewModel, timeout: TimeInterval) {
         let deadline = Date().addingTimeInterval(timeout)
         while model.attributedString.string.isEmpty && Date() < deadline {

@@ -75,7 +75,6 @@ final class TestCreativeResponseComponent: XCTestCase {
     
     // MARK: - Snapshots
 
-    /// Visual regression: Positive creative response button with black background and 10px padding.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
             .frame(width: 350, height: 200)

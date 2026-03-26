@@ -143,7 +143,6 @@ final class TestRowComponent: XCTestCase {
 
     // MARK: - Snapshots
 
-    /// Visual regression: Row with pink background, centered BasicText child, fixed 140x24 frame.
     func testSnapshot() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.basicText)))
             .frame(width: 350, height: 200)
@@ -152,7 +151,6 @@ final class TestRowComponent: XCTestCase {
         assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
     }
 
-    /// Visual regression: Row with multiple children (BasicText, RichText, CloseButton).
     func testSnapshot_withChildren() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.children)))
             .frame(width: 350, height: 200)

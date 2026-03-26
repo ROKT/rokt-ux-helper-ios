@@ -88,8 +88,6 @@ final class TestOneByOneDistributionComponent: XCTestCase {
         XCTAssertFalse(SignalResponseCalled)
     }
 
-    /// Visual regression: Embedded one-by-one distribution layout rendered in a TestViewController.
-    /// Currently disabled pending investigation into perceptual precision usage.
     func testEmbeddedOneByOne() {
 //        withSnapshotTesting(diffTool: .ksdiff) {
 //            waitForViewController("embedded_onebyone") { testViewController in
