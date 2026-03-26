@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -47,6 +48,19 @@ final class TestToggleButtonComponent: XCTestCase {
         
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#FFFFFF", dark: "#000000"))
     }
+
+    // MARK: - Snapshots
+
+    /// Visual regression: ToggleButton default state with white/black adaptive background.
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
+            .frame(width: 350, height: 200)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model() throws -> ToggleButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

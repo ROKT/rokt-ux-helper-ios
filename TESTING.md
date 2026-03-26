@@ -167,34 +167,51 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 #### Row
 
-- [ ] Standard row layout with children
-- [ ] Row with spacing and alignment
+- [x] Standard rendering -- pink background, centered BasicText child, fixed 140x24 frame (`testSnapshot`)
+- [x] Multiple children -- BasicText, RichText, CloseButton in a single row (`testSnapshot_withChildren`)
+
+#### ZStack
+
+- [x] Standard rendering -- pink background, padding, centered alignment (`testSnapshot`)
+- [ ] Multiple overlapping children
 
 #### OneByOne (Distribution)
 
 - [ ] Embedded one-by-one layout (test exists but is commented out -- needs `perceptualPrecision` investigation)
 
-#### ScrollableColumn / ScrollableRow
+#### ScrollableColumn
 
-- [ ] Scrollable content rendering
+- [x] Standard rendering -- Column with pink background inside a ScrollView (`testSnapshot`)
+- [ ] Max height constraint variant
+- [ ] Scroll indicator visibility
+
+#### ScrollableRow
+
+- [ ] Standard rendering
 - [ ] Scroll indicator visibility
 
 #### Overlay
 
 - [ ] Overlay positioning and backdrop
 
-#### ToggleButton / CloseButton / CreativeResponse
+#### CreativeResponse
 
-- [ ] Interactive component default states
-- [ ] Pressed/selected states
+- [x] Positive response button -- black background, 10px padding (`testSnapshot`)
+- [ ] Negative response button
+- [ ] Pressed/hover state
+
+#### ToggleButton
+
+- [x] Default state -- white/black adaptive background (`testSnapshot`)
+- [ ] Selected/toggled state
+
+#### CloseButton
+
+- [ ] Default close button rendering
 
 #### StaticImage / DataImage
 
 - [ ] Image rendering with sizing constraints
-
-#### ZStack
-
-- [ ] Overlapping child layout
 
 #### ProgressIndicator / ProgressControl
 

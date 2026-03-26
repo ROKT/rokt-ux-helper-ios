@@ -92,11 +92,19 @@ All snapshot tests share a single device config (`snapshotDevice` in `Tests/.../
 
 **Current snapshot coverage:**
 
-- `TestBasicTextComponent/testSnapshot` -- BasicText with Arial 20pt, text color, pink background, fixed height
-- `TestColumnComponent/testSnapshot` -- Column with pink background and centered BasicText child
-- `TestRichTextComponent/testSnapshot` -- RichText with HTML bold/italic/underline/strikethrough and campaign font
-- `TestRichTextComponent/testSnapshot_nilDefaultStyle` -- RichText when no `defaultStyle` is provided (PR #220 regression guard)
-- `TestRichTextComponent/testSnapshot_nilTextStyle` -- RichText with a style but no `text` properties (font-stripping regression guard)
+- `TestBasicTextComponent/testSnapshot` -- BasicText with font, color, background, fixed height
+- `TestColumnComponent/testSnapshot` -- Column with background and centered child
+- `TestRichTextComponent/testSnapshot` -- RichText with HTML bold/italic/underline/strikethrough
+- `TestRichTextComponent/testSnapshot_nilDefaultStyle` -- nil `defaultStyle` regression guard
+- `TestRichTextComponent/testSnapshot_nilTextStyle` -- nil text style font-stripping guard
+- `TestRowComponent/testSnapshot` -- Row with background and BasicText child
+- `TestRowComponent/testSnapshot_withChildren` -- Row with multiple children
+- `TestScrollableColumn/testSnapshot` -- ScrollableColumn wrapping a styled Column
+- `TestZStackComponent/testSnapshot` -- ZStack with background and centered alignment
+- `TestCreativeResponseComponent/testSnapshot` -- Positive creative response button
+- `TestToggleButtonComponent/testSnapshot` -- ToggleButton default state
+
+See [TESTING.md](./TESTING.md) for the full coverage matrix including known gaps.
 
 **Workflow:**
 
