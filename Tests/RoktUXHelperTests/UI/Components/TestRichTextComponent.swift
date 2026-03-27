@@ -203,7 +203,7 @@ final class TestRichTextComponent: XCTestCase {
 
     func testSnapshot_nilDefaultStyle() {
         let model = RichTextViewModel(
-            value: "<b>Bold</b> and <i>italic</i> with <a href='https://rokt.com'>a link</a>",
+            value: "<b>Bold</b> and <i>italic</i> with <font color=#0066CC><a href='https://rokt.com'>a link</a></font>",
             defaultStyle: nil,
             openLinks: nil,
             layoutState: LayoutState(),
