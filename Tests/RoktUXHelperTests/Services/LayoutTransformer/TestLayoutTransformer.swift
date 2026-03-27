@@ -679,7 +679,8 @@ final class TestLayoutTransformer: XCTestCase {
         return OfferModel(
             campaignId: "campaignId",
             creative: creative,
-            catalogItems: nil
+            catalogItems: nil,
+            catalogItemGroup: nil
         )
     }
 
@@ -692,13 +693,23 @@ final class TestLayoutTransformer: XCTestCase {
             title: "title",
             description: "description",
             price: nil,
+            priceFormatted: nil,
             originalPrice: nil,
             originalPriceFormatted: nil,
             currency: "USD",
-            linkedProductId: nil,
+            signalType: nil,
+            url: nil,
+            minItemCount: nil,
+            maxItemCount: nil,
+            preSelectedQuantity: nil,
+            providerData: "{}",
+            urlBehavior: nil,
             positiveResponseText: "Add to cart",
             negativeResponseText: "No thanks",
-            providerData: "{}",
+            addOns: nil,
+            copy: nil,
+            inventoryStatus: nil,
+            linkedProductId: nil,
             token: "token"
         )
     }

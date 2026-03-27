@@ -80,7 +80,8 @@ final class TestImageCarouselComponent: XCTestCase {
                                                           links: nil,
                                                           responseOptionsMap: nil,
                                                           jwtToken: "creative-token"),
-                                           catalogItems: nil),
+                                           catalogItems: nil,
+                                           catalogItemGroup: nil),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
     }

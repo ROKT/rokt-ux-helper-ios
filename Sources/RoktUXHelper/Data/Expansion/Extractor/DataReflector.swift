@@ -15,13 +15,11 @@ import Foundation
 
 /// Extracts nested property values from entity `Data` given a sequential chain of property keys in `keys`
 protocol DataReflecting {
-    associatedtype U
-
-    func getReflectedValue(data: Mirror, keys: [String]) -> U?
+    func getReflectedValue(data: Mirror, keys: [String]) -> Any?
 }
 
 struct DataReflector: DataReflecting {
-    func getReflectedValue(data: Mirror, keys: [String]) -> String? {
+    func getReflectedValue(data: Mirror, keys: [String]) -> Any? {
         guard let keyToCheck = keys.first else { return nil }
 
         var targetProperty: Any?
@@ -43,6 +41,14 @@ struct DataReflector: DataReflecting {
                 targetProperty = valueDict[remainingKeysAsString]
 
                 break
+            } else if let valueDict = child.value as? [String: Any] {
+                // support dictionaries with heterogeneous value types
+                let remainingKeys = Array(keys.dropFirst())
+                let remainingKeysAsString = remainingKeys.joined(separator: BNFSeparator.namespace.rawValue)
+
+                targetProperty = valueDict[remainingKeysAsString]
+
+                break
             } else {
                 // recursion to keep digging into nested properties
                 let reflectedChildValue = Mirror(reflecting: child.value)
@@ -52,6 +58,6 @@ struct DataReflector: DataReflecting {
             }
         }
 
-        return targetProperty as? String
+        return targetProperty
     }
 }

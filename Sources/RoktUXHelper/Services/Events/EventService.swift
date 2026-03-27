@@ -142,6 +142,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         parentGuid: String,
         extraMetadata: [RoktEventNameValue] = [RoktEventNameValue](),
         eventData: [String: String] = [:],
+        objectData: [String: String]? = nil,
         jwtToken: String
     ) {
         processor.handle(
@@ -151,6 +152,7 @@ class EventService: Hashable, EventDiagnosticServicing {
                 parentGuid: parentGuid,
                 extraMetadata: extraMetadata,
                 eventData: eventData,
+                objectData: objectData,
                 pageInstanceGuid: pageInstanceGuid,
                 jwtToken: jwtToken
             )

@@ -97,7 +97,8 @@ extension OfferModel {
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),
-            catalogItems: nil
+            catalogItems: nil,
+            catalogItemGroup: nil
         )
     }
 }
@@ -119,13 +120,23 @@ extension CatalogItem {
             title: "Catalog Title",
             description: "Catalog Description",
             price: 14.99,
+            priceFormatted: "$14.99",
             originalPrice: 14.99,
             originalPriceFormatted: "$14.99",
             currency: "USD",
-            linkedProductId: "linked",
+            signalType: nil,
+            url: nil,
+            minItemCount: nil,
+            maxItemCount: nil,
+            preSelectedQuantity: nil,
+            providerData: "861425",
+            urlBehavior: nil,
             positiveResponseText: "Add to order",
             negativeResponseText: "Dismiss",
-            providerData: "861425",
+            addOns: nil,
+            copy: nil,
+            inventoryStatus: nil,
+            linkedProductId: "linked",
             token: "catalog1Token"
         )
     }

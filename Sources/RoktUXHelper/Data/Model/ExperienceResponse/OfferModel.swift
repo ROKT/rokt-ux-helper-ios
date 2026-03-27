@@ -15,6 +15,7 @@ struct OfferModel: Codable {
     let campaignId: String?
     let creative: CreativeModel
     let catalogItems: [CatalogItem]?
+    let catalogItemGroup: CatalogItemGroup?
 }
 
 struct CreativeModel: Codable {

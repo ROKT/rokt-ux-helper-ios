@@ -123,7 +123,8 @@ final class TestDataImageComponent: XCTestCase {
                                                           links: nil,
                                                           responseOptionsMap: nil,
                                                           jwtToken: "creative-token"),
-                                           catalogItems: nil),
+                                           catalogItems: nil,
+                                           catalogItemGroup: nil),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
     }
