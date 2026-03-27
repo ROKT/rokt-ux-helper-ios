@@ -36,7 +36,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
             
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 14)
+            XCTAssertEqual(processedRequests.count, 16)
 
             allEventTypes.forEach { eventType in
                 
@@ -89,7 +89,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(processedPayload.integration.platform, "iOS")
             
             let processedRequests = processedPayload.events
-            XCTAssertEqual(processedRequests.count, 12)
+            XCTAssertEqual(processedRequests.count, 14)
             expectation.fulfill()
         }
         allEventTypes.forEach {
@@ -331,6 +331,35 @@ final class TestEventProcessor: XCTestCase {
         // Since the ProcessedEvent equality is based on sessionId, parentGuid, eventType, pageInstanceGuid, and eventData,
         // changing metadata, date or JWT token should not create new events
         XCTAssertEqual(receivedPayload?.count, 1, "All events should be considered duplicates except for the first one")
+    }
+
+    func testSignalUserInteractionBypassesDeduplication() {
+        let expectation = expectation(description: "user interaction should not deduplicate")
+        var receivedPayload: [RoktEventRequest]?
+        let date = Date()
+
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            guard let self else {
+                XCTFail("Fail self")
+                return
+            }
+            receivedPayload = deserialize(payload)?.events
+            expectation.fulfill()
+        }
+
+        let event = mockEvent(
+            eventType: .SignalUserInteraction,
+            date: date,
+            eventData: ["action": "click"]
+        )
+
+        sut.handle(event: event)
+        sut.handle(event: event)
+
+        wait(for: [expectation], timeout: 1)
+
+        XCTAssertEqual(receivedPayload?.count, 2)
+        XCTAssertEqual(receivedPayload?.filter { $0.eventType == .SignalUserInteraction }.count, 2)
     }
 
     func testDelayProcessorDeallocation() {
