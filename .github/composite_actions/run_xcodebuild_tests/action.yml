@@ -53,7 +53,7 @@ runs:
       with:
         name: snapshot-failures
         path: snapshot-failures/
-        if-no-files-found: ignore
+        if-no-files-found: warn
 
     - name: Install xcresultparser
       if: ${{ inputs.codecov-token != '' }}
