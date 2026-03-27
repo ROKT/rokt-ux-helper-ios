@@ -189,6 +189,22 @@ public class RoktUX: UXEventsDelegate {
         }
     }
 
+    /**
+     Call when device pay has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the purchase succeeded or failed.
+     */
+    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+        if success {
+            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
+        }
+    }
+
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,

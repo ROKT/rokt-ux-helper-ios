@@ -3,7 +3,13 @@ import SwiftUI
 import Combine
 
 enum LayoutDismissOptions {
-    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered
+    case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered, instantPurchaseDismiss
+}
+
+enum DevicePayStatus {
+    case success
+    case failure
+    case retry
 }
 
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
@@ -26,6 +32,8 @@ class EventService: Hashable, EventDiagnosticServicing {
     var responseReceivedDate: Date
     var isFirstPositiveEngagementSend = false
     var dismissOption: LayoutDismissOptions?
+
+    private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -121,6 +129,8 @@ class EventService: Hashable, EventDiagnosticServicing {
             sendDismissalCollapsedEvent()
         case .partnerTriggered:
             sendDismissalPartnerTriggeredEvent()
+        case .instantPurchaseDismiss:
+            sendInstantPurchaseDissmissOfferEvent()
         default:
             sendDefaultDismissEvent()
         }
@@ -178,20 +188,36 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
-    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem) {
+    func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        let objectData = [
+            kAction: action.rawValue,
+            kContext: context.rawValue
+        ]
+        sendCartItemEvent(eventType: .SignalUserInteraction, catalogItem: catalogItem, objectData: objectData)
+    }
+
+    func cartItemDevicePaySuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
+
+        devicePayCompletion?(.success)
+        devicePayCompletion = nil
+    }
+
+    func cartItemDevicePayFailure(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
+
+        devicePayCompletion?(.failure)
+        devicePayCompletion = nil
+    }
+
+    private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem, objectData: [String: String]? = nil) {
         sendEvent(
             eventType,
             parentGuid: catalogItem.instanceGuid,
-            eventData: [
-                kCartItemId: catalogItem.cartItemId,
-                kCatalogItemId: catalogItem.catalogItemId,
-                kCurrency: catalogItem.currency,
-                kDescription: catalogItem.description,
-                kLinkedProductId: catalogItem.linkedProductId ?? "",
-                kTotalPrice: "\(catalogItem.originalPrice ?? 0.0)",
-                kQuantity: "1",
-                kUnitPrice: "\(catalogItem.originalPrice ?? 0.0)"
-            ],
+            objectData: objectData,
             jwtToken: catalogItem.token
         )
     }
@@ -262,6 +288,12 @@ class EventService: Hashable, EventDiagnosticServicing {
                   jwtToken: pluginConfigJWTToken)
     }
 
+    private func sendInstantPurchaseDissmissOfferEvent() {
+        sendEvent(.SignalInstantPurchaseDismissal, parentGuid: pluginInstanceGuid,
+                  extraMetadata: [RoktEventNameValue(name: kInitiator, value: kInstantPurchaseDismiss)],
+                  jwtToken: pluginConfigJWTToken)
+    }
+
     private func sendDismissalNoMoreOfferEvent() {
         sendEvent(.SignalDismissal, parentGuid: pluginInstanceGuid,
                   extraMetadata: [RoktEventNameValue(name: kInitiator, value: kNoMoreOfferToShow)],
@@ -296,7 +328,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         switch dismissOption {
         case .noMoreOffer, .endMessage, .collapsed:
             uxEventDelegate?.onPlacementCompleted(pluginId)
-        case .closeButton, .partnerTriggered:
+        case .closeButton, .partnerTriggered, .instantPurchaseDismiss:
             uxEventDelegate?.onPlacementClosed(pluginId)
         default:
             uxEventDelegate?.onPlacementClosed(pluginId)
