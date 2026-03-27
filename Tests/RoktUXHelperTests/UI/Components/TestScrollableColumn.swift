@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -126,6 +127,18 @@ final class TestScrollableColumn: XCTestCase {
         XCTAssertNotNil(sut.dimensionStyle)
         XCTAssertEqual(sut.dimensionStyle?.maxHeight, 200)
     }
+
+    // MARK: - Snapshots
+
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
+            .frame(width: 350, height: 350)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

@@ -86,21 +86,40 @@ Press `command + U`, or `Product -> Test` from the menu bar.
 
 ## Snapshot Testing
 
-Component tests use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) to catch visual regressions. Each snapshot test renders a component through the real SwiftUI view hierarchy (`EmbeddedComponent` → `LayoutSchemaComponent` → target component) into a `UIHostingController` and compares the result pixel-by-pixel against a reference PNG stored in `__Snapshots__/`.
+Component tests use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) to catch visual regressions. Each snapshot test renders a component via `UIHostingController` and compares the result pixel-by-pixel against a committed reference PNG.
 
-**How it works:**
+All snapshot tests share a single device config (`snapshotDevice` in `Tests/.../UI/Utils/SnapshotConfig.swift`) so the viewport is consistent. CI runs these alongside unit tests and uploads failure diffs as a `snapshot-failures` build artifact when any test fails.
 
-1. **First run** — no reference image exists, so the library records one and the test fails. Review the generated PNG, then commit it.
-2. **Subsequent runs** — the rendered output is compared against the committed reference. Any pixel difference fails the test.
-3. **Intentional changes** — delete the old snapshot (or set `isRecording = true`), re-run to record a new reference, review it, and commit.
+**Current snapshot coverage:**
 
-Reference images live alongside their test files at:
+- `TestBasicTextComponent/testSnapshot` -- BasicText with font, color, background, fixed height
+- `TestColumnComponent/testSnapshot` -- Column with background and centered child
+- `TestRichTextComponent/testSnapshot` -- RichText with HTML bold/italic/underline/strikethrough
+- `TestRichTextComponent/testSnapshot_nilDefaultStyle` -- nil `defaultStyle` regression guard
+- `TestRichTextComponent/testSnapshot_nilTextStyle` -- nil text style font-stripping guard
+- `TestRowComponent/testSnapshot` -- Row with background and BasicText child
+- `TestRowComponent/testSnapshot_withChildren` -- Row with multiple children
+- `TestScrollableColumn/testSnapshot` -- ScrollableColumn wrapping a styled Column
+- `TestZStackComponent/testSnapshot` -- ZStack with background and centered alignment
+- `TestCreativeResponseComponent/testSnapshot` -- Positive creative response button
+- `TestToggleButtonComponent/testSnapshot` -- ToggleButton default state
+
+See [TESTING.md](./TESTING.md) for the full coverage matrix including known gaps.
+
+**Workflow:**
+
+1. **First run** -- no reference image exists; the library records one and fails. Review the PNG, then commit it.
+2. **Subsequent runs** -- rendered output is compared against the reference. Any pixel difference fails the test.
+3. **Intentional UI changes** -- if your code change intentionally alters component appearance, snapshot tests will fail. Delete the old PNGs from `__Snapshots__/`, re-run to re-record, visually inspect, and commit the updated images with your PR. See [TESTING.md](./TESTING.md) for the full step-by-step process.
+4. **CI failures** -- download the `snapshot-failures` artifact from the Actions run to inspect the actual vs. expected diff.
+
+Reference images live at:
 
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/<TestClass>/<testMethod>.1.png
 ```
 
-> **Tip:** Snapshots are environment-sensitive. Always record and compare on the same OS version and simulator device to avoid false failures from font-rendering differences.
+For a detailed guide on adding new snapshots, see [TESTING.md](./TESTING.md).
 
 ## Key Dependencies & Gotchas
 

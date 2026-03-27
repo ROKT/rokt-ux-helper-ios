@@ -65,7 +65,7 @@ final class TestColumnComponent: XCTestCase {
             .frame(width: 350, height: 350)
         
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
     }
     
     func get_model() throws -> ColumnViewModel {

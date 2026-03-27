@@ -89,8 +89,6 @@ final class TestOneByOneDistributionComponent: XCTestCase {
     }
 
     func testEmbeddedOneByOne() {
-        // Create a RoktLayoutUIView with TestViewController
-        // TODO: investigate perceptual precision usage.
 //        withSnapshotTesting(diffTool: .ksdiff) {
 //            waitForViewController("embedded_onebyone") { testViewController in
 //                assertSnapshot(of: testViewController, as: .image(on: .iPhone13Pro(.portrait)))

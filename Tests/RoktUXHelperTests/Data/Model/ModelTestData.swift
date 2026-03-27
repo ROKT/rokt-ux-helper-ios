@@ -293,6 +293,11 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_toggle_button")
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
+
+        static func toggleButtonWithLabel() -> ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_toggle_button_with_label")
+            return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
     }
     
     enum CatalogResponseButtonData {

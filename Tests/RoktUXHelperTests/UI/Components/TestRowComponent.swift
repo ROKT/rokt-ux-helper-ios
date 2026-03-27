@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -139,6 +140,18 @@ final class TestRowComponent: XCTestCase {
         XCTAssertEqual(richTextStyle.spacing?.padding, nil)
         XCTAssertEqual(richTextStyle.spacing?.offset, nil)
     }
+
+    // MARK: - Snapshots
+
+    func testSnapshot_withChildren() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.children)))
+            .frame(width: 350, height: 200)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model(_ layout: LayoutName) throws -> RowViewModel {
         let row: RowModel<LayoutSchemaModel, WhenPredicate>

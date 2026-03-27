@@ -206,12 +206,53 @@ final class TestRichTextComponent: XCTestCase {
         }
     }
     
+    // MARK: - Snapshots
+
     func testSnapshot() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(try get_model()))
-            .frame(width: 350, height: 350)
-        
+        assertRichTextSnapshot(try get_model(), width: 350, height: 350)
+    }
+
+    func testSnapshot_nilDefaultStyle() {
+        let model = RichTextViewModel(
+            value: "<b>Bold</b> and <i>italic</i> with <a href='https://rokt.com'>a link</a>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model)
+    }
+
+    func testSnapshot_nilTextStyle() {
+        let model = RichTextViewModel(
+            value: "<b>Bold</b> and <i>italic</i> text",
+            defaultStyle: [RichTextStyle(dimension: nil, flexChild: nil, spacing: nil, background: nil, text: nil)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model)
+    }
+
+    // MARK: - Helpers
+
+    private func assertRichTextSnapshot(
+        _ model: RichTextViewModel,
+        colorMode: RoktUXConfig.ColorMode? = .light,
+        width: CGFloat = 350,
+        height: CGFloat = 200,
+        file: StaticString = #file,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        model.transformValueToAttributedString(colorMode)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.richText(model))
+            .frame(width: width, height: height)
+
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: .iPhone13Pro(.portrait)))
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, testName: testName, line: line)
     }
     
     // MARK: - Nil / empty defaultStyle tests
@@ -303,8 +344,6 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertNotNil(link)
     }
 
-    // MARK: - Existing helpers
-
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
@@ -321,7 +360,6 @@ final class TestRichTextComponent: XCTestCase {
         return richText
     }
 
-    /// Waits for the async HTML-to-attributed-string conversion to complete (runs main run loop).
     private func waitForAttributedStringConversion(on model: RichTextViewModel, timeout: TimeInterval) {
         let deadline = Date().addingTimeInterval(timeout)
         while model.attributedString.string.isEmpty && Date() < deadline {

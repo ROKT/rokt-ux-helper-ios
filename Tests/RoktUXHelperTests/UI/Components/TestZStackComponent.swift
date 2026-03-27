@@ -12,6 +12,7 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -55,6 +56,18 @@ final class TestZStackComponent: XCTestCase {
         let alignment = try zstack.alignment()
         XCTAssertEqual(alignment, .center)
     }
+
+    // MARK: - Snapshots
+
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(try get_model(.style)))
+            .frame(width: 350, height: 350)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model(_ layoutName: LayoutName) throws -> ZStackViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
