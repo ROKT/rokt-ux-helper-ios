@@ -62,7 +62,9 @@ final class FormValidationCoordinator: FormValidationCoordinating {
 
     @discardableResult
     func validate(fields keys: [String]) -> Bool {
-        keys.allSatisfy { validate(field: $0) }
+        // Eagerly validate every field so all onStatusChange callbacks fire,
+        // even after the first failure (allSatisfy alone would short-circuit).
+        keys.map { validate(field: $0) }.allSatisfy { $0 }
     }
 
     @discardableResult
