@@ -21,6 +21,9 @@ class MockEventService: EventServicing {
     var cartItemInstantPurchaseCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
+    var cartItemUserInteractionCalled = false
+    var cartItemDevicePaySuccessCalled = false
+    var cartItemDevicePayFailureCalled = false
 
     // MARK: - Protocol Properties
 
@@ -81,6 +84,18 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
+    func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
+        cartItemUserInteractionCalled = true
+    }
+
+    func cartItemDevicePaySuccess(itemId: String) {
+        cartItemDevicePaySuccessCalled = true
+    }
+
+    func cartItemDevicePayFailure(itemId: String) {
+        cartItemDevicePayFailureCalled = true
+    }
+
     // MARK: - Additional Test Methods
 
     func sendImpressionEvents(currentOffer: Int) {
@@ -113,6 +128,9 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseCalled = false
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
+        cartItemUserInteractionCalled = false
+        cartItemDevicePaySuccessCalled = false
+        cartItemDevicePayFailureCalled = false
         dismissOption = nil
     }
 }
