@@ -234,14 +234,33 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(fontAfter?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
     }
 
-    // MARK: - Nil base font
+    // MARK: - Nil base font (falls back to system font)
 
-    func test_nil_base_font() {
+    func test_nil_base_font_still_applies_bold() {
         let result = LightweightHTMLParser.parse(html: "<b>Bold</b>", baseFont: nil)
         XCTAssertEqual(result.string, "Bold")
 
-        let font = result.attribute(.font, at: 0, effectiveRange: nil)
-        XCTAssertNil(font)
+        let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertNotNil(font)
+        XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_nil_base_font_still_applies_italic() {
+        let result = LightweightHTMLParser.parse(html: "<i>Italic</i>", baseFont: nil)
+        XCTAssertEqual(result.string, "Italic")
+
+        let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertNotNil(font)
+        XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitItalic), true)
+    }
+
+    func test_nil_base_font_uses_system_font_size() {
+        let result = LightweightHTMLParser.parse(html: "Plain", baseFont: nil)
+        XCTAssertEqual(result.string, "Plain")
+
+        let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertNotNil(font)
+        XCTAssertEqual(font?.pointSize, UIFont.systemFontSize)
     }
 
     // MARK: - HTML entities

@@ -33,7 +33,7 @@ enum LightweightHTMLParser {
             if html[index] == "<" {
                 if let (tag, nextIndex) = scanTag(in: html, from: index) {
                     index = nextIndex
-                    handleTag(tag, stack: &tagStack, result: result, baseFont: baseFont)
+                    handleTag(tag, stack: &tagStack, result: result)
                 } else {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: "<", attributes: attrs))
@@ -67,8 +67,7 @@ enum LightweightHTMLParser {
     private static func handleTag(
         _ tag: Tag,
         stack: inout [Tag],
-        result: NSMutableAttributedString,
-        baseFont: UIFont?
+        result: NSMutableAttributedString
     ) {
         if tag.isClosing {
             if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
@@ -214,12 +213,11 @@ enum LightweightHTMLParser {
 
         var attrs: [NSAttributedString.Key: Any] = [:]
 
-        if let baseFont {
-            var font = baseFont
-            if isBold, let bold = font.including(symbolicTraits: .traitBold) { font = bold }
-            if isItalic, let italic = font.including(symbolicTraits: .traitItalic) { font = italic }
-            attrs[.font] = font
-        }
+        let resolvedFont = baseFont ?? .systemFont(ofSize: UIFont.systemFontSize)
+        var font = resolvedFont
+        if isBold, let bold = font.including(symbolicTraits: .traitBold) { font = bold }
+        if isItalic, let italic = font.including(symbolicTraits: .traitItalic) { font = italic }
+        attrs[.font] = font
 
         if let foregroundColor { attrs[.foregroundColor] = foregroundColor }
         if isUnderline { attrs[.underlineStyle] = NSUnderlineStyle.single.rawValue }

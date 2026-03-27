@@ -296,7 +296,7 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertFalse(model.attributedString.string.contains("<b>"))
     }
 
-    func test_rich_text_nil_default_style_strips_tags_without_font() {
+    func test_rich_text_nil_default_style_preserves_bold() {
         let html = "<b>Bold</b> normal"
         let model = RichTextViewModel(
             value: html,
@@ -309,11 +309,14 @@ final class TestRichTextComponent: XCTestCase {
         waitForAttributedStringConversion(on: model, timeout: 2.0)
 
         XCTAssertEqual(model.attributedString.string, "Bold normal")
-        // The WebKit morphing code strips the font when uiFont is nil
-        // (it removes Times New Roman but has no replacement font to apply).
-        // Bold traits are only preserved when a campaign uiFont is provided.
-        let font = model.attributedString.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
-        XCTAssertNil(font)
+
+        let boldFont = model.attributedString.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertNotNil(boldFont)
+        XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+
+        let plainFont = model.attributedString.attribute(.font, at: 5, effectiveRange: nil) as? UIFont
+        XCTAssertNotNil(plainFont)
+        XCTAssertEqual(plainFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
     }
 
     func test_rich_text_nil_default_style_preserves_link() {
