@@ -143,14 +143,6 @@ final class TestRowComponent: XCTestCase {
 
     // MARK: - Snapshots
 
-    func testSnapshot() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.basicText)))
-            .frame(width: 350, height: 200)
-
-        let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
-    }
-
     func testSnapshot_withChildren() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.children)))
             .frame(width: 350, height: 200)

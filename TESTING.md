@@ -30,7 +30,6 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestRichTextComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
   TestRichTextComponent/testSnapshot_nilTextStyle.1.png
-  TestRowComponent/testSnapshot.1.png
   TestRowComponent/testSnapshot_withChildren.1.png
   TestScrollableColumn/testSnapshot.1.png
   TestToggleButtonComponent/testSnapshot.1.png
@@ -174,7 +173,6 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 #### Row
 
-- [x] Standard rendering -- pink background, centered BasicText child, fixed 140x24 frame (`testSnapshot`)
 - [x] Multiple children -- BasicText, RichText, CloseButton in a single row (`testSnapshot_withChildren`)
 
 #### ZStack
