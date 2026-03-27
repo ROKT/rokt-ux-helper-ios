@@ -52,7 +52,7 @@ final class TestToggleButtonComponent: XCTestCase {
     // MARK: - Snapshots
 
     func testSnapshot() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model()))
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_snapshot_model()))
             .frame(width: 350, height: 200)
 
         let hostingController = UIHostingController(rootView: view)
@@ -64,6 +64,14 @@ final class TestToggleButtonComponent: XCTestCase {
     func get_model() throws -> ToggleButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
+        return try transformer.getToggleButton(customStateKey: model.customStateKey,
+                                               styles: model.styles,
+                                               children: transformer.transformChildren(model.children, context: .outer([])))
+    }
+
+    func get_snapshot_model() throws -> ToggleButtonViewModel {
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
+        let model = ModelTestData.ToggleButtonData.toggleButtonWithLabel()
         return try transformer.getToggleButton(customStateKey: model.customStateKey,
                                                styles: model.styles,
                                                children: transformer.transformChildren(model.children, context: .outer([])))

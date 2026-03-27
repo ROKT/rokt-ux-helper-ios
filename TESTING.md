@@ -24,17 +24,24 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
-  TestBasicTextComponent/
-    testSnapshot.1.png
-  TestColumnComponent/
-    testSnapshot.1.png
-  TestRichTextComponent/
-    testSnapshot.1.png
-    testSnapshot_nilDefaultStyle.1.png
-    testSnapshot_nilTextStyle.1.png
+  TestBasicTextComponent/testSnapshot.1.png
+  TestColumnComponent/testSnapshot.1.png
+  TestCreativeResponseComponent/testSnapshot.1.png
+  TestRichTextComponent/testSnapshot.1.png
+  TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
+  TestRichTextComponent/testSnapshot_nilTextStyle.1.png
+  TestRowComponent/testSnapshot.1.png
+  TestRowComponent/testSnapshot_withChildren.1.png
+  TestScrollableColumn/testSnapshot.1.png
+  TestToggleButtonComponent/testSnapshot.1.png
+  TestZStackComponent/testSnapshot.1.png
 ```
 
 These PNGs **must** be committed to the repository. If they are missing, the test records a new image and fails on the first run.
+
+### Test Fixture Location
+
+JSON fixtures used by component tests live under `Tests/RoktUXHelperTests/Supporting Files/`. Note that the subdirectory names don't always match the component -- for example, `Supporting Files/ZStack/` contains fixtures for ZStack, ToggleButton, and other components that share the same directory. Check `ModelTestData.swift` to see which JSON file maps to which component model.
 
 ### Adding a New Snapshot Test
 
@@ -157,7 +164,7 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### RichText
 
 - [x] Standard rendering -- bold, italic, underline, strikethrough with campaign font (`testSnapshot`)
-- [x] nil `defaultStyle` -- no styling provided, PR #220 regression guard (`testSnapshot_nilDefaultStyle`)
+- [x] nil `defaultStyle` -- HTML parsed correctly without styling, PR #220 fix (`testSnapshot_nilDefaultStyle`)
 - [x] nil text style -- style exists but no text properties, font-stripping guard (`testSnapshot_nilTextStyle`)
 - [ ] Link rendering with default blue underline
 - [ ] Custom link styling (campaign-configured colors/weight)
@@ -202,7 +209,7 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 #### ToggleButton
 
-- [x] Default state -- white/black adaptive background (`testSnapshot`)
+- [x] Default state -- blue background with "Subscribe" label (`testSnapshot`)
 - [ ] Selected/toggled state
 
 #### CloseButton

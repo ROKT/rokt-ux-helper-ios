@@ -242,6 +242,7 @@ final class TestRichTextComponent: XCTestCase {
         width: CGFloat = 350,
         height: CGFloat = 200,
         file: StaticString = #file,
+        testName: String = #function,
         line: UInt = #line
     ) {
         model.transformValueToAttributedString(colorMode)
@@ -251,7 +252,7 @@ final class TestRichTextComponent: XCTestCase {
             .frame(width: width, height: height)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, line: line)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, testName: testName, line: line)
     }
     
     // MARK: - Nil / empty defaultStyle tests
