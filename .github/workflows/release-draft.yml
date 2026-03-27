@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Get current version
         id: version-file
@@ -51,10 +52,11 @@ jobs:
           version="${{ steps.bump-version.outputs.new_version }}"
           sed -i "s/s\.version[[:space:]]*=[[:space:]]*'[0-9.]*'/s.version          = '${version}'/" RoktUXHelper.podspec
 
-      - name: Update changelog
-        uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
+      - name: Generate changelog from git history
+        id: changelog
+        uses: ROKT/rokt-workflows/actions/generate-changelog@1859338d7c2c2b873233505c751acbf09fb218d5 # main
         with:
-          tag: ${{ steps.bump-version.outputs.new_version }}
+          version: ${{ steps.bump-version.outputs.new_version }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
