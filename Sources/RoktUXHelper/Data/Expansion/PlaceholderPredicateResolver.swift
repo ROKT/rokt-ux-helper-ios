@@ -6,7 +6,6 @@ struct PlaceholderResolutionContext {
     let activeCatalogItem: CatalogItem?
 }
 
-@available(iOS 13.0, *)
 final class PlaceholderPredicateResolver {
 
     private let creativeExtractor: CreativeDataExtractor<PlaceholderValidator<DataSanitiser>>
