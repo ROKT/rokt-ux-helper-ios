@@ -1,17 +1,7 @@
-//
-//  TestRowComponent.swift
-//  RoktUXHelperTests
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -139,6 +129,18 @@ final class TestRowComponent: XCTestCase {
         XCTAssertEqual(richTextStyle.spacing?.padding, nil)
         XCTAssertEqual(richTextStyle.spacing?.offset, nil)
     }
+
+    // MARK: - Snapshots
+
+    func testSnapshot_withChildren() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.row(try get_model(.children)))
+            .frame(width: 350, height: 200)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model(_ layout: LayoutName) throws -> RowViewModel {
         let row: RowModel<LayoutSchemaModel, WhenPredicate>

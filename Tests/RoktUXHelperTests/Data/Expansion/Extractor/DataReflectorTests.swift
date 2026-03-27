@@ -1,16 +1,3 @@
-//
-//  DataReflectorTests.swift
-//  RoktUXHelper
-//
-//  Copyright 2020 Rokt Pte Ltd
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import XCTest
 @testable import RoktUXHelper
 
@@ -30,11 +17,28 @@ final class DataReflectorTests: XCTestCase {
     }
 
     func test_getReflectedValue_withValidKeys_returnsValue() {
-        XCTAssertEqual(sut.getReflectedValue(data: fakeSuburbMirror, keys: ["house", "owner", "pet", "name"]), "Ginger")
+        XCTAssertEqual(
+            sut.getReflectedValue(data: fakeSuburbMirror, keys: ["house", "owner", "pet", "name"]) as? String,
+            "Ginger"
+        )
     }
 
     func test_getReflectedValue_withInvalidKeys_returnsNil() {
-        XCTAssertNil(sut.getReflectedValue(data: fakeSuburbMirror, keys: ["house", "owner"]))
+        XCTAssertNil(sut.getReflectedValue(data: fakeSuburbMirror, keys: ["nonexistent"]))
+    }
+
+    func test_getReflectedValue_withPartialKeys_returnsNonStringValue() {
+        // With Any? return type, partial keys resolve to the intermediate object
+        XCTAssertNotNil(sut.getReflectedValue(data: fakeSuburbMirror, keys: ["house", "owner"]))
+    }
+
+    func test_getReflectedValue_withHeterogeneousDictionary_returnsValue() {
+        let productMirror = Mirror(reflecting: ProductDetails(copy: ["pricing.amount": 14.99]))
+
+        XCTAssertEqual(
+            sut.getReflectedValue(data: productMirror, keys: ["copy", "pricing", "amount"]) as? Double,
+            14.99
+        )
     }
 }
 
@@ -52,6 +56,10 @@ struct House {
 
 struct Suburb {
     let house: House
+}
+
+struct ProductDetails {
+    let copy: [String: Any]
 }
 
 let fakePet = Pet(name: "Ginger")

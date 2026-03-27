@@ -1,14 +1,3 @@
-//
-//  RoktUXEventType.swift
-//  RoktUXHelper
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import Foundation
 
 /// Enum representing different types of platform events
@@ -40,6 +29,26 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalCartItemInstantPurchase
     /// Triggered when instant purchase fails
     case SignalCartItemInstantPurchaseFailure
+    /// Triggered when an instant purchase offer is explicitly dismissed.
+    case SignalInstantPurchaseDismissal
+    /// Triggered when the user interacts with the offer.
+    case SignalUserInteraction
     /// Not applicable
     case CaptureAttributes
+}
+
+enum UserInteraction: String, Codable, CaseIterable {
+    case ValidationTriggerFailed
+    case DropDownItemSelected
+    case ThumbnailClick
+    case MainImageScrollIconLeftClick
+    case MainImageScrollIconRightClick
+    case MainImageSwipeLeft
+    case MainImageSwipeRight
+}
+
+enum UserInteractionContext: String, Codable, CaseIterable {
+    case CustomStateValidationTriggerButton
+    case CatalogDropDown
+    case CatalogImageGallery
 }

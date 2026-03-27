@@ -1,14 +1,3 @@
-//
-//  EventProcessor.swift
-//  RoktUXHelper
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import Foundation
 import Combine
 
@@ -29,6 +18,11 @@ class EventProcessor: EventProcessing {
     // EventProcessor is being passed in so that the publisher will always finish publishing before the Processor class gets deallocated.
     private(set) var publisher: PassthroughSubject<(RoktEventRequest, EventProcessor?), Never> = .init()
 
+    /// Event types that should bypass deduplication logic
+    private static let excludedFromDeduplication: Set<RoktUXEventType> = [
+        .SignalUserInteraction
+    ]
+
     init(
         delay: Double = defaultEventBufferDuration,
         queue: DispatchQueue = DispatchQueue.background,
@@ -43,9 +37,13 @@ class EventProcessor: EventProcessing {
                 guard integrationType == .s2s else { return true }
                 return ![.SignalLoadStart, .SignalLoadComplete].contains(event.eventType)
             }
-            // Deduplicate events
+            // Deduplicate events (excluding specific event types)
             .filter { event, processor in
-                processor?.processedEvents.insert(.init(event)).inserted == true
+                guard let processor = processor else { return false }
+                if Self.excludedFromDeduplication.contains(event.eventType) {
+                    return true
+                }
+                return processor.processedEvents.insert(.init(event)).inserted
             }
             .collect(.byTime(queue, .seconds(delay)))
             // Transform to payload

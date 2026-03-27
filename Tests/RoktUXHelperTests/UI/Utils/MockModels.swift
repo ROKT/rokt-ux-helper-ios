@@ -1,14 +1,3 @@
-//
-//  MockModels.swift
-//  RoktUXHelperTests
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import SwiftUI
 @testable import RoktUXHelper
 import DcuiSchema
@@ -97,7 +86,8 @@ extension OfferModel {
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),
-            catalogItems: nil
+            catalogItems: nil,
+            catalogItemGroup: nil
         )
     }
 }
@@ -119,13 +109,23 @@ extension CatalogItem {
             title: "Catalog Title",
             description: "Catalog Description",
             price: 14.99,
+            priceFormatted: "$14.99",
             originalPrice: 14.99,
             originalPriceFormatted: "$14.99",
             currency: "USD",
-            linkedProductId: "linked",
+            signalType: nil,
+            url: nil,
+            minItemCount: nil,
+            maxItemCount: nil,
+            preSelectedQuantity: nil,
+            providerData: "861425",
+            urlBehavior: nil,
             positiveResponseText: "Add to order",
             negativeResponseText: "Dismiss",
-            providerData: "861425",
+            addOns: nil,
+            copy: nil,
+            inventoryStatus: nil,
+            linkedProductId: "linked",
             token: "catalog1Token"
         )
     }

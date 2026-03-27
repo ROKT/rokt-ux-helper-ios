@@ -1,14 +1,3 @@
-//
-//  TestLayoutTransformer.swift
-//  RoktUXHelperTests
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import XCTest
 @testable import RoktUXHelper
 import DcuiSchema
@@ -679,7 +668,8 @@ final class TestLayoutTransformer: XCTestCase {
         return OfferModel(
             campaignId: "campaignId",
             creative: creative,
-            catalogItems: nil
+            catalogItems: nil,
+            catalogItemGroup: nil
         )
     }
 
@@ -692,13 +682,23 @@ final class TestLayoutTransformer: XCTestCase {
             title: "title",
             description: "description",
             price: nil,
+            priceFormatted: nil,
             originalPrice: nil,
             originalPriceFormatted: nil,
             currency: "USD",
-            linkedProductId: nil,
+            signalType: nil,
+            url: nil,
+            minItemCount: nil,
+            maxItemCount: nil,
+            preSelectedQuantity: nil,
+            providerData: "{}",
+            urlBehavior: nil,
             positiveResponseText: "Add to cart",
             negativeResponseText: "No thanks",
-            providerData: "{}",
+            addOns: nil,
+            copy: nil,
+            inventoryStatus: nil,
+            linkedProductId: nil,
             token: "token"
         )
     }

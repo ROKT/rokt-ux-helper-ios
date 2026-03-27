@@ -1,17 +1,7 @@
-//
-//  TestZStackComponent.swift
-//  RoktUXHelperTests
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -55,6 +45,18 @@ final class TestZStackComponent: XCTestCase {
         let alignment = try zstack.alignment()
         XCTAssertEqual(alignment, .center)
     }
+
+    // MARK: - Snapshots
+
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.zStack(try get_model(.style)))
+            .frame(width: 350, height: 350)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
 
     func get_model(_ layoutName: LayoutName) throws -> ZStackViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

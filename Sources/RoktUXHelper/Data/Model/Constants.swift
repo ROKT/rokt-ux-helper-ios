@@ -1,14 +1,3 @@
-//
-//  Constatns.swift
-//  RoktUXHelper
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 // MARK: - Timings API keys
 
 let BE_TIMINGS_EVENT_TIME_KEY = "eventTime"
@@ -35,6 +24,7 @@ let BE_PAGE_SIGNAL_COMPLETE = "pageSignalLoadComplete"
 let BE_PAGE_RENDER_ENGINE = "pageRenderEngine"
 let BE_RENDER_ENGINE_LAYOUTS = "Layouts"
 let BE_JWT_TOKEN = "token"
+let BE_OBJECT_DATA_KEY = "objectData"
 let kEventTimeStamp = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 let kUTCTimeStamp = "UTC"
 let kBaseLocale = "en"
@@ -44,6 +34,7 @@ let kCloseButton = "CLOSE_BUTTON"
 let kNoMoreOfferToShow = "NO_MORE_OFFERS_TO_SHOW"
 let kCollapsed = "COLLAPSED"
 let kEndMessage = "END_MESSAGE"
+let kInstantPurchaseDismiss = "INSTANT_PURCHASE_DISMISSED"
 let kDismissed = "DISMISSED"
 let kPartnerTriggered = "PARTNER_TRIGGERED"
 
@@ -89,3 +80,5 @@ let kLinkedProductId = "linkedProductId"
 let kTotalPrice = "totalPrice"
 let kQuantity = "quantity"
 let kUnitPrice = "unitPrice"
+let kAction = "action"
+let kContext = "context"

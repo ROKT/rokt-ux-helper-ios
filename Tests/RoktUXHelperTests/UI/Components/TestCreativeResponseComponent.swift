@@ -1,17 +1,7 @@
-//
-//  TestCreativeResponseComponent.swift
-//  RoktUXHelperTests
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-
 import XCTest
 import SwiftUI
 import ViewInspector
+import SnapshotTesting
 @testable import RoktUXHelper
 import DcuiSchema
 
@@ -72,6 +62,18 @@ final class TestCreativeResponseComponent: XCTestCase {
         XCTAssertEqual(sut.horizontalAlignment, .center)
     }
     
+    // MARK: - Snapshots
+
+    func testSnapshot() throws {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
+            .frame(width: 350, height: 200)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    // MARK: - Helpers
+
     func get_model() throws -> CreativeResponseViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let creativeResponse = ModelTestData.CreativeResponseData.positive()

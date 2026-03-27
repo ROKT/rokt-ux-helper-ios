@@ -1,15 +1,3 @@
-//
-//  ModelTestData.swift
-//  RoktUXHelper
-//
-//  Copyright 2020 Rokt Pte Ltd
-//
-//  Licensed under the Rokt Software Development Kit (SDK) Terms of Use
-//  Version 2.0 (the "License");
-//
-//  You may not use this file except in compliance with the License.
-//
-//  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 import Foundation
 @testable import RoktUXHelper
 import DcuiSchema
@@ -291,6 +279,11 @@ class ModelTestData: NSObject {
     enum ToggleButtonData {
         static func basicToggleButton() -> ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_toggle_button")
+            return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+
+        static func toggleButtonWithLabel() -> ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_toggle_button_with_label")
             return try! JSONDecoder().decode(ToggleButtonStateTriggerModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
