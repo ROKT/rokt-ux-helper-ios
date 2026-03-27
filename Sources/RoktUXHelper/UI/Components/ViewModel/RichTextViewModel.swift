@@ -156,9 +156,9 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     private func transformValueToAttributedString(_ colorScheme: ColorScheme) {
         let valueToTransform = boundValue
 
-        guard defaultStyle?.count ?? -1 > breakpointIndex,
-              let breakpointDefaultStyle = defaultStyle?[breakpointIndex]
-        else { return }
+        let breakpointDefaultStyle = (defaultStyle?.count ?? -1 > breakpointIndex)
+            ? defaultStyle?[breakpointIndex]
+            : nil
 
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
@@ -170,8 +170,8 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             guard let self else { return }
 
             guard let htmlTransformedValue = try? valueToTransform.htmlToAttributedString(
-                textColorHex: breakpointDefaultStyle.text?.textColor?.getAdaptiveColor(colorScheme),
-                uiFont: breakpointDefaultStyle.text?.styledUIFont,
+                textColorHex: breakpointDefaultStyle?.text?.textColor?.getAdaptiveColor(colorScheme),
+                uiFont: breakpointDefaultStyle?.text?.styledUIFont,
                 linkStyles: breakpointLinkStyle?.text,
                 colorScheme: colorScheme
             ) else {
