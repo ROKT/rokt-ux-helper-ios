@@ -80,7 +80,10 @@ final class FormValidationCoordinator: FormValidationCoordinating {
         registration.lastStatus = status
 
         queue.async(flags: .barrier) {
-            self.registrations[key] = registration
+            // Only update if the field is still registered to the same owner
+            if self.registrations[key]?.owner == registration.owner {
+                self.registrations[key] = registration
+            }
         }
 
         DispatchQueue.main.async {

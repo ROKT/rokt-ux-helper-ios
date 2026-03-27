@@ -82,7 +82,9 @@ class LayoutState: LayoutStateRepresenting {
         let currentProgress: Binding<Int>? = items[LayoutState.currentProgressKey] as? Binding<Int>
         let customStateMap: Binding<RoktUXCustomStateMap?>? = items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
         let globalStates = queue.sync { _globalCustomStateMap }
-        var combinedStates = customStateMap?.wrappedValue ?? [:]
+        // Filter out nil-position (global) entries from local state to avoid
+        // resurrecting stale values that were cleared via resetGlobalCustomState.
+        var combinedStates = (customStateMap?.wrappedValue ?? [:]).filter { $0.key.position != nil }
         for (key, value) in globalStates {
             combinedStates[key] = value
         }
