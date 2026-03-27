@@ -25,13 +25,26 @@ runs:
         wait_for_boot: true
         shutdown_after_job: true
 
+    - name: Build for testing
+      run: >
+        set -o pipefail &&
+        xcodebuild build-for-testing -skipPackagePluginValidation -scheme RoktUXHelper
+        -destination 'id=${{ steps.simulator.outputs.udid }}'
+        -enableCodeCoverage YES -derivedDataPath DerivedData
+        | xcbeautify --renderer github-actions
+      shell: bash
+
     - name: Run unit tests
       env:
         TEST_RUNNER_SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/snapshot-failures
-      run: >
-        set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.udid }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
-        | xcbeautify --renderer github-actions
+      run: |
+        mkdir -p "${{ github.workspace }}/snapshot-failures"
+        set -o pipefail
+        xcodebuild test-without-building \
+          -xctestrun "$(find DerivedData/Build/Products -name '*.xctestrun' -print -quit)" \
+          -destination 'id=${{ steps.simulator.outputs.udid }}' \
+          -enableCodeCoverage YES -derivedDataPath DerivedData \
+          | xcbeautify --renderer github-actions
       shell: bash
 
     - name: Upload snapshot failure diffs
