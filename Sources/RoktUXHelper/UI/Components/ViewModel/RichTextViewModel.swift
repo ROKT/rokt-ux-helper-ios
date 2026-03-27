@@ -152,21 +152,15 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
 
-        // HTML parsing uses WebKit (NSHTMLReader) which can crash when invoked from certain
-        // main-thread contexts (e.g. timer callbacks, layout, nested run loop sources).
-        // Always defer to the next main queue work item so we never run WebKit in those contexts.
         let performTransformation = { [weak self] in
             guard let self else { return }
 
-            guard let htmlTransformedValue = try? valueToTransform.htmlToAttributedString(
+            let htmlTransformedValue = valueToTransform.htmlToAttributedString(
                 textColorHex: breakpointDefaultStyle?.text?.textColor?.getAdaptiveColor(colorScheme),
                 uiFont: breakpointDefaultStyle?.text?.styledUIFont,
                 linkStyles: breakpointLinkStyle?.text,
                 colorScheme: colorScheme
-            ) else {
-                self.attributedString = NSAttributedString(string: valueToTransform)
-                return
-            }
+            )
 
             self.attributedString = htmlTransformedValue
         }

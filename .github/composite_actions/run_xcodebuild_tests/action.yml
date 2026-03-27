@@ -13,7 +13,7 @@ runs:
     - name: Set up Xcode 16
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: 16.4.0
+        xcode-version: 26.2
 
     - name: Setup iOS Simulator
       uses: futureware-tech/simulator-action@v4
@@ -30,7 +30,9 @@ runs:
         TEST_RUNNER_SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/snapshot-failures
       run: >
         set -o pipefail &&
-        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper -destination 'id=${{ steps.simulator.outputs.udid }}' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+        xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper
+        -destination 'id=${{ steps.simulator.outputs.udid }}'
+        -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
         | xcbeautify --renderer github-actions
       shell: bash
 
@@ -40,7 +42,7 @@ runs:
       with:
         name: snapshot-failures
         path: snapshot-failures/
-        if-no-files-found: ignore
+        if-no-files-found: warn
 
     - name: Install xcresultparser
       if: ${{ inputs.codecov-token != '' }}
