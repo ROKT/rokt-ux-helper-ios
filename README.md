@@ -172,7 +172,7 @@ To create a new release version:
 This workflow will:
 
 - Create a release PR with the specified version allowing you to review
-- Generate release notes based on CHANGELOG.md
+- Auto-generate changelog from git history (conventional commit PR titles)
 
 ### Note
 

@@ -253,6 +253,95 @@ final class TestRichTextComponent: XCTestCase {
         let hostingController = UIHostingController(rootView: view)
         assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, line: line)
     }
+    
+    // MARK: - Nil / empty defaultStyle tests
+
+    func test_rich_text_nil_default_style_still_parses_html() {
+        let html = "<b>Bold</b> and <i>italic</i>"
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        XCTAssertEqual(model.attributedString.string, "Bold and italic")
+        XCTAssertFalse(model.attributedString.string.contains("<b>"))
+        XCTAssertFalse(model.attributedString.string.contains("<i>"))
+    }
+
+    func test_rich_text_empty_default_style_still_parses_html() {
+        let html = "<b>Bold</b> and <i>italic</i>"
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: [],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        XCTAssertEqual(model.attributedString.string, "Bold and italic")
+        XCTAssertFalse(model.attributedString.string.contains("<b>"))
+    }
+
+    func test_rich_text_nil_text_property_still_parses_html() {
+        let html = "<b>Bold</b> text"
+        let style = RichTextStyle(dimension: nil, flexChild: nil, spacing: nil, background: nil, text: nil)
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: [style],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        XCTAssertEqual(model.attributedString.string, "Bold text")
+        XCTAssertFalse(model.attributedString.string.contains("<b>"))
+    }
+
+    func test_rich_text_nil_default_style_strips_tags_without_font() {
+        let html = "<b>Bold</b> normal"
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        XCTAssertEqual(model.attributedString.string, "Bold normal")
+        // The WebKit morphing code strips the font when uiFont is nil
+        // (it removes Times New Roman but has no replacement font to apply).
+        // Bold traits are only preserved when a campaign uiFont is provided.
+        let font = model.attributedString.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertNil(font)
+    }
+
+    func test_rich_text_nil_default_style_preserves_link() {
+        let html = "Click <a href='https://rokt.com'>here</a>"
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, timeout: 2.0)
+
+        XCTAssertEqual(model.attributedString.string, "Click here")
+        let link = model.attributedString.attribute(.link, at: 6, effectiveRange: nil)
+        XCTAssertNotNil(link)
+    }
 
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
