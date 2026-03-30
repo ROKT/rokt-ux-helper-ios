@@ -24,13 +24,13 @@ final class PlaceholderPredicateResolver {
                        context: PlaceholderResolutionContext) -> String? {
         do {
             guard let extracted = try extract(placeholder: placeholder, context: context) else { return nil }
-            if let stringValue = extracted.value as? String {
+            if let stringValue = extracted as? String {
                 return stringValue
             }
-            if let decimalValue = extracted.value as? Decimal {
+            if let decimalValue = extracted as? Decimal {
                 return NSDecimalNumber(decimal: decimalValue).stringValue
             }
-            if let convertible = extracted.value as? CustomStringConvertible {
+            if let convertible = extracted as? CustomStringConvertible {
                 return convertible.description
             }
             return nil
@@ -44,19 +44,19 @@ final class PlaceholderPredicateResolver {
         do {
             guard let extracted = try extract(placeholder: placeholder, context: context) else { return nil }
 
-            if let decimalValue = extracted.value as? Decimal {
+            if let decimalValue = extracted as? Decimal {
                 return decimalValue
             }
 
-            if let stringValue = extracted.value as? String {
+            if let stringValue = extracted as? String {
                 return Decimal(string: stringValue)
             }
 
-            if let intValue = extracted.value as? Int {
+            if let intValue = extracted as? Int {
                 return Decimal(intValue)
             }
 
-            if let number = extracted.value as? NSNumber {
+            if let number = extracted as? NSNumber {
                 return number.decimalValue
             }
 
@@ -81,7 +81,7 @@ final class PlaceholderPredicateResolver {
     }
 
     private func extract(placeholder: String,
-                         context: PlaceholderResolutionContext) throws -> (value: Any, isState: Bool)? {
+                         context: PlaceholderResolutionContext) throws -> Any? {
         let parsedPlaceholder = parser.parse(propertyChain: placeholder)
 
         for keyAndNamespace in parsedPlaceholder.parseableChains {
@@ -92,39 +92,32 @@ final class PlaceholderPredicateResolver {
                                                                             propertyChain: keyAndNamespace.withNamespace,
                                                                             responseKey: nil,
                                                                             from: offer)
-                return mapDataBinding(result)
+                return unwrapBinding(result)
             case .dataCatalogItem:
                 if let catalogItem = context.activeCatalogItem {
                     let result = try catalogExtractor.extractDataRepresentedBy(String.self,
                                                                                propertyChain: keyAndNamespace.withNamespace,
                                                                                responseKey: nil,
                                                                                from: catalogItem)
-                    return mapDataBinding(result)
+                    return unwrapBinding(result)
                 }
             case .state:
                 if keyAndNamespace.key == DataBindingStateKeys.indicatorPosition {
-                    return (String(context.currentOfferIndex), true)
+                    return String(context.currentOfferIndex)
                 }
                 if keyAndNamespace.key == DataBindingStateKeys.totalOffers {
-                    let total = context.offers.count
-                    return (String(total), true)
+                    return String(context.offers.count)
                 }
             }
         }
 
-        if let defaultValue = parsedPlaceholder.defaultValue {
-            return (defaultValue, false)
-        }
-
-        return nil
+        return parsedPlaceholder.defaultValue
     }
 
-    private func mapDataBinding(_ binding: DataBinding<String>) -> (value: Any, isState: Bool) {
+    private func unwrapBinding(_ binding: DataBinding<String>) -> Any {
         switch binding {
-        case .value(let value):
-            return (value, false)
-        case .state(let value):
-            return (value, true)
+        case .value(let value), .state(let value):
+            return value
         }
     }
 
