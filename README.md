@@ -174,6 +174,5 @@ This workflow will:
 - Create a release PR with the specified version allowing you to review
 - Auto-generate changelog from git history (conventional commit PR titles)
 
-### Note
-
-The version number should only be updated from that workflow, so decline any PR with changes to the VERSION file.
+> [!NOTE]
+> The "Release – Draft" workflow maintains the `VERSION` file automatically. No manual changes to the `VERSION` file are needed.
