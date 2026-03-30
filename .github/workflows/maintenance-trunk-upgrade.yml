@@ -29,7 +29,7 @@ jobs:
   trunk-upgrade:
     needs: generate-and-call-upgrade
     name: Run trunk upgrade
-    uses: ROKT/rokt-workflows/.github/workflows/trunk-upgrade.yml@main
+    uses: ROKT/rokt-workflows/.github/workflows/trunk-upgrade.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
     with:
       token: ${{ needs.generate-and-call-upgrade.outputs.generated-token }}
 

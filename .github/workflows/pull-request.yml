@@ -59,6 +59,6 @@ jobs:
       github.event.pull_request.draft == false
     needs: [trunk-check, unit-test, podspec-lint]
     name: Notify GChat
-    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
     secrets:
       gchat_webhook: ${{ secrets.GCHAT_PRS_MOBILE_INTEGRATION_CHANNEL_WEBHOOK }}
