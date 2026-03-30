@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-03-30
+
+### Added
+
+- Add device pay, user interaction, and instant purchase dismissal events ([#226](https://github.com/ROKT/rokt-ux-helper-ios/pull/226))
+
+### Fixed
+
+- Replace WebKit HTML parsing with lightweight custom parser ([#219](https://github.com/ROKT/rokt-ux-helper-ios/pull/219))
+- Always parse HTML in RichText when defaultStyle is nil ([#220](https://github.com/ROKT/rokt-ux-helper-ios/pull/220))
+
+### Changed
+
+- Remove license compliance comment lines from file headers ([#225](https://github.com/ROKT/rokt-ux-helper-ios/pull/225))
+- Add schema-agnostic data foundation for shoppable ads ([#223](https://github.com/ROKT/rokt-ux-helper-ios/pull/223))
+- Expand and document snapshot testing ([#222](https://github.com/ROKT/rokt-ux-helper-ios/pull/222))
+- Adopt shared Rokt changelog generation action ([#224](https://github.com/ROKT/rokt-ux-helper-ios/pull/224))
+- Add snapshot testing section to README ([#221](https://github.com/ROKT/rokt-ux-helper-ios/pull/221))
+
 ## [0.8.2] - 2026-03-23
 
 ### Added
@@ -170,7 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.3...HEAD
+[0.8.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.2...0.8.3
 [0.8.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.1...0.8.2
 [0.8.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.7.6...0.8.0
