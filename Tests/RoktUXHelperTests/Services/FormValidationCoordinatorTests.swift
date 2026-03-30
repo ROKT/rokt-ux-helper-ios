@@ -36,7 +36,7 @@ final class FormValidationCoordinatorTests: XCTestCase {
     func test_validateFields_returnsFalseWhenAnyFieldInvalid() {
         let coordinator = FormValidationCoordinator()
         var firstValid = false
-        var secondValid = true
+        let secondValid = true
 
         coordinator.registerField(
             key: "first",
