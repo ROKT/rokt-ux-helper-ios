@@ -13,6 +13,7 @@ struct StyleTransformer {
                 default: transform($0.default),
                 pressed: $0.pressed.map(transform),
                 hovered: $0.hovered.map(transform),
+                focussed: $0.focussed.map(transform),
                 disabled: $0.disabled.map(transform))
         }
     }
@@ -26,6 +27,7 @@ struct StyleTransformer {
         var lastDefault: T?
         var lastPressed: T?
         var lastHovered: T?
+        var lastFocussed: T?
         var lastDisabled: T?
 
         try styles.forEach { style in
@@ -46,6 +48,11 @@ struct StyleTransformer {
             } else {
                 lastHovered = style.hovered
             }
+            if let lastFocussedValue = lastFocussed {
+                lastFocussed = try updatedStyle(lastFocussedValue, newStyle: style.focussed)
+            } else {
+                lastFocussed = style.focussed
+            }
             if let lastDisabledValue = lastDisabled {
                 lastDisabled = try updatedStyle(lastDisabledValue, newStyle: style.disabled)
             } else {
@@ -56,7 +63,46 @@ struct StyleTransformer {
                 BasicStateStylingBlock(default: lastDefault ?? defaultStyle,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
+                                       focussed: try updatedStyle(lastDefault, newStyle: lastFocussed),
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
+        }
+
+        return updatedStyles
+    }
+
+    static func updatedStyles<T: Codable>(
+        _ styles: [FormStateStylingBlock<T>]?
+    ) throws -> [FormStateStylingBlock<T>] {
+        var updatedStyles: [FormStateStylingBlock<T>] = []
+        guard let styles, !styles.isEmpty else { return updatedStyles }
+
+        var lastDefault: T?
+        var lastPressed: T?
+        var lastHovered: T?
+        var lastFocussed: T?
+        var lastDisabled: T?
+        var lastSelected: T?
+        var lastErrored: T?
+
+        try styles.forEach { style in
+            let defaultStyle = style.default
+
+            lastDefault = try lastDefault.map { try updatedStyle($0, newStyle: defaultStyle) } ?? defaultStyle
+            lastPressed = try lastPressed.map { try updatedStyle($0, newStyle: style.pressed) } ?? style.pressed
+            lastHovered = try lastHovered.map { try updatedStyle($0, newStyle: style.hovered) } ?? style.hovered
+            lastFocussed = try lastFocussed.map { try updatedStyle($0, newStyle: style.focussed) } ?? style.focussed
+            lastDisabled = try lastDisabled.map { try updatedStyle($0, newStyle: style.disabled) } ?? style.disabled
+            lastSelected = try lastSelected.map { try updatedStyle($0, newStyle: style.selected) } ?? style.selected
+            lastErrored = try lastErrored.map { try updatedStyle($0, newStyle: style.errored) } ?? style.errored
+
+            updatedStyles.append(
+                FormStateStylingBlock(default: lastDefault ?? defaultStyle,
+                                      pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
+                                      hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
+                                      focussed: try updatedStyle(lastDefault, newStyle: lastFocussed),
+                                      disabled: try updatedStyle(lastDefault, newStyle: lastDisabled),
+                                      selected: try updatedStyle(lastDefault, newStyle: lastSelected),
+                                      errored: try updatedStyle(lastDefault, newStyle: lastErrored)))
         }
 
         return updatedStyles
@@ -147,6 +193,7 @@ struct StyleTransformer {
                 BasicStateStylingBlock(default: lastDefault,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
+                                       focussed: nil,
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
 
             styleIndex += 1

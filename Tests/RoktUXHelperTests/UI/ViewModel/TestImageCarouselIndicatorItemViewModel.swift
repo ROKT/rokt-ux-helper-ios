@@ -46,7 +46,7 @@ class TestImageCarouselIndicatorItemViewModel: XCTestCase {
         let sut = ImageCarouselIndicatorItemViewModel(
             index: index,
             duration: 1000,
-            progressStyle: [.init(default: .init(), pressed: nil, hovered: nil, disabled: nil)],
+            progressStyle: [.init(default: .init(), pressed: nil, hovered: nil, focussed: nil, disabled: nil)],
             activeStyle: nil,
             animatableStyle: nil,
             indicatorStyle: nil,

@@ -297,10 +297,12 @@ final class TestStyleTransformer: XCTestCase {
         let styles = [BasicStateStylingBlock<StaticImageStyles>(default: defaultStyle,
                                                                 pressed: nil,
                                                                 hovered: nil,
+                                                                focussed: nil,
                                                                 disabled: nil),
                       BasicStateStylingBlock<StaticImageStyles>(default: defaultStyle,
                                                                 pressed: pressed,
                                                                 hovered: nil,
+                                                                focussed: nil,
                                                                 disabled: nil)]
         // ACT
         let transformedStyle = try StyleTransformer.updatedStyles(styles)
@@ -355,8 +357,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                             offset: nil),
                                           text: nil)
         
-        let indicator = [BasicStateStylingBlock(default: defaultStyle, pressed: nil, hovered: nil, disabled: nil)]
-        let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, disabled: nil)]
+        let indicator = [BasicStateStylingBlock(default: defaultStyle, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
         
         // ACT
         let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)
@@ -406,9 +408,10 @@ final class TestStyleTransformer: XCTestCase {
                                                                              offset: nil),
                                            text: nil)
         
-        let indicator = [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, disabled: nil),
-                         BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
-        let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, disabled: nil)]
+        let indicator =
+            [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, focussed: nil, disabled: nil),
+             BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
         
         // ACT
         let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)
@@ -444,8 +447,9 @@ final class TestStyleTransformer: XCTestCase {
                                      flexChild: FlexChildStylingProperties(weight: 10, order: 10, alignSelf: nil),
                                      spacing: nil)
         
-        let styles = [BasicStateStylingBlock(default: defaultStyle1, pressed: nil, hovered: hoveredStyle1, disabled: nil),
-                      BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
+        let styles =
+            [BasicStateStylingBlock(default: defaultStyle1, pressed: nil, hovered: hoveredStyle1, focussed: nil, disabled: nil),
+             BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
 
         // ACT
         let transformedStyle = try StyleTransformer.updatedStyles(styles)
@@ -597,8 +601,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                              margin: "1",
                                                                                              offset: nil))
 
-        let indicator = [BasicStateStylingBlock(default: defaultStyle, pressed: nil, hovered: nil, disabled: nil)]
-        let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, disabled: nil)]
+        let indicator = [BasicStateStylingBlock(default: defaultStyle, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
 
         // ACT
         let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)
@@ -644,9 +648,10 @@ final class TestStyleTransformer: XCTestCase {
                                                                                               margin: "1",
                                                                                               offset: nil))
 
-        let indicator = [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, disabled: nil),
-                         BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, disabled: nil)]
-        let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, disabled: nil)]
+        let indicator =
+            [BasicStateStylingBlock(default: defaultStyle1, pressed: pressedStyle1, hovered: nil, focussed: nil, disabled: nil),
+             BasicStateStylingBlock(default: defaultStyle2, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
+        let active = [BasicStateStylingBlock(default: activeStyle1, pressed: nil, hovered: nil, focussed: nil, disabled: nil)]
 
         // ACT
         let transformedStyle = try StyleTransformer.updatedIndicatorStyles(indicator, newStyles: active)

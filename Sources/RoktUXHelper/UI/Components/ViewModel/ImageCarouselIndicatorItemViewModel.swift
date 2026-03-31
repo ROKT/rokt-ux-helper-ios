@@ -100,6 +100,7 @@ class ImageCarouselIndicatorItemViewModel: RowViewModel {
                     ),
                     pressed: nil,
                     hovered: nil,
+                    focussed: nil,
                     disabled: nil
                 )
             ],

@@ -23,6 +23,7 @@ class TestImageCarouselIndicatorViewModel: XCTestCase {
                     ),
                     pressed: nil,
                     hovered: nil,
+                    focussed: nil,
                     disabled: nil
                 )
             ],
@@ -39,6 +40,7 @@ class TestImageCarouselIndicatorViewModel: XCTestCase {
                     ),
                     pressed: nil,
                     hovered: nil,
+                    focussed: nil,
                     disabled: nil
                 )
             ],
