@@ -34,13 +34,15 @@ func get_mock_uistate(currentProgress: Int = 0,
                       position: Int? = nil,
                       width: CGFloat = 100,
                       isDarkMode: Bool = false,
-                      customStateMap: RoktUXCustomStateMap? = nil) -> WhenComponentUIState {
+                      customStateMap: RoktUXCustomStateMap? = nil,
+                      globalCustomStateMap: RoktUXCustomStateMap? = nil) -> WhenComponentUIState {
     return WhenComponentUIState(currentProgress: currentProgress,
                                 totalOffers: totalOffers,
                                 position: position,
                                 width: width,
                                 isDarkMode: isDarkMode,
-                                customStateMap: customStateMap)
+                                customStateMap: customStateMap,
+                                globalCustomStateMap: globalCustomStateMap)
 }
 
 @available(iOS 13.0, *)
@@ -73,7 +75,8 @@ extension OfferModel {
         copy: [String: String] = [:],
         images: [String: CreativeImage]? = nil,
         responseOptionList: ResponseOptionList? = nil,
-        token: String = ""
+        token: String = "",
+        catalogItems: [CatalogItem]? = nil
     ) -> Self {
         .init(
             campaignId: campaignId,
@@ -86,23 +89,28 @@ extension OfferModel {
                 responseOptionsMap: responseOptionList,
                 jwtToken: token
             ),
-            catalogItems: nil,
+            catalogItems: catalogItems,
             catalogItemGroup: nil
         )
     }
 }
 
 extension CatalogItem {
-    static func mock(catalogItemId: String = "catalogItemId") -> Self {
-        .init(
-            images: [
-                "catalogItemImage0": CreativeImage(
-                    light: "https://www.rokt.com",
-                    dark: nil,
-                    alt: nil,
-                    title: nil
-                )
-            ],
+    static func mock(
+        catalogItemId: String = "catalogItemId",
+        images: [String: CreativeImage]? = nil,
+        inventoryStatus: String? = nil
+    ) -> Self {
+        let imageMap = images ?? [
+            "catalogItemImage0": CreativeImage(
+                light: "https://www.rokt.com",
+                dark: nil,
+                alt: nil,
+                title: nil
+            )
+        ]
+        return .init(
+            images: imageMap,
             catalogItemId: catalogItemId,
             cartItemId: "cartItemId",
             instanceGuid: "catalogInstanceGuid",
@@ -113,18 +121,18 @@ extension CatalogItem {
             originalPrice: 14.99,
             originalPriceFormatted: "$14.99",
             currency: "USD",
-            signalType: nil,
-            url: nil,
-            minItemCount: nil,
-            maxItemCount: nil,
-            preSelectedQuantity: nil,
+            signalType: "mockSignalType",
+            url: "https://www.example.com",
+            minItemCount: 1,
+            maxItemCount: 10,
+            preSelectedQuantity: 1,
             providerData: "861425",
-            urlBehavior: nil,
+            urlBehavior: "mockUrlBehavior",
             positiveResponseText: "Add to order",
             negativeResponseText: "Dismiss",
-            addOns: nil,
-            copy: nil,
-            inventoryStatus: nil,
+            addOns: ["addon1", "addon2"],
+            copy: ["key1": "value1", "key2": "value2"],
+            inventoryStatus: inventoryStatus,
             linkedProductId: "linked",
             token: "catalog1Token"
         )
