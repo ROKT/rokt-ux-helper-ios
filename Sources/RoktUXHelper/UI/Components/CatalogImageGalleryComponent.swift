@@ -179,16 +179,17 @@ struct CatalogImageGalleryComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @ObservedObject var model: CatalogImageGalleryViewModel
-    @State var breakpointIndex: Int = 0
-    @State var frameChangeIndex: Int = 0
 
     let config: ComponentConfig
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
+    @Binding var styleState: StyleState
 
     let parentOverride: ComponentParentOverride?
 
+    @State private var breakpointIndex: Int = 0
+    @State private var frameChangeIndex: Int = 0
     @State private var page: Int = 0
     @State private var previousPage: Int = 0
     @State private var isUpdatingFromSelectedIndex = false
@@ -196,13 +197,71 @@ struct CatalogImageGalleryComponent: View {
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
 
+    private var style: CatalogImageGalleryStyles? {
+        model.defaultStyle?[safe: breakpointIndex]
+    }
+
+    private var containerStyle: ContainerStylingProperties? { style?.container }
+    private var dimensionStyle: DimensionStylingProperties? { style?.dimension }
+    private var flexStyle: FlexChildStylingProperties? { style?.flexChild }
+    private var borderStyle: BorderStylingProperties? { style?.border }
+    private var spacingStyle: SpacingStylingProperties? { style?.spacing }
+    private var backgroundStyle: BackgroundStylingProperties? { style?.background }
+
     private var passableBackgroundStyle: BackgroundStylingProperties? {
-        parentOverride?.parentBackgroundStyle
+        backgroundStyle ?? parentOverride?.parentBackgroundStyle
+    }
+
+    private var verticalAlignment: VerticalAlignmentProperty {
+        if let justifyContent = containerStyle?.justifyContent?.asVerticalAlignmentProperty {
+            return justifyContent
+        } else if let parentAlign = parentOverride?.parentVerticalAlignment?.asVerticalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .top
+        }
+    }
+
+    private var horizontalAlignment: HorizontalAlignmentProperty {
+        if let alignItems = containerStyle?.alignItems?.asHorizontalAlignmentProperty {
+            return alignItems
+        } else if let parentAlign = parentOverride?.parentHorizontalAlignment?.asHorizontalAlignmentProperty {
+            return parentAlign
+        } else {
+            return .start
+        }
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(
+            alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
+            spacing: CGFloat(containerStyle?.gap ?? 0)
+        ) {
             mainImageArea
+        }
+        .applyLayoutModifier(
+            verticalAlignmentProperty: verticalAlignment,
+            horizontalAlignmentProperty: horizontalAlignment,
+            spacing: spacingStyle,
+            dimension: dimensionStyle,
+            flex: flexStyle,
+            border: borderStyle,
+            background: backgroundStyle,
+            container: containerStyle,
+            parent: config.parent,
+            parentWidth: $parentWidth,
+            parentHeight: $parentHeight,
+            parentOverride: parentOverride?.updateBackground(passableBackgroundStyle),
+            defaultHeight: .wrapContent,
+            defaultWidth: .wrapContent,
+            isContainer: true,
+            containerType: .column,
+            frameChangeIndex: $frameChangeIndex,
+            imageLoader: model.imageLoader
+        )
+        .readSize(spacing: spacingStyle) { size in
+            availableWidth = size.width
+            availableHeight = size.height
         }
         .onChange(of: globalScreenSize.width) { newSize in
             DispatchQueue.main.async {
@@ -239,6 +298,8 @@ struct CatalogImageGalleryComponent: View {
                 }
             )
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+
+            navigationButtonOverlay
         }
         .frame(maxWidth: .infinity)
         .clipped()
@@ -282,6 +343,62 @@ struct CatalogImageGalleryComponent: View {
         )
     }
 
+    // MARK: - Navigation Buttons
+
+    private var controlButtonStyle: CatalogImageGalleryStyles? {
+        model.controlButtonStyles?[safe: breakpointIndex]?.default
+    }
+
+    @ViewBuilder
+    private var navigationButtonOverlay: some View {
+        if model.backwardImage != nil || model.forwardImage != nil {
+            HStack {
+                if model.canGoBackward, let backwardImage = model.backwardImage {
+                    navButton(themedImage: backwardImage) { model.goBackward() }
+                }
+                Spacer()
+                if model.canGoForward, let forwardImage = model.forwardImage {
+                    navButton(themedImage: forwardImage) { model.goForward() }
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+    }
+
+    @ViewBuilder
+    private func navButton(
+        themedImage: CatalogImageGalleryThemedImageUrl,
+        action: @escaping () -> Void
+    ) -> some View {
+        let btnStyle = controlButtonStyle
+        let bgColor: Color = btnStyle?.background?.backgroundColor.flatMap {
+            Color(hex: colorScheme == .dark ? ($0.dark ?? $0.light) : $0.light)
+        } ?? Color.black.opacity(0.5)
+        let cornerRadius = CGFloat(btnStyle?.border?.borderRadius ?? 4)
+        let iconSize = CGFloat(btnStyle?.text?.fontSize ?? 16)
+        let paddingFrame = FrameAlignmentProperty.getFrameAlignment(btnStyle?.spacing?.padding)
+
+        Button(action: action) {
+            AsyncImageView(
+                imageUrl: ThemeUrl(light: themedImage.light, dark: themedImage.dark),
+                scale: .fit,
+                alt: nil,
+                imageLoader: model.imageLoader,
+                isImageValid: .constant(true)
+            )
+            .frame(width: iconSize, height: iconSize)
+            .padding(EdgeInsets(
+                top: paddingFrame.top,
+                leading: paddingFrame.left,
+                bottom: paddingFrame.bottom,
+                trailing: paddingFrame.right
+            ))
+            .background(bgColor)
+            .cornerRadius(cornerRadius)
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - Indicator Overlay
 
     private func indicatorOverlayAlignment(for breakpointIndex: Int) -> Alignment {
@@ -309,6 +426,20 @@ struct CatalogImageGalleryComponent: View {
                     stretchChildren: false
                 )
             )
+            .overlay {
+                indicatorTapTargets
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var indicatorTapTargets: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<model.images.count, id: \.self) { index in
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { model.selectImage(at: index) }
+            }
         }
     }
 }
