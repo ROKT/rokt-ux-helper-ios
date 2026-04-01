@@ -210,6 +210,11 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         context: context
                     )
                 )
+        case .catalogDevicePayButton,
+             .catalogDropdown,
+             .catalogImageGallery,
+             .catalogCombinedCollection:
+                .empty
         }
     }
 
@@ -910,6 +915,7 @@ private extension BasicStateStylingBlock<DataImageCarouselIndicatorStyles> {
             default: `default`,
             pressed: pressed,
             hovered: hovered,
+            focussed: nil,
             disabled: disabled
         )
     }

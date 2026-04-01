@@ -13,6 +13,7 @@ struct StyleTransformer {
                 default: transform($0.default),
                 pressed: $0.pressed.map(transform),
                 hovered: $0.hovered.map(transform),
+                focussed: $0.focussed.map(transform),
                 disabled: $0.disabled.map(transform))
         }
     }
@@ -26,6 +27,7 @@ struct StyleTransformer {
         var lastDefault: T?
         var lastPressed: T?
         var lastHovered: T?
+        var lastFocussed: T?
         var lastDisabled: T?
 
         try styles.forEach { style in
@@ -46,6 +48,11 @@ struct StyleTransformer {
             } else {
                 lastHovered = style.hovered
             }
+            if let lastFocussedValue = lastFocussed {
+                lastFocussed = try updatedStyle(lastFocussedValue, newStyle: style.focussed)
+            } else {
+                lastFocussed = style.focussed
+            }
             if let lastDisabledValue = lastDisabled {
                 lastDisabled = try updatedStyle(lastDisabledValue, newStyle: style.disabled)
             } else {
@@ -56,6 +63,7 @@ struct StyleTransformer {
                 BasicStateStylingBlock(default: lastDefault ?? defaultStyle,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
+                                       focussed: try updatedStyle(lastDefault, newStyle: lastFocussed),
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
         }
 
@@ -147,6 +155,7 @@ struct StyleTransformer {
                 BasicStateStylingBlock(default: lastDefault,
                                        pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
                                        hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
+                                       focussed: nil,
                                        disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
 
             styleIndex += 1

@@ -109,6 +109,7 @@ extension BasicStateStylingBlock where StyleProperties: Codable {
             default: transform(`default`),
             pressed: pressed.map(transform),
             hovered: hovered.map(transform),
+            focussed: focussed.map(transform),
             disabled: disabled.map(transform)
         )
     }
