@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add CatalogImageGallery snapshot test covering navigation buttons, pill indicator, and gallery image rendering
+- Document CatalogImageGallery in TESTING.md coverage matrix and add data URI / ARGB hex guidance
+
+### Fixed
+
+- Move navigation button overlay outside clipped ZStack to prevent button clipping
+
 ## [0.8.3] - 2026-03-30
 
 ### Added

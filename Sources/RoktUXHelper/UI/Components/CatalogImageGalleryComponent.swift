@@ -310,11 +310,10 @@ struct CatalogImageGalleryComponent: View {
                     }
                 }
             )
-
-            navigationButtonOverlay
         }
         .frame(maxWidth: .infinity)
         .clipped()
+        .overlay { navigationButtonOverlay }
         .overlay(alignment: overlayAlignment) {
             indicatorOverlay(alignment: overlayAlignment)
         }
