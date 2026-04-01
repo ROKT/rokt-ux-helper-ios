@@ -47,7 +47,46 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
 
     func handleTap() {
         guard let catalogItem else { return }
-        eventService?.cartItemInstantPurchase(catalogItem: catalogItem)
+        eventService?.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: provider,
+            completion: { [weak self] status in
+                guard let self else { return }
+                self.handleDevicePayCompletion(status: status)
+            }
+        )
+    }
+
+    private func handleDevicePayCompletion(status: DevicePayStatus) {
+        guard let customStateKey, !customStateKey.isEmpty else {
+            layoutState?.actionCollection[.close](nil)
+            return
+        }
+
+        let value: Int
+        switch status {
+        case .success:
+            value = 1
+        case .failure, .retry:
+            value = -1
+        }
+
+        setLayoutVariantCustomState(key: customStateKey, value: value)
+    }
+
+    private func setLayoutVariantCustomState(key: String, value: Int) {
+        guard let layoutState,
+              let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
+        else { return }
+
+        let identifier = CustomStateIdentifiable(position: position, key: key)
+
+        DispatchQueue.main.async {
+            var map = binding.wrappedValue ?? [:]
+            map[identifier] = value
+            binding.wrappedValue = map
+            layoutState.publishStateChange()
+        }
     }
 
     static func == (lhs: CatalogDevicePayButtonViewModel, rhs: CatalogDevicePayButtonViewModel) -> Bool {
