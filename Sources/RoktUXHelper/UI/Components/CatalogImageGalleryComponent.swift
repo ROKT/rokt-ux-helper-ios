@@ -263,14 +263,22 @@ struct CatalogImageGalleryComponent: View {
         }
     }
 
+    @State private var imageStyleState: StyleState = .default
+
     private func imageViewComponent(for viewModel: DataImageViewModel) -> some View {
-        LayoutSchemaComponent(
-            config: config.updateParent(.row),
-            layout: .dataImage(viewModel),
-            parentWidth: $parentWidth,
-            parentHeight: $parentHeight,
-            styleState: .constant(.default),
-            parentOverride: parentOverride
+        DataImageViewComponent(
+            config: config.updateParent(.column),
+            model: viewModel,
+            parentWidth: $availableWidth,
+            parentHeight: $availableHeight,
+            styleState: $imageStyleState,
+            parentOverride: ComponentParentOverride(
+                parentVerticalAlignment: .center,
+                parentHorizontalAlignment: .center,
+                parentBackgroundStyle: passableBackgroundStyle,
+                stretchChildren: false
+            ),
+            expandsToContainerOnSelfAlign: false
         )
     }
 

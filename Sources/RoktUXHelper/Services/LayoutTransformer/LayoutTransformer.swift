@@ -401,6 +401,11 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         let seenIndicatorStyles = try StyleTransformer.updatedStyles(elements?.seenIndicator)
         let progressIndicatorContainer = try StyleTransformer.updatedStyles(elements?.progressIndicatorContainer)
 
+        let imageDefaultStyle = mainImageStyles.compactMap { $0.default.asDataImageStyles }
+        let imagePressedStyle = mainImageStyles.compactMap { $0.pressed?.asDataImageStyles }
+        let imageHoveredStyle = mainImageStyles.compactMap { $0.hovered?.asDataImageStyles }
+        let imageDisabledStyle = mainImageStyles.compactMap { $0.disabled?.asDataImageStyles }
+
         // Extract images from the catalog item in context
         var images: [DataImageViewModel] = []
         switch context {
@@ -409,10 +414,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                 .sorted { $0.key < $1.key }
                 .compactMap { DataImageViewModel(
                     image: $0.value,
-                    defaultStyle: nil,
-                    pressedStyle: nil,
-                    hoveredStyle: nil,
-                    disabledStyle: nil,
+                    defaultStyle: imageDefaultStyle.isEmpty ? nil : imageDefaultStyle,
+                    pressedStyle: imagePressedStyle.isEmpty ? nil : imagePressedStyle,
+                    hoveredStyle: imageHoveredStyle.isEmpty ? nil : imageHoveredStyle,
+                    disabledStyle: imageDisabledStyle.isEmpty ? nil : imageDisabledStyle,
                     layoutState: layoutState
                 ) }
         case .inner(.generic(let offer?)),
@@ -423,10 +428,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                     .sorted { $0.key < $1.key }
                     .compactMap { DataImageViewModel(
                         image: $0.value,
-                        defaultStyle: nil,
-                        pressedStyle: nil,
-                        hoveredStyle: nil,
-                        disabledStyle: nil,
+                        defaultStyle: imageDefaultStyle.isEmpty ? nil : imageDefaultStyle,
+                        pressedStyle: imagePressedStyle.isEmpty ? nil : imagePressedStyle,
+                        hoveredStyle: imageHoveredStyle.isEmpty ? nil : imageHoveredStyle,
+                        disabledStyle: imageDisabledStyle.isEmpty ? nil : imageDisabledStyle,
                         layoutState: layoutState
                     ) }
             }
