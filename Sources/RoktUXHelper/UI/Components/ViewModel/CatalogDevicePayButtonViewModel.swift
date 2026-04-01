@@ -18,6 +18,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let pressedStyle: [CatalogDevicePayButtonStyles]?
     let hoveredStyle: [CatalogDevicePayButtonStyles]?
     let disabledStyle: [CatalogDevicePayButtonStyles]?
+    let validatorTriggerConfig: ValidationTriggerConfig?
     let customStateKey: String?
     var position: Int?
 
@@ -31,6 +32,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         pressedStyle: [CatalogDevicePayButtonStyles]?,
         hoveredStyle: [CatalogDevicePayButtonStyles]?,
         disabledStyle: [CatalogDevicePayButtonStyles]?,
+        validatorTriggerConfig: ValidationTriggerConfig?,
         customStateKey: String?
     ) {
         self.catalogItem = catalogItem
@@ -42,12 +44,33 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
+        self.validatorTriggerConfig = validatorTriggerConfig
         self.customStateKey = customStateKey
     }
 
     func handleTap() {
+        guard shouldProceedAfterValidation() else {
+            if let catalogItem {
+                eventService?.cartItemUserInteraction(
+                    itemId: catalogItem.catalogItemId,
+                    action: UserInteraction.ValidationTriggerFailed,
+                    context: UserInteractionContext.CustomStateValidationTriggerButton
+                )
+            }
+            return
+        }
+
         guard let catalogItem else { return }
         eventService?.cartItemInstantPurchase(catalogItem: catalogItem)
+    }
+
+    private func shouldProceedAfterValidation() -> Bool {
+        guard let triggerConfig = validatorTriggerConfig,
+              !triggerConfig.validatorFieldKeys.isEmpty,
+              let coordinator = layoutState?.validationCoordinator else {
+            return true
+        }
+        return coordinator.validate(fields: triggerConfig.validatorFieldKeys)
     }
 
     static func == (lhs: CatalogDevicePayButtonViewModel, rhs: CatalogDevicePayButtonViewModel) -> Bool {
