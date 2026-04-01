@@ -9,6 +9,7 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let pressedStyle: [CloseButtonStyles]?
     let hoveredStyle: [CloseButtonStyles]?
     let disabledStyle: [CloseButtonStyles]?
+    let dismissalMethod: String?
     weak var eventService: EventServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: RoktUXImageLoader? {
@@ -20,6 +21,7 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          pressedStyle: [CloseButtonStyles]?,
          hoveredStyle: [CloseButtonStyles]?,
          disabledStyle: [CloseButtonStyles]?,
+         dismissalMethod: String? = nil,
          layoutState: (any LayoutStateRepresenting)?,
          eventService: EventServicing?) {
         self.children = children
@@ -27,12 +29,22 @@ class CloseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle
         self.disabledStyle = disabledStyle
+        self.dismissalMethod = dismissalMethod
         self.layoutState = layoutState
         self.eventService = eventService
     }
 
     func sendCloseEvent() {
-        eventService?.dismissOption = .closeButton
+        eventService?.dismissOption = dismissOption
         eventService?.sendDismissalEvent()
+    }
+
+    private var dismissOption: LayoutDismissOptions {
+        switch dismissalMethod {
+        case kInstantPurchaseDismiss:
+            return .instantPurchaseDismiss
+        default:
+            return .closeButton
+        }
     }
 }
