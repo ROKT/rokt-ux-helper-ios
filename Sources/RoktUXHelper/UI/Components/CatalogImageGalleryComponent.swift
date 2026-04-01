@@ -193,13 +193,16 @@ struct CatalogImageGalleryComponent: View {
     @State private var previousPage: Int = 0
     @State private var isUpdatingFromSelectedIndex = false
     @State private var isUpdatingFromSwipe = false
+    @State private var availableWidth: CGFloat?
+    @State private var availableHeight: CGFloat?
+
+    private var passableBackgroundStyle: BackgroundStylingProperties? {
+        parentOverride?.parentBackgroundStyle
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             mainImageArea
-            if model.showIndicators {
-                indicatorDots
-            }
         }
         .onChange(of: globalScreenSize.width) { newSize in
             DispatchQueue.main.async {
@@ -214,7 +217,9 @@ struct CatalogImageGalleryComponent: View {
     // MARK: - Main Image Area
 
     private var mainImageArea: some View {
-        ZStack {
+        let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
+
+        return ZStack {
             imageViewComponent(for: model.images[0]).opacity(0.0)
             CatalogHSPageView(
                 page: $page,
@@ -237,6 +242,13 @@ struct CatalogImageGalleryComponent: View {
         }
         .frame(maxWidth: .infinity)
         .clipped()
+        .overlay(alignment: overlayAlignment) {
+            indicatorOverlay(alignment: overlayAlignment)
+        }
+        .readSize(spacing: nil) { size in
+            availableWidth = size.width
+            availableHeight = size.height
+        }
         .onChange(of: page) { newValue in
             previousPage = page
             model.selectedIndex = newValue
@@ -262,17 +274,33 @@ struct CatalogImageGalleryComponent: View {
         )
     }
 
-    // MARK: - Indicator Dots (placeholder -- will be replaced with schema-driven indicators)
+    // MARK: - Indicator Overlay
 
-    private var indicatorDots: some View {
-        HStack(spacing: 6) {
-            ForEach(model.images.indices, id: \.self) { index in
-                Circle()
-                    .fill(index == model.selectedIndex ? Color.primary : Color.gray.opacity(0.5))
-                    .frame(width: 8, height: 8)
-                    .onTapGesture { model.selectImage(at: index) }
-            }
+    private func indicatorOverlayAlignment(for breakpointIndex: Int) -> Alignment {
+        guard let alignSelf = model.indicatorAlignSelf(for: breakpointIndex) else {
+            return .bottom
         }
-        .padding(.top, 8)
+        let vertical = alignSelf.asVerticalAlignment.asVerticalType ?? .bottom
+        return Alignment(horizontal: .center, vertical: vertical)
+    }
+
+    @ViewBuilder
+    private func indicatorOverlay(alignment: Alignment) -> some View {
+        if model.showIndicators,
+           let containerViewModel = model.indicatorContainerViewModel(for: breakpointIndex) {
+            RowComponent(
+                config: config,
+                model: containerViewModel,
+                parentWidth: $availableWidth,
+                parentHeight: $availableHeight,
+                styleState: .constant(.default),
+                parentOverride: ComponentParentOverride(
+                    parentVerticalAlignment: alignment.asVerticalType ?? .center,
+                    parentHorizontalAlignment: alignment.asHorizontalType ?? .center,
+                    parentBackgroundStyle: passableBackgroundStyle,
+                    stretchChildren: false
+                )
+            )
+        }
     }
 }

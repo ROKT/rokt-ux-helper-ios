@@ -133,6 +133,10 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         return .build(children: children, stylingProperties: containerBlocks, layoutState: layoutState)
     }
 
+    func indicatorAlignSelf(for breakpointIndex: Int) -> FlexAlignment? {
+        progressIndicatorContainerBlocks?[safe: breakpointIndex]?.default.flexChild?.alignSelf
+    }
+
     // MARK: - Hashable
 
     func hash(into hasher: inout Hasher) {
