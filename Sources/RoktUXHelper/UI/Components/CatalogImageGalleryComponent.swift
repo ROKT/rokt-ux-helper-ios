@@ -97,17 +97,20 @@ struct CatalogHSPageView<Content: View>: View {
     let pages: Int
     let content: Content
     let onSwipe: ((Bool) -> Void)?
+    let onTap: ((Bool) -> Void)?
     @State private var dragOffset: CGFloat = 0
 
     init(
         page: Binding<Int>,
         pages: Int,
         onSwipe: ((Bool) -> Void)? = nil,
+        onTap: ((Bool) -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         _page = page
         self.pages = pages
         self.onSwipe = onSwipe
+        self.onTap = onTap
         self.content = content()
     }
 
@@ -122,12 +125,13 @@ struct CatalogHSPageView<Content: View>: View {
 
             GalleryGestureView(
                 onTap: { point in
-                    let isLeft = point.x < geo.size.width/2
-                    if isLeft {
-                        page = max(page - 1, 0)
-                    } else {
+                    let isForward = point.x >= geo.size.width/2
+                    if isForward {
                         page = min(page + 1, pages - 1)
+                    } else {
+                        page = max(page - 1, 0)
                     }
+                    onTap?(isForward)
                 },
                 onPanChanged: { translation in
                     dragOffset = translation
@@ -293,13 +297,19 @@ struct CatalogImageGalleryComponent: View {
                         model.handleSwipeBackward()
                     }
                 },
+                onTap: { isForward in
+                    if isForward {
+                        model.handleNavButtonForward()
+                    } else {
+                        model.handleNavButtonBackward()
+                    }
+                },
                 content: {
                     ForEach(0..<model.images.count, id: \.self) { index in
                         imageViewComponent(for: model.images[index])
                     }
                 }
             )
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 
             navigationButtonOverlay
         }
