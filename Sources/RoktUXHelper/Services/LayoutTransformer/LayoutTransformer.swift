@@ -225,7 +225,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                 )
         case .catalogDropdown(let dropdownModel):
                 .catalogDropdown(
-                    try getCatalogDropdown(model: dropdownModel)
+                    try getCatalogDropdown(
+                        model: dropdownModel,
+                        attributeIndex: layoutState.nextCatalogDropdownAttributeIndex.advanceAndReturnPrevious()
+                    )
                 )
         case .catalogImageGallery(let galleryModel):
             try transformWithFallback {
@@ -361,7 +364,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     }
 
     func getCatalogDropdown(
-        model: CatalogDropdownModel<WhenPredicate>
+        model: CatalogDropdownModel<WhenPredicate>,
+        attributeIndex: Int = 0
     ) throws -> CatalogDropdownViewModel {
         let elements = model.styles?.elements
         let ownStyles = try StyleTransformer.updatedStyles(elements?.own)
@@ -382,6 +386,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             unavailableValue: model.unavailableValue,
             validatorFieldConfig: model.validatorFieldConfig,
             a11yLabel: model.a11yLabel,
+            attributeIndex: attributeIndex,
             layoutState: layoutState,
             eventService: eventService
         )
@@ -460,6 +465,9 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             throw LayoutTransformerError.InvalidMapping()
         }
 
+        // Reset dropdown attribute counter for this offer's scope
+        layoutState.nextCatalogDropdownAttributeIndex = 0
+
         // Set the first catalog item as active and store the full offer
         if let firstCatalogItem = offer.catalogItems?.first {
             layoutState.items[LayoutState.activeCatalogItemKey] = firstCatalogItem
@@ -469,6 +477,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
 
         let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
+            // Reset counter so dropdowns inside the template get consistent indices across rebuilds
+            self.layoutState.nextCatalogDropdownAttributeIndex = 0
             do {
                 switch model.template {
                 case .column(let templateModel):
