@@ -287,8 +287,10 @@ struct CatalogImageGalleryComponent: View {
                     isUpdatingFromSwipe = true
                     if isForward {
                         model.goForward()
+                        model.handleSwipeForward()
                     } else {
                         model.goBackward()
+                        model.handleSwipeBackward()
                     }
                 },
                 content: {
@@ -354,11 +356,17 @@ struct CatalogImageGalleryComponent: View {
         if model.backwardImage != nil || model.forwardImage != nil {
             HStack {
                 if model.canGoBackward, let backwardImage = model.backwardImage {
-                    navButton(themedImage: backwardImage) { model.goBackward() }
+                    navButton(themedImage: backwardImage) {
+                        model.goBackward()
+                        model.handleNavButtonBackward()
+                    }
                 }
                 Spacer()
                 if model.canGoForward, let forwardImage = model.forwardImage {
-                    navButton(themedImage: forwardImage) { model.goForward() }
+                    navButton(themedImage: forwardImage) {
+                        model.goForward()
+                        model.handleNavButtonForward()
+                    }
                 }
             }
             .padding(.horizontal, 8)
@@ -438,7 +446,10 @@ struct CatalogImageGalleryComponent: View {
             ForEach(0..<model.images.count, id: \.self) { index in
                 Color.clear
                     .contentShape(Rectangle())
-                    .onTapGesture { model.selectImage(at: index) }
+                    .onTapGesture {
+                        model.selectImage(at: index)
+                        model.handleIndicatorTap()
+                    }
             }
         }
     }
