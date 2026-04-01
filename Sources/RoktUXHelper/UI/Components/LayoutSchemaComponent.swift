@@ -179,10 +179,43 @@ struct LayoutSchemaComponent: View {
                 styleState: $styleState,
                 parentOverride: parentOverride
             )
+        case .catalogCombinedCollection(let model):
+            CatalogCombinedCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
+        case .catalogDevicePayButton(let model):
+            CatalogDevicePayButtonComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
         case .catalogResponseButton(let model):
             CatalogResponseButtonComponent(
                 config: config,
                 model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
+        case .catalogDropdown(let model):
+            CatalogDropdownComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                parentOverride: parentOverride
+            )
+        case .catalogImageGallery(let model):
+            CatalogImageGalleryComponent(
+                model: model,
+                config: config,
                 parentWidth: $parentWidth,
                 parentHeight: $parentHeight,
                 parentOverride: parentOverride

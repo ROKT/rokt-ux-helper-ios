@@ -28,7 +28,11 @@ enum LayoutSchemaViewModel: Hashable {
     case toggleButton(ToggleButtonViewModel)
     case dataImageCarousel(DataImageCarouselViewModel)
     case catalogStackedCollection(CatalogStackedCollectionViewModel)
+    case catalogCombinedCollection(CatalogCombinedCollectionViewModel)
+    case catalogDevicePayButton(CatalogDevicePayButtonViewModel)
     case catalogResponseButton(CatalogResponseButtonViewModel)
+    case catalogDropdown(CatalogDropdownViewModel)
+    case catalogImageGallery(CatalogImageGalleryViewModel)
     case empty
 }
 
@@ -44,6 +48,10 @@ extension LayoutSchemaViewModel {
         case (.catalogResponseButton(let lhs), .catalogResponseButton(let rhs)):
             return lhs == rhs
         case (.catalogStackedCollection(let lhs), .catalogStackedCollection(let rhs)):
+            return lhs == rhs
+        case (.catalogCombinedCollection(let lhs), .catalogCombinedCollection(let rhs)):
+            return lhs == rhs
+        case (.catalogDevicePayButton(let lhs), .catalogDevicePayButton(let rhs)):
             return lhs == rhs
         case (.column(let lhsModel), .column(let rhsModel)):
             return lhsModel == rhsModel
@@ -81,6 +89,10 @@ extension LayoutSchemaViewModel {
             return lhsModel == rhsModel
         case (.dataImageCarousel(let lhsModel), .dataImageCarousel(let rhsModel)):
             return lhsModel == rhsModel
+        case (.catalogDropdown(let lhs), .catalogDropdown(let rhs)):
+            return lhs == rhs
+        case (.catalogImageGallery(let lhs), .catalogImageGallery(let rhs)):
+            return lhs == rhs
         case (.empty, .empty):
             return true
         default:
