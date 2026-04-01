@@ -16,7 +16,10 @@ class LayoutState: LayoutStateRepresenting {
     static let globalCustomStateMapKey = "globalCustomStateMap" // Global CustomStateMap
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
-    static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [String: Int]
+    static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [Int: Int] (attributeIndex -> optionIndex)
+
+    /// Counter used during layout transformation to assign attribute indices to dropdowns.
+    var nextCatalogDropdownAttributeIndex: Int = 0
 
     private var _items = [String: Any]()
     private var _globalCustomStateMap = RoktUXCustomStateMap()
@@ -174,5 +177,14 @@ class LayoutState: LayoutStateRepresenting {
                 self.publishStateChange()
             }
         }
+    }
+}
+
+extension Int {
+    /// Returns the current value and increments it. Used for assigning sequential indices.
+    mutating func advanceAndReturnPrevious() -> Int {
+        let current = self
+        self += 1
+        return current
     }
 }

@@ -888,8 +888,31 @@
                                           "head": [
                                             {
                                               "default": {
-                                                "flexChild": {
-                                                  "alignSelf": "center"
+                                                "background": {
+                                                  "backgroundColor": {
+                                                    "light": "#F5F5F5"
+                                                  }
+                                                },
+                                                "border": {
+                                                  "borderColor": {
+                                                    "light": "#D0D5DD"
+                                                  },
+                                                  "borderRadius": 8,
+                                                  "borderStyle": "solid",
+                                                  "borderWidth": "1"
+                                                },
+                                                "spacing": {
+                                                  "padding": "12 16"
+                                                },
+                                                "dimension": {
+                                                  "width": {
+                                                    "type": "percentage",
+                                                    "value": 100
+                                                  },
+                                                  "height": {
+                                                    "type": "fixed",
+                                                    "value": 44
+                                                  }
                                                 },
                                                 "text": {
                                                   "fontSize": 14,
@@ -897,6 +920,31 @@
                                                     "light": "#262626"
                                                   },
                                                   "lineHeight": 20
+                                                },
+                                                "container": {
+                                                  "alignItems": "center",
+                                                  "justifyContent": "center"
+                                                }
+                                              },
+                                              "hovered": {
+                                                "border": {
+                                                  "borderColor": {
+                                                    "light": "#98A2B3"
+                                                  }
+                                                }
+                                              },
+                                              "focussed": {
+                                                "border": {
+                                                  "borderColor": {
+                                                    "light": "#667085"
+                                                  }
+                                                }
+                                              },
+                                              "errored": {
+                                                "border": {
+                                                  "borderColor": {
+                                                    "light": "#F04438"
+                                                  }
                                                 }
                                               }
                                             }
