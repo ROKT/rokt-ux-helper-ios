@@ -288,6 +288,13 @@ class ModelTestData: NSObject {
         }
     }
     
+    enum CatalogDevicePayButtonData {
+        static func catalogDevicePayButton() -> CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_device_pay")
+            return try! JSONDecoder().decode(CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+    }
+
     enum CatalogResponseButtonData {
         static func catalogResponseButton() -> CatalogResponseButtonModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_catalog_response")
