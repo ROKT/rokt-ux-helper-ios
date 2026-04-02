@@ -428,20 +428,20 @@ extension PredicateHandling {
         placeholderPredicates.forEach { predicate in
             switch predicate {
             case .textValue(let stringPredicate):
-                guard let resolved = placeholderResolver.resolveString(placeholder: stringPredicate.input,
-                                                                       context: context) else {
-                    matched = false
-                    return
-                }
+                let resolved = placeholderResolver.resolveString(placeholder: stringPredicate.input,
+                                                                 context: context)
+                // Resolve the RHS value as a placeholder too, falling back to the literal string
+                let expectedValue = placeholderResolver.resolveString(placeholder: stringPredicate.value,
+                                                                      context: context) ?? stringPredicate.value
                 switch stringPredicate.condition {
                 case .is:
-                    matched = matched && resolved == stringPredicate.value
+                    matched = matched && resolved == expectedValue
                 case .isNot:
-                    matched = matched && resolved != stringPredicate.value
+                    matched = matched && resolved != expectedValue
                 case .exists:
-                    matched = matched && !resolved.isEmpty
+                    matched = matched && resolved != nil && !resolved!.isEmpty
                 case .notExists:
-                    matched = matched && resolved.isEmpty
+                    matched = matched && (resolved == nil || resolved!.isEmpty)
                 }
             case .textLength(let lengthPredicate):
                 guard let resolvedLength = placeholderResolver.resolveTextLength(placeholder: lengthPredicate.input,
