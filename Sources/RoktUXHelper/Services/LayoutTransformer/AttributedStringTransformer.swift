@@ -37,9 +37,13 @@ class AttributedStringTransformer {
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .toggleButton(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
+        case .catalogDevicePayButton(let parentModel):
+            convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .catalogResponseButton(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .catalogStackedCollection(let parentModel):
+            convertRichTextHTMLInChildren(parent: parentModel, config: config)
+        case .catalogCombinedCollection(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .richText(let richTextUIModel):
             richTextUIModel.transformValueToAttributedString(config?.colorMode, colorScheme: nil)

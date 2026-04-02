@@ -100,7 +100,13 @@
                                   "addOns": [],
                                   "addOnPluginUrl": "https://www.rokt.com",
                                   "addOnPluginName": "arrive-plugin",
-                                  "token": "catalog1Token"
+                                  "token": "catalog1Token",
+                                  "copy": {
+                                      "provider.discountLabel": "Save 20%",
+                                      "provider.color.hex": "#E6B8A2",
+                                      "provider.variationTitle": "Burnt Clay",
+                                      "provider.pricing.shippingFees": "4.90"
+                                  }
                               },
                               {
                                   "images": {

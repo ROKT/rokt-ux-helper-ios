@@ -61,8 +61,13 @@ class MockEventService: EventDiagnosticServicing {
         eventsOnLoadCalled = true
     }
 
+    var lastSlotImpressionInstanceGuid: String?
+    var lastSlotImpressionJwtToken: String?
+
     func sendSlotImpressionEvent(instanceGuid: String, jwtToken: String) {
         slotImpressionEventCalled = true
+        lastSlotImpressionInstanceGuid = instanceGuid
+        lastSlotImpressionJwtToken = jwtToken
     }
 
     func sendSignalViewedEvent(instanceGuid: String, jwtToken: String) {
@@ -98,9 +103,18 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
+    var lastUserInteractionItemId: String?
+    var lastUserInteractionAction: UserInteraction?
+    var lastUserInteractionContext: UserInteractionContext?
+
     func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
         cartItemUserInteractionCalled = true
+        lastUserInteractionItemId = itemId
+        lastUserInteractionAction = action
+        lastUserInteractionContext = context
     }
+
+    var cartItemDevicePayCompletionCallback: ((DevicePayStatus) -> Void)?
 
     func cartItemDevicePay(
         catalogItem: CatalogItem,
@@ -108,6 +122,7 @@ class MockEventService: EventDiagnosticServicing {
         completion: @escaping (DevicePayStatus) -> Void
     ) {
         cartItemDevicePayCalled = true
+        cartItemDevicePayCompletionCallback = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
