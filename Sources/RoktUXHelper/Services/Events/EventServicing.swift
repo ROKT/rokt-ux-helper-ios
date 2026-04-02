@@ -1,4 +1,5 @@
 import Foundation
+import DcuiSchema
 
 protocol EventServicing: AnyObject {
     var dismissOption: LayoutDismissOptions? { get set }
@@ -16,6 +17,11 @@ protocol EventServicing: AnyObject {
     func cartItemInstantPurchaseSuccess(itemId: String)
     func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext)
     func cartItemInstantPurchaseFailure(itemId: String)
+    func cartItemDevicePay(
+        catalogItem: CatalogItem,
+        paymentProvider: PaymentProvider,
+        completion: @escaping (_ status: DevicePayStatus) -> Void
+    )
     func cartItemDevicePaySuccess(itemId: String)
     func cartItemDevicePayFailure(itemId: String)
 }

@@ -9,6 +9,7 @@ struct CatalogDropdownComponent: View {
     @State var frameChangeIndex: Int = 0
     @State var isExpanded: Bool = false
     @State var showValidationError: Bool = false
+    @State var isValidatorRegistered: Bool = false
     @State var buttonFrameInGlobal: CGRect = .zero
 
     let config: ComponentConfig
@@ -90,6 +91,59 @@ struct CatalogDropdownComponent: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(model.a11yLabel ?? "")
+        .onAppear { registerValidatorIfNeeded() }
+        .onDisappear { unregisterValidator() }
+    }
+
+    // MARK: - Validation Registration
+
+    private func registerValidatorIfNeeded() {
+        guard !isValidatorRegistered,
+              let fieldConfig = model.validatorFieldConfig,
+              let layoutState = model.layoutState else { return }
+        let key = fieldConfig.validationFieldKey
+        guard !key.isEmpty else { return }
+
+        layoutState.validationCoordinator.registerField(
+            key: key,
+            owner: model,
+            validation: {
+                guard let validators = model.validatorFieldConfig?.validators else { return .valid }
+                for validator in validators {
+                    switch validator {
+                    case .required:
+                        if model.persistedSelectedIndex == nil {
+                            return .invalid
+                        }
+                    }
+                }
+                return .valid
+            },
+            onStatusChange: { status in
+                showValidationError = status == .invalid
+            }
+        )
+        isValidatorRegistered = true
+    }
+
+    private func unregisterValidator() {
+        guard isValidatorRegistered,
+              let layoutState = model.layoutState,
+              let key = model.validatorFieldConfig?.validationFieldKey else { return }
+
+        layoutState.validationCoordinator.unregisterField(for: key, owner: model)
+        isValidatorRegistered = false
+        showValidationError = false
+    }
+
+    private func notifyValidationOfSelectionChange() {
+        guard isValidatorRegistered,
+              let layoutState = model.layoutState,
+              let key = model.validatorFieldConfig?.validationFieldKey else { return }
+
+        if model.validatorFieldConfig?.validateOnChange == true || showValidationError {
+            layoutState.validationCoordinator.validate(field: key)
+        }
     }
 
     // MARK: - Head View (trigger)
@@ -249,9 +303,7 @@ struct CatalogDropdownComponent: View {
             if !isDisabled {
                 model.selectItem(at: index)
                 withAnimation { isExpanded = false }
-                if model.validatorFieldConfig?.validateOnChange == true {
-                    showValidationError = model.persistedSelectedIndex == nil
-                }
+                notifyValidationOfSelectionChange()
             }
         } label: {
             HStack {

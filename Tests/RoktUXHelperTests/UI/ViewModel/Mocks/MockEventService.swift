@@ -35,6 +35,7 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
     var cartItemUserInteractionCalled = false
+    var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
 
@@ -101,6 +102,14 @@ class MockEventService: EventDiagnosticServicing {
         cartItemUserInteractionCalled = true
     }
 
+    func cartItemDevicePay(
+        catalogItem: CatalogItem,
+        paymentProvider: DcuiSchema.PaymentProvider,
+        completion: @escaping (DevicePayStatus) -> Void
+    ) {
+        cartItemDevicePayCalled = true
+    }
+
     func cartItemDevicePaySuccess(itemId: String) {
         cartItemDevicePaySuccessCalled = true
     }
@@ -142,6 +151,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
         cartItemUserInteractionCalled = false
+        cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
         dismissOption = nil
