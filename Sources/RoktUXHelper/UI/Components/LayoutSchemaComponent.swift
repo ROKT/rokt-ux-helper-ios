@@ -212,12 +212,13 @@ struct LayoutSchemaComponent: View {
                 parentHeight: $parentHeight,
                 parentOverride: parentOverride
             )
-        case .catalogImageGallery(let model):
+        case .catalogImageGallery(let galleryModel):
             CatalogImageGalleryComponent(
-                model: model,
+                model: galleryModel,
                 config: config,
                 parentWidth: $parentWidth,
                 parentHeight: $parentHeight,
+                styleState: $styleState,
                 parentOverride: parentOverride
             )
         default:

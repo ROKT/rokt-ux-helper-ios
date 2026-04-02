@@ -114,6 +114,19 @@ extension BaseStyles {
     }
 }
 
+@available(iOS 13, *)
+extension CatalogImageGalleryStyles {
+    var asDataImageStyles: DataImageStyles {
+        DataImageStyles(
+            background: background,
+            border: border,
+            dimension: dimension,
+            flexChild: flexChild,
+            spacing: spacing
+        )
+    }
+}
+
 extension BasicStateStylingBlock where StyleProperties: Codable {
     func mapToBaseStyles(_ transform: (StyleProperties) -> BaseStyles) -> BasicStateStylingBlock<BaseStyles> {
         BasicStateStylingBlock<BaseStyles>(

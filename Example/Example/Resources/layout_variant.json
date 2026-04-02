@@ -237,9 +237,14 @@
                                     "type": "CatalogImageGallery",
                                     "node": {
                                       "showIndicators": true,
-                                      "aspectRatio": "1/1",
-                                      "backwardIcon": "\u25c0",
-                                      "forwardIcon": "\u25b6",
+                                      "backwardImage": {
+                                        "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAMUlEQVR4nGNgoCH4DwQ0NZxmFvxHAqOGjxo+avhgMxzZApoYjmzBqCWjloxaMpIsAQCm4wsExMny/QAAAABJRU5ErkJggg==",
+                                        "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAMUlEQVR4nGNgoCH4DwQ0NZxmFvxHAqOGjxo+avhgMxzZApoYjmzBqCWjloxaMpIsAQCm4wsExMny/QAAAABJRU5ErkJggg=="
+                                      },
+                                      "forwardImage": {
+                                        "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAALUlEQVR4nGP4DwUMtAL/kcCoJaOWjFoyagkVLaGp4TSxYNTwUcNHDR/MhgMBANdJFvjceLlpAAAAAElFTkSuQmCC",
+                                        "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAALUlEQVR4nGP4DwUMtAL/kcCoJaOWjFoyagkVLaGp4TSxYNTwUcNHDR/MhgMBANdJFvjceLlpAAAAAElFTkSuQmCC"
+                                      },
                                       "a11yLabel": "Product images",
                                       "styles": {
                                         "elements": {

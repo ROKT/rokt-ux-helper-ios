@@ -25,6 +25,7 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestBasicTextComponent/testSnapshot.1.png
+  TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot.1.png
@@ -142,6 +143,14 @@ waitForAttributedStringConversion(on: model, timeout: 2.0)
 
 This spins the main run loop until `model.attributedString.string` is non-empty or the timeout expires.
 
+### Image Components and Data URIs
+
+Components that load images asynchronously (e.g. `AsyncImageView`) will render blank in snapshot tests when given remote URLs, because network requests don't complete during the synchronous snapshot capture.
+
+To work around this, use **base64 data URIs** for image sources in snapshot factories. `AsyncImageView` already supports `data:image/...;base64,...` URIs and renders them synchronously via `Base64Image`. See `TestCatalogImageGalleryComponent.swift` for an example that defines small solid-color PNGs and arrow icons as static data URI constants.
+
+**ARGB hex format:** The `UIColor(hexString:)` initializer uses **ARGB** byte order for 8-character hex values, not RGBA. For example, 60% opaque black is `#99000000` (not `#00000099`, which would be fully transparent).
+
 ### Snapshot Coverage Matrix
 
 This matrix tracks which visual scenarios have snapshot tests and which are known gaps. When adding a new feature or fixing a visual bug, check the relevant component below and add a snapshot for unchecked items where appropriate.
@@ -217,6 +226,10 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### StaticImage / DataImage
 
 - [ ] Image rendering with sizing constraints
+
+#### CatalogImageGallery
+
+- [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
 
 #### ProgressIndicator / ProgressControl
 
