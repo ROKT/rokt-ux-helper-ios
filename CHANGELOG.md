@@ -18,6 +18,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move navigation button overlay outside clipped ZStack to prevent button clipping
 
+## [0.8.4] - 2026-04-02
+
+### Added
+
+- Shoppable ads ([#239](https://github.com/ROKT/rokt-ux-helper-ios/pull/239))
+- Add global custom state, form validation, and placeholder predicate infrastructure ([#227](https://github.com/ROKT/rokt-ux-helper-ios/pull/227))
+
+### Fixed
+
+- Pin GitHub Actions to commit SHAs for supply chain security ([#229](https://github.com/ROKT/rokt-ux-helper-ios/pull/229))
+
+### Changed
+
+- Remove note from readme ([#230](https://github.com/ROKT/rokt-ux-helper-ios/pull/230))
+
 ## [0.8.3] - 2026-03-30
 
 ### Added
@@ -198,7 +213,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.4...HEAD
+[0.8.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.3...0.8.4
 [0.8.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.2...0.8.3
 [0.8.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.1...0.8.2
 [0.8.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.0...0.8.1
