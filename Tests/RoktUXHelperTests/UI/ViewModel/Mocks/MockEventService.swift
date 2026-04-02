@@ -3,7 +3,20 @@ import Foundation
 import DcuiSchema
 
 @available(iOS 15, *)
-class MockEventService: EventServicing {
+class MockEventService: EventDiagnosticServicing {
+    var pluginInstanceGuid: String = "mock-plugin-guid"
+    var pluginConfigJWTToken: String = "mock-jwt"
+    var useDiagnosticEvents: Bool = false
+
+    func sendEvent(
+        _ eventType: RoktUXEventType,
+        parentGuid: String,
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
+        objectData: [String: String]?,
+        jwtToken: String
+    ) {}
+
     // MARK: - Test Tracking Properties
 
     var dismissalCollapsedEventSent = false

@@ -133,6 +133,60 @@ final class CatalogImageGalleryViewModel: ObservableObject, ScreenSizeAdaptive, 
         return .build(children: children, stylingProperties: containerBlocks, layoutState: layoutState)
     }
 
+    func indicatorAlignSelf(for breakpointIndex: Int) -> FlexAlignment? {
+        progressIndicatorContainerBlocks?[safe: breakpointIndex]?.default.flexChild?.alignSelf
+    }
+
+    // MARK: - Event Tracking
+
+    func handleNavButtonBackward() {
+        sendScrollEvent(direction: .left, isSwipe: false)
+    }
+
+    func handleNavButtonForward() {
+        sendScrollEvent(direction: .right, isSwipe: false)
+    }
+
+    func handleSwipeForward() {
+        sendScrollEvent(direction: .right, isSwipe: true)
+    }
+
+    func handleSwipeBackward() {
+        sendScrollEvent(direction: .left, isSwipe: true)
+    }
+
+    func handleIndicatorTap() {
+        guard let catalogItem = activeCatalogItem else { return }
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: .ThumbnailClick,
+            context: .CatalogImageGallery
+        )
+    }
+
+    private var activeCatalogItem: CatalogItem? {
+        layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
+    }
+
+    private func sendScrollEvent(direction: ScrollDirection, isSwipe: Bool) {
+        guard let catalogItem = activeCatalogItem else { return }
+        let action: UserInteraction = switch (isSwipe, direction) {
+        case (true, .left): .MainImageSwipeLeft
+        case (true, .right): .MainImageSwipeRight
+        case (false, .left): .MainImageScrollIconLeftClick
+        case (false, .right): .MainImageScrollIconRightClick
+        }
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: action,
+            context: .CatalogImageGallery
+        )
+    }
+
+    private enum ScrollDirection {
+        case left, right
+    }
+
     // MARK: - Hashable
 
     func hash(into hasher: inout Hasher) {
