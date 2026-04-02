@@ -1,6 +1,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
 @available(iOS 15, *)
@@ -570,6 +571,23 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice
+        ))
+    }
+
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+        onRoktEvent?(RoktUXEvent.CartItemDevicePay(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice,
+            paymentProvider: paymentProvider
         ))
     }
 }
