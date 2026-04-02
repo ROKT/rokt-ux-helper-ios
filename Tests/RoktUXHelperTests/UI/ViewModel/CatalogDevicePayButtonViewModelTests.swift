@@ -5,6 +5,23 @@ import DcuiSchema
 @available(iOS 15, *)
 final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
+    func test_customStateKey_isPaymentResult() {
+        let sut = CatalogDevicePayButtonViewModel(
+            catalogItem: makeCatalogItem(id: "item"),
+            children: nil,
+            provider: .applePay,
+            layoutState: MockLayoutState(),
+            eventService: MockEventService(),
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: nil
+        )
+
+        XCTAssertEqual(sut.customStateKey, "paymentResult")
+    }
+
     func test_handleTap_doesNotTriggerEventWhenValidationFails() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
@@ -29,8 +46,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: nil
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
         sut.handleTap()
         XCTAssertFalse(eventService.cartItemDevicePayCalled)
@@ -60,8 +76,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: nil
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
 
         isValid = true
@@ -70,11 +85,10 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
     }
 
-    func test_devicePaySuccess_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
+    func test_devicePaySuccess_setsLayoutVariantCustomState() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
-        var isValid = true
-        var didClose = false
+        let isValid = true
 
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
@@ -84,8 +98,6 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             },
             onStatusChange: { _ in }
         )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
 
         let sut = CatalogDevicePayButtonViewModel(
             catalogItem: makeCatalogItem(id: "item"),
@@ -97,8 +109,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: "paymentResult"
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
         sut.position = 0
 
@@ -115,15 +126,19 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), 1)
-        XCTAssertFalse(didClose)
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            ),
+            1
+        )
     }
 
-    func test_devicePayFailure_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
+    func test_devicePayFailure_setsLayoutVariantCustomState() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         let isValid = true
-        var didClose = false
 
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
@@ -133,8 +148,6 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             },
             onStatusChange: { _ in }
         )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
 
         let sut = CatalogDevicePayButtonViewModel(
             catalogItem: makeCatalogItem(id: "item"),
@@ -146,8 +159,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: "paymentResult"
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
         sut.position = 0
 
@@ -164,15 +176,19 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), -1)
-        XCTAssertFalse(didClose)
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            ),
+            -1
+        )
     }
 
-    func test_devicePayRetry_setsLayoutVariantCustomState_whenCustomStateKeyProvided() {
+    func test_devicePayRetry_setsLayoutVariantCustomState() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         let isValid = true
-        var didClose = false
 
         layoutState.validationCoordinator.registerField(
             key: "dropdown",
@@ -182,8 +198,6 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             },
             onStatusChange: { _ in }
         )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
 
         let sut = CatalogDevicePayButtonViewModel(
             catalogItem: makeCatalogItem(id: "item"),
@@ -195,8 +209,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: "paymentResult"
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
         sut.position = 0
 
@@ -213,131 +226,13 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertEqual(layoutState.layoutVariantCustomStateValue(for: "paymentResult", position: 0), -1)
-        XCTAssertFalse(didClose)
-    }
-
-    func test_devicePaySuccess_callsCloseAction_whenNoCustomStateKey() {
-        let layoutState = MockLayoutState()
-        let eventService = MockEventService()
-        let isValid = true
-        var didClose = false
-
-        layoutState.validationCoordinator.registerField(
-            key: "dropdown",
-            owner: self,
-            validation: {
-                return isValid ? .valid : .invalid
-            },
-            onStatusChange: { _ in }
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            ),
+            -1
         )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
-
-        let sut = CatalogDevicePayButtonViewModel(
-            catalogItem: makeCatalogItem(id: "item"),
-            children: nil,
-            provider: .applePay,
-            layoutState: layoutState,
-            eventService: eventService,
-            defaultStyle: nil,
-            pressedStyle: nil,
-            hoveredStyle: nil,
-            disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: nil
-        )
-
-        sut.handleTap()
-
-        XCTAssertTrue(eventService.cartItemDevicePayCalled)
-
-        eventService.cartItemDevicePayCompletionCallback?(.success)
-
-        XCTAssertNil(layoutState.globalCustomStateValue(for: "paymentResult"))
-        XCTAssertTrue(didClose)
-    }
-
-    func test_devicePayFailure_callsCloseAction_whenNoCustomStateKey() {
-        let layoutState = MockLayoutState()
-        let eventService = MockEventService()
-        let isValid = true
-        var didClose = false
-
-        layoutState.validationCoordinator.registerField(
-            key: "dropdown",
-            owner: self,
-            validation: {
-                return isValid ? .valid : .invalid
-            },
-            onStatusChange: { _ in }
-        )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
-
-        let sut = CatalogDevicePayButtonViewModel(
-            catalogItem: makeCatalogItem(id: "item"),
-            children: nil,
-            provider: .applePay,
-            layoutState: layoutState,
-            eventService: eventService,
-            defaultStyle: nil,
-            pressedStyle: nil,
-            hoveredStyle: nil,
-            disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: nil
-        )
-
-        sut.handleTap()
-
-        XCTAssertTrue(eventService.cartItemDevicePayCalled)
-
-        eventService.cartItemDevicePayCompletionCallback?(.failure)
-
-        XCTAssertNil(layoutState.globalCustomStateValue(for: "paymentResult"))
-        XCTAssertTrue(didClose)
-    }
-
-    func test_devicePaySuccess_doesNotSetState_whenCustomStateKeyIsEmpty() {
-        let layoutState = MockLayoutState()
-        let eventService = MockEventService()
-        let isValid = true
-        var didClose = false
-
-        layoutState.validationCoordinator.registerField(
-            key: "dropdown",
-            owner: self,
-            validation: {
-                return isValid ? .valid : .invalid
-            },
-            onStatusChange: { _ in }
-        )
-
-        layoutState.actionCollection[.close] = { _ in didClose = true }
-
-        let sut = CatalogDevicePayButtonViewModel(
-            catalogItem: makeCatalogItem(id: "item"),
-            children: nil,
-            provider: .applePay,
-            layoutState: layoutState,
-            eventService: eventService,
-            defaultStyle: nil,
-            pressedStyle: nil,
-            hoveredStyle: nil,
-            disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: ""
-        )
-
-        sut.handleTap()
-
-        XCTAssertTrue(eventService.cartItemDevicePayCalled)
-
-        eventService.cartItemDevicePayCompletionCallback?(.success)
-
-        XCTAssertNil(layoutState.globalCustomStateValue(for: "paymentResult"))
-        XCTAssertTrue(didClose)
     }
 
     private func makeCatalogItem(id: String) -> CatalogItem {
