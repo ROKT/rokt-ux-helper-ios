@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import DcuiSchema
 
 enum LayoutDismissOptions {
     case closeButton, noMoreOffer, endMessage, collapsed, defaultDismiss, partnerTriggered, instantPurchaseDismiss
@@ -195,6 +196,21 @@ class EventService: Hashable, EventDiagnosticServicing {
             kContext: context.rawValue
         ]
         sendCartItemEvent(eventType: .SignalUserInteraction, catalogItem: catalogItem, objectData: objectData)
+    }
+
+    func cartItemDevicePay(
+        catalogItem: CatalogItem,
+        paymentProvider: PaymentProvider,
+        completion: @escaping (_ status: DevicePayStatus) -> Void
+    ) {
+        let objectData = [
+            kCatalogItemId: catalogItem.catalogItemId,
+            kQuantity: "1"
+        ]
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem, objectData: objectData)
+        uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
+
+        self.devicePayCompletion = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {

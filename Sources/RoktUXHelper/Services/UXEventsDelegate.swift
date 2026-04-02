@@ -1,4 +1,5 @@
 import Foundation
+import DcuiSchema
 
 protocol UXEventsDelegate: AnyObject {
     func onOfferEngagement(_ layoutId: String)
@@ -22,4 +23,5 @@ protocol UXEventsDelegate: AnyObject {
                  onError: @escaping (String, Error?) -> Void)
 
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem)
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider)
 }

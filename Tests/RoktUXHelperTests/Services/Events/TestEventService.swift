@@ -1,4 +1,5 @@
 import XCTest
+import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 13, *)
@@ -437,5 +438,10 @@ class MockUXHelper: UXEventsDelegate {
     
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem) {
         self.roktEvents.append(.CartItemInstantPurchase)
+    }
+
+    func onCartItemDevicePay(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem,
+                             paymentProvider: DcuiSchema.PaymentProvider) {
+        self.roktEvents.append(.CartItemDevicePay)
     }
 }
