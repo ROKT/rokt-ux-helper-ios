@@ -123,6 +123,13 @@ extension PredicateHandling {
         }
     } ?? [] }
 
+    private var placeholderPredicates: [PlaceholderPredicate] { predicates?.compactMap {
+        switch $0 {
+        case .placeholder(let predicate): return predicate
+        default: return nil
+        }
+    } ?? [] }
+
     private func progressionPredicatesMatched(currentProgress: Int) -> Bool? {
         // currentProgress refer to currentOffer in Onebyone and current page in carousel
 
@@ -356,6 +363,7 @@ extension PredicateHandling {
         let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap,
                                                               globalCustomStateMap: uiState.globalCustomStateMap,
                                                               position: uiState.position)
+        let placeholderMatched = placeholderPredicatesMatched(uiState: uiState)
 
         if progressionMatched == nil &&
             breakPointsMatched == nil &&
@@ -364,7 +372,8 @@ extension PredicateHandling {
             staticBooleanMatched == nil &&
             creativeCopyMatched == nil &&
             staticStringMatched == nil &&
-            customStateMatched == nil { return true }
+            customStateMatched == nil &&
+            placeholderMatched == nil { return true }
 
         var matched = true
 
@@ -398,6 +407,93 @@ extension PredicateHandling {
 
         if let customStateMatched {
             matched = matched && customStateMatched
+        }
+
+        if let placeholderMatched {
+            matched = matched && placeholderMatched
+        }
+
+        return matched
+    }
+
+    private func placeholderPredicatesMatched(uiState: WhenComponentUIState) -> Bool? {
+        guard !placeholderPredicates.isEmpty else { return nil }
+
+        let context = PlaceholderResolutionContext(offers: offers,
+                                                   currentOfferIndex: uiState.currentProgress,
+                                                   activeCatalogItem: activeCatalogItem)
+
+        var matched = true
+
+        placeholderPredicates.forEach { predicate in
+            switch predicate {
+            case .textValue(let stringPredicate):
+                let resolved = placeholderResolver.resolveString(placeholder: stringPredicate.input,
+                                                                 context: context)
+                // Resolve the RHS value as a placeholder too, falling back to the literal string
+                let expectedValue = placeholderResolver.resolveString(placeholder: stringPredicate.value,
+                                                                      context: context) ?? stringPredicate.value
+                switch stringPredicate.condition {
+                case .is:
+                    matched = matched && resolved == expectedValue
+                case .isNot:
+                    matched = matched && resolved != expectedValue
+                case .exists:
+                    matched = matched && resolved != nil && !resolved!.isEmpty
+                case .notExists:
+                    matched = matched && (resolved == nil || resolved!.isEmpty)
+                }
+            case .textLength(let lengthPredicate):
+                guard let resolvedLength = placeholderResolver.resolveTextLength(placeholder: lengthPredicate.input,
+                                                                                 context: context) else {
+                    matched = false
+                    return
+                }
+                let expectedInt: Int
+                if let resolved = placeholderResolver.resolveInt(placeholder: lengthPredicate.value, context: context) {
+                    expectedInt = resolved
+                } else if let literal = Int(lengthPredicate.value) {
+                    expectedInt = literal
+                } else {
+                    matched = false
+                    return
+                }
+                switch lengthPredicate.condition {
+                case .is:
+                    matched = matched && resolvedLength == expectedInt
+                case .isNot:
+                    matched = matched && resolvedLength != expectedInt
+                case .isAbove:
+                    matched = matched && resolvedLength > expectedInt
+                case .isBelow:
+                    matched = matched && resolvedLength < expectedInt
+                }
+            case .numeric(let numericPredicate):
+                guard let resolvedInputDecimal = placeholderResolver.resolveDecimal(placeholder: numericPredicate.input,
+                                                                                    context: context) else {
+                    matched = false
+                    return
+                }
+                let expectedDecimal: Decimal
+                if let resolved = placeholderResolver.resolveDecimal(placeholder: numericPredicate.value, context: context) {
+                    expectedDecimal = resolved
+                } else if let literal = Decimal(string: numericPredicate.value) {
+                    expectedDecimal = literal
+                } else {
+                    matched = false
+                    return
+                }
+                switch numericPredicate.condition {
+                case .is:
+                    matched = matched && resolvedInputDecimal == expectedDecimal
+                case .isNot:
+                    matched = matched && resolvedInputDecimal != expectedDecimal
+                case .isAbove:
+                    matched = matched && resolvedInputDecimal > expectedDecimal
+                case .isBelow:
+                    matched = matched && resolvedInputDecimal < expectedDecimal
+                }
+            }
         }
 
         return matched

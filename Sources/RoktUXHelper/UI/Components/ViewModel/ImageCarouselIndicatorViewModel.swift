@@ -73,6 +73,7 @@ class ImageCarouselIndicatorViewModel:
                 ),
                 pressed: nil,
                 hovered: nil,
+                focussed: nil,
                 disabled: nil
             )
         ]
@@ -94,6 +95,7 @@ class ImageCarouselIndicatorViewModel:
                 ),
                 pressed: nil,
                 hovered: nil,
+                focussed: nil,
                 disabled: nil
             )
         ]

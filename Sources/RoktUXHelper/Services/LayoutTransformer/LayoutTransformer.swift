@@ -28,6 +28,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     let addToCartMapper: AddToCartMapper
     let extractor: Extractor
 
+    var moduleName: String? {
+        layoutPlugin.slots.first?.layoutVariant?.moduleName
+    }
+
     init(
         layoutPlugin: LayoutPlugin,
         creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
@@ -146,7 +150,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                 .closeButton(
                     try getCloseButton(
                         styles: closeButtonModel.styles,
-                        children: transformChildren(closeButtonModel.children, context: context)
+                        children: transformChildren(closeButtonModel.children, context: context),
+                        dismissalMethod: closeButtonModel.dismissalMethod
                     )
                 )
         case .carouselDistribution(let carouselModel):
@@ -209,6 +214,31 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
                         children: transformChildren(model.children, context: context),
                         context: context
                     )
+                )
+        case .catalogDevicePayButton(let devicePayModel):
+                .catalogDevicePayButton(
+                    try getCatalogDevicePayButton(
+                        model: devicePayModel,
+                        children: transformChildren(devicePayModel.children, context: context),
+                        context: context
+                    )
+                )
+        case .catalogDropdown(let dropdownModel):
+                .catalogDropdown(
+                    try getCatalogDropdown(
+                        model: dropdownModel,
+                        attributeIndex: layoutState.nextCatalogDropdownAttributeIndex.advanceAndReturnPrevious()
+                    )
+                )
+        case .catalogImageGallery(let galleryModel):
+            try transformWithFallback {
+                .catalogImageGallery(
+                    try getCatalogImageGallery(model: galleryModel, context: context)
+                )
+            }
+        case .catalogCombinedCollection(let model):
+                .catalogCombinedCollection(
+                    try getCatalogCombinedCollection(model: model, context: context)
                 )
         }
     }
@@ -320,15 +350,212 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
 
     func getCloseButton(styles: LayoutStyle<CloseButtonElements,
                                             ConditionalStyleTransition<CloseButtonTransitions, WhenPredicate>>?,
-                        children: [LayoutSchemaViewModel]?) throws -> CloseButtonViewModel {
+                        children: [LayoutSchemaViewModel]?,
+                        dismissalMethod: String? = nil) throws -> CloseButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return CloseButtonViewModel(children: children,
                                     defaultStyle: updateStyles.compactMap {$0.default},
                                     pressedStyle: updateStyles.compactMap {$0.pressed},
                                     hoveredStyle: updateStyles.compactMap {$0.hovered},
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
+                                    dismissalMethod: dismissalMethod,
                                     layoutState: layoutState,
                                     eventService: eventService)
+    }
+
+    func getCatalogDropdown(
+        model: CatalogDropdownModel<WhenPredicate>,
+        attributeIndex: Int = 0
+    ) throws -> CatalogDropdownViewModel {
+        let elements = model.styles?.elements
+        let ownStyles = try StyleTransformer.updatedStyles(elements?.own)
+        let headStyles = try StyleTransformer.updatedStyles(elements?.head)
+        let iconStyles = try StyleTransformer.updatedStyles(elements?.icon)
+        let optionListStyles = try StyleTransformer.updatedStyles(elements?.optionList)
+        let optionStyles = try StyleTransformer.updatedStyles(elements?.option)
+        let errorStyles = try StyleTransformer.updatedStyles(elements?.error)
+
+        return CatalogDropdownViewModel(
+            ownStyles: ownStyles.isEmpty ? nil : ownStyles,
+            headStyles: headStyles.isEmpty ? nil : headStyles,
+            iconStyles: iconStyles.isEmpty ? nil : iconStyles,
+            optionListStyles: optionListStyles.isEmpty ? nil : optionListStyles,
+            optionStyles: optionStyles.isEmpty ? nil : optionStyles,
+            errorStyles: errorStyles.isEmpty ? nil : errorStyles,
+            placeholderValue: model.placeholderValue,
+            unavailableValue: model.unavailableValue,
+            validatorFieldConfig: model.validatorFieldConfig,
+            a11yLabel: model.a11yLabel,
+            attributeIndex: attributeIndex,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+    }
+
+    func getCatalogImageGallery(
+        model: CatalogImageGalleryModel<WhenPredicate>,
+        context: Context
+    ) throws -> CatalogImageGalleryViewModel {
+        let elements = model.styles?.elements
+
+        let ownStyles = try StyleTransformer.updatedStyles(elements?.own)
+        let mainImageStyles = try StyleTransformer.updatedStyles(elements?.mainImage)
+        let controlButtonStyles = try StyleTransformer.updatedStyles(elements?.controlButton)
+        let indicatorStyles = try StyleTransformer.updatedStyles(elements?.indicator)
+        let activeIndicatorStyles = try StyleTransformer.updatedStyles(elements?.activeIndicator)
+        let seenIndicatorStyles = try StyleTransformer.updatedStyles(elements?.seenIndicator)
+        let progressIndicatorContainer = try StyleTransformer.updatedStyles(elements?.progressIndicatorContainer)
+
+        let imageDefaultStyle = mainImageStyles.compactMap { $0.default.asDataImageStyles }
+        let imagePressedStyle = mainImageStyles.compactMap { $0.pressed?.asDataImageStyles }
+        let imageHoveredStyle = mainImageStyles.compactMap { $0.hovered?.asDataImageStyles }
+        let imageDisabledStyle = mainImageStyles.compactMap { $0.disabled?.asDataImageStyles }
+
+        // Extract images from the catalog item in context
+        var images: [DataImageViewModel] = []
+        switch context {
+        case let .inner(.addToCart(catalogItem)):
+            images = catalogItem.images
+                .sorted { $0.key < $1.key }
+                .compactMap { DataImageViewModel(
+                    image: $0.value,
+                    defaultStyle: imageDefaultStyle.isEmpty ? nil : imageDefaultStyle,
+                    pressedStyle: imagePressedStyle.isEmpty ? nil : imagePressedStyle,
+                    hoveredStyle: imageHoveredStyle.isEmpty ? nil : imageHoveredStyle,
+                    disabledStyle: imageDisabledStyle.isEmpty ? nil : imageDisabledStyle,
+                    layoutState: layoutState
+                ) }
+        case .inner(.generic(let offer?)),
+                .inner(.negative(let offer)),
+                .inner(.positive(let offer)):
+            if let catalogItem = offer.catalogItems?.first {
+                images = catalogItem.images
+                    .sorted { $0.key < $1.key }
+                    .compactMap { DataImageViewModel(
+                        image: $0.value,
+                        defaultStyle: imageDefaultStyle.isEmpty ? nil : imageDefaultStyle,
+                        pressedStyle: imagePressedStyle.isEmpty ? nil : imagePressedStyle,
+                        hoveredStyle: imageHoveredStyle.isEmpty ? nil : imageHoveredStyle,
+                        disabledStyle: imageDisabledStyle.isEmpty ? nil : imageDisabledStyle,
+                        layoutState: layoutState
+                    ) }
+            }
+        default:
+            break
+        }
+
+        return CatalogImageGalleryViewModel(
+            images: images,
+            defaultStyle: ownStyles.compactMap { $0.default },
+            mainImageStyles: mainImageStyles.isEmpty ? nil : mainImageStyles,
+            controlButtonStyles: controlButtonStyles.isEmpty ? nil : controlButtonStyles,
+            indicatorStyle: indicatorStyles.isEmpty ? nil : indicatorStyles,
+            activeIndicatorStyle: activeIndicatorStyles.isEmpty ? nil : activeIndicatorStyles,
+            seenIndicatorStyle: seenIndicatorStyles.isEmpty ? nil : seenIndicatorStyles,
+            progressIndicatorContainer: progressIndicatorContainer.isEmpty ? nil : progressIndicatorContainer,
+            showIndicators: model.showIndicators ?? true,
+            backwardImage: model.backwardImage,
+            forwardImage: model.forwardImage,
+            a11yLabel: model.a11yLabel,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+    }
+
+    func getCatalogCombinedCollection(
+        model: CatalogCombinedCollectionModel<CatalogCombinedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
+        context: Context
+    ) throws -> CatalogCombinedCollectionViewModel {
+        guard case let .inner(.generic(.some(offer))) = context else {
+            throw LayoutTransformerError.InvalidMapping()
+        }
+
+        // Reset dropdown attribute counter for this offer's scope
+        layoutState.nextCatalogDropdownAttributeIndex = 0
+
+        // Set the first catalog item as active and store the full offer
+        if let firstCatalogItem = offer.catalogItems?.first {
+            layoutState.items[LayoutState.activeCatalogItemKey] = firstCatalogItem
+        }
+        layoutState.items[LayoutState.fullOfferKey] = offer
+
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+
+        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
+            // Reset counter so dropdowns inside the template get consistent indices across rebuilds
+            self.layoutState.nextCatalogDropdownAttributeIndex = 0
+            do {
+                switch model.template {
+                case .column(let templateModel):
+                    let transformedChildren = try self.transformChildren(
+                        templateModel.children,
+                        context: .inner(.addToCart(catalogItem))
+                    )
+                    return [
+                        .column(
+                            try self.getColumn(
+                                templateModel.styles,
+                                children: transformedChildren
+                            )
+                        )
+                    ]
+                case .row(let templateModel):
+                    let transformedChildren = try self.transformChildren(
+                        templateModel.children,
+                        context: .inner(.addToCart(catalogItem))
+                    )
+                    return [
+                        .row(
+                            try self.getRow(
+                                templateModel.styles,
+                                children: transformedChildren
+                            )
+                        )
+                    ]
+                }
+            } catch {
+                return nil
+            }
+        }
+
+        let initialChildren = offer.catalogItems?.first.flatMap(childBuilder) ?? []
+
+        return CatalogCombinedCollectionViewModel(
+            children: initialChildren,
+            defaultStyle: updateStyles.compactMap { $0.default },
+            layoutState: layoutState,
+            eventService: eventService,
+            childBuilder: childBuilder
+        )
+    }
+
+    func getCatalogDevicePayButton(
+        model: CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate>,
+        children: [LayoutSchemaViewModel]?,
+        context: Context
+    ) throws -> CatalogDevicePayButtonViewModel {
+        var catalogItem: CatalogItem?
+        switch context {
+        case let .inner(.addToCart(item)):
+            catalogItem = item
+        default:
+            break
+        }
+
+        let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
+        return CatalogDevicePayButtonViewModel(
+            catalogItem: catalogItem,
+            children: children,
+            provider: model.provider,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: updateStyles.compactMap { $0.default },
+            pressedStyle: updateStyles.compactMap { $0.pressed },
+            hoveredStyle: updateStyles.compactMap { $0.hovered },
+            disabledStyle: updateStyles.compactMap { $0.disabled },
+            validatorTriggerConfig: model.validatorTriggerConfig,
+            customStateKey: nil
+        )
     }
 
     func getProgressControl(styles: LayoutStyle<ProgressControlElements,
@@ -904,12 +1131,14 @@ private extension BasicStateStylingBlock<DataImageCarouselIndicatorStyles> {
         default: DataImageCarouselIndicatorStyles,
         pressed: DataImageCarouselIndicatorStyles? = nil,
         hovered: DataImageCarouselIndicatorStyles? = nil,
+        focussed: DataImageCarouselIndicatorStyles? = nil,
         disabled: DataImageCarouselIndicatorStyles? = nil
     ) -> BasicStateStylingBlock<DataImageCarouselIndicatorStyles> {
         .init(
             default: `default`,
             pressed: pressed,
             hovered: hovered,
+            focussed: focussed,
             disabled: disabled
         )
     }

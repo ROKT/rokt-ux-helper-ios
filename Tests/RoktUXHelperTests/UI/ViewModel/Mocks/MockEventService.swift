@@ -3,7 +3,20 @@ import Foundation
 import DcuiSchema
 
 @available(iOS 15, *)
-class MockEventService: EventServicing {
+class MockEventService: EventDiagnosticServicing {
+    var pluginInstanceGuid: String = "mock-plugin-guid"
+    var pluginConfigJWTToken: String = "mock-jwt"
+    var useDiagnosticEvents: Bool = false
+
+    func sendEvent(
+        _ eventType: RoktUXEventType,
+        parentGuid: String,
+        extraMetadata: [RoktEventNameValue],
+        eventData: [String: String],
+        objectData: [String: String]?,
+        jwtToken: String
+    ) {}
+
     // MARK: - Test Tracking Properties
 
     var dismissalCollapsedEventSent = false
@@ -22,6 +35,7 @@ class MockEventService: EventServicing {
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
     var cartItemUserInteractionCalled = false
+    var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
 
@@ -47,8 +61,13 @@ class MockEventService: EventServicing {
         eventsOnLoadCalled = true
     }
 
+    var lastSlotImpressionInstanceGuid: String?
+    var lastSlotImpressionJwtToken: String?
+
     func sendSlotImpressionEvent(instanceGuid: String, jwtToken: String) {
         slotImpressionEventCalled = true
+        lastSlotImpressionInstanceGuid = instanceGuid
+        lastSlotImpressionJwtToken = jwtToken
     }
 
     func sendSignalViewedEvent(instanceGuid: String, jwtToken: String) {
@@ -84,8 +103,26 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
+    var lastUserInteractionItemId: String?
+    var lastUserInteractionAction: UserInteraction?
+    var lastUserInteractionContext: UserInteractionContext?
+
     func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
         cartItemUserInteractionCalled = true
+        lastUserInteractionItemId = itemId
+        lastUserInteractionAction = action
+        lastUserInteractionContext = context
+    }
+
+    var cartItemDevicePayCompletionCallback: ((DevicePayStatus) -> Void)?
+
+    func cartItemDevicePay(
+        catalogItem: CatalogItem,
+        paymentProvider: DcuiSchema.PaymentProvider,
+        completion: @escaping (DevicePayStatus) -> Void
+    ) {
+        cartItemDevicePayCalled = true
+        cartItemDevicePayCompletionCallback = completion
     }
 
     func cartItemDevicePaySuccess(itemId: String) {
@@ -129,6 +166,7 @@ class MockEventService: EventServicing {
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
         cartItemUserInteractionCalled = false
+        cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
         dismissOption = nil

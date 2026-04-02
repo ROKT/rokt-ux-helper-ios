@@ -49,6 +49,7 @@ final class TestImageCarouselIndicator: XCTestCase {
                 ),
                 pressed: nil,
                 hovered: nil,
+                focussed: nil,
                 disabled: nil
             )]),
             styleState: styleState,

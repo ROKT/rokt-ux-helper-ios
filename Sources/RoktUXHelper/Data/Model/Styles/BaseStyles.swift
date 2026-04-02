@@ -101,6 +101,30 @@ extension BaseStyles {
             spacing: style.spacing
         )
     }
+
+    init(_ style: CatalogImageGalleryIndicatorStyles) {
+        self.init(
+            background: style.background,
+            border: style.border,
+            container: style.container,
+            dimension: style.dimension,
+            flexChild: style.flexChild,
+            spacing: style.spacing
+        )
+    }
+}
+
+@available(iOS 13, *)
+extension CatalogImageGalleryStyles {
+    var asDataImageStyles: DataImageStyles {
+        DataImageStyles(
+            background: background,
+            border: border,
+            dimension: dimension,
+            flexChild: flexChild,
+            spacing: spacing
+        )
+    }
 }
 
 extension BasicStateStylingBlock where StyleProperties: Codable {
@@ -109,6 +133,7 @@ extension BasicStateStylingBlock where StyleProperties: Codable {
             default: transform(`default`),
             pressed: pressed.map(transform),
             hovered: hovered.map(transform),
+            focussed: focussed.map(transform),
             disabled: disabled.map(transform)
         )
     }
