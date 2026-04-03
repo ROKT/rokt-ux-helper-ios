@@ -28,6 +28,7 @@ extension CustomStateIdentifiable {
     enum Keys {
         case imageCarouselPosition
         case imageCarouselKey(key: String)
+        case paymentResult
 
         var rawValue: String {
             switch self {
@@ -35,6 +36,8 @@ extension CustomStateIdentifiable {
                 return "imageCarouselPosition"
             case .imageCarouselKey(let key):
                 return "DataImageCarousel.\(key)"
+            case .paymentResult:
+                return "paymentResult"
             }
         }
     }

@@ -19,7 +19,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let hoveredStyle: [CatalogDevicePayButtonStyles]?
     let disabledStyle: [CatalogDevicePayButtonStyles]?
     let validatorTriggerConfig: ValidationTriggerConfig?
-    let customStateKey: String?
+    let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
     var position: Int?
 
     init(
@@ -32,8 +32,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         pressedStyle: [CatalogDevicePayButtonStyles]?,
         hoveredStyle: [CatalogDevicePayButtonStyles]?,
         disabledStyle: [CatalogDevicePayButtonStyles]?,
-        validatorTriggerConfig: ValidationTriggerConfig?,
-        customStateKey: String?
+        validatorTriggerConfig: ValidationTriggerConfig?
     ) {
         self.catalogItem = catalogItem
         self.children = children
@@ -45,7 +44,6 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         self.layoutState = layoutState
         self.eventService = eventService
         self.validatorTriggerConfig = validatorTriggerConfig
-        self.customStateKey = customStateKey
     }
 
     func handleTap() {
@@ -72,11 +70,6 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     private func handleDevicePayCompletion(status: DevicePayStatus) {
-        guard let customStateKey, !customStateKey.isEmpty else {
-            layoutState?.actionCollection[.close](nil)
-            return
-        }
-
         let value: Int
         switch status {
         case .success:

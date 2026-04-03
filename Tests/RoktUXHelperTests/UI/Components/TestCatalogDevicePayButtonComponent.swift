@@ -20,8 +20,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: nil,
-            customStateKey: nil
+            validatorTriggerConfig: nil
         )
 
         sut.handleTap()
@@ -42,8 +41,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: nil,
-            customStateKey: nil
+            validatorTriggerConfig: nil
         )
 
         sut.handleTap()
@@ -73,8 +71,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"]),
-            customStateKey: nil
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
         )
 
         sut.handleTap()
@@ -98,8 +95,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: nil,
-            customStateKey: "PaymentCompleted"
+            validatorTriggerConfig: nil
         )
         sut.position = 0
 
@@ -112,7 +108,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let exp = expectation(description: "custom state updated")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             let map = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
-            let identifier = CustomStateIdentifiable(position: 0, key: "PaymentCompleted")
+            let identifier = CustomStateIdentifiable(position: 0, key: .paymentResult)
             XCTAssertEqual(map?.wrappedValue?[identifier], 1)
             exp.fulfill()
         }
@@ -134,8 +130,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            validatorTriggerConfig: nil,
-            customStateKey: "PaymentCompleted"
+            validatorTriggerConfig: nil
         )
         sut.position = 0
 
@@ -145,7 +140,7 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         let exp = expectation(description: "custom state updated")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             let map = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
-            let identifier = CustomStateIdentifiable(position: 0, key: "PaymentCompleted")
+            let identifier = CustomStateIdentifiable(position: 0, key: .paymentResult)
             XCTAssertEqual(map?.wrappedValue?[identifier], -1)
             exp.fulfill()
         }
