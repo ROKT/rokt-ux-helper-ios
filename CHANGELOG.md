@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move navigation button overlay outside clipped ZStack to prevent button clipping
 
+## [0.9.1] - 2026-04-03
+
+### Added
+
+- Hardcode paymentResult custom state key in CatalogDevicePayButtonViewModel ([#242](https://github.com/ROKT/rokt-ux-helper-ios/pull/242))
+
 ## [0.9.0] - 2026-04-02
 
 ### Added
@@ -213,7 +219,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.3...0.9.0
 [0.8.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.2...0.8.3
 [0.8.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.1...0.8.2
