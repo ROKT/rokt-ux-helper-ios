@@ -124,9 +124,8 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendDismissalEvent() {
-        // Any in-flight forward payment is now pointed at a closed layout — drop
-        // its completion so a late finalized call from the host doesn't emit a
-        // success/failure signal against a dead view.
+        // Drop any pending forward-payment completion so a late host finalization
+        // doesn't fire against a dismissed layout.
         forwardPaymentCompletion = nil
         sendDismissalEventCallback()
         switch dismissOption {
@@ -244,13 +243,10 @@ class EventService: Hashable, EventDiagnosticServicing {
         partnerPaymentReference: String?,
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     ) {
-        // Drop duplicates: a second tap before the host finalizes the first would
-        // silently overwrite the pending completion and double-count the initiated
-        // signal in analytics.
         guard forwardPaymentCompletion == nil else {
             sendDiagnostics(
-                message: kForwardPaymentInFlightErrorCode,
-                callStack: "Forward payment in flight for layout \(pluginId); dropped request for \(catalogItem.catalogItemId)"
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
             )
             return
         }

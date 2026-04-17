@@ -492,7 +492,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(invocationCount, 1)
     }
 
-    func test_forward_payment_duplicate_call_is_ignored_while_in_flight() {
+    func test_forward_payment_duplicate_call_is_ignored_while_processing() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -515,8 +515,6 @@ final class TestEventService: XCTestCase {
             completion: { _ in secondCount += 1 }
         )
 
-        // Duplicate call must not emit another Initiated signal — only the diagnostic
-        // (which is only sent if useDiagnosticEvents is on; count parity is the invariant).
         XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemForwardPaymentInitiated }.count, eventsAfterFirst)
 
         eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
@@ -562,7 +560,6 @@ final class TestEventService: XCTestCase {
 
         eventService.sendDismissalEvent()
 
-        // Late finalize from host after layout closed — completion must be dropped.
         eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
 
         XCTAssertEqual(invocationCount, 0)

@@ -9,12 +9,6 @@ private enum PPUCreativeCopyKey {
 
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
-    // `paymentResult` is reused with the DevicePay flow — both record the outcome
-    // of the most recent payment attempt so creative predicates can drive UI
-    // transitions uniformly (1 = success, -1 = failure).
-    // `paymentProcessing` is the orthogonal in-flight flag (1 = in flight, 0 =
-    // idle) so predicates can surface a loading/disabled visual during the
-    // window between tap and host finalization.
     private static let paymentResultKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
     private static let paymentProcessingKey = CustomStateIdentifiable.Keys.paymentProcessing.rawValue
 
@@ -54,7 +48,6 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         guard let raw = offerCreativeCopy?[PPUCreativeCopyKey.partnerManagedPurchase] else {
             return true
         }
-        // Only literal "true"/"false" opt out. Typos keep the safe default (true).
         return Bool(raw) ?? true
     }
 
