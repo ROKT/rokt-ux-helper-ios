@@ -212,9 +212,6 @@ public class RoktUXEvent {
         }
     }
 
-    /// Triggered when the user taps a catalog response button configured to forward payment to Rokt.
-    /// The host integration is expected to perform the purchase API call to Rokt and report
-    /// the outcome via `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)`.
     public class CartItemForwardPayment: RoktUXEvent {
         public let layoutId: String
         public let name: String

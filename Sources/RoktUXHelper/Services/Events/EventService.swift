@@ -124,8 +124,6 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendDismissalEvent() {
-        // Drop any pending forward-payment completion so a late host finalization
-        // doesn't fire against a dismissed layout.
         forwardPaymentCompletion = nil
         sendDismissalEventCallback()
         switch dismissOption {
