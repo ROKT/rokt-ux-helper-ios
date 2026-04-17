@@ -1,10 +1,45 @@
 import XCTest
 import SwiftUI
+import SnapshotTesting
 import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
 final class TestCatalogDevicePayButtonComponent: XCTestCase {
+
+    // MARK: - Snapshots
+
+    func testSnapshot_applePay() throws {
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    provider: .applePay,
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
+        )
+        .frame(width: 350, height: 80)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
+
+    func testSnapshot_afterpay() throws {
+        let view = try TestPlaceHolder.make(
+            layoutMaker: { layoutState, eventService in
+                try LayoutSchemaViewModel.makeCatalogDevicePayButton(
+                    provider: .afterpay,
+                    layoutState: layoutState,
+                    eventService: eventService
+                )
+            }
+        )
+        .frame(width: 350, height: 120)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    }
 
     func test_handleTap_callsDevicePay_whenNoValidation() {
         let eventService = MockEventService()
@@ -145,5 +180,42 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
             exp.fulfill()
         }
         wait(for: [exp], timeout: 1.0)
+    }
+}
+
+@available(iOS 15.0, *)
+extension LayoutSchemaViewModel {
+    static func makeCatalogDevicePayButton(
+        provider: PaymentProvider,
+        layoutState: LayoutState,
+        eventService: EventService
+    ) throws -> Self {
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState,
+            eventService: eventService
+        )
+        let model: CatalogDevicePayButtonModel<LayoutSchemaModel, WhenPredicate>
+        switch provider {
+        case .applePay:
+            model = ModelTestData.CatalogDevicePayButtonData.applePay()
+        case .afterpay:
+            model = ModelTestData.CatalogDevicePayButtonData.afterpay()
+        default:
+            model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+        }
+
+        guard let catalogItem = ModelTestData.CatalogPageModelData.withBNF().layoutPlugins?.first?.slots.first?.offer?
+            .catalogItems?.first else {
+            XCTFail("Couldn't get catalog item")
+            throw LayoutTransformerError.InvalidMapping()
+        }
+        return LayoutSchemaViewModel.catalogDevicePayButton(
+            try transformer.getCatalogDevicePayButton(
+                model: model,
+                children: transformer.transformChildren(model.children, context: .inner(.addToCart(catalogItem))),
+                context: .inner(.addToCart(catalogItem))
+            )
+        )
     }
 }
