@@ -48,7 +48,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             eventService: eventService
         )
 
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventService.cartItemInstantPurchaseCalled)
         XCTAssertFalse(eventService.cartItemForwardPaymentCalled)
@@ -74,7 +74,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             eventService: eventService
         )
 
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
         XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
@@ -82,6 +82,17 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertFalse(closeInvoked)
         XCTAssertEqual(eventService.lastForwardPaymentReference, "ref-xyz")
         XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
+    }
+
+    func test_isPartnerManagedPurchase_true_whenFlagTypo() {
+        let layoutState = MockLayoutState()
+        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
+            "ppu.partnerManagedPurchase": "trrue"
+        ])
+
+        let sut = makeSUT(layoutState: layoutState)
+
+        XCTAssertTrue(sut.isPartnerManagedPurchase)
     }
 
     func test_cartItemInstantPurchase_nilCatalogItem_dismisses() {
@@ -96,7 +107,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             eventService: eventService
         )
 
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
         XCTAssertFalse(eventService.cartItemForwardPaymentCalled)
@@ -116,9 +127,8 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             layoutState: layoutState,
             eventService: eventService
         )
-        sut.position = 0
 
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: 0)
         XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
 
         let expectation = expectation(description: "Success state written")
@@ -147,9 +157,8 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             layoutState: layoutState,
             eventService: eventService
         )
-        sut.position = 0
 
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: 0)
         XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
 
         let expectation = expectation(description: "Failure state written")

@@ -9,6 +9,11 @@ private enum PPUCreativeCopyKey {
 
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
+    // Reused with the DevicePay flow — both write the outcome of the most recent
+    // payment attempt under the same custom-state key so creative predicates can
+    // drive UI transitions uniformly.
+    private static let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
+
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
     var children: [LayoutSchemaViewModel]?
@@ -22,9 +27,6 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let pressedStyle: [CatalogResponseButtonStyles]?
     let hoveredStyle: [CatalogResponseButtonStyles]?
     let disabledStyle: [CatalogResponseButtonStyles]?
-
-    let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
-    var position: Int?
 
     init(catalogItem: CatalogItem?,
          children: [LayoutSchemaViewModel]?,
@@ -48,7 +50,8 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         guard let raw = offerCreativeCopy?[PPUCreativeCopyKey.partnerManagedPurchase] else {
             return true
         }
-        return (raw as NSString).boolValue
+        // Only literal "true"/"false" opt out. Typos keep the safe default (true).
+        return Bool(raw) ?? true
     }
 
     var partnerPaymentReference: String? {
@@ -59,7 +62,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         (layoutState?.items[LayoutState.fullOfferKey] as? OfferModel)?.creative.copy
     }
 
-    func cartItemInstantPurchase() {
+    func cartItemInstantPurchase(position: Int?) {
         guard let catalogItem else {
             sendCloseEvent()
             closeLayout()
@@ -75,7 +78,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
                 catalogItem: catalogItem,
                 partnerPaymentReference: partnerPaymentReference,
                 completion: { [weak self] status in
-                    self?.handleForwardPaymentCompletion(status: status)
+                    self?.handleForwardPaymentCompletion(status: status, position: position)
                 }
             )
         }
@@ -85,7 +88,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         layoutState?.actionCollection[.close](nil)
     }
 
-    private func handleForwardPaymentCompletion(status: ForwardPaymentStatus) {
+    private func handleForwardPaymentCompletion(status: ForwardPaymentStatus, position: Int?) {
         let value: Int
         switch status {
         case .success:
@@ -93,15 +96,15 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         case .failure:
             value = -1
         }
-        setLayoutVariantCustomState(key: customStateKey, value: value)
+        setLayoutVariantCustomState(value: value, position: position)
     }
 
-    private func setLayoutVariantCustomState(key: String, value: Int) {
+    private func setLayoutVariantCustomState(value: Int, position: Int?) {
         guard let layoutState,
               let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
         else { return }
 
-        let identifier = CustomStateIdentifiable(position: position, key: key)
+        let identifier = CustomStateIdentifiable(position: position, key: Self.customStateKey)
 
         DispatchQueue.main.async {
             var map = binding.wrappedValue ?? [:]

@@ -15,7 +15,7 @@ enum DevicePayStatus {
 
 enum ForwardPaymentStatus {
     case success
-    case failure(reason: String)
+    case failure(reason: String?)
 }
 
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
@@ -124,6 +124,10 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendDismissalEvent() {
+        // Any in-flight forward payment is now pointed at a closed layout — drop
+        // its completion so a late finalized call from the host doesn't emit a
+        // success/failure signal against a dead view.
+        forwardPaymentCompletion = nil
         sendDismissalEventCallback()
         switch dismissOption {
         case .noMoreOffer:
@@ -240,6 +244,17 @@ class EventService: Hashable, EventDiagnosticServicing {
         partnerPaymentReference: String?,
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     ) {
+        // Drop duplicates: a second tap before the host finalizes the first would
+        // silently overwrite the pending completion and double-count the initiated
+        // signal in analytics.
+        guard forwardPaymentCompletion == nil else {
+            sendDiagnostics(
+                message: kForwardPaymentInFlightErrorCode,
+                callStack: "Forward payment in flight for layout \(pluginId); dropped request for \(catalogItem.catalogItemId)"
+            )
+            return
+        }
+
         sendCartItemEvent(eventType: .SignalCartItemForwardPaymentInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemForwardPayment(
             pluginId,
@@ -258,12 +273,13 @@ class EventService: Hashable, EventDiagnosticServicing {
         forwardPaymentCompletion = nil
     }
 
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String) {
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        let objectData = failureReason.map { [kFailureReason: $0] }
         sendCartItemEvent(
             eventType: .SignalCartItemForwardPaymentFailure,
             catalogItem: catalogItem,
-            objectData: [kFailureReason: failureReason]
+            objectData: objectData
         )
 
         forwardPaymentCompletion?(.failure(reason: failureReason))

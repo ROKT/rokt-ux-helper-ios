@@ -213,13 +213,13 @@ public class RoktUX: UXEventsDelegate {
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the payment succeeded or failed.
-       - failureReason: required when `success` is `false`; describes why the payment failed. Ignored when `success` is `true`.
+       - failureReason: optional; when provided alongside `success: false`, it is emitted on the failure signal. Ignored when `success` is `true`.
      */
     public func forwardPaymentFinalized(
         layoutId: String,
         catalogItemId: String,
         success: Bool,
-        failureReason: String = "Unknown failure reason"
+        failureReason: String? = nil
     ) {
         if success {
             eventServices[layoutId]?.cartItemForwardPaymentSuccess(itemId: catalogItemId)

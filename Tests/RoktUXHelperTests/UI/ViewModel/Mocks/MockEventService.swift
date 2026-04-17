@@ -156,7 +156,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemForwardPaymentSuccessCalled = true
     }
 
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String) {
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
         cartItemForwardPaymentFailureCalled = true
         lastForwardPaymentFailureReason = failureReason
     }

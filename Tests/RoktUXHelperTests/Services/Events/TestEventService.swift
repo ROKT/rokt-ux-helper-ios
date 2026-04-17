@@ -491,6 +491,82 @@ final class TestEventService: XCTestCase {
 
         XCTAssertEqual(invocationCount, 1)
     }
+
+    func test_forward_payment_duplicate_call_is_ignored_while_in_flight() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        var firstCount = 0
+        var secondCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in firstCount += 1 }
+        )
+        let eventsAfterFirst = events.count
+
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in secondCount += 1 }
+        )
+
+        // Duplicate call must not emit another Initiated signal — only the diagnostic
+        // (which is only sent if useDiagnosticEvents is on; count parity is the invariant).
+        XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemForwardPaymentInitiated }.count, eventsAfterFirst)
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        XCTAssertEqual(firstCount, 1, "first completion should still fire")
+        XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
+    }
+
+    func test_forward_payment_failure_without_reason_omits_object_data() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: nil)
+
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentFailure)
+        XCTAssertNil(event?.objectData?[kFailureReason])
+    }
+
+    func test_forward_payment_completion_cleared_on_dismissal() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var invocationCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in invocationCount += 1 }
+        )
+
+        eventService.sendDismissalEvent()
+
+        // Late finalize from host after layout closed — completion must be dropped.
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        XCTAssertEqual(invocationCount, 0)
+    }
 }
 
 class MockUXHelper: UXEventsDelegate {

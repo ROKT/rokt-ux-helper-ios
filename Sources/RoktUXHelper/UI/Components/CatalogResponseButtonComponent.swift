@@ -26,7 +26,6 @@ struct CatalogResponseButtonComponent: View {
         _parentHeight = parentHeight
 
         self.parentOverride = parentOverride
-        self.model.position = config.position
     }
 
     @State var styleState: StyleState = .default
@@ -218,7 +217,7 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        model.cartItemInstantPurchase()
+        model.cartItemInstantPurchase(position: config.position)
     }
 
     private func updateStyleState() {

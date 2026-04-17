@@ -30,5 +30,5 @@ protocol EventServicing: AnyObject {
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     )
     func cartItemForwardPaymentSuccess(itemId: String)
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String)
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?)
 }
