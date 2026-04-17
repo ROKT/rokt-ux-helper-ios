@@ -472,6 +472,36 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(reason, "card declined")
     }
 
+    func test_forward_payment_synchronous_host_finalization_invokes_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        stubUXHelper.onForwardPaymentInvoked = { [weak eventService] _, catalogItem in
+            eventService?.cartItemForwardPaymentSuccess(itemId: catalogItem.catalogItemId)
+        }
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        guard case .success = capturedStatus else {
+            return XCTFail("expected success, got \(String(describing: capturedStatus))")
+        }
+
+        var secondStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { secondStatus = $0 }
+        )
+        XCTAssertNotNil(secondStatus, "second attempt should not be blocked by stale completion")
+    }
+
     func test_forward_payment_completion_only_invoked_once() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
@@ -642,10 +672,12 @@ class MockUXHelper: UXEventsDelegate {
     }
 
     var forwardPaymentReference: String?
+    var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem) -> Void)?
     func onCartItemForwardPayment(_ layoutId: String,
                                   catalogItem: RoktUXHelper.CatalogItem,
                                   partnerPaymentReference: String?) {
         self.roktEvents.append(.CartItemForwardPayment)
         self.forwardPaymentReference = partnerPaymentReference
+        onForwardPaymentInvoked?(layoutId, catalogItem)
     }
 }

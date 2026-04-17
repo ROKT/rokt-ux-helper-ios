@@ -249,14 +249,14 @@ class EventService: Hashable, EventDiagnosticServicing {
             return
         }
 
+        self.forwardPaymentCompletion = completion
+
         sendCartItemEvent(eventType: .SignalCartItemForwardPaymentInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemForwardPayment(
             pluginId,
             catalogItem: catalogItem,
             partnerPaymentReference: partnerPaymentReference
         )
-
-        self.forwardPaymentCompletion = completion
     }
 
     func cartItemForwardPaymentSuccess(itemId: String) {
