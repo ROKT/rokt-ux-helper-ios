@@ -70,29 +70,40 @@ struct CatalogDropdownComponent: View {
 
     // MARK: - Body
 
+    @ViewBuilder
     var body: some View {
-        VStack(spacing: 0) {
-            headView
-            if showValidationError {
-                errorView
+        // Hide the dropdown (and skip validator registration) when there is
+        // nothing meaningful to choose. Align with web dcui, which
+        // returns null when `items.length <= 1`. The two cases this guards:
+        //   • Offer has no `catalogItemGroup` (e.g. single-variant product —
+        //     the backend selector didn't configure a group) → options == [].
+        //   • A group attribute has only one option.
+        if model.options.count < 2 {
+            EmptyView()
+        } else {
+            VStack(spacing: 0) {
+                headView
+                if showValidationError {
+                    errorView
+                }
             }
-        }
-        .background(
-            DropdownWindowOverlayPresenter(
-                isPresented: $isExpanded,
-                content: { expandedOverlayView() }
+            .background(
+                DropdownWindowOverlayPresenter(
+                    isPresented: $isExpanded,
+                    content: { expandedOverlayView() }
+                )
             )
-        )
-        .onChange(of: globalScreenSize.width) { newSize in
-            DispatchQueue.main.async {
-                breakpointIndex = model.updateBreakpointIndex(for: newSize)
-                frameChangeIndex += 1
+            .onChange(of: globalScreenSize.width) { newSize in
+                DispatchQueue.main.async {
+                    breakpointIndex = model.updateBreakpointIndex(for: newSize)
+                    frameChangeIndex += 1
+                }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(model.a11yLabel ?? "")
+            .onAppear { registerValidatorIfNeeded() }
+            .onDisappear { unregisterValidator() }
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(model.a11yLabel ?? "")
-        .onAppear { registerValidatorIfNeeded() }
-        .onDisappear { unregisterValidator() }
     }
 
     // MARK: - Validation Registration
