@@ -211,4 +211,48 @@ public class RoktUXEvent {
             self.paymentProvider = paymentProvider
         }
     }
+
+    /// Triggered when the user taps a catalog response button configured to forward payment to Rokt.
+    /// The host integration is expected to perform the purchase API call to Rokt and report
+    /// the outcome via `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)`.
+    public class CartItemForwardPayment: RoktUXEvent {
+        public let layoutId: String
+        public let name: String
+        public let cartItemId: String
+        public let catalogItemId: String
+        public let currency: String
+        public let description: String
+        public let linkedProductId: String?
+        public let providerData: String
+        public let quantity: Decimal
+        public let totalPrice: Decimal?
+        public let unitPrice: Decimal?
+        public let partnerPaymentReference: String?
+
+        init(layoutId: String,
+             name: String,
+             cartItemId: String,
+             catalogItemId: String,
+             currency: String,
+             description: String,
+             linkedProductId: String?,
+             providerData: String,
+             quantity: Decimal,
+             totalPrice: Decimal?,
+             unitPrice: Decimal?,
+             partnerPaymentReference: String?) {
+            self.layoutId = layoutId
+            self.name = name
+            self.cartItemId = cartItemId
+            self.catalogItemId = catalogItemId
+            self.currency = currency
+            self.description = description
+            self.linkedProductId = linkedProductId
+            self.providerData = providerData
+            self.quantity = quantity
+            self.totalPrice = totalPrice
+            self.unitPrice = unitPrice
+            self.partnerPaymentReference = partnerPaymentReference
+        }
+    }
 }

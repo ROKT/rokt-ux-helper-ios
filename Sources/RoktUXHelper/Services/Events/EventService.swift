@@ -13,6 +13,11 @@ enum DevicePayStatus {
     case retry
 }
 
+enum ForwardPaymentStatus {
+    case success
+    case failure(reason: String)
+}
+
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
 
 @available(iOS 13.0, *)
@@ -35,6 +40,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     var dismissOption: LayoutDismissOptions?
 
     private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
+    private var forwardPaymentCompletion: ((_ status: ForwardPaymentStatus) -> Void)?
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -227,6 +233,41 @@ class EventService: Hashable, EventDiagnosticServicing {
 
         devicePayCompletion?(.failure)
         devicePayCompletion = nil
+    }
+
+    func cartItemForwardPayment(
+        catalogItem: CatalogItem,
+        partnerPaymentReference: String?,
+        completion: @escaping (_ status: ForwardPaymentStatus) -> Void
+    ) {
+        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemForwardPayment(
+            pluginId,
+            catalogItem: catalogItem,
+            partnerPaymentReference: partnerPaymentReference
+        )
+
+        self.forwardPaymentCompletion = completion
+    }
+
+    func cartItemForwardPaymentSuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentSuccess, catalogItem: catalogItem)
+
+        forwardPaymentCompletion?(.success)
+        forwardPaymentCompletion = nil
+    }
+
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        sendCartItemEvent(
+            eventType: .SignalCartItemForwardPaymentFailure,
+            catalogItem: catalogItem,
+            objectData: [kFailureReason: failureReason]
+        )
+
+        forwardPaymentCompletion?(.failure(reason: failureReason))
+        forwardPaymentCompletion = nil
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem, objectData: [String: String]? = nil) {

@@ -24,4 +24,11 @@ protocol EventServicing: AnyObject {
     )
     func cartItemDevicePaySuccess(itemId: String)
     func cartItemDevicePayFailure(itemId: String)
+    func cartItemForwardPayment(
+        catalogItem: CatalogItem,
+        partnerPaymentReference: String?,
+        completion: @escaping (_ status: ForwardPaymentStatus) -> Void
+    )
+    func cartItemForwardPaymentSuccess(itemId: String)
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String)
 }

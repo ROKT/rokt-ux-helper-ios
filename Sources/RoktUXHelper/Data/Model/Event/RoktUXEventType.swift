@@ -29,6 +29,12 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalCartItemInstantPurchase
     /// Triggered when instant purchase fails
     case SignalCartItemInstantPurchaseFailure
+    /// Triggered when the user clicks catalog response button in forward-payment mode (payment forwarded to Rokt).
+    case SignalCartItemForwardPaymentInitiated
+    /// Triggered when forward payment succeeds.
+    case SignalCartItemForwardPaymentSuccess
+    /// Triggered when forward payment fails.
+    case SignalCartItemForwardPaymentFailure
     /// Triggered when an instant purchase offer is explicitly dismissed.
     case SignalInstantPurchaseDismissal
     /// Triggered when the user interacts with the offer.

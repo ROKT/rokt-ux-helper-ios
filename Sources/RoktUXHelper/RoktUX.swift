@@ -206,6 +206,31 @@ public class RoktUX: UXEventsDelegate {
         }
     }
 
+    /**
+     Call when a forward-payment flow has succeeded or failed.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - success: whether the payment succeeded or failed.
+       - failureReason: required when `success` is `false`; describes why the payment failed. Ignored when `success` is `true`.
+     */
+    public func forwardPaymentFinalized(
+        layoutId: String,
+        catalogItemId: String,
+        success: Bool,
+        failureReason: String = "Unknown failure reason"
+    ) {
+        if success {
+            eventServices[layoutId]?.cartItemForwardPaymentSuccess(itemId: catalogItemId)
+        } else {
+            eventServices[layoutId]?.cartItemForwardPaymentFailure(
+                itemId: catalogItemId,
+                failureReason: failureReason
+            )
+        }
+    }
+
     private func initiatePageModel(integrationType: HelperIntegrationType = .s2s,
                                    startDate: Date,
                                    experienceResponse: String,
@@ -588,6 +613,27 @@ public class RoktUX: UXEventsDelegate {
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice,
             paymentProvider: paymentProvider
+        ))
+    }
+
+    func onCartItemForwardPayment(
+        _ layoutId: String,
+        catalogItem: CatalogItem,
+        partnerPaymentReference: String?
+    ) {
+        onRoktEvent?(RoktUXEvent.CartItemForwardPayment(
+            layoutId: layoutId,
+            name: catalogItem.title,
+            cartItemId: catalogItem.cartItemId,
+            catalogItemId: catalogItem.catalogItemId,
+            currency: catalogItem.currency,
+            description: catalogItem.description,
+            linkedProductId: catalogItem.linkedProductId,
+            providerData: catalogItem.providerData,
+            quantity: 1,
+            totalPrice: catalogItem.originalPrice,
+            unitPrice: catalogItem.originalPrice,
+            partnerPaymentReference: partnerPaymentReference
         ))
     }
 }
