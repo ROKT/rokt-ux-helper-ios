@@ -9,10 +9,14 @@ private enum PPUCreativeCopyKey {
 
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
-    // Reused with the DevicePay flow — both write the outcome of the most recent
-    // payment attempt under the same custom-state key so creative predicates can
-    // drive UI transitions uniformly.
-    private static let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
+    // `paymentResult` is reused with the DevicePay flow — both record the outcome
+    // of the most recent payment attempt so creative predicates can drive UI
+    // transitions uniformly (1 = success, -1 = failure).
+    // `paymentProcessing` is the orthogonal in-flight flag (1 = in flight, 0 =
+    // idle) so predicates can surface a loading/disabled visual during the
+    // window between tap and host finalization.
+    private static let paymentResultKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
+    private static let paymentProcessingKey = CustomStateIdentifiable.Keys.paymentProcessing.rawValue
 
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
@@ -74,6 +78,10 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
             sendCloseEvent()
             closeLayout()
         } else {
+            setLayoutVariantCustomState(
+                updates: [Self.paymentProcessingKey: 1],
+                position: position
+            )
             eventService?.cartItemForwardPayment(
                 catalogItem: catalogItem,
                 partnerPaymentReference: partnerPaymentReference,
@@ -89,26 +97,32 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     }
 
     private func handleForwardPaymentCompletion(status: ForwardPaymentStatus, position: Int?) {
-        let value: Int
+        let result: Int
         switch status {
         case .success:
-            value = 1
+            result = 1
         case .failure:
-            value = -1
+            result = -1
         }
-        setLayoutVariantCustomState(value: value, position: position)
+        setLayoutVariantCustomState(
+            updates: [
+                Self.paymentProcessingKey: 0,
+                Self.paymentResultKey: result
+            ],
+            position: position
+        )
     }
 
-    private func setLayoutVariantCustomState(value: Int, position: Int?) {
+    private func setLayoutVariantCustomState(updates: [String: Int], position: Int?) {
         guard let layoutState,
               let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
         else { return }
 
-        let identifier = CustomStateIdentifiable(position: position, key: Self.customStateKey)
-
         DispatchQueue.main.async {
             var map = binding.wrappedValue ?? [:]
-            map[identifier] = value
+            for (key, value) in updates {
+                map[CustomStateIdentifiable(position: position, key: key)] = value
+            }
             binding.wrappedValue = map
             layoutState.publishStateChange()
         }
