@@ -90,7 +90,8 @@ extension OfferModel {
                 jwtToken: token
             ),
             catalogItems: catalogItems,
-            catalogItemGroup: nil
+            catalogItemGroup: nil,
+            transactionData: nil
         )
     }
 }
