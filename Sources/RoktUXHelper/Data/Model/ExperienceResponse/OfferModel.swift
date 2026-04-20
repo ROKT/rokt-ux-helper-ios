@@ -5,6 +5,7 @@ struct OfferModel: Codable {
     let creative: CreativeModel
     let catalogItems: [CatalogItem]?
     let catalogItemGroup: CatalogItemGroup?
+    let transactionData: TransactionData?
 }
 
 struct CreativeModel: Codable {
