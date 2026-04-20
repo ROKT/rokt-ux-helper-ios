@@ -20,6 +20,7 @@ protocol EventServicing: AnyObject {
     func cartItemDevicePay(
         catalogItem: CatalogItem,
         paymentProvider: PaymentProvider,
+        transactionData: TransactionData?,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     )
     func cartItemDevicePaySuccess(itemId: String)

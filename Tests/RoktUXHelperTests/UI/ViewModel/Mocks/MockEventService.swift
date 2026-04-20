@@ -121,13 +121,16 @@ class MockEventService: EventDiagnosticServicing {
     }
 
     var cartItemDevicePayCompletionCallback: ((DevicePayStatus) -> Void)?
+    var cartItemDevicePayLastTransactionData: TransactionData?
 
     func cartItemDevicePay(
         catalogItem: CatalogItem,
         paymentProvider: DcuiSchema.PaymentProvider,
+        transactionData: TransactionData?,
         completion: @escaping (DevicePayStatus) -> Void
     ) {
         cartItemDevicePayCalled = true
+        cartItemDevicePayLastTransactionData = transactionData
         cartItemDevicePayCompletionCallback = completion
     }
 

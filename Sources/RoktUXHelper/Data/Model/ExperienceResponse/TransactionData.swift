@@ -1,18 +1,23 @@
 import Foundation
 
-struct TransactionData: Codable {
-    let shippingAddress: Address?
-    let billingAddress: Address?
-    let paymentType: String?
-    let supportedPaymentMethods: [PaymentMethod]?
-    let isPartnerManagedPurchase: Bool
-    let partnerPaymentReference: String?
-    let confirmationRef: String?
-    let metadata: [String: String]
+/// Transaction-level data decoded from the backend experience response.
+///
+/// Exposed publicly so the Rokt SDK (and partner apps, via `RoktUXEvent.CartItemDevicePay`)
+/// can read the pre-collected billing / shipping / supported-methods information the
+/// backend provides, instead of requiring partners to re-supply these as attributes.
+public struct TransactionData: Codable {
+    public let shippingAddress: Address?
+    public let billingAddress: Address?
+    public let paymentType: String?
+    public let supportedPaymentMethods: [PaymentMethod]?
+    public let isPartnerManagedPurchase: Bool
+    public let partnerPaymentReference: String?
+    public let confirmationRef: String?
+    public let metadata: [String: String]
 }
 
-struct PaymentMethod: Codable {
-    enum MethodType: String, Codable {
+public struct PaymentMethod: Codable {
+    public enum MethodType: String, Codable {
         case unspecified = "UNSPECIFIED"
         case other = "OTHER"
         case card = "CARD"
@@ -22,23 +27,23 @@ struct PaymentMethod: Codable {
         case afterpay = "AFTERPAY"
         case unknown
 
-        init(from decoder: Decoder) throws {
+        public init(from decoder: Decoder) throws {
             let raw = try decoder.singleValueContainer().decode(String.self)
             self = MethodType(rawValue: raw) ?? .unknown
         }
     }
 
-    let type: MethodType
+    public let type: MethodType
 }
 
-struct Address: Codable {
-    let name: String
-    let address1: String
-    let address2: String?
-    let city: String
-    let state: String
-    let stateCode: String
-    let country: String
-    let countryCode: String
-    let zip: String?
+public struct Address: Codable {
+    public let name: String
+    public let address1: String
+    public let address2: String?
+    public let city: String
+    public let state: String
+    public let stateCode: String
+    public let country: String
+    public let countryCode: String
+    public let zip: String?
 }

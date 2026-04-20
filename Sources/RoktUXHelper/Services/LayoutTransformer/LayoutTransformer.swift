@@ -542,6 +542,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             break
         }
 
+        let transactionData = (layoutState.items[LayoutState.fullOfferKey] as? OfferModel)?.transactionData
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
         return CatalogDevicePayButtonViewModel(
             catalogItem: catalogItem,
@@ -553,7 +554,8 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             pressedStyle: updateStyles.compactMap { $0.pressed },
             hoveredStyle: updateStyles.compactMap { $0.hovered },
             disabledStyle: updateStyles.compactMap { $0.disabled },
-            validatorTriggerConfig: model.validatorTriggerConfig
+            validatorTriggerConfig: model.validatorTriggerConfig,
+            transactionData: transactionData
         )
     }
 
