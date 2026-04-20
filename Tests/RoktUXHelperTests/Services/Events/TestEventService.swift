@@ -719,8 +719,10 @@ class MockUXHelper: UXEventsDelegate {
         self.roktEvents.append(.CartItemInstantPurchase)
     }
 
-    func onCartItemDevicePay(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem,
-                             paymentProvider: DcuiSchema.PaymentProvider) {
+    func onCartItemDevicePay(_ layoutId: String,
+                             catalogItem: RoktUXHelper.CatalogItem,
+                             paymentProvider: DcuiSchema.PaymentProvider,
+                             transactionData: TransactionData?) {
         self.roktEvents.append(.CartItemDevicePay)
     }
 

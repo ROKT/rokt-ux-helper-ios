@@ -607,7 +607,12 @@ public class RoktUX: UXEventsDelegate {
         ))
     }
 
-    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider) {
+    func onCartItemDevicePay(
+        _ layoutId: String,
+        catalogItem: CatalogItem,
+        paymentProvider: PaymentProvider,
+        transactionData: TransactionData?
+    ) {
         onRoktEvent?(RoktUXEvent.CartItemDevicePay(
             layoutId: layoutId,
             name: catalogItem.title,
@@ -620,7 +625,8 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice,
-            paymentProvider: paymentProvider
+            paymentProvider: paymentProvider,
+            transactionData: transactionData
         ))
     }
 

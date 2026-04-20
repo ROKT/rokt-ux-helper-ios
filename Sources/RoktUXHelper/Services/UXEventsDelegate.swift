@@ -23,6 +23,11 @@ protocol UXEventsDelegate: AnyObject {
                  onError: @escaping (String, Error?) -> Void)
 
     func onCartItemInstantPurchase(_ layoutId: String, catalogItem: CatalogItem)
-    func onCartItemDevicePay(_ layoutId: String, catalogItem: CatalogItem, paymentProvider: PaymentProvider)
+    func onCartItemDevicePay(
+        _ layoutId: String,
+        catalogItem: CatalogItem,
+        paymentProvider: PaymentProvider,
+        transactionData: TransactionData?
+    )
     func onCartItemForwardPayment(_ layoutId: String, catalogItem: CatalogItem, partnerPaymentReference: String?)
 }

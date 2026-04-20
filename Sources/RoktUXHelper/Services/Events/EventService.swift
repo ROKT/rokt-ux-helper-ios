@@ -208,6 +208,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     func cartItemDevicePay(
         catalogItem: CatalogItem,
         paymentProvider: PaymentProvider,
+        transactionData: TransactionData?,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     ) {
         let objectData = [
@@ -215,7 +216,12 @@ class EventService: Hashable, EventDiagnosticServicing {
             kQuantity: "1"
         ]
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem, objectData: objectData)
-        uxEventDelegate?.onCartItemDevicePay(pluginId, catalogItem: catalogItem, paymentProvider: paymentProvider)
+        uxEventDelegate?.onCartItemDevicePay(
+            pluginId,
+            catalogItem: catalogItem,
+            paymentProvider: paymentProvider,
+            transactionData: transactionData
+        )
 
         self.devicePayCompletion = completion
     }
