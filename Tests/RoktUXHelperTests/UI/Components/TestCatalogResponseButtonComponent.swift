@@ -58,7 +58,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
             .actualView()
 
         let sut = catalogResponseButton.model
-        sut.cartItemInstantPurchase()
+        sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventDelegate.roktEvents.contains(.CartItemInstantPurchase))
         XCTAssertTrue(eventDelegate.roktEvents.contains(.PlacementClosed))

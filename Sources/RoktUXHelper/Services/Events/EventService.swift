@@ -13,6 +13,11 @@ enum DevicePayStatus {
     case retry
 }
 
+enum ForwardPaymentStatus {
+    case success
+    case failure(reason: String?)
+}
+
 typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
 
 @available(iOS 13.0, *)
@@ -35,6 +40,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     var dismissOption: LayoutDismissOptions?
 
     private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
+    private var forwardPaymentCompletion: ((_ status: ForwardPaymentStatus) -> Void)?
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -118,6 +124,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendDismissalEvent() {
+        forwardPaymentCompletion = nil
         sendDismissalEventCallback()
         switch dismissOption {
         case .noMoreOffer:
@@ -227,6 +234,66 @@ class EventService: Hashable, EventDiagnosticServicing {
 
         devicePayCompletion?(.failure)
         devicePayCompletion = nil
+    }
+
+    func cartItemForwardPayment(
+        catalogItem: CatalogItem,
+        partnerPaymentReference: String?,
+        completion: @escaping (_ status: ForwardPaymentStatus) -> Void
+    ) {
+        guard forwardPaymentCompletion == nil else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
+            )
+            return
+        }
+
+        self.forwardPaymentCompletion = completion
+
+        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentInitiated, catalogItem: catalogItem)
+        uxEventDelegate?.onCartItemForwardPayment(
+            pluginId,
+            catalogItem: catalogItem,
+            partnerPaymentReference: partnerPaymentReference
+        )
+    }
+
+    func cartItemForwardPaymentSuccess(itemId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment success for unknown itemId \(itemId) on layout \(pluginId)"
+            )
+            forwardPaymentCompletion?(.failure(reason: "Unknown catalog item: \(itemId)"))
+            forwardPaymentCompletion = nil
+            return
+        }
+        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentSuccess, catalogItem: catalogItem)
+
+        forwardPaymentCompletion?(.success)
+        forwardPaymentCompletion = nil
+    }
+
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment failure for unknown itemId \(itemId) on layout \(pluginId)"
+            )
+            forwardPaymentCompletion?(.failure(reason: failureReason ?? "Unknown catalog item: \(itemId)"))
+            forwardPaymentCompletion = nil
+            return
+        }
+        let objectData = failureReason.map { [kFailureReason: $0] }
+        sendCartItemEvent(
+            eventType: .SignalCartItemForwardPaymentFailure,
+            catalogItem: catalogItem,
+            objectData: objectData
+        )
+
+        forwardPaymentCompletion?(.failure(reason: failureReason))
+        forwardPaymentCompletion = nil
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem, objectData: [String: String]? = nil) {

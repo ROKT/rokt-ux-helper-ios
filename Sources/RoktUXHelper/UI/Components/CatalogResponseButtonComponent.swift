@@ -217,8 +217,7 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        model.cartItemInstantPurchase()
-        model.layoutState?.actionCollection[.close](nil)
+        model.cartItemInstantPurchase(position: config.position)
     }
 
     private func updateStyleState() {

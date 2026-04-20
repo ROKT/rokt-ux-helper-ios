@@ -38,6 +38,12 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemForwardPaymentCalled = false
+    var cartItemForwardPaymentSuccessCalled = false
+    var cartItemForwardPaymentFailureCalled = false
+    var lastForwardPaymentReference: String?
+    var lastForwardPaymentCatalogItem: CatalogItem?
+    var lastForwardPaymentFailureReason: String?
 
     // MARK: - Protocol Properties
 
@@ -133,6 +139,28 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayFailureCalled = true
     }
 
+    var cartItemForwardPaymentCompletionCallback: ((ForwardPaymentStatus) -> Void)?
+
+    func cartItemForwardPayment(
+        catalogItem: CatalogItem,
+        partnerPaymentReference: String?,
+        completion: @escaping (ForwardPaymentStatus) -> Void
+    ) {
+        cartItemForwardPaymentCalled = true
+        lastForwardPaymentCatalogItem = catalogItem
+        lastForwardPaymentReference = partnerPaymentReference
+        cartItemForwardPaymentCompletionCallback = completion
+    }
+
+    func cartItemForwardPaymentSuccess(itemId: String) {
+        cartItemForwardPaymentSuccessCalled = true
+    }
+
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
+        cartItemForwardPaymentFailureCalled = true
+        lastForwardPaymentFailureReason = failureReason
+    }
+
     // MARK: - Additional Test Methods
 
     func sendImpressionEvents(currentOffer: Int) {
@@ -169,6 +197,12 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemForwardPaymentCalled = false
+        cartItemForwardPaymentSuccessCalled = false
+        cartItemForwardPaymentFailureCalled = false
+        lastForwardPaymentReference = nil
+        lastForwardPaymentCatalogItem = nil
+        lastForwardPaymentFailureReason = nil
         dismissOption = nil
     }
 }

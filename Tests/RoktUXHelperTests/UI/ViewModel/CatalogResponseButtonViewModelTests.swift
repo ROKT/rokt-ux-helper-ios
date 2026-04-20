@@ -1,0 +1,189 @@
+import XCTest
+import DcuiSchema
+@testable import RoktUXHelper
+
+@available(iOS 15, *)
+final class CatalogResponseButtonViewModelTests: XCTestCase {
+
+    func test_isPartnerManagedPurchase_defaultsToTrue_whenNotProvided() {
+        let sut = makeSUT()
+
+        XCTAssertTrue(sut.isPartnerManagedPurchase)
+    }
+
+    func test_cartItemInstantPurchase_partnerManaged_callsInstantPurchaseAndDismisses() {
+        let eventService = MockEventService()
+        let layoutState = MockLayoutState()
+        var closeInvoked = false
+        layoutState.actionCollection[.close] = { _ in closeInvoked = true }
+
+        let sut = makeSUT(
+            catalogItem: makeCatalogItem(id: "item-1"),
+            layoutState: layoutState,
+            eventService: eventService,
+            isPartnerManagedPurchase: true
+        )
+
+        sut.cartItemInstantPurchase(position: nil)
+
+        XCTAssertTrue(eventService.cartItemInstantPurchaseCalled)
+        XCTAssertFalse(eventService.cartItemForwardPaymentCalled)
+        XCTAssertTrue(eventService.dismissalEventCalled)
+        XCTAssertEqual(eventService.dismissOption, .defaultDismiss)
+        XCTAssertTrue(closeInvoked)
+    }
+
+    func test_cartItemInstantPurchase_forwardPayment_callsForwardPaymentWithReference() {
+        let eventService = MockEventService()
+        let layoutState = MockLayoutState()
+        var closeInvoked = false
+        layoutState.actionCollection[.close] = { _ in closeInvoked = true }
+
+        let catalogItem = makeCatalogItem(id: "item-1")
+        let sut = makeSUT(
+            catalogItem: catalogItem,
+            layoutState: layoutState,
+            eventService: eventService,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-xyz"
+        )
+
+        sut.cartItemInstantPurchase(position: nil)
+
+        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
+        XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
+        XCTAssertFalse(eventService.dismissalEventCalled)
+        XCTAssertFalse(closeInvoked)
+        XCTAssertEqual(eventService.lastForwardPaymentReference, "ref-xyz")
+        XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
+    }
+
+    func test_cartItemInstantPurchase_nilCatalogItem_dismisses() {
+        let eventService = MockEventService()
+        let layoutState = MockLayoutState()
+        var closeInvoked = false
+        layoutState.actionCollection[.close] = { _ in closeInvoked = true }
+
+        let sut = makeSUT(
+            catalogItem: nil,
+            layoutState: layoutState,
+            eventService: eventService
+        )
+
+        sut.cartItemInstantPurchase(position: nil)
+
+        XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
+        XCTAssertFalse(eventService.cartItemForwardPaymentCalled)
+        XCTAssertTrue(eventService.dismissalEventCalled)
+        XCTAssertTrue(closeInvoked)
+    }
+
+    func test_forwardPaymentSuccess_writesSuccessToPaymentResult() {
+        let eventService = MockEventService()
+        let layoutState = MockLayoutState()
+
+        let sut = makeSUT(
+            catalogItem: makeCatalogItem(id: "item-1"),
+            layoutState: layoutState,
+            eventService: eventService,
+            isPartnerManagedPurchase: false
+        )
+
+        sut.cartItemInstantPurchase(position: 0)
+        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
+
+        let expectation = expectation(description: "Success state written")
+        eventService.cartItemForwardPaymentCompletionCallback?(.success)
+        DispatchQueue.main.async { expectation.fulfill() }
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            ),
+            1
+        )
+    }
+
+    func test_forwardPaymentFailure_writesFailureToPaymentResult() {
+        let eventService = MockEventService()
+        let layoutState = MockLayoutState()
+
+        let sut = makeSUT(
+            catalogItem: makeCatalogItem(id: "item-1"),
+            layoutState: layoutState,
+            eventService: eventService,
+            isPartnerManagedPurchase: false
+        )
+
+        sut.cartItemInstantPurchase(position: 0)
+        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
+
+        let expectation = expectation(description: "Failure state written")
+        eventService.cartItemForwardPaymentCompletionCallback?(.failure(reason: "declined"))
+        DispatchQueue.main.async { expectation.fulfill() }
+        wait(for: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            ),
+            -1
+        )
+    }
+
+    // MARK: - Helpers
+
+    private func makeSUT(
+        catalogItem: CatalogItem? = nil,
+        layoutState: MockLayoutState = MockLayoutState(),
+        eventService: MockEventService = MockEventService(),
+        isPartnerManagedPurchase: Bool = true,
+        partnerPaymentReference: String? = nil
+    ) -> CatalogResponseButtonViewModel {
+        CatalogResponseButtonViewModel(
+            catalogItem: catalogItem,
+            children: nil,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            isPartnerManagedPurchase: isPartnerManagedPurchase,
+            partnerPaymentReference: partnerPaymentReference
+        )
+    }
+
+    private func makeCatalogItem(id: String) -> CatalogItem {
+        CatalogItem(
+            images: [:],
+            catalogItemId: id,
+            cartItemId: "cart-\(id)",
+            instanceGuid: "instance-\(id)",
+            title: "title-\(id)",
+            description: "description-\(id)",
+            price: nil,
+            priceFormatted: nil,
+            originalPrice: nil,
+            originalPriceFormatted: nil,
+            currency: "USD",
+            signalType: nil,
+            url: nil,
+            minItemCount: nil,
+            maxItemCount: nil,
+            preSelectedQuantity: nil,
+            providerData: "provider-\(id)",
+            urlBehavior: nil,
+            positiveResponseText: "positive",
+            negativeResponseText: "negative",
+            addOns: nil,
+            copy: nil,
+            inventoryStatus: nil,
+            linkedProductId: nil,
+            token: "token-\(id)"
+        )
+    }
+}

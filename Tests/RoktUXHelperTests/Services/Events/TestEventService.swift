@@ -392,6 +392,261 @@ final class TestEventService: XCTestCase {
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
     }
+
+    func test_send_forward_payment_initiated() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(),
+            partnerPaymentReference: "ref-1",
+            completion: { _ in }
+        )
+
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentInitiated)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
+
+        XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
+        XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemForwardPayment))
+        XCTAssertEqual(stubUXHelper.forwardPaymentReference, "ref-1")
+    }
+
+    func test_send_forward_payment_success_emits_signal_and_invokes_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentSuccess)
+        XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
+
+        guard case .success = capturedStatus else {
+            return XCTFail("expected success status, got \(String(describing: capturedStatus))")
+        }
+    }
+
+    func test_send_forward_payment_failure_emits_signal_with_reason_and_invokes_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: "card declined")
+
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentFailure)
+        XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
+        XCTAssertEqual(event?.objectData?[kFailureReason], "card declined")
+
+        guard case .failure(let reason) = capturedStatus else {
+            return XCTFail("expected failure status, got \(String(describing: capturedStatus))")
+        }
+        XCTAssertEqual(reason, "card declined")
+    }
+
+    func test_forward_payment_synchronous_host_finalization_invokes_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        stubUXHelper.onForwardPaymentInvoked = { [weak eventService] _, catalogItem in
+            eventService?.cartItemForwardPaymentSuccess(itemId: catalogItem.catalogItemId)
+        }
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        guard case .success = capturedStatus else {
+            return XCTFail("expected success, got \(String(describing: capturedStatus))")
+        }
+
+        var secondStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { secondStatus = $0 }
+        )
+        XCTAssertNotNil(secondStatus, "second attempt should not be blocked by stale completion")
+    }
+
+    func test_forward_payment_completion_only_invoked_once() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var invocationCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in invocationCount += 1 }
+        )
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: "late")
+
+        XCTAssertEqual(invocationCount, 1)
+    }
+
+    func test_forward_payment_duplicate_call_is_ignored_while_processing() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        var firstCount = 0
+        var secondCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in firstCount += 1 }
+        )
+        let eventsAfterFirst = events.count
+
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in secondCount += 1 }
+        )
+
+        XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemForwardPaymentInitiated }.count, eventsAfterFirst)
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        XCTAssertEqual(firstCount, 1, "first completion should still fire")
+        XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
+    }
+
+    func test_forward_payment_success_with_unknown_itemId_unlocks_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "unknownItemId")
+
+        guard case .failure = capturedStatus else {
+            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+        }
+
+        var secondStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { secondStatus = $0 }
+        )
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        guard case .success = secondStatus else {
+            return XCTFail("subsequent attempt should succeed after prior completion cleared")
+        }
+    }
+
+    func test_forward_payment_failure_with_unknown_itemId_unlocks_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        eventService.cartItemForwardPaymentFailure(itemId: "unknownItemId", failureReason: "nope")
+
+        guard case .failure(let reason) = capturedStatus else {
+            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+        }
+        XCTAssertEqual(reason, "nope")
+    }
+
+    func test_forward_payment_failure_without_reason_omits_object_data() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: nil)
+
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentFailure)
+        XCTAssertNil(event?.objectData?[kFailureReason])
+    }
+
+    func test_forward_payment_completion_cleared_on_dismissal() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var invocationCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { _ in invocationCount += 1 }
+        )
+
+        eventService.sendDismissalEvent()
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        XCTAssertEqual(invocationCount, 0)
+    }
 }
 
 class MockUXHelper: UXEventsDelegate {
@@ -467,5 +722,15 @@ class MockUXHelper: UXEventsDelegate {
     func onCartItemDevicePay(_ layoutId: String, catalogItem: RoktUXHelper.CatalogItem,
                              paymentProvider: DcuiSchema.PaymentProvider) {
         self.roktEvents.append(.CartItemDevicePay)
+    }
+
+    var forwardPaymentReference: String?
+    var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem) -> Void)?
+    func onCartItemForwardPayment(_ layoutId: String,
+                                  catalogItem: RoktUXHelper.CatalogItem,
+                                  partnerPaymentReference: String?) {
+        self.roktEvents.append(.CartItemForwardPayment)
+        self.forwardPaymentReference = partnerPaymentReference
+        onForwardPaymentInvoked?(layoutId, catalogItem)
     }
 }
