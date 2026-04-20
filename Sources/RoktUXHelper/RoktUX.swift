@@ -209,6 +209,8 @@ public class RoktUX: UXEventsDelegate {
     /**
      Call when a forward-payment flow has succeeded or failed.
 
+     Must be called on the main queue.
+
      - Parameters:
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
@@ -221,10 +223,16 @@ public class RoktUX: UXEventsDelegate {
         success: Bool,
         failureReason: String? = nil
     ) {
+        guard let eventService = eventServices[layoutId] else {
+            RoktUXLogger.shared.warning(
+                "forwardPaymentFinalized called for unknown layoutId \(layoutId); ignoring"
+            )
+            return
+        }
         if success {
-            eventServices[layoutId]?.cartItemForwardPaymentSuccess(itemId: catalogItemId)
+            eventService.cartItemForwardPaymentSuccess(itemId: catalogItemId)
         } else {
-            eventServices[layoutId]?.cartItemForwardPaymentFailure(
+            eventService.cartItemForwardPaymentFailure(
                 itemId: catalogItemId,
                 failureReason: failureReason
             )

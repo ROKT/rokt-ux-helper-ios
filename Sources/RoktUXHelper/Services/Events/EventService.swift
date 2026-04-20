@@ -260,7 +260,15 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemForwardPaymentSuccess(itemId: String) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment success for unknown itemId \(itemId) on layout \(pluginId)"
+            )
+            forwardPaymentCompletion?(.failure(reason: "Unknown catalog item: \(itemId)"))
+            forwardPaymentCompletion = nil
+            return
+        }
         sendCartItemEvent(eventType: .SignalCartItemForwardPaymentSuccess, catalogItem: catalogItem)
 
         forwardPaymentCompletion?(.success)
@@ -268,7 +276,15 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment failure for unknown itemId \(itemId) on layout \(pluginId)"
+            )
+            forwardPaymentCompletion?(.failure(reason: failureReason ?? "Unknown catalog item: \(itemId)"))
+            forwardPaymentCompletion = nil
+            return
+        }
         let objectData = failureReason.map { [kFailureReason: $0] }
         sendCartItemEvent(
             eventType: .SignalCartItemForwardPaymentFailure,

@@ -553,6 +553,59 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
     }
 
+    func test_forward_payment_success_with_unknown_itemId_unlocks_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        eventService.cartItemForwardPaymentSuccess(itemId: "unknownItemId")
+
+        guard case .failure = capturedStatus else {
+            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+        }
+
+        var secondStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { secondStatus = $0 }
+        )
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+
+        guard case .success = secondStatus else {
+            return XCTFail("subsequent attempt should succeed after prior completion cleared")
+        }
+    }
+
+    func test_forward_payment_failure_with_unknown_itemId_unlocks_completion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            partnerPaymentReference: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        eventService.cartItemForwardPaymentFailure(itemId: "unknownItemId", failureReason: "nope")
+
+        guard case .failure(let reason) = capturedStatus else {
+            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+        }
+        XCTAssertEqual(reason, "nope")
+    }
+
     func test_forward_payment_failure_without_reason_omits_object_data() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
