@@ -312,6 +312,13 @@ class ModelTestData: NSObject {
         }
     }
 
+    enum CatalogDropdownData {
+        static func catalogDropdown() -> CatalogDropdownModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_dropdown")
+            return try! JSONDecoder().decode(CatalogDropdownModel<WhenPredicate>.self, from: data)
+        }
+    }
+
     @available(iOS 13, *)
     enum PageModelData {
         static func withBNF() -> RoktUXPageModel {

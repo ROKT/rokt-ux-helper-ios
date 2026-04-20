@@ -66,6 +66,39 @@ final class CatalogDropdownViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.options[1].label, "Blue")
     }
 
+    func test_options_returnsEmptyWhenCatalogItemGroupIsNil() {
+        let layoutState = LayoutState()
+        let offer = OfferModel(
+            campaignId: "",
+            creative: .init(
+                referralCreativeId: "",
+                instanceGuid: "",
+                copy: [:],
+                images: nil,
+                links: [:],
+                responseOptionsMap: nil,
+                jwtToken: ""
+            ),
+            catalogItems: [CatalogItem.mock(catalogItemId: "item1", inventoryStatus: "InStock")],
+            catalogItemGroup: nil
+        )
+        layoutState.items[LayoutState.fullOfferKey] = offer
+
+        let viewModel = makeViewModel(layoutState: layoutState)
+
+        XCTAssertTrue(viewModel.options.isEmpty)
+        XCTAssertNil(viewModel.attribute)
+    }
+
+    func test_options_returnsEmptyWhenAttributeIndexOutOfRange() {
+        let (layoutState, _) = makeLayoutStateWithGroup()
+        // Group has a single attribute at index 0 — requesting index 1 is out of range.
+        let viewModel = makeViewModel(layoutState: layoutState, attributeIndex: 1)
+
+        XCTAssertTrue(viewModel.options.isEmpty)
+        XCTAssertNil(viewModel.attribute)
+    }
+
     // MARK: - Helpers
 
     private func makeLayoutStateWithGroup() -> (LayoutState, [CatalogItem]) {
