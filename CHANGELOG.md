@@ -9,16 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-04-20
+
 ### Added
 
-- Forward-payment flow for `CatalogResponseButton` gated on `TransactionData.isPartnerManagedPurchase`, with `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)` for host finalization and `SignalCartItemForwardPaymentInitiated/Success/Failure` events ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
-- Add CatalogImageGallery snapshot test covering navigation buttons, pill indicator, and gallery image rendering
-- Document CatalogImageGallery in TESTING.md coverage matrix and add data URI / ARGB hex guidance
-- Decode `transactionData` (with `Address` and `PaymentMethod` types) on `OfferModel` to support PPU on iOS
+- Expose TransactionData on CartItemDevicePay event ([#255](https://github.com/ROKT/rokt-ux-helper-ios/pull/255))
+- Add AFTERPAY case to supported payment methods enum ([#254](https://github.com/ROKT/rokt-ux-helper-ios/pull/254))
+- Add afterpay and child node support in CatalogDevicePayButtonComponent ([#249](https://github.com/ROKT/rokt-ux-helper-ios/pull/249))
+- Add releasing guidelines to RELEASING.md ([#252](https://github.com/ROKT/rokt-ux-helper-ios/pull/252))
+- Add forward-payment flow for CatalogResponseButton (UTYP-1394) ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
+- Decode transactionData on Offer for PPU on iOS (UTYP-1396) ([#251](https://github.com/ROKT/rokt-ux-helper-ios/pull/251))
 
 ### Fixed
 
-- Move navigation button overlay outside clipped ZStack to prevent button clipping
+- Hide dropdown when no choice exists ([#250](https://github.com/ROKT/rokt-ux-helper-ios/pull/250))
+- Harden GitHub Actions workflows and add zizmor CI check ([#245](https://github.com/ROKT/rokt-ux-helper-ios/pull/245))
+
+### Changed
+
+- Bump actions/create-github-app-token from 3.0.0 to 3.1.1 ([#247](https://github.com/ROKT/rokt-ux-helper-ios/pull/247))
+- Bump peter-evans/create-pull-request from 8.1.0 to 8.1.1 ([#246](https://github.com/ROKT/rokt-ux-helper-ios/pull/246))
+- Bump github.com/pointfreeco/swift-snapshot-testing from 1.19.1 to 1.19.2 ([#244](https://github.com/ROKT/rokt-ux-helper-ios/pull/244))
 
 ## [0.9.1] - 2026-04-03
 
@@ -221,7 +232,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.0...HEAD
+[0.10.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.3...0.9.0
 [0.8.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.8.2...0.8.3
