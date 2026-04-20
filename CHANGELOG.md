@@ -9,17 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Forward-payment flow for `CatalogResponseButton` gated on `TransactionData.isPartnerManagedPurchase`, with `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)` for host finalization and `SignalCartItemForwardPaymentInitiated/Success/Failure` events ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
-- Add CatalogImageGallery snapshot test covering navigation buttons, pill indicator, and gallery image rendering
-- Document CatalogImageGallery in TESTING.md coverage matrix and add data URI / ARGB hex guidance
-- Decode `transactionData` (with `Address` and `PaymentMethod` types) on `OfferModel` to support PPU on iOS
-
-### Fixed
-
-- Move navigation button overlay outside clipped ZStack to prevent button clipping
-
 ## [0.10.0] - 2026-04-20
 
 ### Added
