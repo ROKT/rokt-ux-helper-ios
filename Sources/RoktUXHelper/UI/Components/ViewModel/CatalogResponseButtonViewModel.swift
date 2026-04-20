@@ -5,7 +5,6 @@ import DcuiSchema
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     private static let paymentResultKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
-    private static let paymentProcessingKey = CustomStateIdentifiable.Keys.paymentProcessing.rawValue
 
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
@@ -58,10 +57,6 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
             sendCloseEvent()
             closeLayout()
         } else {
-            setLayoutVariantCustomState(
-                updates: [Self.paymentProcessingKey: 1],
-                position: position
-            )
             eventService?.cartItemForwardPayment(
                 catalogItem: catalogItem,
                 partnerPaymentReference: partnerPaymentReference,
@@ -84,25 +79,17 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         case .failure:
             result = -1
         }
-        setLayoutVariantCustomState(
-            updates: [
-                Self.paymentProcessingKey: 0,
-                Self.paymentResultKey: result
-            ],
-            position: position
-        )
+        setPaymentResult(result, position: position)
     }
 
-    private func setLayoutVariantCustomState(updates: [String: Int], position: Int?) {
+    private func setPaymentResult(_ value: Int, position: Int?) {
         guard let layoutState,
               let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>
         else { return }
 
         DispatchQueue.main.async {
             var map = binding.wrappedValue ?? [:]
-            for (key, value) in updates {
-                map[CustomStateIdentifiable(position: position, key: key)] = value
-            }
+            map[CustomStateIdentifiable(position: position, key: Self.paymentResultKey)] = value
             binding.wrappedValue = map
             layoutState.publishStateChange()
         }

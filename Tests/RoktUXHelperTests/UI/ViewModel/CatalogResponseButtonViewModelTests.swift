@@ -78,41 +78,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertTrue(closeInvoked)
     }
 
-    func test_forwardPayment_dispatch_writesProcessingFlag() {
-        let eventService = MockEventService()
-        let layoutState = MockLayoutState()
-
-        let sut = makeSUT(
-            catalogItem: makeCatalogItem(id: "item-1"),
-            layoutState: layoutState,
-            eventService: eventService,
-            isPartnerManagedPurchase: false
-        )
-
-        sut.cartItemInstantPurchase(position: 0)
-        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
-
-        let expectation = expectation(description: "Processing flag written")
-        DispatchQueue.main.async { expectation.fulfill() }
-        wait(for: [expectation], timeout: 1.0)
-
-        XCTAssertEqual(
-            layoutState.layoutVariantCustomStateValue(
-                for: CustomStateIdentifiable.Keys.paymentProcessing.rawValue,
-                position: 0
-            ),
-            1
-        )
-        XCTAssertNil(
-            layoutState.layoutVariantCustomStateValue(
-                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
-                position: 0
-            ),
-            "paymentResult should not be set until finalization"
-        )
-    }
-
-    func test_forwardPaymentSuccess_writesSuccessToCustomState_andClearsProcessing() {
+    func test_forwardPaymentSuccess_writesSuccessToPaymentResult() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
 
@@ -138,16 +104,9 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             ),
             1
         )
-        XCTAssertEqual(
-            layoutState.layoutVariantCustomStateValue(
-                for: CustomStateIdentifiable.Keys.paymentProcessing.rawValue,
-                position: 0
-            ),
-            0
-        )
     }
 
-    func test_forwardPaymentFailure_writesFailureToCustomState_andClearsProcessing() {
+    func test_forwardPaymentFailure_writesFailureToPaymentResult() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
 
@@ -172,13 +131,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
                 position: 0
             ),
             -1
-        )
-        XCTAssertEqual(
-            layoutState.layoutVariantCustomStateValue(
-                for: CustomStateIdentifiable.Keys.paymentProcessing.rawValue,
-                position: 0
-            ),
-            0
         )
     }
 
