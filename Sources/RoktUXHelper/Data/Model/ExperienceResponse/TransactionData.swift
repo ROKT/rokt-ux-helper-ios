@@ -19,6 +19,7 @@ struct PaymentMethod: Codable {
         case applePay = "APPLE_PAY"
         case paypal = "PAYPAL"
         case googlePay = "GOOGLE_PAY"
+        case afterpay = "AFTERPAY"
         case unknown
 
         init(from decoder: Decoder) throws {

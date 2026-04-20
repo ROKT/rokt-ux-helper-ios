@@ -23,7 +23,8 @@ final class TransactionDataTests: XCTestCase {
             "paymentType": "amex",
             "supportedPaymentMethods": [
                 { "type": "CARD" },
-                { "type": "APPLE_PAY" }
+                { "type": "APPLE_PAY" },
+                { "type": "AFTERPAY" }
             ],
             "isPartnerManagedPurchase": false,
             "partnerPaymentReference": "hg206hsc",
@@ -38,7 +39,7 @@ final class TransactionDataTests: XCTestCase {
         XCTAssertEqual(sut.shippingAddress?.zip, "90210")
         XCTAssertNil(sut.billingAddress)
         XCTAssertEqual(sut.paymentType, "amex")
-        XCTAssertEqual(sut.supportedPaymentMethods?.map { $0.type }, [.card, .applePay])
+        XCTAssertEqual(sut.supportedPaymentMethods?.map { $0.type }, [.card, .applePay, .afterpay])
         XCTAssertFalse(sut.isPartnerManagedPurchase)
         XCTAssertEqual(sut.partnerPaymentReference, "hg206hsc")
         XCTAssertEqual(sut.confirmationRef, "hg206hsc")
