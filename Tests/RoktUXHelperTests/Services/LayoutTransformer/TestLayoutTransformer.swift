@@ -669,7 +669,8 @@ final class TestLayoutTransformer: XCTestCase {
             campaignId: "campaignId",
             creative: creative,
             catalogItems: nil,
-            catalogItemGroup: nil
+            catalogItemGroup: nil,
+            transactionData: nil
         )
     }
 

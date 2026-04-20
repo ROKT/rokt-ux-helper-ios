@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `paymentProcessing` custom state key for driving loading UI while a forward payment is in progress ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
 - Add CatalogImageGallery snapshot test covering navigation buttons, pill indicator, and gallery image rendering
 - Document CatalogImageGallery in TESTING.md coverage matrix and add data URI / ARGB hex guidance
+- Decode `transactionData` (with `Address` and `PaymentMethod` types) on `OfferModel` to support PPU on iOS
 
 ### Fixed
 

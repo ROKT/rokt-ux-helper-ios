@@ -1149,7 +1149,8 @@ final class TestWhenViewModel: XCTestCase {
                 responseOptionsMap: nil,
                 jwtToken: "jwtToken1"),
             catalogItems: catalogItems,
-            catalogItemGroup: nil)
+            catalogItemGroup: nil,
+            transactionData: nil)
     }
     
     func get_shared_data_with_breakpoints() -> BreakPoint {
