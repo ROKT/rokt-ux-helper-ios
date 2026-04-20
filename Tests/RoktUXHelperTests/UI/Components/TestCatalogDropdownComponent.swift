@@ -131,7 +131,8 @@ final class TestCatalogDropdownComponent: XCTestCase {
                 jwtToken: ""
             ),
             catalogItems: items,
-            catalogItemGroup: group
+            catalogItemGroup: group,
+            transactionData: nil
         )
         layoutState.items[LayoutState.fullOfferKey] = offer
         return layoutState

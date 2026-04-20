@@ -80,7 +80,8 @@ final class CatalogDropdownViewModelTests: XCTestCase {
                 jwtToken: ""
             ),
             catalogItems: [CatalogItem.mock(catalogItemId: "item1", inventoryStatus: "InStock")],
-            catalogItemGroup: nil
+            catalogItemGroup: nil,
+            transactionData: nil
         )
         layoutState.items[LayoutState.fullOfferKey] = offer
 
