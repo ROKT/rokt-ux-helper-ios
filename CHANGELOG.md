@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Forward-payment flow for `CatalogResponseButton` gated on `ppu.partnerManagedPurchase` creative copy, with `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)` for host finalization and `SignalCartItemForwardPaymentInitiated/Success/Failure` events ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
+- Forward-payment flow for `CatalogResponseButton` gated on `TransactionData.isPartnerManagedPurchase`, with `RoktUX.forwardPaymentFinalized(layoutId:catalogItemId:success:failureReason:)` for host finalization and `SignalCartItemForwardPaymentInitiated/Success/Failure` events ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
 - `paymentProcessing` custom state key for driving loading UI while a forward payment is in progress ([#248](https://github.com/ROKT/rokt-ux-helper-ios/pull/248))
 - Add CatalogImageGallery snapshot test covering navigation buttons, pill indicator, and gallery image rendering
 - Document CatalogImageGallery in TESTING.md coverage matrix and add data URI / ARGB hex guidance

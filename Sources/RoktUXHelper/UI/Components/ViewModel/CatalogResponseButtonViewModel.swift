@@ -2,11 +2,6 @@ import Foundation
 import SwiftUI
 import DcuiSchema
 
-private enum PPUCreativeCopyKey {
-    static let partnerManagedPurchase = "ppu.partnerManagedPurchase"
-    static let partnerPaymentReference = "ppu.partnerPaymentReference"
-}
-
 @available(iOS 15, *)
 class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     private static let paymentResultKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
@@ -26,6 +21,9 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let hoveredStyle: [CatalogResponseButtonStyles]?
     let disabledStyle: [CatalogResponseButtonStyles]?
 
+    let isPartnerManagedPurchase: Bool
+    let partnerPaymentReference: String?
+
     init(catalogItem: CatalogItem?,
          children: [LayoutSchemaViewModel]?,
          layoutState: (any LayoutStateRepresenting)?,
@@ -33,7 +31,9 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
          defaultStyle: [CatalogResponseButtonStyles]?,
          pressedStyle: [CatalogResponseButtonStyles]?,
          hoveredStyle: [CatalogResponseButtonStyles]?,
-         disabledStyle: [CatalogResponseButtonStyles]?) {
+         disabledStyle: [CatalogResponseButtonStyles]?,
+         isPartnerManagedPurchase: Bool = true,
+         partnerPaymentReference: String? = nil) {
         self.catalogItem = catalogItem
         self.children = children
         self.defaultStyle = defaultStyle
@@ -42,21 +42,8 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
-    }
-
-    var isPartnerManagedPurchase: Bool {
-        guard let raw = offerCreativeCopy?[PPUCreativeCopyKey.partnerManagedPurchase] else {
-            return true
-        }
-        return Bool(raw) ?? true
-    }
-
-    var partnerPaymentReference: String? {
-        offerCreativeCopy?[PPUCreativeCopyKey.partnerPaymentReference]
-    }
-
-    private var offerCreativeCopy: [String: String]? {
-        (layoutState?.items[LayoutState.fullOfferKey] as? OfferModel)?.creative.copy
+        self.isPartnerManagedPurchase = isPartnerManagedPurchase
+        self.partnerPaymentReference = partnerPaymentReference
     }
 
     func cartItemInstantPurchase(position: Int?) {

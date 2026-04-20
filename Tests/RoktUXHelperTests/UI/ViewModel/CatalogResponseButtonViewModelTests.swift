@@ -5,35 +5,10 @@ import DcuiSchema
 @available(iOS 15, *)
 final class CatalogResponseButtonViewModelTests: XCTestCase {
 
-    func test_isPartnerManagedPurchase_defaultsToTrue_whenFlagAbsent() {
-        let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [:])
-
-        let sut = makeSUT(layoutState: layoutState)
+    func test_isPartnerManagedPurchase_defaultsToTrue_whenNotProvided() {
+        let sut = makeSUT()
 
         XCTAssertTrue(sut.isPartnerManagedPurchase)
-    }
-
-    func test_isPartnerManagedPurchase_true_whenFlagTrue() {
-        let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "true"
-        ])
-
-        let sut = makeSUT(layoutState: layoutState)
-
-        XCTAssertTrue(sut.isPartnerManagedPurchase)
-    }
-
-    func test_isPartnerManagedPurchase_false_whenFlagFalse() {
-        let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "false"
-        ])
-
-        let sut = makeSUT(layoutState: layoutState)
-
-        XCTAssertFalse(sut.isPartnerManagedPurchase)
     }
 
     func test_cartItemInstantPurchase_partnerManaged_callsInstantPurchaseAndDismisses() {
@@ -45,7 +20,8 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         let sut = makeSUT(
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
-            eventService: eventService
+            eventService: eventService,
+            isPartnerManagedPurchase: true
         )
 
         sut.cartItemInstantPurchase(position: nil)
@@ -60,10 +36,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
     func test_cartItemInstantPurchase_forwardPayment_callsForwardPaymentWithReference() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "false",
-            "ppu.partnerPaymentReference": "ref-xyz"
-        ])
         var closeInvoked = false
         layoutState.actionCollection[.close] = { _ in closeInvoked = true }
 
@@ -71,7 +43,9 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         let sut = makeSUT(
             catalogItem: catalogItem,
             layoutState: layoutState,
-            eventService: eventService
+            eventService: eventService,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-xyz"
         )
 
         sut.cartItemInstantPurchase(position: nil)
@@ -82,17 +56,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertFalse(closeInvoked)
         XCTAssertEqual(eventService.lastForwardPaymentReference, "ref-xyz")
         XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
-    }
-
-    func test_isPartnerManagedPurchase_true_whenFlagTypo() {
-        let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "trrue"
-        ])
-
-        let sut = makeSUT(layoutState: layoutState)
-
-        XCTAssertTrue(sut.isPartnerManagedPurchase)
     }
 
     func test_cartItemInstantPurchase_nilCatalogItem_dismisses() {
@@ -118,14 +81,12 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
     func test_forwardPayment_dispatch_writesProcessingFlag() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "false"
-        ])
 
         let sut = makeSUT(
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
-            eventService: eventService
+            eventService: eventService,
+            isPartnerManagedPurchase: false
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -154,14 +115,12 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
     func test_forwardPaymentSuccess_writesSuccessToCustomState_andClearsProcessing() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "false"
-        ])
 
         let sut = makeSUT(
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
-            eventService: eventService
+            eventService: eventService,
+            isPartnerManagedPurchase: false
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -191,14 +150,12 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
     func test_forwardPaymentFailure_writesFailureToCustomState_andClearsProcessing() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
-        layoutState.items[LayoutState.fullOfferKey] = makeOfferModel(copy: [
-            "ppu.partnerManagedPurchase": "false"
-        ])
 
         let sut = makeSUT(
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
-            eventService: eventService
+            eventService: eventService,
+            isPartnerManagedPurchase: false
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -229,8 +186,10 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
 
     private func makeSUT(
         catalogItem: CatalogItem? = nil,
-        layoutState: MockLayoutState,
-        eventService: MockEventService = MockEventService()
+        layoutState: MockLayoutState = MockLayoutState(),
+        eventService: MockEventService = MockEventService(),
+        isPartnerManagedPurchase: Bool = true,
+        partnerPaymentReference: String? = nil
     ) -> CatalogResponseButtonViewModel {
         CatalogResponseButtonViewModel(
             catalogItem: catalogItem,
@@ -240,24 +199,9 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             defaultStyle: nil,
             pressedStyle: nil,
             hoveredStyle: nil,
-            disabledStyle: nil
-        )
-    }
-
-    private func makeOfferModel(copy: [String: String]) -> OfferModel {
-        OfferModel(
-            campaignId: nil,
-            creative: CreativeModel(
-                referralCreativeId: "ref",
-                instanceGuid: "instance",
-                copy: copy,
-                images: nil,
-                links: nil,
-                responseOptionsMap: nil,
-                jwtToken: "token"
-            ),
-            catalogItems: nil,
-            catalogItemGroup: nil
+            disabledStyle: nil,
+            isPartnerManagedPurchase: isPartnerManagedPurchase,
+            partnerPaymentReference: partnerPaymentReference
         )
     }
 
