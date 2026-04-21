@@ -29,18 +29,18 @@ public struct RoktIntegrationInfo: Encodable {
 }
 
 public struct RoktIntegrationInfoDetails: Codable {
-    let deviceType: String
-    let deviceModel: String
-    let deviceLocale: String
-    let framework: String
+    public let deviceType: String
+    public let deviceModel: String
+    public let deviceLocale: String
+    public let framework: String
     public let layoutSchemaVersion: String
-    let name: String
-    let version: String
-    let operatingSystem: String
-    let operatingSystemVersion: String
-    let packageVersion: String?
-    let packageName: String?
-    let platform: String
+    public let name: String
+    public let version: String
+    public let operatingSystem: String
+    public let operatingSystemVersion: String
+    public let packageVersion: String?
+    public let packageName: String?
+    public let platform: String
 
     init(
         deviceType: String = UIDevice.current.userInterfaceIdiom.string,
