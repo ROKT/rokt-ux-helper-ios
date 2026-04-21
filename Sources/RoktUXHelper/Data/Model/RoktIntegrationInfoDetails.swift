@@ -33,7 +33,7 @@ public struct RoktIntegrationInfoDetails: Codable {
     let deviceModel: String
     let deviceLocale: String
     let framework: String
-    let layoutSchemaVersion: String
+    public let layoutSchemaVersion: String
     let name: String
     let version: String
     let operatingSystem: String
