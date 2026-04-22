@@ -22,6 +22,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
 
     let isPartnerManagedPurchase: Bool
     let partnerPaymentReference: String?
+    let transactionData: TransactionData?
 
     init(catalogItem: CatalogItem?,
          children: [LayoutSchemaViewModel]?,
@@ -32,7 +33,8 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
          hoveredStyle: [CatalogResponseButtonStyles]?,
          disabledStyle: [CatalogResponseButtonStyles]?,
          isPartnerManagedPurchase: Bool = true,
-         partnerPaymentReference: String? = nil) {
+         partnerPaymentReference: String? = nil,
+         transactionData: TransactionData? = nil) {
         self.catalogItem = catalogItem
         self.children = children
         self.defaultStyle = defaultStyle
@@ -43,6 +45,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.eventService = eventService
         self.isPartnerManagedPurchase = isPartnerManagedPurchase
         self.partnerPaymentReference = partnerPaymentReference
+        self.transactionData = transactionData
     }
 
     func cartItemInstantPurchase(position: Int?) {
@@ -60,6 +63,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
             eventService?.cartItemForwardPayment(
                 catalogItem: catalogItem,
                 partnerPaymentReference: partnerPaymentReference,
+                transactionData: transactionData,
                 completion: { [weak self] status in
                     self?.handleForwardPaymentCompletion(status: status, position: position)
                 }

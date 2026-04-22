@@ -403,6 +403,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(),
             partnerPaymentReference: "ref-1",
+            transactionData: nil,
             completion: { _ in }
         )
 
@@ -428,6 +429,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { capturedStatus = $0 }
         )
         events.removeAll()
@@ -455,6 +457,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { capturedStatus = $0 }
         )
         events.removeAll()
@@ -486,6 +489,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { capturedStatus = $0 }
         )
 
@@ -497,6 +501,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { secondStatus = $0 }
         )
         XCTAssertNotNil(secondStatus, "second attempt should not be blocked by stale completion")
@@ -512,6 +517,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { _ in invocationCount += 1 }
         )
 
@@ -535,6 +541,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { _ in firstCount += 1 }
         )
         let eventsAfterFirst = events.count
@@ -542,6 +549,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { _ in secondCount += 1 }
         )
 
@@ -563,6 +571,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { capturedStatus = $0 }
         )
 
@@ -576,6 +585,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { secondStatus = $0 }
         )
         eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
@@ -595,6 +605,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { capturedStatus = $0 }
         )
 
@@ -617,6 +628,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { _ in }
         )
         events.removeAll()
@@ -638,6 +650,7 @@ final class TestEventService: XCTestCase {
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             partnerPaymentReference: nil,
+            transactionData: nil,
             completion: { _ in invocationCount += 1 }
         )
 
@@ -727,12 +740,15 @@ class MockUXHelper: UXEventsDelegate {
     }
 
     var forwardPaymentReference: String?
+    var forwardPaymentTransactionData: TransactionData?
     var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem) -> Void)?
     func onCartItemForwardPayment(_ layoutId: String,
                                   catalogItem: RoktUXHelper.CatalogItem,
-                                  partnerPaymentReference: String?) {
+                                  partnerPaymentReference: String?,
+                                  transactionData: TransactionData?) {
         self.roktEvents.append(.CartItemForwardPayment)
         self.forwardPaymentReference = partnerPaymentReference
+        self.forwardPaymentTransactionData = transactionData
         onForwardPaymentInvoked?(layoutId, catalogItem)
     }
 }

@@ -58,6 +58,44 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
     }
 
+    func test_cartItemInstantPurchase_forwardPayment_forwardsTransactionData() {
+        let eventService = MockEventService()
+        let transactionData = TransactionData(
+            shippingAddress: Address(
+                name: "",
+                address1: "123 Main St",
+                address2: "Apt 4B",
+                city: "New York",
+                state: "NY",
+                stateCode: "",
+                country: "US",
+                countryCode: "",
+                zip: "10001"
+            ),
+            billingAddress: nil,
+            paymentType: nil,
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-xyz",
+            confirmationRef: nil,
+            metadata: [:]
+        )
+        let sut = makeSUT(
+            catalogItem: makeCatalogItem(id: "item-1"),
+            eventService: eventService,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-xyz",
+            transactionData: transactionData
+        )
+
+        sut.cartItemInstantPurchase(position: nil)
+
+        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.address1, "123 Main St")
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.zip, "10001")
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.partnerPaymentReference, "ref-xyz")
+    }
+
     func test_cartItemInstantPurchase_nilCatalogItem_dismisses() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
@@ -141,7 +179,8 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         layoutState: MockLayoutState = MockLayoutState(),
         eventService: MockEventService = MockEventService(),
         isPartnerManagedPurchase: Bool = true,
-        partnerPaymentReference: String? = nil
+        partnerPaymentReference: String? = nil,
+        transactionData: TransactionData? = nil
     ) -> CatalogResponseButtonViewModel {
         CatalogResponseButtonViewModel(
             catalogItem: catalogItem,
@@ -153,7 +192,8 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             hoveredStyle: nil,
             disabledStyle: nil,
             isPartnerManagedPurchase: isPartnerManagedPurchase,
-            partnerPaymentReference: partnerPaymentReference
+            partnerPaymentReference: partnerPaymentReference,
+            transactionData: transactionData
         )
     }
 

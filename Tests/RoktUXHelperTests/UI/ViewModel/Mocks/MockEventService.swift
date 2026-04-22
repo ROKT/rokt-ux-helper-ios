@@ -44,6 +44,7 @@ class MockEventService: EventDiagnosticServicing {
     var lastForwardPaymentReference: String?
     var lastForwardPaymentCatalogItem: CatalogItem?
     var lastForwardPaymentFailureReason: String?
+    var lastForwardPaymentTransactionData: TransactionData?
 
     // MARK: - Protocol Properties
 
@@ -147,11 +148,13 @@ class MockEventService: EventDiagnosticServicing {
     func cartItemForwardPayment(
         catalogItem: CatalogItem,
         partnerPaymentReference: String?,
+        transactionData: TransactionData?,
         completion: @escaping (ForwardPaymentStatus) -> Void
     ) {
         cartItemForwardPaymentCalled = true
         lastForwardPaymentCatalogItem = catalogItem
         lastForwardPaymentReference = partnerPaymentReference
+        lastForwardPaymentTransactionData = transactionData
         cartItemForwardPaymentCompletionCallback = completion
     }
 
@@ -206,6 +209,7 @@ class MockEventService: EventDiagnosticServicing {
         lastForwardPaymentReference = nil
         lastForwardPaymentCatalogItem = nil
         lastForwardPaymentFailureReason = nil
+        lastForwardPaymentTransactionData = nil
         dismissOption = nil
     }
 }
