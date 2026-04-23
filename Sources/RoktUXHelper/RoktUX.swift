@@ -17,7 +17,7 @@ public class RoktUX: UXEventsDelegate {
         RoktUXLogger.shared.logLevel = logLevel
     }
 
-    private(set) var onRoktEvent: ((RoktUXEvent) -> Void)?
+    internal var onRoktEvent: ((RoktUXEvent) -> Void)?
     private var eventServices: [String: EventService] = [:]
 
     public init() {}
@@ -602,8 +602,8 @@ public class RoktUX: UXEventsDelegate {
             linkedProductId: catalogItem.linkedProductId,
             providerData: catalogItem.providerData,
             quantity: 1,
-            totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice
+            totalPrice: catalogItem.price,
+            unitPrice: catalogItem.price
         ))
     }
 
@@ -623,8 +623,8 @@ public class RoktUX: UXEventsDelegate {
             linkedProductId: catalogItem.linkedProductId,
             providerData: catalogItem.providerData,
             quantity: 1,
-            totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice,
+            totalPrice: catalogItem.price,
+            unitPrice: catalogItem.price,
             paymentProvider: paymentProvider,
             transactionData: transactionData
         ))
@@ -645,8 +645,8 @@ public class RoktUX: UXEventsDelegate {
             linkedProductId: catalogItem.linkedProductId,
             providerData: catalogItem.providerData,
             quantity: 1,
-            totalPrice: catalogItem.originalPrice,
-            unitPrice: catalogItem.originalPrice,
+            totalPrice: catalogItem.price,
+            unitPrice: catalogItem.price,
             transactionData: transactionData
         ))
     }
