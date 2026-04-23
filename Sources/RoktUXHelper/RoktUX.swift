@@ -17,7 +17,7 @@ public class RoktUX: UXEventsDelegate {
         RoktUXLogger.shared.logLevel = logLevel
     }
 
-    var onRoktEvent: ((RoktUXEvent) -> Void)?
+    internal var onRoktEvent: ((RoktUXEvent) -> Void)?
     private var eventServices: [String: EventService] = [:]
 
     public init() {}
