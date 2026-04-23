@@ -400,10 +400,19 @@ final class TestEventService: XCTestCase {
             self.events.append(event)
         })
 
+        let transactionData = TransactionData(
+            shippingAddress: nil,
+            billingAddress: nil,
+            paymentType: nil,
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-1",
+            confirmationRef: nil,
+            metadata: [:]
+        )
         eventService.cartItemForwardPayment(
             catalogItem: .mock(),
-            partnerPaymentReference: "ref-1",
-            transactionData: nil,
+            transactionData: transactionData,
             completion: { _ in }
         )
 
@@ -414,7 +423,7 @@ final class TestEventService: XCTestCase {
 
         XCTAssertEqual(stubUXHelper.roktEvents.count, 1)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.CartItemForwardPayment))
-        XCTAssertEqual(stubUXHelper.forwardPaymentReference, "ref-1")
+        XCTAssertEqual(stubUXHelper.forwardPaymentTransactionData?.partnerPaymentReference, "ref-1")
     }
 
     func test_send_forward_payment_success_emits_signal_and_invokes_completion() {
@@ -428,7 +437,6 @@ final class TestEventService: XCTestCase {
         var capturedStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { capturedStatus = $0 }
         )
@@ -456,7 +464,6 @@ final class TestEventService: XCTestCase {
         var capturedStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { capturedStatus = $0 }
         )
@@ -488,7 +495,6 @@ final class TestEventService: XCTestCase {
         var capturedStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { capturedStatus = $0 }
         )
@@ -500,7 +506,6 @@ final class TestEventService: XCTestCase {
         var secondStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { secondStatus = $0 }
         )
@@ -516,7 +521,6 @@ final class TestEventService: XCTestCase {
         var invocationCount = 0
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { _ in invocationCount += 1 }
         )
@@ -540,7 +544,6 @@ final class TestEventService: XCTestCase {
         var secondCount = 0
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { _ in firstCount += 1 }
         )
@@ -548,7 +551,6 @@ final class TestEventService: XCTestCase {
 
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { _ in secondCount += 1 }
         )
@@ -570,7 +572,6 @@ final class TestEventService: XCTestCase {
         var capturedStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { capturedStatus = $0 }
         )
@@ -584,7 +585,6 @@ final class TestEventService: XCTestCase {
         var secondStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { secondStatus = $0 }
         )
@@ -604,7 +604,6 @@ final class TestEventService: XCTestCase {
         var capturedStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { capturedStatus = $0 }
         )
@@ -627,7 +626,6 @@ final class TestEventService: XCTestCase {
 
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { _ in }
         )
@@ -649,7 +647,6 @@ final class TestEventService: XCTestCase {
         var invocationCount = 0
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
-            partnerPaymentReference: nil,
             transactionData: nil,
             completion: { _ in invocationCount += 1 }
         )
@@ -739,15 +736,12 @@ class MockUXHelper: UXEventsDelegate {
         self.roktEvents.append(.CartItemDevicePay)
     }
 
-    var forwardPaymentReference: String?
     var forwardPaymentTransactionData: TransactionData?
     var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem) -> Void)?
     func onCartItemForwardPayment(_ layoutId: String,
                                   catalogItem: RoktUXHelper.CatalogItem,
-                                  partnerPaymentReference: String?,
                                   transactionData: TransactionData?) {
         self.roktEvents.append(.CartItemForwardPayment)
-        self.forwardPaymentReference = partnerPaymentReference
         self.forwardPaymentTransactionData = transactionData
         onForwardPaymentInvoked?(layoutId, catalogItem)
     }

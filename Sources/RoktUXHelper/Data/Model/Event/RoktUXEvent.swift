@@ -230,7 +230,6 @@ public class RoktUXEvent {
         public let quantity: Decimal
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
-        public let partnerPaymentReference: String?
         /// Backend-provided transaction data (billing / shipping address, supported
         /// payment methods, partner payment reference). `nil` if the offer did not
         /// include transaction data.
@@ -247,7 +246,6 @@ public class RoktUXEvent {
              quantity: Decimal,
              totalPrice: Decimal?,
              unitPrice: Decimal?,
-             partnerPaymentReference: String?,
              transactionData: TransactionData?) {
             self.layoutId = layoutId
             self.name = name
@@ -260,7 +258,6 @@ public class RoktUXEvent {
             self.quantity = quantity
             self.totalPrice = totalPrice
             self.unitPrice = unitPrice
-            self.partnerPaymentReference = partnerPaymentReference
             self.transactionData = transactionData
         }
     }

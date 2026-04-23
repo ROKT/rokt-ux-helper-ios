@@ -33,33 +33,12 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertTrue(closeInvoked)
     }
 
-    func test_cartItemInstantPurchase_forwardPayment_callsForwardPaymentWithReference() {
+    func test_cartItemInstantPurchase_forwardPayment_forwardsTransactionData() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
         var closeInvoked = false
         layoutState.actionCollection[.close] = { _ in closeInvoked = true }
 
-        let catalogItem = makeCatalogItem(id: "item-1")
-        let sut = makeSUT(
-            catalogItem: catalogItem,
-            layoutState: layoutState,
-            eventService: eventService,
-            isPartnerManagedPurchase: false,
-            partnerPaymentReference: "ref-xyz"
-        )
-
-        sut.cartItemInstantPurchase(position: nil)
-
-        XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
-        XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
-        XCTAssertFalse(eventService.dismissalEventCalled)
-        XCTAssertFalse(closeInvoked)
-        XCTAssertEqual(eventService.lastForwardPaymentReference, "ref-xyz")
-        XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
-    }
-
-    func test_cartItemInstantPurchase_forwardPayment_forwardsTransactionData() {
-        let eventService = MockEventService()
         let transactionData = TransactionData(
             shippingAddress: Address(
                 name: "",
@@ -82,15 +61,19 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         )
         let sut = makeSUT(
             catalogItem: makeCatalogItem(id: "item-1"),
+            layoutState: layoutState,
             eventService: eventService,
             isPartnerManagedPurchase: false,
-            partnerPaymentReference: "ref-xyz",
             transactionData: transactionData
         )
 
         sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventService.cartItemForwardPaymentCalled)
+        XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
+        XCTAssertFalse(eventService.dismissalEventCalled)
+        XCTAssertFalse(closeInvoked)
+        XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
         XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.address1, "123 Main St")
         XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.zip, "10001")
         XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.partnerPaymentReference, "ref-xyz")
@@ -179,7 +162,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         layoutState: MockLayoutState = MockLayoutState(),
         eventService: MockEventService = MockEventService(),
         isPartnerManagedPurchase: Bool = true,
-        partnerPaymentReference: String? = nil,
         transactionData: TransactionData? = nil
     ) -> CatalogResponseButtonViewModel {
         CatalogResponseButtonViewModel(
@@ -192,7 +174,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             hoveredStyle: nil,
             disabledStyle: nil,
             isPartnerManagedPurchase: isPartnerManagedPurchase,
-            partnerPaymentReference: partnerPaymentReference,
             transactionData: transactionData
         )
     }

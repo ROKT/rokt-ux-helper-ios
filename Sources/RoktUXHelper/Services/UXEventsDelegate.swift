@@ -32,7 +32,6 @@ protocol UXEventsDelegate: AnyObject {
     func onCartItemForwardPayment(
         _ layoutId: String,
         catalogItem: CatalogItem,
-        partnerPaymentReference: String?,
         transactionData: TransactionData?
     )
 }
