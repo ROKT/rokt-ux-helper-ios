@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-04-23
+
+### Added
+
+- Expose TransactionData on CartItemForwardPayment event (UTYP-1406) ([#259](https://github.com/ROKT/rokt-ux-helper-ios/pull/259))
+
 ## [0.10.1] - 2026-04-21
 
 ### Fixed
@@ -238,7 +244,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.2...HEAD
+[0.10.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.1...0.10.2
 [0.10.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.0...0.10.1
 [0.10.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.9.0...0.9.1
