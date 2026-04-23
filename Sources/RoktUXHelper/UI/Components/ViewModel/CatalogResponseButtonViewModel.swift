@@ -20,8 +20,11 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let hoveredStyle: [CatalogResponseButtonStyles]?
     let disabledStyle: [CatalogResponseButtonStyles]?
 
-    let isPartnerManagedPurchase: Bool
     let transactionData: TransactionData?
+
+    var isPartnerManagedPurchase: Bool {
+        transactionData?.isPartnerManagedPurchase ?? true
+    }
 
     init(catalogItem: CatalogItem?,
          children: [LayoutSchemaViewModel]?,
@@ -31,7 +34,6 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
          pressedStyle: [CatalogResponseButtonStyles]?,
          hoveredStyle: [CatalogResponseButtonStyles]?,
          disabledStyle: [CatalogResponseButtonStyles]?,
-         isPartnerManagedPurchase: Bool = true,
          transactionData: TransactionData? = nil) {
         self.catalogItem = catalogItem
         self.children = children
@@ -41,7 +43,6 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
-        self.isPartnerManagedPurchase = isPartnerManagedPurchase
         self.transactionData = transactionData
     }
 

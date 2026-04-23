@@ -21,7 +21,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: true
+            transactionData: makeTransactionData(isPartnerManagedPurchase: true)
         )
 
         sut.cartItemInstantPurchase(position: nil)
@@ -63,7 +63,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false,
             transactionData: transactionData
         )
 
@@ -107,7 +106,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false
+            transactionData: makeTransactionData(isPartnerManagedPurchase: false)
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -135,7 +134,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false
+            transactionData: makeTransactionData(isPartnerManagedPurchase: false)
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -161,7 +160,6 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         catalogItem: CatalogItem? = nil,
         layoutState: MockLayoutState = MockLayoutState(),
         eventService: MockEventService = MockEventService(),
-        isPartnerManagedPurchase: Bool = true,
         transactionData: TransactionData? = nil
     ) -> CatalogResponseButtonViewModel {
         CatalogResponseButtonViewModel(
@@ -173,8 +171,20 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
-            isPartnerManagedPurchase: isPartnerManagedPurchase,
             transactionData: transactionData
+        )
+    }
+
+    private func makeTransactionData(isPartnerManagedPurchase: Bool) -> TransactionData {
+        TransactionData(
+            shippingAddress: nil,
+            billingAddress: nil,
+            paymentType: nil,
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: isPartnerManagedPurchase,
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
         )
     }
 
