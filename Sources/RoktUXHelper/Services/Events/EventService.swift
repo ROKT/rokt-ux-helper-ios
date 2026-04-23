@@ -244,7 +244,7 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     func cartItemForwardPayment(
         catalogItem: CatalogItem,
-        partnerPaymentReference: String?,
+        transactionData: TransactionData?,
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     ) {
         guard forwardPaymentCompletion == nil else {
@@ -261,7 +261,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         uxEventDelegate?.onCartItemForwardPayment(
             pluginId,
             catalogItem: catalogItem,
-            partnerPaymentReference: partnerPaymentReference
+            transactionData: transactionData
         )
     }
 

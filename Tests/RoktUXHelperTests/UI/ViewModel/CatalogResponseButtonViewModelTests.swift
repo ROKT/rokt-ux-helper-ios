@@ -21,7 +21,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: true
+            transactionData: makeTransactionData(isPartnerManagedPurchase: true)
         )
 
         sut.cartItemInstantPurchase(position: nil)
@@ -33,19 +33,37 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertTrue(closeInvoked)
     }
 
-    func test_cartItemInstantPurchase_forwardPayment_callsForwardPaymentWithReference() {
+    func test_cartItemInstantPurchase_forwardPayment_forwardsTransactionData() {
         let eventService = MockEventService()
         let layoutState = MockLayoutState()
         var closeInvoked = false
         layoutState.actionCollection[.close] = { _ in closeInvoked = true }
 
-        let catalogItem = makeCatalogItem(id: "item-1")
+        let transactionData = TransactionData(
+            shippingAddress: Address(
+                name: "",
+                address1: "123 Main St",
+                address2: "Apt 4B",
+                city: "New York",
+                state: "NY",
+                stateCode: "",
+                country: "US",
+                countryCode: "",
+                zip: "10001"
+            ),
+            billingAddress: nil,
+            paymentType: nil,
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: "ref-xyz",
+            confirmationRef: nil,
+            metadata: [:]
+        )
         let sut = makeSUT(
-            catalogItem: catalogItem,
+            catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false,
-            partnerPaymentReference: "ref-xyz"
+            transactionData: transactionData
         )
 
         sut.cartItemInstantPurchase(position: nil)
@@ -54,8 +72,10 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         XCTAssertFalse(eventService.cartItemInstantPurchaseCalled)
         XCTAssertFalse(eventService.dismissalEventCalled)
         XCTAssertFalse(closeInvoked)
-        XCTAssertEqual(eventService.lastForwardPaymentReference, "ref-xyz")
         XCTAssertEqual(eventService.lastForwardPaymentCatalogItem?.catalogItemId, "item-1")
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.address1, "123 Main St")
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.shippingAddress?.zip, "10001")
+        XCTAssertEqual(eventService.lastForwardPaymentTransactionData?.partnerPaymentReference, "ref-xyz")
     }
 
     func test_cartItemInstantPurchase_nilCatalogItem_dismisses() {
@@ -86,7 +106,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false
+            transactionData: makeTransactionData(isPartnerManagedPurchase: false)
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -114,7 +134,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             catalogItem: makeCatalogItem(id: "item-1"),
             layoutState: layoutState,
             eventService: eventService,
-            isPartnerManagedPurchase: false
+            transactionData: makeTransactionData(isPartnerManagedPurchase: false)
         )
 
         sut.cartItemInstantPurchase(position: 0)
@@ -140,8 +160,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
         catalogItem: CatalogItem? = nil,
         layoutState: MockLayoutState = MockLayoutState(),
         eventService: MockEventService = MockEventService(),
-        isPartnerManagedPurchase: Bool = true,
-        partnerPaymentReference: String? = nil
+        transactionData: TransactionData? = nil
     ) -> CatalogResponseButtonViewModel {
         CatalogResponseButtonViewModel(
             catalogItem: catalogItem,
@@ -152,8 +171,20 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             pressedStyle: nil,
             hoveredStyle: nil,
             disabledStyle: nil,
+            transactionData: transactionData
+        )
+    }
+
+    private func makeTransactionData(isPartnerManagedPurchase: Bool) -> TransactionData {
+        TransactionData(
+            shippingAddress: nil,
+            billingAddress: nil,
+            paymentType: nil,
+            supportedPaymentMethods: nil,
             isPartnerManagedPurchase: isPartnerManagedPurchase,
-            partnerPaymentReference: partnerPaymentReference
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
         )
     }
 

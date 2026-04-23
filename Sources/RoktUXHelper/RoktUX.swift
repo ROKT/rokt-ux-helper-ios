@@ -633,7 +633,7 @@ public class RoktUX: UXEventsDelegate {
     func onCartItemForwardPayment(
         _ layoutId: String,
         catalogItem: CatalogItem,
-        partnerPaymentReference: String?
+        transactionData: TransactionData?
     ) {
         onRoktEvent?(RoktUXEvent.CartItemForwardPayment(
             layoutId: layoutId,
@@ -647,7 +647,7 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.originalPrice,
             unitPrice: catalogItem.originalPrice,
-            partnerPaymentReference: partnerPaymentReference
+            transactionData: transactionData
         ))
     }
 }

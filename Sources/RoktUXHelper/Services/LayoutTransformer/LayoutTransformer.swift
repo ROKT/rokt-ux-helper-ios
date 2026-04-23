@@ -882,8 +882,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
             pressedStyle: updateStyles.compactMap { $0.pressed },
             hoveredStyle: updateStyles.compactMap { $0.hovered },
             disabledStyle: updateStyles.compactMap { $0.disabled },
-            isPartnerManagedPurchase: transactionData?.isPartnerManagedPurchase ?? true,
-            partnerPaymentReference: transactionData?.partnerPaymentReference
+            transactionData: transactionData
         )
     }
 
