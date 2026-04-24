@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `SignalCartItemForwardPaymentInitiated`, `SignalCartItemForwardPaymentSuccess`, and `SignalCartItemForwardPaymentFailure` cases from `RoktUXEventType` (rejected by `/v2/events` — never existed in Kafka)
 
+## [0.10.4] - 2026-04-24
+
+### Fixed
+
+- Align forward-payment events with backend-accepted types ([#263](https://github.com/ROKT/rokt-ux-helper-ios/pull/263))
+
 ## [0.10.3] - 2026-04-24
 
 ### Fixed
@@ -258,7 +264,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...HEAD
+[0.10.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.3...0.10.4
 [0.10.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.2...0.10.3
 [0.10.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.1...0.10.2
 [0.10.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.0...0.10.1
