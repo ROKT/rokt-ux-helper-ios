@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Forward-payment flow now emits `SignalCartItemInstantPurchaseInitiated` on tap; success/failure signals are no longer emitted client-side (backend emits them)
+
+### Removed
+
+- `SignalCartItemForwardPaymentInitiated`, `SignalCartItemForwardPaymentSuccess`, and `SignalCartItemForwardPaymentFailure` cases from `RoktUXEventType` (rejected by `/v2/events` — never existed in Kafka)
+
 ## [0.10.3] - 2026-04-24
 
 ### Fixed

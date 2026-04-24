@@ -417,7 +417,7 @@ final class TestEventService: XCTestCase {
         )
 
         let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentInitiated)
+        XCTAssertEqual(event?.eventType, .SignalCartItemInstantPurchaseInitiated)
         XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
         XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
 
@@ -426,7 +426,7 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.forwardPaymentTransactionData?.partnerPaymentReference, "ref-1")
     }
 
-    func test_send_forward_payment_success_emits_signal_and_invokes_completion() {
+    func test_send_forward_payment_success_invokes_completion_without_emitting_event() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -444,16 +444,14 @@ final class TestEventService: XCTestCase {
 
         eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
 
-        let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentSuccess)
-        XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
+        XCTAssertTrue(events.isEmpty, "success should not emit a platform event; backend emits it")
 
         guard case .success = capturedStatus else {
             return XCTFail("expected success status, got \(String(describing: capturedStatus))")
         }
     }
 
-    func test_send_forward_payment_failure_emits_signal_with_reason_and_invokes_completion() {
+    func test_send_forward_payment_failure_invokes_completion_without_emitting_event() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -471,10 +469,7 @@ final class TestEventService: XCTestCase {
 
         eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: "card declined")
 
-        let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentFailure)
-        XCTAssertEqual(event?.parentGuid, "catalogInstanceGuid")
-        XCTAssertEqual(event?.objectData?[kFailureReason], "card declined")
+        XCTAssertTrue(events.isEmpty, "failure should not emit a platform event; backend emits it")
 
         guard case .failure(let reason) = capturedStatus else {
             return XCTFail("expected failure status, got \(String(describing: capturedStatus))")
@@ -555,7 +550,7 @@ final class TestEventService: XCTestCase {
             completion: { _ in secondCount += 1 }
         )
 
-        XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemForwardPaymentInitiated }.count, eventsAfterFirst)
+        XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count, eventsAfterFirst)
 
         eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
 
@@ -614,28 +609,6 @@ final class TestEventService: XCTestCase {
             return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
         }
         XCTAssertEqual(reason, "nope")
-    }
-
-    func test_forward_payment_failure_without_reason_omits_object_data() {
-        let eventService = get_mock_event_processor(startDate: startDate,
-                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
-                                                    uxEventDelegate: stubUXHelper,
-                                                    eventHandler: { event in
-            self.events.append(event)
-        })
-
-        eventService.cartItemForwardPayment(
-            catalogItem: .mock(catalogItemId: "catalogItemId"),
-            transactionData: nil,
-            completion: { _ in }
-        )
-        events.removeAll()
-
-        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: nil)
-
-        let event = events.first
-        XCTAssertEqual(event?.eventType, .SignalCartItemForwardPaymentFailure)
-        XCTAssertNil(event?.objectData?[kFailureReason])
     }
 
     func test_forward_payment_completion_cleared_on_dismissal() {
