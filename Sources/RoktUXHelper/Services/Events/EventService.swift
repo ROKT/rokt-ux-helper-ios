@@ -257,7 +257,7 @@ class EventService: Hashable, EventDiagnosticServicing {
 
         self.forwardPaymentCompletion = completion
 
-        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentInitiated, catalogItem: catalogItem)
+        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
         uxEventDelegate?.onCartItemForwardPayment(
             pluginId,
             catalogItem: catalogItem,
@@ -266,7 +266,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func cartItemForwardPaymentSuccess(itemId: String) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else {
             sendDiagnostics(
                 message: kForwardPaymentProcessingErrorCode,
                 callStack: "Forward payment success for unknown itemId \(itemId) on layout \(pluginId)"
@@ -275,14 +275,13 @@ class EventService: Hashable, EventDiagnosticServicing {
             forwardPaymentCompletion = nil
             return
         }
-        sendCartItemEvent(eventType: .SignalCartItemForwardPaymentSuccess, catalogItem: catalogItem)
 
         forwardPaymentCompletion?(.success)
         forwardPaymentCompletion = nil
     }
 
     func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
-        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else {
             sendDiagnostics(
                 message: kForwardPaymentProcessingErrorCode,
                 callStack: "Forward payment failure for unknown itemId \(itemId) on layout \(pluginId)"
@@ -291,12 +290,6 @@ class EventService: Hashable, EventDiagnosticServicing {
             forwardPaymentCompletion = nil
             return
         }
-        let objectData = failureReason.map { [kFailureReason: $0] }
-        sendCartItemEvent(
-            eventType: .SignalCartItemForwardPaymentFailure,
-            catalogItem: catalogItem,
-            objectData: objectData
-        )
 
         forwardPaymentCompletion?(.failure(reason: failureReason))
         forwardPaymentCompletion = nil
