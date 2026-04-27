@@ -1,6 +1,5 @@
 import Foundation
 
-@available(iOS 13, *)
 class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Validator.T == String {
 
     private let dataValidator: Validator

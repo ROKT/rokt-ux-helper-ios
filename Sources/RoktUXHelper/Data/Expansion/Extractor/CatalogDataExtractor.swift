@@ -1,6 +1,5 @@
 import Foundation
 
-@available(iOS 13, *)
 struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Validator.T == String {
 
     private let dataValidator: Validator
