@@ -14,7 +14,6 @@ import Foundation
 /// **Deferred namespaces** (`DATA.catalogRuntime.*` and any `STATE.*`) are intentionally
 /// skipped: they have separate runtime / render-time resolution paths and may be unresolved
 /// at finalize time without indicating a defect.
-@available(iOS 13, *)
 enum OrphanedPlaceholderResolver {
 
     private static let bnfRegex: NSRegularExpression? = {

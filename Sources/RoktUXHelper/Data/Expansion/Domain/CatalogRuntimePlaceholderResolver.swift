@@ -12,7 +12,6 @@ import Foundation
 /// The resolver only touches placeholders that contain at least one `DATA.catalogRuntime.*`
 /// alternative; everything else passes through untouched so other namespaces (catalog,
 /// transactionData, creative) can be handled by their own mappers.
-@available(iOS 13, *)
 enum CatalogRuntimePlaceholderResolver {
 
     private static let bnfRegex: NSRegularExpression? = {
