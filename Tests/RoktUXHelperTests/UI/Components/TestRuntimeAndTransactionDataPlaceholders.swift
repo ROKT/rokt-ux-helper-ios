@@ -184,7 +184,15 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         )
         .frame(width: width, height: height)
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, testName: testName, line: line)
+        // perceptualPrecision tolerates sub-pixel text rendering differences between
+        // simulator iOS versions (CI runs `os_version: ">=18.0"` so the runtime drifts).
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, perceptualPrecision: 0.98),
+            file: file,
+            testName: testName,
+            line: line
+        )
     }
 
     private func makeCatalogItem() -> CatalogItem {
