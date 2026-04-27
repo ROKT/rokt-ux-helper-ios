@@ -8,3 +8,6 @@ extension OfferModel: DomainMappingSource {}
 
 @available(iOS 13, *)
 extension CatalogItem: DomainMappingSource {}
+
+@available(iOS 13, *)
+extension TransactionData: DomainMappingSource {}

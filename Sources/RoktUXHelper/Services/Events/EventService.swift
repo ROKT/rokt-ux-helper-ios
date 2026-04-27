@@ -11,6 +11,10 @@ enum DevicePayStatus {
     case success
     case failure
     case retry
+    /// Intermediate state emitted when the host SDK has fetched the cart breakdown
+    /// (subtotal/tax/shipping/total + e.g. PayPal URL) and the UX should now display
+    /// the confirmation screen before the user finalizes the purchase.
+    case pendingConfirmation(catalogRuntimeData: [String: String])
 }
 
 enum ForwardPaymentStatus {
@@ -239,6 +243,18 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
 
         devicePayCompletion?(.failure)
+        devicePayCompletion = nil
+    }
+
+    /// Invoked when the host SDK has fetched the order breakdown from
+    /// `/v1/cart/initialize-purchase` (or equivalent) and wants the UX to display the
+    /// confirmation screen. Resolves the stored `devicePayCompletion` with the breakdown
+    /// payload so the button view model can publish it to the layout. No new Rokt platform
+    /// signal is emitted here — `SignalCartItemInstantPurchaseInitiated` was already sent
+    /// when the user tapped the device-pay button.
+    func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String]) {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
+        devicePayCompletion?(.pendingConfirmation(catalogRuntimeData: catalogRuntimeData))
         devicePayCompletion = nil
     }
 

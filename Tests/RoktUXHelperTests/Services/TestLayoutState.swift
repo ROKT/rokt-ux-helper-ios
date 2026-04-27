@@ -29,6 +29,23 @@ class TestLayoutState: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testSubscriberCanReadItemsWhenItemsChange() {
+        layoutState = LayoutState()
+        let expectation = expectation(description: "Subscriber reads items")
+        layoutState.itemsPublisher
+            .compactMap { $0["test"] as? Int }
+            .sink { [weak self] value in
+                XCTAssertEqual(value, 1)
+                XCTAssertEqual(self?.layoutState.items["test"] as? Int, 1)
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        layoutState.items["test"] = 1
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testUpdateLayoutType() {
         layoutState = LayoutState()
         let expectation = expectation(description: "Test layout type")

@@ -81,6 +81,10 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
             // DATA.catalogItem.someValue1, DATA.catalogItem.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
+            // Only resolve placeholders that belong to this mapper's namespace; leave others
+            // intact so subsequent mappers (or reactive resolution) can handle them.
+            guard chainOfValues.contains(BNFNamespace.dataCatalogItem.withNamespaceSeparator) else { continue }
+
             let resolvedDataBinding = try extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,

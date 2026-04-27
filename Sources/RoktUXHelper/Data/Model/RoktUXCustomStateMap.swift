@@ -29,6 +29,7 @@ extension CustomStateIdentifiable {
         case imageCarouselPosition
         case imageCarouselKey(key: String)
         case paymentResult
+        case devicePayState
 
         var rawValue: String {
             switch self {
@@ -38,6 +39,8 @@ extension CustomStateIdentifiable {
                 return "DataImageCarousel.\(key)"
             case .paymentResult:
                 return "paymentResult"
+            case .devicePayState:
+                return "devicePayState"
             }
         }
     }

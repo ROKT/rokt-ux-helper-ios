@@ -7,6 +7,9 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     // `value` is used by our BNF transformer to update `dataBinding`
     private(set) var value: String?
     private(set) var dataBinding: DataBinding = .value("")
+    // Post-mapper text retained as the template for reactive `%^DATA.catalogRuntime.<key>^%`
+    // resolution. See `BasicTextViewModel` for the same pattern.
+    private var postMapperTemplate: String?
     // this closure performs the STATE-based data expansion (eg. progress indicator component owning a rich text child)
     private var stateDataExpansionClosure: ((String?) -> String?)?
     private weak var eventService: EventDiagnosticServicing?
@@ -76,6 +79,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
             self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+            self.reapplyCatalogRuntimeResolution()
         }
     }
 
@@ -86,13 +90,16 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
         self.dataBinding = dataBinding
+        if case .value(let v) = dataBinding {
+            self.postMapperTemplate = v
+        }
         runDataExpansion()
     }
 
     private func runDataExpansion() {
         switch dataBinding {
         case .value(let data):
-            boundValue = data
+            boundValue = applyCatalogRuntimeResolution(to: data)
         case .state(let data):
             var isStateIndicatorPosition = false
             // if the input is `%^STATE.IndicatorPosition^%`, associated value `data` = `IndicatorPosition`
@@ -108,6 +115,36 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             processStateValue(value, isStateIndicatorPosition: isStateIndicatorPosition)
         }
 
+        updateBoundValueWithStyling()
+    }
+
+    private func reapplyCatalogRuntimeResolution() {
+        guard let template = postMapperTemplate else { return }
+        boundValue = applyCatalogRuntimeResolution(to: template)
+        updateBoundValueWithStyling()
+    }
+
+    private func applyCatalogRuntimeResolution(to text: String) -> String {
+        CatalogRuntimePlaceholderResolver.resolve(
+            text: text,
+            catalogRuntimeData: layoutState?.items[LayoutState.catalogRuntimeDataKey] as? [String: String]
+        )
+    }
+
+    /// Called by the layout transformer after every mapper has had its turn. Substitutes
+    /// `|` defaults for any placeholder no mapper claimed, and zeroes the line if a
+    /// mandatory placeholder is still unresolved. Deferred namespaces (`DATA.catalogRuntime`,
+    /// `STATE.*`) are left intact.
+    func finalizePlaceholders() {
+        guard let template = postMapperTemplate else { return }
+        guard let validated = OrphanedPlaceholderResolver.resolve(text: template) else {
+            postMapperTemplate = ""
+            boundValue = ""
+            updateBoundValueWithStyling()
+            return
+        }
+        postMapperTemplate = validated
+        boundValue = applyCatalogRuntimeResolution(to: validated)
         updateBoundValueWithStyling()
     }
 

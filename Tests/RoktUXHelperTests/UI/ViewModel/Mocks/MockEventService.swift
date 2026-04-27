@@ -38,6 +38,9 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemDevicePayCalled = false
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemDevicePayPendingConfirmationCalled = false
+    var lastDevicePayPendingConfirmationItemId: String?
+    var lastDevicePayPendingConfirmationData: [String: String]?
     var cartItemForwardPaymentCalled = false
     var cartItemForwardPaymentSuccessCalled = false
     var cartItemForwardPaymentFailureCalled = false
@@ -142,6 +145,12 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayFailureCalled = true
     }
 
+    func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String]) {
+        cartItemDevicePayPendingConfirmationCalled = true
+        lastDevicePayPendingConfirmationItemId = itemId
+        lastDevicePayPendingConfirmationData = catalogRuntimeData
+    }
+
     var cartItemForwardPaymentCompletionCallback: ((ForwardPaymentStatus) -> Void)?
 
     func cartItemForwardPayment(
@@ -200,6 +209,9 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCalled = false
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemDevicePayPendingConfirmationCalled = false
+        lastDevicePayPendingConfirmationItemId = nil
+        lastDevicePayPendingConfirmationData = nil
         cartItemForwardPaymentCalled = false
         cartItemForwardPaymentSuccessCalled = false
         cartItemForwardPaymentFailureCalled = false

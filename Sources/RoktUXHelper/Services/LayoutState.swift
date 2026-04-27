@@ -17,6 +17,10 @@ class LayoutState: LayoutStateRepresenting {
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
     static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [Int: Int] (attributeIndex -> optionIndex)
+    // Holds runtime catalog values pushed by the host SDK after API calls
+    // (e.g. {subtotal, tax, shipping, total} after `/cart/initialize-purchase`)
+    // for reactive `%^DATA.catalogRuntime.<key>^%` placeholder resolution in text view models.
+    static let catalogRuntimeDataKey = "catalogRuntimeData" // [String: String]
 
     /// Counter used during layout transformation to assign attribute indices to dropdowns.
     var nextCatalogDropdownAttributeIndex: Int = 0
@@ -35,11 +39,10 @@ class LayoutState: LayoutStateRepresenting {
             }
         }
         set {
-            queue.async(flags: .barrier) { [weak self] in
-                guard let self else { return }
-                self._items = newValue
-                self.itemsPublisher.send(newValue)
+            queue.sync(flags: .barrier) {
+                _items = newValue
             }
+            itemsPublisher.send(newValue)
         }
     }
 

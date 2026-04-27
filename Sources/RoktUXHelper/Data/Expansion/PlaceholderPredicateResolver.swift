@@ -108,6 +108,11 @@ final class PlaceholderPredicateResolver {
                 if keyAndNamespace.key == DataBindingStateKeys.totalOffers {
                     return String(context.offers.count)
                 }
+            case .dataTransactionData, .dataCatalogRuntime:
+                // Predicates targeting transactionData / DATA.catalogRuntime.* aren't supported
+                // through this resolver; the When predicate framework would need its own
+                // injection. Skip so other chain alternatives can resolve.
+                continue
             }
         }
 

@@ -235,6 +235,66 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         )
     }
 
+    func test_devicePayPendingConfirmation_writesDevicePayStateAndBreakdown() {
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        let catalogRuntimeData: [String: String] = [
+            "subtotal": "$24.00",
+            "tax": "$1.94",
+            "shipping": "$0.00",
+            "total": "$26.72"
+        ]
+
+        let sut = CatalogDevicePayButtonViewModel(
+            catalogItem: makeCatalogItem(id: "item"),
+            children: nil,
+            provider: .paypal,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: nil
+        )
+        sut.position = 0
+
+        sut.handleTap()
+        XCTAssertTrue(eventService.cartItemDevicePayCalled)
+
+        let expectation = expectation(description: "State is set")
+        eventService.cartItemDevicePayCompletionCallback?(.pendingConfirmation(catalogRuntimeData: catalogRuntimeData))
+
+        DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                expectation.fulfill()
+            }
+        }
+
+        wait(for: [expectation], timeout: 1.0)
+
+        // devicePayState gates the confirmation When-node.
+        XCTAssertEqual(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.devicePayState.rawValue,
+                position: 0
+            ),
+            1
+        )
+        // paymentResult is reserved for success/failure and must not be touched here.
+        XCTAssertNil(
+            layoutState.layoutVariantCustomStateValue(
+                for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
+                position: 0
+            )
+        )
+        // Catalog-runtime payload is published into items so reactive text resolution sees it.
+        XCTAssertEqual(
+            layoutState.items[LayoutState.catalogRuntimeDataKey] as? [String: String],
+            catalogRuntimeData
+        )
+    }
+
     private func makeCatalogItem(id: String) -> CatalogItem {
         CatalogItem(
             images: [:],

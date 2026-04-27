@@ -18,6 +18,13 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     private(set) var value: String?
     private(set) var dataBinding: DataBinding<String> = .value("")
 
+    // Post-mapper text retained as the template for reactive catalog-runtime resolution. Mappers
+    // resolve their own namespaces and write the partially-resolved text here; on every
+    // `LayoutState.itemsPublisher` emission we re-resolve `%^DATA.catalogRuntime.<key>^%`
+    // against the latest catalog-runtime dictionary so live values from the host SDK appear
+    // without re-running the layout transformer.
+    private var postMapperTemplate: String?
+
     // extracted data from `dataBinding` that's published externally
     @LazyPublished var boundValue = ""
 
@@ -87,6 +94,9 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
             guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
             self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+            // Re-resolve `%^DATA.catalogRuntime.<key>^%` against the latest catalog-runtime dict so the
+            // confirmation screen picks up subtotal/tax/shipping/total values pushed at runtime.
+            self.reapplyCatalogRuntimeResolution()
         }
     }
 
@@ -97,13 +107,16 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
 
     func updateDataBinding(dataBinding: DataBinding<String>) {
         self.dataBinding = dataBinding
+        if case .value(let v) = dataBinding {
+            self.postMapperTemplate = v
+        }
         runDataExpansion()
     }
 
     private func runDataExpansion() {
         switch dataBinding {
         case .value(let data):
-            boundValue = data
+            boundValue = applyCatalogRuntimeResolution(to: data)
         case .state(let data):
             var isStateIndicatorPosition = false
 
@@ -120,6 +133,36 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
             processStateValue(value, isStateIndicatorPosition: isStateIndicatorPosition)
         }
 
+        updateBoundValueWithStyling()
+    }
+
+    private func reapplyCatalogRuntimeResolution() {
+        guard let template = postMapperTemplate else { return }
+        boundValue = applyCatalogRuntimeResolution(to: template)
+        updateBoundValueWithStyling()
+    }
+
+    private func applyCatalogRuntimeResolution(to text: String) -> String {
+        CatalogRuntimePlaceholderResolver.resolve(
+            text: text,
+            catalogRuntimeData: layoutState?.items[LayoutState.catalogRuntimeDataKey] as? [String: String]
+        )
+    }
+
+    /// Called by the layout transformer after every mapper has had its turn. Substitutes
+    /// `|` defaults for any placeholder no mapper claimed, and zeroes the line if a
+    /// mandatory placeholder is still unresolved. Deferred namespaces (`DATA.catalogRuntime`,
+    /// `STATE.*`) are left intact.
+    func finalizePlaceholders() {
+        guard let template = postMapperTemplate else { return }
+        guard let validated = OrphanedPlaceholderResolver.resolve(text: template) else {
+            postMapperTemplate = ""
+            boundValue = ""
+            updateBoundValueWithStyling()
+            return
+        }
+        postMapperTemplate = validated
+        boundValue = applyCatalogRuntimeResolution(to: validated)
         updateBoundValueWithStyling()
     }
 

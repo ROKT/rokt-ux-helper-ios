@@ -207,6 +207,29 @@ public class RoktUX: UXEventsDelegate {
     }
 
     /**
+     Call after `/v1/cart/initialize-purchase` returns to display the confirmation screen
+     for a device-pay flow (e.g. PayPal). The catalog-runtime dictionary is published into the
+     layout's reactive state and resolved against `%^DATA.catalogRuntime.<key>^%` placeholders.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - catalogRuntimeData: dictionary of pre-formatted runtime values keyed to match
+         `%^DATA.catalogRuntime.<key>^%` placeholders in the layout — typically the order
+         breakdown (e.g. `["subtotal": "$24.00", "tax": "$1.94", "shipping": "$0.00", "total": "$26.72"]`).
+     */
+    public func devicePayShowConfirmation(
+        layoutId: String,
+        catalogItemId: String,
+        catalogRuntimeData: [String: String]
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayPendingConfirmation(
+            itemId: catalogItemId,
+            catalogRuntimeData: catalogRuntimeData
+        )
+    }
+
+    /**
      Call when a forward-payment flow has succeeded or failed.
 
      Must be called on the main queue.

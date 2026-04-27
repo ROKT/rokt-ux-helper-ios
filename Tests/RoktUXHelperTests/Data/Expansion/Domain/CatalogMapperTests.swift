@@ -204,12 +204,13 @@ final class CatalogMapperTests: XCTestCase {
         )
     }
 
-    // sentence with an invalid mandatory and a valid optional link should still return empty
-    func test_richText_sentenceWithInvalidMandatoryCreativeLink_returnsEmptyString() {
-        // Sentence with %^DATA.creativeLink.nonexistent^% and %^DATA.creativeLink.privacyPolicy|^%
+    // CatalogMapper now skips foreign-namespace placeholders so subsequent mappers (or
+    // reactive resolution) can handle them; previously it threw and zeroed the whole text.
+    func test_richText_creativeLinkPlaceholders_passThroughUnchanged() {
+        // %^DATA.creativeLink.nonexistent^% and %^DATA.creativeLink.privacyPolicy|^%
         assertRichTextDataExpansion(
             childIndex: 22,
-            expectedValue: ""
+            expectedValue: "%^DATA.creativeLink.nonexistent^% and %^DATA.creativeLink.privacyPolicy|^%"
         )
     }
 

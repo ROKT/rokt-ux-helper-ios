@@ -65,7 +65,10 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
         case .state:
             guard DataBindingStateKeys.isValidKey(chain.key) else { return .empty }
             return .init(mappedValue: chain.key, isStateType: true)
-        case .dataCatalogItem:
+        case .dataCatalogItem,
+                .dataTransactionData,
+                .dataCatalogRuntime:
+            // Foreign namespaces — handled by other mappers / reactive resolution.
             return .empty
         }
     }
