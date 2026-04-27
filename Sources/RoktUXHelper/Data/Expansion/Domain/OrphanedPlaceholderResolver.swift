@@ -35,6 +35,8 @@ enum OrphanedPlaceholderResolver {
         ]
 
         var result = text
+        let startLen = BNFSeparator.startDelimiter.charCount
+        let endLen = BNFSeparator.endDelimiter.charCount
         // Walk in reverse so substitutions don't shift earlier match ranges.
         for match in matches.reversed() {
             guard let chainRange = Range(match.range, in: result) else { continue }
@@ -44,12 +46,13 @@ enum OrphanedPlaceholderResolver {
 
             let parsed = parser.parse(propertyChain: chain)
             if let fallback = parsed.defaultValue {
-                let fullPlaceholder = BNFSeparator.startDelimiter.rawValue
-                    + chain
-                    + BNFSeparator.endDelimiter.rawValue
-                if let placeholderRange = result.range(of: fullPlaceholder) {
-                    result.replaceSubrange(placeholderRange, with: fallback)
-                }
+                // Replace at the regex-derived position (expanded to include `%^` and `^%`).
+                // A global string search would re-target the first identical token if the same
+                // placeholder appears multiple times; reverse iteration keeps positional ranges
+                // valid because earlier indices stay stable when later content shifts.
+                let tokenStart = result.index(chainRange.lowerBound, offsetBy: -startLen)
+                let tokenEnd = result.index(chainRange.upperBound, offsetBy: endLen)
+                result.replaceSubrange(tokenStart..<tokenEnd, with: fallback)
             } else {
                 // Mandatory and unresolved → fail-loud.
                 return nil

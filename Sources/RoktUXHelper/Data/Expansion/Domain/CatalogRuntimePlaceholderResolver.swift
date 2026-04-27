@@ -28,6 +28,8 @@ enum CatalogRuntimePlaceholderResolver {
         // earlier index ranges remain valid as we splice the result string.
         var result = text
         let prefix = BNFNamespace.dataCatalogRuntime.withNamespaceSeparator
+        let startLen = BNFSeparator.startDelimiter.charCount
+        let endLen = BNFSeparator.endDelimiter.charCount
         for match in matches.reversed() {
             guard let chainRange = Range(match.range, in: result) else { continue }
             let chain = String(result[chainRange])
@@ -35,13 +37,13 @@ enum CatalogRuntimePlaceholderResolver {
             guard chain.contains(prefix) else { continue }
 
             let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData)
-            // Replace including the surrounding %^ ... ^% delimiters.
-            let startDelimiter = BNFSeparator.startDelimiter.rawValue
-            let endDelimiter = BNFSeparator.endDelimiter.rawValue
-            let fullPlaceholder = startDelimiter + chain + endDelimiter
-            if let placeholderRange = result.range(of: fullPlaceholder) {
-                result.replaceSubrange(placeholderRange, with: resolved)
-            }
+            // Replace at the regex-derived position (expanded to include `%^` and `^%`).
+            // A global string search would re-target the first identical token if the same
+            // placeholder appears multiple times; reverse iteration keeps positional ranges
+            // valid because earlier indices stay stable when later content shifts.
+            let tokenStart = result.index(chainRange.lowerBound, offsetBy: -startLen)
+            let tokenEnd = result.index(chainRange.upperBound, offsetBy: endLen)
+            result.replaceSubrange(tokenStart..<tokenEnd, with: resolved)
         }
         return result
     }

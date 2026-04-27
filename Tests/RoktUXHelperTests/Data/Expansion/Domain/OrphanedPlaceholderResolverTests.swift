@@ -96,6 +96,20 @@ final class OrphanedPlaceholderResolverTests: XCTestCase {
         XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
     }
 
+    func test_duplicateOptionalOrphans_bothFallbacksApply() {
+        // Same token appears twice. A global `result.range(of:)` replacement would only
+        // substitute the first occurrence; the second would leak raw `%^…^%` syntax.
+        let text = "%^DATA.creativeLink.foo | a^% / %^DATA.creativeLink.foo | a^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "a / a")
+    }
+
+    func test_mixedDuplicateAndUniqueOrphans_allSubstituted() {
+        let text = "%^DATA.creativeLink.foo | A^% %^DATA.creativeLink.bar | B^% %^DATA.creativeLink.foo | A^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "A B A")
+    }
+
     // MARK: - Mixed: deferred + orphan
 
     func test_deferredAlongsideOptionalOrphan_substitutesOptional_keepsDeferred() {
