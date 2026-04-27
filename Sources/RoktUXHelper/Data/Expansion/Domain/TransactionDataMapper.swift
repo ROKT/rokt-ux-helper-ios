@@ -12,8 +12,9 @@ struct TransactionDataMapper<Extractor: DataExtracting>: SyntaxMapping where Ext
     func map(consumer: LayoutSchemaViewModel, context: TransactionData) {
         switch consumer {
         case .richText(let textModel):
-            // Chain after creative/catalog mappers: prefer the post-mapper bound value so
-            // earlier substitutions are preserved; fall back to the raw template on first run.
+            // Chain after creative/catalog mappers: prefer the post-mapper template so
+            // earlier substitutions are preserved (including legitimate empty resolutions);
+            // fall back to the raw template on first run.
             let originalText = textModel.currentTemplateText
             let transformedText = resolveDataExpansion(originalText, context: context)
             textModel.updateDataBinding(dataBinding: .value(transformedText))
@@ -79,32 +80,5 @@ struct TransactionDataMapper<Extractor: DataExtracting>: SyntaxMapping where Ext
         }
 
         return placeHolderToResolvedValue
-    }
-}
-
-@available(iOS 15, *)
-private extension BasicTextViewModel {
-    /// Returns the current template — the post-previous-mapper bound value if a mapper has
-    /// already updated `dataBinding`, otherwise the raw template stored at init time. This
-    /// lets multiple mappers chain so each one's substitutions accumulate.
-    var currentTemplateText: String {
-        let bound: String
-        switch dataBinding {
-        case .value(let v): bound = v
-        case .state(let v): bound = v
-        }
-        return bound.isEmpty ? (value ?? "") : bound
-    }
-}
-
-@available(iOS 15, *)
-private extension RichTextViewModel {
-    var currentTemplateText: String {
-        let bound: String
-        switch dataBinding {
-        case .value(let v): bound = v
-        case .state(let v): bound = v
-        }
-        return bound.isEmpty ? (value ?? "") : bound
     }
 }

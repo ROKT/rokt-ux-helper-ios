@@ -96,6 +96,15 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         runDataExpansion()
     }
 
+    /// Template text for chained mappers: the post-previous-mapper output if any mapper has
+    /// already written to `dataBinding`, otherwise the raw template. Distinguishes "no prior
+    /// mapping" (postMapperTemplate == nil) from "prior mapping resolved to empty"
+    /// (postMapperTemplate == ""), so an empty mapper output is preserved instead of
+    /// reintroducing the raw placeholders for a later finalize pass to zero the line.
+    var currentTemplateText: String {
+        postMapperTemplate ?? value ?? ""
+    }
+
     private func runDataExpansion() {
         switch dataBinding {
         case .value(let data):
