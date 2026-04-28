@@ -8,7 +8,6 @@ protocol DataBindingImplementable {
     func updateDataBinding(dataBinding: DataBinding<T>)
 }
 
-@available(iOS 15, *)
 class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingImplementable {
     private var bag = Set<AnyCancellable>()
 

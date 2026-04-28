@@ -2,7 +2,6 @@ import DcuiSchema
 import Foundation
 import SwiftUI
 
-@available(iOS 15, *)
 class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     let catalogItem: CatalogItem?

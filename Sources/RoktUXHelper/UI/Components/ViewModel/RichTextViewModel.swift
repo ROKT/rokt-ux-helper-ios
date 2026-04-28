@@ -2,7 +2,6 @@ import SwiftUI
 import Combine
 import DcuiSchema
 
-@available(iOS 15, *)
 class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     // `value` is used by our BNF transformer to update `dataBinding`
     private(set) var value: String?

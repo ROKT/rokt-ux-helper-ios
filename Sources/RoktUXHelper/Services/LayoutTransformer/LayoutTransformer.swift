@@ -1,7 +1,6 @@
 import Foundation
 import DcuiSchema
 
-@available(iOS 15, *)
 struct LayoutTransformer<
     CreativeSyntaxMapper: SyntaxMapping,
     AddToCartMapper: SyntaxMapping,
@@ -1057,7 +1056,6 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     }
 }
 
-@available(iOS 15, *)
 private extension LayoutTransformer.Context {
     var mapToCreativeContext: CreativeContext? {
         switch self {
@@ -1119,7 +1117,6 @@ private extension CarouselSlideInOutTransitionSettings {
     }
 }
 
-@available(iOS 15, *)
 private extension CarouselTransition {
     var transtion: DataImageCarouselViewModel.Transition {
         switch self {

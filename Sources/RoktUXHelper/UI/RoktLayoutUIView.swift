@@ -5,7 +5,6 @@ import SwiftUI
 /// The RoktLayoutUIView class provides multiple initialization options,
 /// allowing for configuration flexibility. You can initialize it with an experienceResponse
 /// and optional configuration parameters such as RoktUXConfig, RoktUXImageLoader, and event handlers.
-@available(iOS 15, *)
 @objc public class RoktLayoutUIView: UIView {
     private(set) var roktEmbeddedSwiftUIView: UIView?
     private var uxHelper: RoktUX?
@@ -160,7 +159,6 @@ import SwiftUI
     }
 }
 
-@available(iOS 15, *)
 extension RoktLayoutUIView: LayoutLoader {
 
     /// Loads the layout content with the specified parameters.

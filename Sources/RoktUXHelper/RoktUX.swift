@@ -4,7 +4,6 @@ import Combine
 import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
-@available(iOS 15, *)
 public class RoktUX: UXEventsDelegate {
     /**
      * Get the Rokt SDK configuration. Data to be included in the Rokt API request.

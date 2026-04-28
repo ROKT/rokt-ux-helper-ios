@@ -29,7 +29,6 @@ enum CreativeContext {
 /// Maps properties of `Node`s using values in `context`.
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
-@available(iOS 15, *)
 struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.MappingSource == OfferModel {
     let extractor: Extractor
 

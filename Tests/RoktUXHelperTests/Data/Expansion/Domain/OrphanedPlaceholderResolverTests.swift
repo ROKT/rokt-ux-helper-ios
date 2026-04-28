@@ -1,7 +1,6 @@
 import XCTest
 @testable import RoktUXHelper
 
-@available(iOS 15, *)
 final class OrphanedPlaceholderResolverTests: XCTestCase {
 
     // MARK: - Mandatory orphans (no `|` default) → fail-loud (nil return)

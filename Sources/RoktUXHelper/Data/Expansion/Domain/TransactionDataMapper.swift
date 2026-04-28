@@ -1,6 +1,5 @@
 import Foundation
 
-@available(iOS 15, *)
 struct TransactionDataMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.MappingSource == TransactionData {
 
     private let extractor: Extractor

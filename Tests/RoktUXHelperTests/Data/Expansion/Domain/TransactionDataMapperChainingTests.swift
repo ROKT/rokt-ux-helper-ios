@@ -1,7 +1,6 @@
 import XCTest
 @testable import RoktUXHelper
 
-@available(iOS 15, *)
 final class TransactionDataMapperChainingTests: XCTestCase {
 
     // Regression: when a prior mapper (catalog/creative) resolves a placeholder to "",

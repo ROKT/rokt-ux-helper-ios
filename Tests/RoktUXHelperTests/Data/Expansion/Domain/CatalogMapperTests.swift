@@ -2,7 +2,6 @@ import XCTest
 @testable import RoktUXHelper
 import DcuiSchema
 
-@available(iOS 15, *)
 final class CatalogMapperTests: XCTestCase {
 
     var sut: CatalogMapper? = CatalogMapper()
@@ -250,7 +249,6 @@ final class CatalogMapperTests: XCTestCase {
 
 }
 
-@available(iOS 15, *)
 fileprivate extension RichTextModel {
     var asViewModel: RichTextViewModel {
         RichTextViewModel(
@@ -265,7 +263,6 @@ fileprivate extension RichTextModel {
     }
 }
 
-@available(iOS 15, *)
 fileprivate extension BasicTextModel {
     var asViewModel: BasicTextViewModel {
         BasicTextViewModel(

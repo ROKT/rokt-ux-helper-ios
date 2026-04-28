@@ -12,7 +12,6 @@ import SnapshotTesting
 /// 2. `DATA.transactionData.*` — offer-level transaction data resolved at transform
 ///    time by `TransactionDataMapper` against the active offer's `TransactionData`.
 /// 3. `OrphanedPlaceholderResolver` — fail-loud-on-mandatory-orphan typo guard.
-@available(iOS 15.0, *)
 final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
 
     // MARK: - DATA.catalogRuntime.*

@@ -2,7 +2,6 @@ import Foundation
 @testable import RoktUXHelper
 import DcuiSchema
 
-@available(iOS 15, *)
 class MockEventService: EventDiagnosticServicing {
     var pluginInstanceGuid: String = "mock-plugin-guid"
     var pluginConfigJWTToken: String = "mock-jwt"

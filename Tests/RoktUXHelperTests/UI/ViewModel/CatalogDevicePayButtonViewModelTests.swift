@@ -2,7 +2,6 @@ import XCTest
 import DcuiSchema
 @testable import RoktUXHelper
 
-@available(iOS 15, *)
 final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
     func test_customStateKey_isPaymentResult() {

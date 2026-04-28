@@ -1,6 +1,5 @@
 import Foundation
 
-@available(iOS 15, *)
 struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.MappingSource == CatalogItem {
 
     private let extractor: Extractor
