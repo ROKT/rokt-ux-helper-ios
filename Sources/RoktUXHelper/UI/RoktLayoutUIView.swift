@@ -5,7 +5,6 @@ import SwiftUI
 /// The RoktLayoutUIView class provides multiple initialization options,
 /// allowing for configuration flexibility. You can initialize it with an experienceResponse
 /// and optional configuration parameters such as RoktUXConfig, RoktUXImageLoader, and event handlers.
-@available(iOS 15, *)
 @objc public class RoktLayoutUIView: UIView {
     private(set) var roktEmbeddedSwiftUIView: UIView?
     private var uxHelper: RoktUX?
@@ -109,6 +108,46 @@ import SwiftUI
         uxHelper?.devicePayFinalized(layoutId: layoutId, catalogItemId: catalogItemId, success: success)
     }
 
+    /// Call after the host SDK has fetched the runtime catalog data (e.g. an order breakdown
+    /// from `/v1/cart/initialize-purchase`) to display the confirmation screen.
+    /// - Parameters:
+    ///   - layoutId: layout Id for the relevant displayed catalog item.
+    ///   - catalogItemId: Id of the catalog item that was selected.
+    ///   - catalogRuntimeData: dictionary of pre-formatted runtime values keyed to match
+    ///     `%^DATA.catalogRuntime.<key>^%` placeholders in the layout — typically the order
+    ///     breakdown (e.g. `["subtotal": "$24.00", "tax": "$1.94", "shipping": "$0.00", "total": "$26.72"]`).
+    public func devicePayShowConfirmation(
+        layoutId: String,
+        catalogItemId: String,
+        catalogRuntimeData: [String: String]
+    ) {
+        uxHelper?.devicePayShowConfirmation(
+            layoutId: layoutId,
+            catalogItemId: catalogItemId,
+            catalogRuntimeData: catalogRuntimeData
+        )
+    }
+
+    /// Call when a forward-payment flow has succeeded or failed.
+    /// - Parameters:
+    ///   - layoutId: layout Id for the relevant displayed catalog item.
+    ///   - catalogItemId: Id of the catalog item that was selected.
+    ///   - success: whether the payment succeeded or failed.
+    ///   - failureReason: optional reason emitted on failure.
+    public func forwardPaymentFinalized(
+        layoutId: String,
+        catalogItemId: String,
+        success: Bool,
+        failureReason: String? = nil
+    ) {
+        uxHelper?.forwardPaymentFinalized(
+            layoutId: layoutId,
+            catalogItemId: catalogItemId,
+            success: success,
+            failureReason: failureReason
+        )
+    }
+
     private func addEmbeddedLayoutConstraints(embeddedView: UIView) {
         NSLayoutConstraint.activate([
             embeddedView.topAnchor.constraint(equalTo: topAnchor),
@@ -120,7 +159,6 @@ import SwiftUI
     }
 }
 
-@available(iOS 15, *)
 extension RoktLayoutUIView: LayoutLoader {
 
     /// Loads the layout content with the specified parameters.

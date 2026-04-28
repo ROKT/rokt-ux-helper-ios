@@ -29,7 +29,6 @@ enum CreativeContext {
 /// Maps properties of `Node`s using values in `context`.
 /// The mappable property of each `node` is known here (eg. `TextNode`'s value)
 /// Bridge that knows the `LayoutSchemaModel` data type
-@available(iOS 15, *)
 struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.MappingSource == OfferModel {
     let extractor: Extractor
 
@@ -115,6 +114,10 @@ struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.
             // DATA.creativeCopy.someValue1, DATA.creativeCopy.someValue2
             let chainOfValues = String(fullText[swiftRange])
 
+            // Only resolve placeholders this mapper owns; leave others (catalog, transactionData,
+            // DATA.catalogRuntime) intact for subsequent mappers / reactive resolution.
+            guard chainBelongsToCreativeMapper(chainOfValues) else { continue }
+
             let resolvedDataBinding = try extractor.extractDataRepresentedBy(
                 String.self,
                 propertyChain: chainOfValues,
@@ -129,5 +132,21 @@ struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.
         }
 
         return placeHolderToResolvedValue
+    }
+
+    private func chainBelongsToCreativeMapper(_ chain: String) -> Bool {
+        let creativeMarkers: [BNFNamespace] = [
+            .dataCreativeCopy,
+            .dataCreativeResponse,
+            .dataCreativeLink,
+            .dataImageCarousel
+        ]
+        if creativeMarkers.contains(where: { chain.contains($0.withNamespaceSeparator) }) {
+            return true
+        }
+        // STATE.* placeholders (e.g. STATE.IndicatorPosition) are owned by this mapper too,
+        // but DATA.catalogRuntime.* is reserved for reactive resolution in BasicTextViewModel.
+        return chain.contains(BNFNamespace.state.withNamespaceSeparator)
+            && !chain.contains(BNFNamespace.dataCatalogRuntime.withNamespaceSeparator)
     }
 }

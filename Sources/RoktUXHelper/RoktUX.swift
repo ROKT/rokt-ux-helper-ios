@@ -4,7 +4,6 @@ import Combine
 import DcuiSchema
 
 /// An object that is responsible for handling UX events and loading user experience layouts provided by Rokt.
-@available(iOS 15, *)
 public class RoktUX: UXEventsDelegate {
     /**
      * Get the Rokt SDK configuration. Data to be included in the Rokt API request.
@@ -204,6 +203,29 @@ public class RoktUX: UXEventsDelegate {
         } else {
             eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
         }
+    }
+
+    /**
+     Call after `/v1/cart/initialize-purchase` returns to display the confirmation screen
+     for a device-pay flow (e.g. PayPal). The catalog-runtime dictionary is published into the
+     layout's reactive state and resolved against `%^DATA.catalogRuntime.<key>^%` placeholders.
+
+     - Parameters:
+       - layoutId: layout Id for the relevant displayed catalog item.
+       - catalogItemId: Id of the catalog item that was selected.
+       - catalogRuntimeData: dictionary of pre-formatted runtime values keyed to match
+         `%^DATA.catalogRuntime.<key>^%` placeholders in the layout — typically the order
+         breakdown (e.g. `["subtotal": "$24.00", "tax": "$1.94", "shipping": "$0.00", "total": "$26.72"]`).
+     */
+    public func devicePayShowConfirmation(
+        layoutId: String,
+        catalogItemId: String,
+        catalogRuntimeData: [String: String]
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayPendingConfirmation(
+            itemId: catalogItemId,
+            catalogRuntimeData: catalogRuntimeData
+        )
     }
 
     /**

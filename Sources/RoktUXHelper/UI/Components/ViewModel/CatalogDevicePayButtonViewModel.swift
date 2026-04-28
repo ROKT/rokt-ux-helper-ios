@@ -2,7 +2,6 @@ import DcuiSchema
 import Foundation
 import SwiftUI
 
-@available(iOS 15, *)
 class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
@@ -74,15 +73,20 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     private func handleDevicePayCompletion(status: DevicePayStatus) {
-        let value: Int
         switch status {
         case .success:
-            value = 1
+            setLayoutVariantCustomState(key: customStateKey, value: 1)
         case .failure, .retry:
-            value = -1
+            setLayoutVariantCustomState(key: customStateKey, value: -1)
+        case .pendingConfirmation(let catalogRuntimeData):
+            // Publish runtime data first so reactive text resolution sees the values when the
+            // confirmation subtree mounts on the devicePayState=1 transition.
+            setCatalogRuntimeData(catalogRuntimeData)
+            setLayoutVariantCustomState(
+                key: CustomStateIdentifiable.Keys.devicePayState.rawValue,
+                value: 1
+            )
         }
-
-        setLayoutVariantCustomState(key: customStateKey, value: value)
     }
 
     private func setLayoutVariantCustomState(key: String, value: Int) {
@@ -97,6 +101,17 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             map[identifier] = value
             binding.wrappedValue = map
             layoutState.publishStateChange()
+        }
+    }
+
+    private func setCatalogRuntimeData(_ catalogRuntimeData: [String: String]) {
+        guard let layoutState else { return }
+        DispatchQueue.main.async {
+            var newItems = layoutState.items
+            newItems[LayoutState.catalogRuntimeDataKey] = catalogRuntimeData
+            // Setter on `items` re-publishes through `itemsPublisher`, triggering reactive
+            // catalog-runtime resolution in BasicTextViewModel / RichTextViewModel.
+            layoutState.items = newItems
         }
     }
 

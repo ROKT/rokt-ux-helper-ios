@@ -1,6 +1,5 @@
 import Foundation
 
-@available(iOS 13, *)
 struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Validator.T == String {
 
     private let dataValidator: Validator
@@ -62,7 +61,12 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
             case .dataCreativeCopy,
                     .dataCreativeResponse,
                     .dataCreativeLink,
-                    .dataImageCarousel:
+                    .dataImageCarousel,
+                    .dataTransactionData,
+                    .dataCatalogRuntime:
+                // Foreign namespaces — handled by other mappers / reactive resolution.
+                // The mapper-level filter prevents these from reaching here in normal flow;
+                // throw defensively if it does.
                 throw LayoutTransformerError.InvalidSyntaxMapping()
             }
         }

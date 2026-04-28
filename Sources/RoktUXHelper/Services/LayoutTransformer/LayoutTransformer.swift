@@ -1,13 +1,15 @@
 import Foundation
 import DcuiSchema
 
-@available(iOS 15, *)
 struct LayoutTransformer<
     CreativeSyntaxMapper: SyntaxMapping,
     AddToCartMapper: SyntaxMapping,
+    TransactionMapper: SyntaxMapping,
     Extractor: DataExtracting
 >
-where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context == CatalogItem {
+where CreativeSyntaxMapper.Context == CreativeContext,
+      AddToCartMapper.Context == CatalogItem,
+      TransactionMapper.Context == TransactionData {
 
     enum Context {
         case outer([OfferModel?])
@@ -26,6 +28,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     let eventService: EventDiagnosticServicing?
     let creativeMapper: CreativeSyntaxMapper
     let addToCartMapper: AddToCartMapper
+    let transactionDataMapper: TransactionMapper
     let extractor: Extractor
 
     var moduleName: String? {
@@ -36,6 +39,7 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         layoutPlugin: LayoutPlugin,
         creativeMapper: CreativeSyntaxMapper = CreativeMapper(),
         addToCartMapper: AddToCartMapper = CatalogMapper(),
+        transactionDataMapper: TransactionMapper = TransactionDataMapper(),
         extractor: Extractor = CreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
         eventService: EventDiagnosticServicing? = nil
@@ -43,9 +47,16 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         self.layoutPlugin = layoutPlugin
         self.creativeMapper = creativeMapper
         self.addToCartMapper = addToCartMapper
+        self.transactionDataMapper = transactionDataMapper
         self.extractor = extractor
         self.layoutState = layoutState
         self.eventService = eventService
+    }
+
+    /// Pulls `transactionData` off the active offer (if any) so text mappers can resolve
+    /// `%^DATA.transactionData.*^%` placeholders for order summaries / shipping cards.
+    private var activeTransactionData: TransactionData? {
+        (layoutState.items[LayoutState.fullOfferKey] as? OfferModel)?.transactionData
     }
 
     func transform() throws -> LayoutSchemaViewModel? {
@@ -608,6 +619,12 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
         }
+        if case .inner = context, let transactionData = activeTransactionData {
+            transactionDataMapper.map(consumer: .basicText(vm), context: transactionData)
+        }
+        // Final pass after the whole mapper chain: substitute `|` defaults for any
+        // placeholder no mapper resolved, or zero the line if a mandatory orphan remains.
+        vm.finalizePlaceholders()
         return vm
     }
 
@@ -626,6 +643,10 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
         }
+        if case .inner = context, let transactionData = activeTransactionData {
+            transactionDataMapper.map(consumer: .richText(vm), context: transactionData)
+        }
+        vm.finalizePlaceholders()
         return vm
     }
 
@@ -1035,7 +1056,6 @@ where CreativeSyntaxMapper.Context == CreativeContext, AddToCartMapper.Context =
     }
 }
 
-@available(iOS 15, *)
 private extension LayoutTransformer.Context {
     var mapToCreativeContext: CreativeContext? {
         switch self {
@@ -1097,7 +1117,6 @@ private extension CarouselSlideInOutTransitionSettings {
     }
 }
 
-@available(iOS 15, *)
 private extension CarouselTransition {
     var transtion: DataImageCarouselViewModel.Transition {
         switch self {

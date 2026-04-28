@@ -32,6 +32,11 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
   TestRichTextComponent/testSnapshot_nilTextStyle.1.png
   TestRowComponent/testSnapshot_withChildren.1.png
+  TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_catalogRuntimeFallsBackToDefault_whenDataMissing.1.png
+  TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_mandatoryOrphan_zeroesLine.1.png
+  TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_optionalOrphan_substitutesDefault.1.png
+  TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesCatalogRuntimePlaceholders.1.png
+  TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesShippingAddressFromTransactionData.1.png
   TestScrollableColumn/testSnapshot.1.png
   TestToggleButtonComponent/testSnapshot.1.png
   TestZStackComponent/testSnapshot.1.png
@@ -191,7 +196,7 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 #### OneByOne (Distribution)
 
-- [ ] Embedded one-by-one layout (test exists but is commented out -- needs `perceptualPrecision` investigation)
+- [ ] Embedded one-by-one layout (test exists but is commented out -- see `TestRuntimeAndTransactionDataPlaceholders` for a working `perceptualPrecision: 0.98` pattern that may unblock this)
 
 #### ScrollableColumn
 
@@ -230,6 +235,19 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
+
+#### Placeholder Resolution (Runtime + Transaction Data)
+
+End-to-end coverage for the placeholder namespaces and the finalize step. These
+drive `BasicTextViewModel` directly and through the full `LayoutTransformer`
+pipeline. They use `perceptualPrecision: 0.98` to tolerate sub-pixel text
+rendering drift across simulator runtimes.
+
+- [x] `DATA.catalogRuntime.*` -- host-pushed runtime values resolved reactively from `LayoutState.catalogRuntimeDataKey` (`testSnapshot_basicText_resolvesCatalogRuntimePlaceholders`)
+- [x] `DATA.catalogRuntime.*` fallback -- `--` default substitutes when host has not pushed runtime data (`testSnapshot_basicText_catalogRuntimeFallsBackToDefault_whenDataMissing`)
+- [x] `DATA.transactionData.shippingAddress.*` -- full transformer pipeline, `TransactionDataMapper` resolves from active offer via `LayoutState.fullOfferKey` (`testSnapshot_basicText_resolvesShippingAddressFromTransactionData`)
+- [x] OrphanedPlaceholderResolver -- optional orphan with `|` default substitutes the literal, line stays (`testSnapshot_basicText_optionalOrphan_substitutesDefault`)
+- [x] OrphanedPlaceholderResolver -- mandatory orphan (no `|` default) zeroes the line, `boundValue == ""` (`testSnapshot_basicText_mandatoryOrphan_zeroesLine`)
 
 #### ProgressIndicator / ProgressControl
 

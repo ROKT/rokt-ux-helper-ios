@@ -16,6 +16,8 @@ import UIKit
 
 class SampleViewController: UIViewController {
 
+    private var roktView: RoktLayoutUIView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupView()
@@ -27,6 +29,7 @@ class SampleViewController: UIViewController {
             return
         }
 
+        RoktUX.setLogLevel(.verbose)
         let roktView = RoktLayoutUIView(
             experienceResponse: experience,
             location: "#target_element" // "targetElementSelector" in experience JSON file
@@ -53,12 +56,40 @@ class SampleViewController: UIViewController {
                 dismiss(animated: true)
             }
 
-            // Handle UX events here
+            // Mock the host SDK round-trip for the PayPal device-pay flow.
+            // Real flow: rokt-sdk-ios calls /v1/cart/initialize-purchase, opens the PayPal URL,
+            // and on auth posts back the breakdown. We fake a 1.5s network delay and ship a
+            // hard-coded breakdown so the layout renders the confirmation screen end-to-end.
+            if let devicePay = uxEvent as? RoktUXEvent.CartItemDevicePay {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                    self?.roktView?.devicePayShowConfirmation(
+                        layoutId: devicePay.layoutId,
+                        catalogItemId: devicePay.catalogItemId,
+                        catalogRuntimeData: [
+                            "subtotal": "$24.00",
+                            "tax": "$1.94",
+                            "shipping": "$0.00",
+                            "total": "$26.72"
+                        ]
+                    )
+                }
+            } else if let forward = uxEvent as? RoktUXEvent.CartItemForwardPayment {
+                // Real flow: rokt-sdk-ios calls /purchase to finalize. Here we just succeed
+                // after a short delay so the existing paymentResult==1 success screen shows.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                    self?.roktView?.forwardPaymentFinalized(
+                        layoutId: forward.layoutId,
+                        catalogItemId: forward.catalogItemId,
+                        success: true
+                    )
+                }
+            }
 
         } onPlatformEvent: { _ in
             // Send these platform events to Rokt API
         }
 
+        self.roktView = roktView
         view.addSubview(roktView)
 
         roktView.translatesAutoresizingMaskIntoConstraints = false
