@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.5] - 2026-04-28
+
+### Added
+
+- Add PayPal payment confirmation flow with runtime catalog data ([#265](https://github.com/ROKT/rokt-ux-helper-ios/pull/265))
+
 ## [0.10.4] - 2026-04-24
 
 ### Removed
@@ -264,7 +270,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.5...HEAD
+[0.10.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...0.10.5
 [0.10.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.3...0.10.4
 [0.10.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.2...0.10.3
 [0.10.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.1...0.10.2
