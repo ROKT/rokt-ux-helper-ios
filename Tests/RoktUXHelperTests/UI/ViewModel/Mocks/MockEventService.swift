@@ -124,6 +124,7 @@ class MockEventService: EventDiagnosticServicing {
 
     var cartItemDevicePayCompletionCallback: ((DevicePayStatus) -> Void)?
     var cartItemDevicePayLastTransactionData: TransactionData?
+    var cartItemDevicePayLastProvider: DcuiSchema.PaymentProvider?
 
     func cartItemDevicePay(
         catalogItem: CatalogItem,
@@ -133,6 +134,7 @@ class MockEventService: EventDiagnosticServicing {
     ) {
         cartItemDevicePayCalled = true
         cartItemDevicePayLastTransactionData = transactionData
+        cartItemDevicePayLastProvider = paymentProvider
         cartItemDevicePayCompletionCallback = completion
     }
 
@@ -209,6 +211,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
         cartItemDevicePayPendingConfirmationCalled = false
+        cartItemDevicePayLastProvider = nil
         lastDevicePayPendingConfirmationItemId = nil
         lastDevicePayPendingConfirmationData = nil
         cartItemForwardPaymentCalled = false
