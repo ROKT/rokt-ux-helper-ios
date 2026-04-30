@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Sync `Constants.layoutSchemaVersion` (was stuck at `2.5.0`) with the `dcui-swift-schema` package version (`2.7.0`) and add `SchemaVersionConsistencyTests` to fail the build on future drift
+
 ## [0.10.6] - 2026-04-30
 
 ### Added

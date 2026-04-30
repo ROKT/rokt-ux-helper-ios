@@ -140,7 +140,8 @@ For a detailed guide on adding new snapshots, see [TESTING.md](./TESTING.md).
 1. Ensure the Swift version of SSOT has been released in [DCUI-Schema-Repo](https://github.com/ROKT/dcui-layout-schema)
 2. Update dcui-swift-schema dependency version in package.swift to the latest version
    `.package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "x.y.z"),`
-3. Verify `schema.swift` is updated
+3. Update `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` to match the same `x.y.z`. `SchemaVersionConsistencyTests` fails the build if these two values drift.
+4. Verify `schema.swift` is updated
 
 ## Example App
 
