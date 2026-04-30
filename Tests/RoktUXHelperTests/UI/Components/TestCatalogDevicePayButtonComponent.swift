@@ -63,6 +63,29 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         XCTAssertTrue(eventService.cartItemDevicePayCalled)
     }
 
+    func test_handleTap_routesCardProvider_throughCartItemDevicePay() {
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item-card")
+
+        let sut = CatalogDevicePayButtonViewModel(
+            catalogItem: catalogItem,
+            children: nil,
+            provider: .card,
+            layoutState: MockLayoutState(),
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: nil
+        )
+
+        sut.handleTap()
+
+        XCTAssertTrue(eventService.cartItemDevicePayCalled)
+        XCTAssertEqual(eventService.cartItemDevicePayLastProvider, .card)
+    }
+
     func test_handleTap_doesNotCallDevicePay_whenNoCatalogItem() {
         let eventService = MockEventService()
 
