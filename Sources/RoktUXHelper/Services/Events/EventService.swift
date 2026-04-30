@@ -232,17 +232,23 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     func cartItemDevicePaySuccess(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        // For two-step flows that already transitioned to .pendingConfirmation,
+        // devicePayCompletion was cleared by cartItemDevicePayPendingConfirmation and the
+        // Step-2 SignalCartItemForwardPayment* signals own the terminal state. Skip emitting
+        // SignalCartItemInstantPurchase here to avoid double-counting.
+        guard let completion = devicePayCompletion else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
-
-        devicePayCompletion?(.success)
+        completion(.success)
         devicePayCompletion = nil
     }
 
     func cartItemDevicePayFailure(itemId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        // Symmetric guard with cartItemDevicePaySuccess — once the flow transitioned to
+        // forward-payment Step-2, that branch owns the terminal failure signal.
+        guard let completion = devicePayCompletion else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
-
-        devicePayCompletion?(.failure)
+        completion(.failure)
         devicePayCompletion = nil
     }
 

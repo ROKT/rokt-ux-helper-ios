@@ -393,6 +393,68 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.roktEvents.count, 0)
     }
 
+    /// After the two-step flow has transitioned to .pendingConfirmation (devicePayCompletion
+    /// cleared), a late cartItemDevicePaySuccess from the SDK must NOT emit SignalCartItemInstantPurchase
+    /// — the Step-2 forwardPayment* signals own the terminal state, and double-emitting would
+    /// double-count the purchase in analytics.
+    func test_devicePaySuccess_afterPendingConfirmation_doesNotEmitInstantPurchaseSignal() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .paypal,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "USD 10.00"]
+        )
+        events.removeAll()
+
+        // Act
+        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+        eventService.cartItemDevicePayFailure(itemId: "catalogItemId")
+
+        // Assert: no terminal device-pay signal emitted after pendingConfirmation cleared the completion.
+        XCTAssertFalse(events.contains { $0.eventType == .SignalCartItemInstantPurchase })
+        XCTAssertFalse(events.contains { $0.eventType == .SignalCartItemInstantPurchaseFailure })
+    }
+
+    /// One-step Apple-Pay-style flow: devicePayCompletion is still pending when the SDK reports
+    /// success, so SignalCartItemInstantPurchase must fire and the completion must be invoked.
+    func test_devicePaySuccess_whenCompletionPending_emitsInstantPurchaseSignalAndInvokesCompletion() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        var completionStatus: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { status in completionStatus = status }
+        )
+        events.removeAll()
+
+        // Act
+        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+
+        // Assert
+        XCTAssertTrue(events.contains { $0.eventType == .SignalCartItemInstantPurchase })
+        if case .success = completionStatus {} else {
+            XCTFail("Expected completion to fire with .success, got \(String(describing: completionStatus))")
+        }
+    }
+
     func test_send_forward_payment_initiated() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     uxEventDelegate: stubUXHelper,

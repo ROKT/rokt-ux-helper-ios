@@ -167,7 +167,10 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     }
 
     public override func viewDidDisappear(_ animated: Bool) {
-        // The viewcontroller is dismissed by touching outside of swipe down
+        // Skip when temporarily covered by a presented modal — the placement isn't dismissed.
+        if presentedViewController != nil {
+            return
+        }
         if eventService?.dismissOption == nil {
             eventService?.sendDismissalEvent()
         }
