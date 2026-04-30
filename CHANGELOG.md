@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.6] - 2026-04-30
+
+### Added
+
+- Bump dcui-swift-schema to 2.7.0 for Card payment provider ([#267](https://github.com/ROKT/rokt-ux-helper-ios/pull/267))
+
 ## [0.10.5] - 2026-04-28
 
 ### Added
@@ -270,7 +276,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.5...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.6...HEAD
+[0.10.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.5...0.10.6
 [0.10.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...0.10.5
 [0.10.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.3...0.10.4
 [0.10.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.2...0.10.3
