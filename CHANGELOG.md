@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Sync `Constants.layoutSchemaVersion` (was stuck at `2.5.0`) with the `dcui-swift-schema` package version (`2.7.0`) and add `SchemaVersionConsistencyTests` to fail the build on future drift
 
+## [0.10.7] - 2026-05-01
+
+### Fixed
+
+- Sync layoutSchemaVersion with dcui-swift-schema and guard drift ([#269](https://github.com/ROKT/rokt-ux-helper-ios/pull/269))
+
 ## [0.10.6] - 2026-04-30
 
 ### Added
@@ -280,7 +286,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.6...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.7...HEAD
+[0.10.7]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.6...0.10.7
 [0.10.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.5...0.10.6
 [0.10.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...0.10.5
 [0.10.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.3...0.10.4
