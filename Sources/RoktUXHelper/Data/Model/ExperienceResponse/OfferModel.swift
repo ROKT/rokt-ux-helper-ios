@@ -48,6 +48,7 @@ struct CreativeLink: Codable, Hashable {
     let title: String?
 }
 
+@available(iOS 15, *)
 extension OfferModel {
     /// Returns true when image alt text matches title-like creative copy so the image can be hidden from VoiceOver as decorative.
     func imageAltDuplicatesTitleLikeCopy(_ alt: String) -> Bool {
@@ -56,7 +57,10 @@ extension OfferModel {
 
         for (key, value) in creative.copy {
             guard Self.isTitleLikeCopyField(key) else { continue }
-            if Self.normalizeAccessibilityComparisonString(value) == normalizedAlt {
+            let comparableCopy = Self.normalizeAccessibilityComparisonString(
+                Self.plainTextFromCreativeCopyForAccessibilityComparison(value)
+            )
+            if comparableCopy == normalizedAlt {
                 return true
             }
         }
@@ -71,6 +75,17 @@ extension OfferModel {
         guard let alt else { return false }
         guard let offer = layoutState?.items[LayoutState.fullOfferKey] as? OfferModel else { return false }
         return offer.imageAltDuplicatesTitleLikeCopy(alt)
+    }
+
+    /// Title-like copy may contain DCUI HTML (`<h2>…</h2>`) or entities (`&amp;`); alt is plain—parse to comparable text before matching.
+    private static func plainTextFromCreativeCopyForAccessibilityComparison(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "" }
+        guard trimmed.contains("<") || trimmed.contains("&") else {
+            return trimmed
+        }
+        let (parsed, _) = LightweightHTMLParser.parse(html: trimmed, baseFont: nil)
+        return parsed.string
     }
 
     private static func isTitleLikeCopyField(_ key: String) -> Bool {
