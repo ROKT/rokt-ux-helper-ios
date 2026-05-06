@@ -7,12 +7,19 @@ struct ExternalAsyncImage: View {
     @ObservedObject var imageDownloader: ImageDownloader
     let scale: BackgroundImageScale?
     let altString: String
+    var decorativeAccessibilityDuplicateOfOfferCopy: Bool = false
     @State private var image: UIImage?
 
-    init(urlString: String, scale: BackgroundImageScale?, altString: String, loader: RoktUXImageLoader) {
+    private var hideFromAccessibility: Bool {
+        altString.isEmpty || decorativeAccessibilityDuplicateOfOfferCopy
+    }
+
+    init(urlString: String, scale: BackgroundImageScale?, altString: String, loader: RoktUXImageLoader,
+         decorativeAccessibilityDuplicateOfOfferCopy: Bool = false) {
         self.imageDownloader = ImageDownloader(urlString: urlString, loader: loader)
         self.scale = scale
         self.altString = altString
+        self.decorativeAccessibilityDuplicateOfOfferCopy = decorativeAccessibilityDuplicateOfOfferCopy
     }
 
     var body: some View {
@@ -20,7 +27,7 @@ struct ExternalAsyncImage: View {
             Image(uiImage: image)
                 .scaleIfNeeded(scale: scale)
                 .accessibilityLabel(altString)
-                .accessibilityHidden(altString.isEmpty)
+                .accessibilityHidden(hideFromAccessibility)
                 .onReceive(imageDownloader.imageSubject) { newImage in
                     self.image = newImage
                 }

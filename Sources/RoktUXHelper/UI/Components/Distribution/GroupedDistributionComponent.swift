@@ -39,7 +39,7 @@ struct GroupedDistributionComponent: View {
     var accessibilityAnnouncement: String {
         String(format: kPageAnnouncement,
                currentGroup + 1,
-               model.children?.count ?? 1)
+               totalPages)
     }
 
     let parentOverride: ComponentParentOverride?

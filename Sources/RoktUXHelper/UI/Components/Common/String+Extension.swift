@@ -10,15 +10,30 @@ internal extension StringProtocol {
         linkStyles: InlineTextStylingProperties?,
         colorScheme: ColorScheme
     ) -> NSAttributedString {
+        htmlToAttributedStringWithAccessibilitySemantics(
+            textColorHex: textColorHex,
+            uiFont: uiFont,
+            linkStyles: linkStyles,
+            colorScheme: colorScheme
+        ).attributedString
+    }
+
+    func htmlToAttributedStringWithAccessibilitySemantics(
+        textColorHex: String?,
+        uiFont: UIFont?,
+        linkStyles: InlineTextStylingProperties?,
+        colorScheme: ColorScheme
+    ) -> (attributedString: NSAttributedString, containsHeadingContent: Bool) {
         var convertedText = String(self)
 
         if let textColorHex {
             convertedText = "<font color=\(textColorHex)>" + self + "</font>"
         }
 
-        let parsed = LightweightHTMLParser.parse(html: convertedText, baseFont: uiFont)
+        let (parsed, containsHeadingContent) = LightweightHTMLParser.parse(html: convertedText, baseFont: uiFont)
 
-        return updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
+        let attributed = updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
+        return (attributed, containsHeadingContent)
     }
 
     private func updateLinkStyles(_ linkStyles: InlineTextStylingProperties?,

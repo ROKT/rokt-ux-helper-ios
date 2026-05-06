@@ -84,6 +84,10 @@ struct StaticImageViewComponent: View {
             scale: .fit,
             alt: model.alt,
             imageLoader: model.imageLoader,
+            decorativeAccessibilityDuplicateOfOfferCopy: OfferModel.decorativeAccessibilityDueToDuplicateOfferCopy(
+                alt: model.alt,
+                layoutState: model.layoutState
+            ),
             isImageValid: $isImageValid
         )
     }

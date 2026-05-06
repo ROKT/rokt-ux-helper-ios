@@ -86,6 +86,10 @@ struct DataImageViewComponent: View {
                        scale: .fit,
                        alt: model.image?.alt,
                        imageLoader: model.imageLoader,
+                       decorativeAccessibilityDuplicateOfOfferCopy: OfferModel.decorativeAccessibilityDueToDuplicateOfferCopy(
+                           alt: model.image?.alt,
+                           layoutState: model.layoutState
+                       ),
                        isImageValid: $isImageValid)
     }
 

@@ -164,5 +164,6 @@ struct RichTextComponent: View {
             .scaledFont(textStyle: style?.text)
             .tint(Color(hex: style?.text?.textColor?.getAdaptiveColor(colorScheme)))
             .environment(\.openURL, OpenURLAction(handler: model.handleURL))
+            .accessibilityAddTraits(model.accessibilityUsesHeadingTrait ? [.isHeader] : [])
     }
 }

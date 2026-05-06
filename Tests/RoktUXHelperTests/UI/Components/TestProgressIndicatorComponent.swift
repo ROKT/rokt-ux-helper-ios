@@ -30,7 +30,7 @@ final class TestProgressIndicatorComponent: XCTestCase {
         let padding = try progressIndicator.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0))
         
-        XCTAssertEqual(try progressIndicator.accessibilityLabel().string(), "1 of 1")
+        XCTAssertEqual(try progressIndicator.accessibilityLabel().string(), "Offer 1 of 1")
         XCTAssertEqual(try progressIndicator.accessibilityHidden(), false)
     }
     

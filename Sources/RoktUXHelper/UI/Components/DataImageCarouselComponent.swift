@@ -238,6 +238,10 @@ struct DataImageCarouselComponent: View {
             scale: .fit,
             alt: image.alt,
             imageLoader: model.imageLoader,
+            decorativeAccessibilityDuplicateOfOfferCopy: OfferModel.decorativeAccessibilityDueToDuplicateOfferCopy(
+                alt: image.alt,
+                layoutState: model.layoutState
+            ),
             isImageValid: .constant(true)
         )
         .frame(maxWidth: .infinity)

@@ -4,7 +4,8 @@ import UIKit
 ///
 /// Supports the DCUI rich text tag surface:
 ///   `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<s>`, `<strike>`,
-///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`
+///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`,
+///   `<h1>`–`<h6>` (semantic heading only; VoiceOver trait applied by `RichTextComponent`)
 ///
 /// Also decodes common HTML entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`,
 /// `&apos;`, `&nbsp;`, `&#NNN;`, `&#xHHH;`).
@@ -13,10 +14,11 @@ enum LightweightHTMLParser {
 
     // MARK: - Public API
 
-    static func parse(html: String, baseFont: UIFont?) -> NSMutableAttributedString {
+    static func parse(html: String, baseFont: UIFont?) -> (NSMutableAttributedString, Bool) {
         let result = NSMutableAttributedString()
         var index = html.startIndex
         var tagStack: [Tag] = []
+        var containsHeadingContent = false
 
         while index < html.endIndex {
             if html[index] == "<" {
@@ -33,13 +35,27 @@ enum LightweightHTMLParser {
                 index = nextIndex
                 let decoded = decodeHTMLEntities(text)
                 if !decoded.isEmpty {
+                    if tagStackContainsHeading(tagStack) {
+                        containsHeadingContent = true
+                    }
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: decoded, attributes: attrs))
                 }
             }
         }
 
-        return result
+        return (result, containsHeadingContent)
+    }
+
+    private static func tagStackContainsHeading(_ tagStack: [Tag]) -> Bool {
+        tagStack.contains { tag in
+            switch tag.name {
+            case "h1", "h2", "h3", "h4", "h5", "h6":
+                return true
+            default:
+                return false
+            }
+        }
     }
 
     // MARK: - Tag model

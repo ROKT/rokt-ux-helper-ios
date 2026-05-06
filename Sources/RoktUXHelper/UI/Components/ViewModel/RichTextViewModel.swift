@@ -24,6 +24,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     @LazyPublished var breakpointIndex = 0
     @LazyPublished var breakpointLinkIndex = 0
     @LazyPublished var attributedString = NSAttributedString("")
+    @LazyPublished var accessibilityUsesHeadingTrait = false
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -200,14 +201,16 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         let performTransformation = { [weak self] in
             guard let self else { return }
 
-            let htmlTransformedValue = valueToTransform.htmlToAttributedString(
-                textColorHex: breakpointDefaultStyle?.text?.textColor?.getAdaptiveColor(colorScheme),
-                uiFont: breakpointDefaultStyle?.text?.styledUIFont,
-                linkStyles: breakpointLinkStyle?.text,
-                colorScheme: colorScheme
-            )
+            let (htmlTransformedValue, containsHeadingContent) = valueToTransform
+                .htmlToAttributedStringWithAccessibilitySemantics(
+                    textColorHex: breakpointDefaultStyle?.text?.textColor?.getAdaptiveColor(colorScheme),
+                    uiFont: breakpointDefaultStyle?.text?.styledUIFont,
+                    linkStyles: breakpointLinkStyle?.text,
+                    colorScheme: colorScheme
+                )
 
             self.attributedString = htmlTransformedValue
+            self.accessibilityUsesHeadingTrait = containsHeadingContent
         }
 
         DispatchQueue.main.async {

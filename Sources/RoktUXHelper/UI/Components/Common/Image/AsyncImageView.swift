@@ -10,9 +10,15 @@ struct AsyncImageView: View {
     let scale: BackgroundImageScale?
     var alt: String?
     var imageLoader: RoktUXImageLoader?
+    /// When true, hides this image from VoiceOver because its alt duplicates title-like offer copy (decorative brand treatment).
+    var decorativeAccessibilityDuplicateOfOfferCopy: Bool = false
 
     private var altString: String {
         alt ?? ""
+    }
+
+    private var hideFromAccessibility: Bool {
+        altString.isEmpty || decorativeAccessibilityDuplicateOfOfferCopy
     }
 
     private var imgURL: String {
@@ -49,12 +55,14 @@ struct AsyncImageView: View {
                let base64Image = UIImage(data: base64Data) {
                 Base64Image(scale: scale,
                             altString: altString,
-                            base64Image: base64Image)
+                            base64Image: base64Image,
+                            decorativeAccessibilityDuplicateOfOfferCopy: decorativeAccessibilityDuplicateOfOfferCopy)
             } else if let imageLoader {
                 ExternalAsyncImage(urlString: imgURL,
                                    scale: scale,
                                    altString: altString,
-                                   loader: imageLoader)
+                                   loader: imageLoader,
+                                   decorativeAccessibilityDuplicateOfOfferCopy: decorativeAccessibilityDuplicateOfOfferCopy)
             } else {
                 AsyncImage(url: URL(string: imgURL)) { phase in
                     if let image = phase.image { // valid
@@ -67,7 +75,7 @@ struct AsyncImageView: View {
                     }
                 }
                 .accessibilityLabel(altString)
-                .accessibilityHidden(altString.isEmpty)
+                .accessibilityHidden(hideFromAccessibility)
             }
         } else {
             EmptyView()

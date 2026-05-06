@@ -67,9 +67,9 @@ let kSharedDataItemsQueueLabel = "com.rokt.shareddata.items.queue"
 
 // MARK: - Accessibility
 
-let kPageAnnouncement = "Page %d of %d"
+let kPageAnnouncement = "Offer %d of %d"
 let kOneByOneAnnouncement = "Offer %d of %d"
-let kProgressIndicatorAnnouncement = "%d of %d"
+let kProgressIndicatorAnnouncement = "Offer %d of %d"
 
 // MARK: Cart Item Instant purchase constants
 

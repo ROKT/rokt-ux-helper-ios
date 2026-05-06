@@ -37,7 +37,7 @@ final class TestCarouselDistributionComponent: XCTestCase {
 
         // Test accessibility label on the carousel item (LayoutSchemaComponent)
         let carouselItem = try geometryReader.find(LayoutSchemaComponent.self)
-        XCTAssertEqual(try carouselItem.accessibilityLabel().string(), "Page 1 of 1")
+        XCTAssertEqual(try carouselItem.accessibilityLabel().string(), "Offer 1 of 1")
 
         carouselComponent.model.goToNextOffer(nil)
         XCTAssertTrue(closeActionCalled)

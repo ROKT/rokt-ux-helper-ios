@@ -41,7 +41,7 @@ final class TestGroupedDistributionComponent: XCTestCase {
         let padding = try grouped.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
         
-        XCTAssertEqual(try grouped.accessibilityLabel().string(), "Page 1 of 1")
+        XCTAssertEqual(try grouped.accessibilityLabel().string(), "Offer 1 of 1")
 
         groupedComponent.goToNextOffer()
         XCTAssertTrue(closeActionCalled)

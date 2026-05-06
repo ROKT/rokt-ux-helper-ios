@@ -10,7 +10,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Plain text (no tags)
 
     func test_plain_text() {
-        let result = LightweightHTMLParser.parse(html: "Hello World", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "Hello World", baseFont: baseFont)
         XCTAssertEqual(result.string, "Hello World")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -18,14 +18,14 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_empty_string() {
-        let result = LightweightHTMLParser.parse(html: "", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "", baseFont: baseFont)
         XCTAssertEqual(result.string, "")
     }
 
     // MARK: - Bold
 
     func test_bold_b_tag() {
-        let result = LightweightHTMLParser.parse(html: "<b>Bold</b>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<b>Bold</b>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Bold")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -33,7 +33,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_bold_strong_tag() {
-        let result = LightweightHTMLParser.parse(html: "<strong>Bold</strong>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<strong>Bold</strong>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Bold")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -43,7 +43,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Italic
 
     func test_italic_i_tag() {
-        let result = LightweightHTMLParser.parse(html: "<i>Italic</i>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<i>Italic</i>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Italic")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -51,7 +51,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_italic_em_tag() {
-        let result = LightweightHTMLParser.parse(html: "<em>Italic</em>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<em>Italic</em>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Italic")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -61,7 +61,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Underline
 
     func test_underline() {
-        let result = LightweightHTMLParser.parse(html: "<u>Underlined</u>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<u>Underlined</u>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Underlined")
 
         let underline = result.attribute(.underlineStyle, at: 0, effectiveRange: nil) as? Int
@@ -71,7 +71,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Strikethrough
 
     func test_strikethrough_s_tag() {
-        let result = LightweightHTMLParser.parse(html: "<s>Struck</s>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<s>Struck</s>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Struck")
 
         let strike = result.attribute(.strikethroughStyle, at: 0, effectiveRange: nil) as? Int
@@ -79,7 +79,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_strikethrough_strike_tag() {
-        let result = LightweightHTMLParser.parse(html: "<strike>Struck</strike>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<strike>Struck</strike>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Struck")
 
         let strike = result.attribute(.strikethroughStyle, at: 0, effectiveRange: nil) as? Int
@@ -89,7 +89,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Links
 
     func test_link_with_href() {
-        let result = LightweightHTMLParser.parse(
+        let (result, _) = LightweightHTMLParser.parse(
             html: "<a href=\"https://rokt.com\">Rokt</a>",
             baseFont: baseFont
         )
@@ -100,7 +100,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_link_with_target_attribute() {
-        let result = LightweightHTMLParser.parse(
+        let (result, _) = LightweightHTMLParser.parse(
             html: "<a href=\"https://rokt.com/privacy\" target=\"_blank\">Privacy</a>",
             baseFont: baseFont
         )
@@ -113,7 +113,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Font color
 
     func test_font_color_unquoted() {
-        let result = LightweightHTMLParser.parse(
+        let (result, _) = LightweightHTMLParser.parse(
             html: "<font color=#FF0000>Red</font>",
             baseFont: baseFont
         )
@@ -124,7 +124,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_font_color_quoted() {
-        let result = LightweightHTMLParser.parse(
+        let (result, _) = LightweightHTMLParser.parse(
             html: "<font color=\"#00FF00\">Green</font>",
             baseFont: baseFont
         )
@@ -135,7 +135,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_font_color_does_not_bleed_outside_tag() {
-        let result = LightweightHTMLParser.parse(
+        let (result, _) = LightweightHTMLParser.parse(
             html: "Before <font color=#FF0000>Red</font> After",
             baseFont: baseFont
         )
@@ -151,12 +151,12 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Line break
 
     func test_br_tag() {
-        let result = LightweightHTMLParser.parse(html: "Line1<br>Line2", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "Line1<br>Line2", baseFont: baseFont)
         XCTAssertEqual(result.string, "Line1\nLine2")
     }
 
     func test_self_closing_br_tag() {
-        let result = LightweightHTMLParser.parse(html: "Line1<br/>Line2", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "Line1<br/>Line2", baseFont: baseFont)
         XCTAssertEqual(result.string, "Line1\nLine2")
     }
 
@@ -164,7 +164,7 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_dcui_fixture_strong_em_u_s() {
         let html = "<strong><em><u>ORDER</u> <s>Number</s>: Uk171359906</em></strong>"
-        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
 
         XCTAssertEqual(result.string, "ORDER Number: Uk171359906")
 
@@ -187,7 +187,7 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_dcui_fixture_with_font_color_wrapper() {
         let html = "<font color=#AABBCC><strong><em><u>ORDER</u> <s>Number</s>: Uk171359906</em></strong></font>"
-        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
 
         XCTAssertEqual(result.string, "ORDER Number: Uk171359906")
 
@@ -199,7 +199,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Bold + Italic combined
 
     func test_bold_italic_combined() {
-        let result = LightweightHTMLParser.parse(html: "<b><i>BoldItalic</i></b>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<b><i>BoldItalic</i></b>", baseFont: baseFont)
         XCTAssertEqual(result.string, "BoldItalic")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -210,7 +210,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Mixed styled and unstyled text
 
     func test_partial_bold() {
-        let result = LightweightHTMLParser.parse(html: "Get <b>20% off</b> today", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "Get <b>20% off</b> today", baseFont: baseFont)
         XCTAssertEqual(result.string, "Get 20% off today")
 
         let fontPlain = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -226,7 +226,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Nil base font (falls back to system font)
 
     func test_nil_base_font_still_applies_bold() {
-        let result = LightweightHTMLParser.parse(html: "<b>Bold</b>", baseFont: nil)
+        let (result, _) = LightweightHTMLParser.parse(html: "<b>Bold</b>", baseFont: nil)
         XCTAssertEqual(result.string, "Bold")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -235,7 +235,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_nil_base_font_still_applies_italic() {
-        let result = LightweightHTMLParser.parse(html: "<i>Italic</i>", baseFont: nil)
+        let (result, _) = LightweightHTMLParser.parse(html: "<i>Italic</i>", baseFont: nil)
         XCTAssertEqual(result.string, "Italic")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -244,7 +244,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_nil_base_font_uses_system_font_size() {
-        let result = LightweightHTMLParser.parse(html: "Plain", baseFont: nil)
+        let (result, _) = LightweightHTMLParser.parse(html: "Plain", baseFont: nil)
         XCTAssertEqual(result.string, "Plain")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -255,39 +255,39 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - HTML entities
 
     func test_html_entities_amp_lt_gt() {
-        let result = LightweightHTMLParser.parse(html: "A &amp; B &lt; C &gt; D", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "A &amp; B &lt; C &gt; D", baseFont: baseFont)
         XCTAssertEqual(result.string, "A & B < C > D")
     }
 
     func test_html_entities_quot_apos() {
-        let result = LightweightHTMLParser.parse(html: "&quot;hello&quot; &apos;world&apos;", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "&quot;hello&quot; &apos;world&apos;", baseFont: baseFont)
         XCTAssertEqual(result.string, "\"hello\" 'world'")
     }
 
     func test_html_entity_nbsp() {
-        let result = LightweightHTMLParser.parse(html: "no&nbsp;break", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "no&nbsp;break", baseFont: baseFont)
         XCTAssertEqual(result.string, "no\u{00A0}break")
     }
 
     func test_numeric_decimal_entity() {
-        let result = LightweightHTMLParser.parse(html: "&#65;&#66;&#67;", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "&#65;&#66;&#67;", baseFont: baseFont)
         XCTAssertEqual(result.string, "ABC")
     }
 
     func test_numeric_hex_entity() {
-        let result = LightweightHTMLParser.parse(html: "&#x41;&#x42;&#x43;", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "&#x41;&#x42;&#x43;", baseFont: baseFont)
         XCTAssertEqual(result.string, "ABC")
     }
 
     func test_unknown_entity_preserved() {
-        let result = LightweightHTMLParser.parse(html: "&unknown;", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "&unknown;", baseFont: baseFont)
         XCTAssertEqual(result.string, "&unknown;")
     }
 
     // MARK: - Case insensitivity
 
     func test_uppercase_tags() {
-        let result = LightweightHTMLParser.parse(html: "<B>Bold</B>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<B>Bold</B>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Bold")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -295,7 +295,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_mixed_case_tags() {
-        let result = LightweightHTMLParser.parse(html: "<Strong>Bold</Strong>", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<Strong>Bold</Strong>", baseFont: baseFont)
         XCTAssertEqual(result.string, "Bold")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -305,7 +305,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Malformed HTML resilience
 
     func test_unclosed_tag_still_renders_text() {
-        let result = LightweightHTMLParser.parse(html: "<b>Bold text", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "<b>Bold text", baseFont: baseFont)
         XCTAssertEqual(result.string, "Bold text")
 
         let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
@@ -313,15 +313,23 @@ final class TestLightweightHTMLParser: XCTestCase {
     }
 
     func test_stray_less_than() {
-        let result = LightweightHTMLParser.parse(html: "A < B", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "A < B", baseFont: baseFont)
         XCTAssertTrue(result.string.contains("A"))
         XCTAssertTrue(result.string.contains("B"))
     }
 
     func test_empty_tag() {
-        let result = LightweightHTMLParser.parse(html: "Before<>After", baseFont: baseFont)
+        let (result, _) = LightweightHTMLParser.parse(html: "Before<>After", baseFont: baseFont)
         XCTAssertTrue(result.string.contains("Before"))
         XCTAssertTrue(result.string.contains("After"))
+    }
+
+    func test_heading_tags_set_semantic_heading_flag() {
+        let (_, hasHeading) = LightweightHTMLParser.parse(html: "<h2>Winter savings</h2>", baseFont: baseFont)
+        XCTAssertTrue(hasHeading)
+
+        let (_, noHeading) = LightweightHTMLParser.parse(html: "<b>Winter savings</b>", baseFont: baseFont)
+        XCTAssertFalse(noHeading)
     }
 
     // MARK: - Integration with htmlToAttributedString extension

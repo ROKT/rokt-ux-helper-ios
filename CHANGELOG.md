@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- VoiceOver: pagination and dot indicators now announce `Offer X of Y` for consistent context; grouped distribution uses page count for the total; Rich Text wrapped in HTML `h1`–`h6` exposes the Heading trait (no extra spoken suffix); creative images and static images hide from VoiceOver when alt duplicates title-like offer copy (decorative brand/logo treatment).
+
 ## [0.10.7] - 2026-05-01
 
 ### Fixed
