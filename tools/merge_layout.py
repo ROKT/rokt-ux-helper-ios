@@ -52,11 +52,16 @@ def replace_field(content, field_name, encoded_value):
     pattern = rf'("{field_name}":\s*)("(?:[^"\\]|\\.)*")'
     match = re.search(pattern, content)
     if not match:
-        print(f"  ERROR: field '{field_name}' not found in experience.json", file=sys.stderr)
+        print(
+            f"  ERROR: field '{field_name}' not found in experience.json",
+            file=sys.stderr,
+        )
         return content, False
 
     prefix = match.group(1)
-    new_content = content[: match.start()] + prefix + encoded_value + content[match.end() :]
+    new_content = (
+        content[: match.start()] + prefix + encoded_value + content[match.end() :]
+    )
     return new_content, True
 
 
@@ -64,7 +69,9 @@ def main():
     repo_root = find_repo_root()
     resources = os.path.join(repo_root, "Example", "Example", "Resources")
 
-    parser = argparse.ArgumentParser(description="Merge layout JSONs into experience.json")
+    parser = argparse.ArgumentParser(
+        description="Merge layout JSONs into experience.json"
+    )
     parser.add_argument(
         "--experience",
         default=os.path.join(resources, "experience.json"),
@@ -117,7 +124,9 @@ def main():
     with open(args.experience, "w") as f:
         f.write(content)
 
-    print(f"Merged {', '.join(merged)} into {os.path.relpath(args.experience, repo_root)}")
+    print(
+        f"Merged {', '.join(merged)} into {os.path.relpath(args.experience, repo_root)}"
+    )
 
 
 if __name__ == "__main__":

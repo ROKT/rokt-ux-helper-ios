@@ -25,7 +25,8 @@ extension InspectableView where View: SingleViewContent {
         }).dropFirst(index ?? 0).first else {
             throw InspectionError.modifierNotFound(
                 parent: Inspector.typeName(value: content.view),
-                modifier: name, index: index ?? 0)
+                modifier: name, index: index ?? 0
+            )
         }
         let medium = target.medium.resettingViewModifiers()
         let modifierContent = try Inspector.unwrap(view: view, medium: medium)

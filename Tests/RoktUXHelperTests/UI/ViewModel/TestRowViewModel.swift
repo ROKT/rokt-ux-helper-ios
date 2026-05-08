@@ -17,7 +17,8 @@ class TestRowViewModel: XCTestCase {
             layoutState: layoutState,
             predicates: [WhenPredicate.progression(ProgressionPredicate(condition: .is, value: "0"))],
             globalBreakPoints: nil,
-            offers: [])
+            offers: []
+        )
 
         XCTAssertTrue(sut.animate)
     }
@@ -32,7 +33,8 @@ class TestRowViewModel: XCTestCase {
             layoutState: layoutState,
             predicates: [WhenPredicate.progression(ProgressionPredicate(condition: .is, value: "1"))],
             globalBreakPoints: nil,
-            offers: [])
+            offers: []
+        )
 
         XCTAssertFalse(sut.animate)
         layoutState.items[LayoutState.currentProgressKey] = Binding.constant(1)

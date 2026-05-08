@@ -49,12 +49,14 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
             eventService?.sendGatedSignalResponseEvent(
                 instanceGuid: responseOptions?.instanceGuid ?? "",
                 jwtToken: responseJWTToken,
-                isPositive: responseKey == .positive)
+                isPositive: responseKey == .positive
+            )
         case .signalResponse:
             eventService?.sendSignalResponseEvent(
                 instanceGuid: responseOptions?.instanceGuid ?? "",
                 jwtToken: responseJWTToken,
-                isPositive: responseKey == .positive)
+                isPositive: responseKey == .positive
+            )
         default:
             break
         }

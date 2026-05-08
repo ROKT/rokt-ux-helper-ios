@@ -104,10 +104,10 @@ final class TestDataImageComponent: XCTestCase {
                                                           copy: [:],
                                                           images: [
                                                               "creativeImage": CreativeImage(
-                                                                light: image,
-                                                                dark: nil, alt: "",
-                                                                title: nil
-                                                            )
+                                                                  light: image,
+                                                                  dark: nil, alt: "",
+                                                                  title: nil
+                                                              )
                                                           ],
                                                           links: nil,
                                                           responseOptionsMap: nil,
