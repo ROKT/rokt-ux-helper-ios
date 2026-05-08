@@ -4,7 +4,6 @@ description: Action runs `xcodebuild test` on xcode 16.x
 inputs:
   codecov-token:
     description: Codecov token
-    type: string
     required: false
 
 runs:

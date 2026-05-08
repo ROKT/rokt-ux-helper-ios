@@ -27,7 +27,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_is_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "0"))
+            ProgressionPredicate(condition: .is, value: "0")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -39,7 +40,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_is_invalid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "1"))
+            ProgressionPredicate(condition: .is, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -51,7 +53,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_is_not_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isNot, value: "1"))
+            ProgressionPredicate(condition: .isNot, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -63,7 +66,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_is_not_invalid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isNot, value: "1"))
+            ProgressionPredicate(condition: .isNot, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 1))
@@ -75,7 +79,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_above_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isAbove, value: "0"))
+            ProgressionPredicate(condition: .isAbove, value: "0")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 1))
@@ -87,7 +92,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_above_invalid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isAbove, value: "1"))
+            ProgressionPredicate(condition: .isAbove, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -99,7 +105,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_below_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isBelow, value: "1"))
+            ProgressionPredicate(condition: .isBelow, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -111,7 +118,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_below_invalid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isBelow, value: "2"))
+            ProgressionPredicate(condition: .isBelow, value: "2")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(currentProgress: 3, totalOffers: 3))
@@ -123,7 +131,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_negative_is_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "-1"))
+            ProgressionPredicate(condition: .is, value: "-1")
+        )
         let layoutState = LayoutState()
         layoutState.items[LayoutState.totalItemsKey] = 3
         let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
@@ -137,7 +146,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_negative_is_invalid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "-1"))
+            ProgressionPredicate(condition: .is, value: "-1")
+        )
         let layoutState = LayoutState()
         layoutState.items[LayoutState.totalItemsKey] = 3
         let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
@@ -151,7 +161,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_negative_above_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isAbove, value: "-2"))
+            ProgressionPredicate(condition: .isAbove, value: "-2")
+        )
         let layoutState = LayoutState()
         layoutState.items[LayoutState.totalItemsKey] = 4
         let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
@@ -165,7 +176,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_progression_negative_below_valid() {
         // Arrange
         let predicate = WhenPredicate.progression(
-            ProgressionPredicate(condition: .isBelow, value: "-1"))
+            ProgressionPredicate(condition: .isBelow, value: "-1")
+        )
         let layoutState = LayoutState()
         layoutState.items[LayoutState.totalItemsKey] = 5
         let whenVM = get_when_view_model(predicates: [predicate], layoutState: layoutState)
@@ -181,7 +193,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_is_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "0"))
+            PositionPredicate(condition: .is, value: "0")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0))
@@ -193,7 +206,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_negative_is_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-1"))
+            PositionPredicate(condition: .is, value: "-1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(totalOffers: 2, position: 1))
@@ -205,7 +219,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_is_invalid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "1"))
+            PositionPredicate(condition: .is, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0))
@@ -217,7 +232,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_negative_is_invalid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-1"))
+            PositionPredicate(condition: .is, value: "-1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(totalOffers: 2, position: 0))
@@ -229,7 +245,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_empty_position_false() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "0"))
+            PositionPredicate(condition: .is, value: "0")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: nil))
@@ -241,7 +258,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_is_not_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isNot, value: "1"))
+            PositionPredicate(condition: .isNot, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0))
@@ -253,7 +271,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_is_not_invalid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isNot, value: "1"))
+            PositionPredicate(condition: .isNot, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 1))
@@ -264,7 +283,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_above_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isAbove, value: "0"))
+            PositionPredicate(condition: .isAbove, value: "0")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 1))
@@ -276,7 +296,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_above_invalid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isAbove, value: "1"))
+            PositionPredicate(condition: .isAbove, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 1))
@@ -288,7 +309,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_below_valid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isBelow, value: "1"))
+            PositionPredicate(condition: .isBelow, value: "1")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0))
@@ -300,7 +322,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_position_below_invalid() {
         // Arrange
         let predicate = WhenPredicate.position(
-            PositionPredicate(condition: .isBelow, value: "2"))
+            PositionPredicate(condition: .isBelow, value: "2")
+        )
         let whenVM = get_when_view_model(predicates: [predicate])
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(totalOffers: 3, position: 3))
@@ -314,7 +337,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_valid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 1))
@@ -326,7 +350,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_invalid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 501))
@@ -338,7 +363,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_not_valid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isNot, value: "mobile"))
+            BreakpointPredicate(condition: .isNot, value: "mobile")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 501))
@@ -350,7 +376,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_not_invalid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isNot, value: "mobile"))
+            BreakpointPredicate(condition: .isNot, value: "mobile")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 1))
@@ -362,7 +389,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_below_valid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isBelow, value: "tablet"))
+            BreakpointPredicate(condition: .isBelow, value: "tablet")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 200))
@@ -374,7 +402,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_below_invalid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isBelow, value: "tablet"))
+            BreakpointPredicate(condition: .isBelow, value: "tablet")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 600))
@@ -386,7 +415,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_above_valid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isAbove, value: "tablet"))
+            BreakpointPredicate(condition: .isAbove, value: "tablet")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 1000))
@@ -398,7 +428,8 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_is_above_invalid() {
         // Arrange
         let predicate = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .isAbove, value: "tablet"))
+            BreakpointPredicate(condition: .isAbove, value: "tablet")
+        )
         let whenVM = get_when_view_model(predicates: [predicate], breakPoint: get_shared_data_with_breakpoints())
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(width: 400))
@@ -537,7 +568,8 @@ final class TestWhenViewModel: XCTestCase {
         let predicate2 = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.copy"))
         let whenVM = get_when_view_model(
             predicates: [predicate1, predicate2],
-            copy: ["creative.title": "Awesome offer", "creative.copy": "For you"])
+            copy: ["creative.title": "Awesome offer", "creative.copy": "For you"]
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -586,13 +618,15 @@ final class TestWhenViewModel: XCTestCase {
             copy: [:], // Empty catalog copy
             inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
-            token: catalogItem.token)
+            token: catalogItem.token
+        )
 
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "creative.title"))
         let whenVM = get_when_view_model(
             predicates: [predicate],
             copy: ["creative.title": "Awesome offer"],
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -608,7 +642,8 @@ final class TestWhenViewModel: XCTestCase {
             predicates: [predicate],
             copy: ["key1": "creative value"],
             layoutState: layoutState,
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -643,13 +678,15 @@ final class TestWhenViewModel: XCTestCase {
             copy: [:], // Empty catalog copy
             inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
-            token: catalogItem.token)
+            token: catalogItem.token
+        )
 
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "nonexistent.key"))
         let whenVM = get_when_view_model(
             predicates: [predicate],
             copy: [:], // Empty creative copy
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -684,13 +721,15 @@ final class TestWhenViewModel: XCTestCase {
             copy: ["key1": ""], // Empty string value
             inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
-            token: catalogItem.token)
+            token: catalogItem.token
+        )
 
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .exists, value: "key1"))
         let whenVM = get_when_view_model(
             predicates: [predicate],
             copy: [:],
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -727,13 +766,15 @@ final class TestWhenViewModel: XCTestCase {
             copy: [:], // Empty catalog copy
             inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
-            token: catalogItem.token)
+            token: catalogItem.token
+        )
 
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "nonexistent.key"))
         let whenVM = get_when_view_model(
             predicates: [predicate],
             copy: [:],
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -768,13 +809,15 @@ final class TestWhenViewModel: XCTestCase {
             copy: [:], // Empty catalog copy
             inventoryStatus: nil,
             linkedProductId: catalogItem.linkedProductId,
-            token: catalogItem.token)
+            token: catalogItem.token
+        )
 
         let predicate = WhenPredicate.creativeCopy(CreativeCopyPredicate(condition: .notExists, value: "creative.title"))
         let whenVM = get_when_view_model(
             predicates: [predicate],
             copy: ["creative.title": "Awesome offer"],
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -790,7 +833,8 @@ final class TestWhenViewModel: XCTestCase {
             predicates: [predicate],
             copy: [:],
             layoutState: layoutState,
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
@@ -806,13 +850,15 @@ final class TestWhenViewModel: XCTestCase {
             predicates: [predicate],
             copy: ["key1": "creative value"],
             layoutState: layoutState,
-            catalogItem: catalogItem)
+            catalogItem: catalogItem
+        )
 
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
 
         XCTAssertFalse(
             shouldApply,
-            "Should not apply when both creative and catalog copy contain the key with notExists condition")
+            "Should not apply when both creative and catalog copy contain the key with notExists condition"
+        )
     }
 
     // MARK: - StaticString
@@ -857,7 +903,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldNotApply_customStateMapNil() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .is, value: 1))
+            key: "state", condition: .is, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -867,7 +914,8 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_whenConditionEqualsIsNot_customStateMapNil() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isNot, value: 1))
+            key: "state", condition: .isNot, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let shouldApply = whenVM.shouldApply(get_mock_uistate())
@@ -877,7 +925,8 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_customStateMapInvalidKey() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .is, value: 1))
+            key: "state", condition: .is, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
         
         let customStateId = CustomStateIdentifiable(position: nil, key: "otherState")
@@ -890,7 +939,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldApply_whenConditionEqualsIs_valueEqualsCustomState() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .is, value: 1))
+            key: "state", condition: .is, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
         let customStateMap = RoktUXCustomStateMap(uniqueKeysWithValues: [(key: customStateId,
@@ -902,7 +952,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldNotApply_whenConditionEqualsIs_valueNotEqualsCustomState() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .is, value: 1))
+            key: "state", condition: .is, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -915,7 +966,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldApply_whenConditionEqualsIsNot_valueNotEqualsCustomState() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isNot, value: 1))
+            key: "state", condition: .isNot, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -928,7 +980,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldNotApply_whenConditionEqualsIsNot_valueEqualsCustomState() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isNot, value: 1))
+            key: "state", condition: .isNot, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -941,7 +994,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldApply_whenConditionEqualsIsAbove_customStateAboveValue() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isAbove, value: 1))
+            key: "state", condition: .isAbove, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -954,7 +1008,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldNotApply_whenConditionEqualsIsAbove_customStateNotAboveValue() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isAbove, value: 1))
+            key: "state", condition: .isAbove, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -967,7 +1022,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldApply_whenConditionEqualsIsBelow_customStateBelowValue() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isBelow, value: 1))
+            key: "state", condition: .isBelow, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -980,7 +1036,8 @@ final class TestWhenViewModel: XCTestCase {
 
     func test_shouldNotApply_whenConditionEqualsIsBelow_customStateNotBelowValue() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .isAbove, value: 11))
+            key: "state", condition: .isAbove, value: 11
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
 
         let customStateId = CustomStateIdentifiable(position: nil, key: "state")
@@ -993,7 +1050,8 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_whenConditionEqualsIs_valueEqualsCustomState_positionNotEquals() {
         let predicate = WhenPredicate.customState(CustomStatePredicate(
-            key: "state", condition: .is, value: 1))
+            key: "state", condition: .is, value: 1
+        ))
         let whenVM = get_when_view_model(predicates: [predicate])
         
         // Setup customStateMap with ["state": 1] on position 0
@@ -1013,17 +1071,22 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_position_progression_is_valid() {
         // Arrange
         let predicate1 = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         let predicate2 = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-1"))
+            PositionPredicate(condition: .is, value: "-1")
+        )
         let predicate3 = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "0"))
+            ProgressionPredicate(condition: .is, value: "0")
+        )
         let predicate4 = WhenPredicate.darkMode(
-            DarkModePredicate(condition: .is, value: true))
+            DarkModePredicate(condition: .is, value: true)
+        )
 
         let whenVM = get_when_view_model(
             predicates: [predicate1, predicate2, predicate3, predicate4],
-            breakPoint: get_shared_data_with_breakpoints())
+            breakPoint: get_shared_data_with_breakpoints()
+        )
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0, width: 1, isDarkMode: true))
 
@@ -1035,18 +1098,23 @@ final class TestWhenViewModel: XCTestCase {
     func test_should_apply_breakpoint_position_progression_is_invalid() {
         // Arrange
         let predicate1 = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         // This one should fail
         let predicate2 = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-2"))
+            PositionPredicate(condition: .is, value: "-2")
+        )
         let predicate3 = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "0"))
+            ProgressionPredicate(condition: .is, value: "0")
+        )
         let predicate4 = WhenPredicate.darkMode(
-            DarkModePredicate(condition: .isNot, value: true))
+            DarkModePredicate(condition: .isNot, value: true)
+        )
 
         let whenVM = get_when_view_model(
             predicates: [predicate1, predicate2, predicate3, predicate4],
-            breakPoint: get_shared_data_with_breakpoints())
+            breakPoint: get_shared_data_with_breakpoints()
+        )
         // Act
         let shouldApply = whenVM.shouldApply(get_mock_uistate(position: 0, width: 1))
         
@@ -1058,15 +1126,20 @@ final class TestWhenViewModel: XCTestCase {
     func test_shouldApply_breakpoint_position_progression_darkMode_customState() {
         // Arrange
         let predicate1 = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         let predicate2 = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-1"))
+            PositionPredicate(condition: .is, value: "-1")
+        )
         let predicate3 = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "0"))
+            ProgressionPredicate(condition: .is, value: "0")
+        )
         let predicate4 = WhenPredicate.darkMode(
-            DarkModePredicate(condition: .is, value: true))
+            DarkModePredicate(condition: .is, value: true)
+        )
         let predicate5 = WhenPredicate.customState(
-            CustomStatePredicate(key: "state", condition: .is, value: 21))
+            CustomStatePredicate(key: "state", condition: .is, value: 21)
+        )
 
         let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4, predicate5],
                                          breakPoint: get_shared_data_with_breakpoints())
@@ -1084,15 +1157,20 @@ final class TestWhenViewModel: XCTestCase {
     
     func test_shouldNotApply_breakpoint_position_progression_darkMode_customStateNotEqual() {
         let predicate1 = WhenPredicate.breakpoint(
-            BreakpointPredicate(condition: .is, value: "mobile"))
+            BreakpointPredicate(condition: .is, value: "mobile")
+        )
         let predicate2 = WhenPredicate.position(
-            PositionPredicate(condition: .is, value: "-1"))
+            PositionPredicate(condition: .is, value: "-1")
+        )
         let predicate3 = WhenPredicate.progression(
-            ProgressionPredicate(condition: .is, value: "0"))
+            ProgressionPredicate(condition: .is, value: "0")
+        )
         let predicate4 = WhenPredicate.darkMode(
-            DarkModePredicate(condition: .is, value: true))
+            DarkModePredicate(condition: .is, value: true)
+        )
         let predicate5 = WhenPredicate.customState(
-            CustomStatePredicate(key: "state", condition: .is, value: 21))
+            CustomStatePredicate(key: "state", condition: .is, value: 21)
+        )
         
         let whenVM = get_when_view_model(predicates: [predicate1, predicate2, predicate3, predicate4, predicate5],
                                          breakPoint: get_shared_data_with_breakpoints())
@@ -1147,10 +1225,12 @@ final class TestWhenViewModel: XCTestCase {
                 images: nil,
                 links: nil,
                 responseOptionsMap: nil,
-                jwtToken: "jwtToken1"),
+                jwtToken: "jwtToken1"
+            ),
             catalogItems: catalogItems,
             catalogItemGroup: nil,
-            transactionData: nil)
+            transactionData: nil
+        )
     }
     
     func get_shared_data_with_breakpoints() -> BreakPoint {

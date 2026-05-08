@@ -23,7 +23,8 @@ struct BottomSheetComponent: View {
                                 dimension: updateButtomSheetHeight(dimension: style?.dimension),
                                 flexChild: style?.flexChild,
                                 spacing: style?.spacing,
-                                border: style?.border),
+                                border: style?.border
+                            ),
                             layoutState: model.layoutState,
                             eventService: model.eventService,
                             parentWidth: $availableWidth,

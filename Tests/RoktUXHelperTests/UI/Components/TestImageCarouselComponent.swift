@@ -54,15 +54,15 @@ final class TestImageCarouselComponent: XCTestCase {
                                                           copy: [:],
                                                           images: [
                                                               "creativeCarouselImageVertical.1": CreativeImage(
-                                                                light: image,
-                                                                dark: nil, alt: "",
-                                                                title: nil
-                                                            ),
+                                                                  light: image,
+                                                                  dark: nil, alt: "",
+                                                                  title: nil
+                                                              ),
                                                               "creativeCarouselImageVertical.2": CreativeImage(
-                                                                light: image,
-                                                                dark: nil, alt: "",
-                                                                title: nil
-                                                            )
+                                                                  light: image,
+                                                                  dark: nil, alt: "",
+                                                                  title: nil
+                                                              )
                                                           ],
                                                           links: nil,
                                                           responseOptionsMap: nil,

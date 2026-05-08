@@ -36,7 +36,8 @@ final class TestProgressIndicatorComponent: XCTestCase {
     
     func test_start_position_progress_indicator() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.progressIndicator(try get_model(
-            model: ModelTestData.ProgressIndicatorData.startPosition())))
+            model: ModelTestData.ProgressIndicatorData.startPosition()
+        )))
         
         let progressIndicatorComponent = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
