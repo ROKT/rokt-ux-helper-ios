@@ -5,7 +5,6 @@ import DcuiSchema
 
 /// UIKit gesture layer that disambiguates horizontal pan from vertical scroll,
 /// allowing the gallery swipe to coexist with a parent ScrollView(.vertical).
-@available(iOS 15, *)
 struct GalleryGestureView: UIViewRepresentable {
     var onTap: (CGPoint) -> Void
     var onPanChanged: ((CGFloat) -> Void)?
@@ -102,25 +101,21 @@ struct GalleryGestureView: UIViewRepresentable {
 
 // MARK: - GallerySwipePolicy
 
-@available(iOS 15, *)
 enum GalleryPanAxis: Equatable {
     case horizontal
     case vertical
 }
 
-@available(iOS 15, *)
 enum GallerySwipeDirection: Equatable {
     case backward
     case forward
 }
 
-@available(iOS 15, *)
 struct GallerySwipeResolution: Equatable {
     let page: Int
     let direction: GallerySwipeDirection?
 }
 
-@available(iOS 15, *)
 enum GallerySwipePolicy {
     private static let thresholdRatio: CGFloat = 0.22
     private static let minimumThreshold: CGFloat = 44
@@ -192,7 +187,6 @@ enum GallerySwipePolicy {
 // MARK: - CatalogHSPageView
 
 /// Horizontal pager that tracks drag offset for interactive swipe animation.
-@available(iOS 15, *)
 struct CatalogHSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
@@ -277,7 +271,6 @@ struct CatalogHSPageView<Content: View>: View {
 
 // MARK: - CatalogImageGalleryComponent
 
-@available(iOS 15, *)
 struct CatalogImageGalleryComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var globalScreenSize: GlobalScreenSize

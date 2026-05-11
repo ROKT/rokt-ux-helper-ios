@@ -18,7 +18,6 @@ import DcuiSchema
 
 // MARK: - Component Tests
 
-@available(iOS 15.0, *)
 final class TestCatalogImageGalleryComponent: XCTestCase {
 
     // MARK: - Rendering
@@ -468,7 +467,6 @@ private class MockPanGestureRecognizer: UIPanGestureRecognizer {
 
 // MARK: - Factory Helpers
 
-@available(iOS 15.0, *)
 private extension TestCatalogImageGalleryComponent {
 
     func makeCatalogImageGalleryViewModel(
@@ -644,7 +642,6 @@ private extension TestCatalogImageGalleryComponent {
 
 // MARK: - LayoutSchemaViewModel Factory
 
-@available(iOS 15.0, *)
 extension LayoutSchemaViewModel {
     static func makeCatalogImageGallery(
         layoutState: LayoutState,
