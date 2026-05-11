@@ -331,6 +331,19 @@ final class GalleryGestureViewTests: XCTestCase {
 
         XCTAssertFalse(coordinator.gestureRecognizerShouldBegin(pan))
     }
+
+    func test_coordinator_verticalDominantDiagonalPanDoesNotBeginGalleryGesture() {
+        let coordinator = GalleryGestureView.Coordinator(onTap: { _ in }, onPanChanged: nil, onPanEnded: nil)
+        let pan = MockPanGestureRecognizer(
+            target: coordinator,
+            action: #selector(GalleryGestureView.Coordinator.handlePan(_:))
+        )
+        pan.mockTranslation = CGPoint(x: 80, y: 100)
+        pan.mockVelocity = CGPoint(x: 80, y: 100)
+
+        XCTAssertFalse(coordinator.gestureRecognizerShouldBegin(pan))
+        XCTAssertTrue(coordinator.gestureRecognizer(pan, shouldRecognizeSimultaneouslyWith: UIPanGestureRecognizer()))
+    }
 }
 
 // MARK: - GallerySwipePolicy Tests
@@ -398,12 +411,16 @@ final class GallerySwipePolicyTests: XCTestCase {
         XCTAssertEqual(backwardAtStart.direction, .backward)
     }
 
-    func test_mostlyHorizontalDiagonalPan_canBegin() {
-        XCTAssertTrue(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 90, y: 100)))
+    func test_horizontalDominantDiagonalPan_canBegin() {
+        XCTAssertTrue(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 120, y: 100)))
     }
 
-    func test_verticalDiagonalPan_doesNotBegin() {
-        XCTAssertFalse(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 80, y: 200)))
+    func test_verticalDominantDiagonalPan_doesNotBegin() {
+        XCTAssertFalse(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 80, y: 100)))
+    }
+
+    func test_equalDiagonalPan_prioritizesVerticalScroll() {
+        XCTAssertFalse(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 100, y: 100)))
     }
 
     func test_axisLock_usesInitialHorizontalTranslationBeforeVerticalVelocity() {

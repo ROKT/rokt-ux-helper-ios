@@ -126,7 +126,7 @@ enum GallerySwipePolicy {
     private static let minimumThreshold: CGFloat = 44
     private static let maximumThreshold: CGFloat = 90
     private static let flickVelocity: CGFloat = 500
-    private static let horizontalIntentRatio: CGFloat = 0.75
+    private static let horizontalDominanceRatio: CGFloat = 1
     private static let axisLockMinimumDistance: CGFloat = 8
 
     static func shouldBeginPan(translation: CGPoint = .zero, velocity: CGPoint) -> Bool {
@@ -143,7 +143,7 @@ enum GallerySwipePolicy {
 
     private static func axis(horizontal: CGFloat, vertical: CGFloat, minimum: CGFloat) -> GalleryPanAxis? {
         guard max(horizontal, vertical) > minimum else { return nil }
-        return horizontal >= vertical * horizontalIntentRatio ? .horizontal : .vertical
+        return horizontal > vertical * horizontalDominanceRatio ? .horizontal : .vertical
     }
 
     static func threshold(for width: CGFloat) -> CGFloat {
