@@ -5,11 +5,10 @@ import DcuiSchema
 
 /// UIKit gesture layer that disambiguates horizontal pan from vertical scroll,
 /// allowing the gallery swipe to coexist with a parent ScrollView(.vertical).
-@available(iOS 15, *)
 struct GalleryGestureView: UIViewRepresentable {
     var onTap: (CGPoint) -> Void
     var onPanChanged: ((CGFloat) -> Void)?
-    var onPanEnded: ((CGFloat) -> Void)?
+    var onPanEnded: ((CGFloat, CGFloat) -> Void)?
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -44,12 +43,13 @@ struct GalleryGestureView: UIViewRepresentable {
     class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var onTap: (CGPoint) -> Void
         var onPanChanged: ((CGFloat) -> Void)?
-        var onPanEnded: ((CGFloat) -> Void)?
+        var onPanEnded: ((CGFloat, CGFloat) -> Void)?
+        private var lockedAxis: GalleryPanAxis?
 
         init(
             onTap: @escaping (CGPoint) -> Void,
             onPanChanged: ((CGFloat) -> Void)?,
-            onPanEnded: ((CGFloat) -> Void)?
+            onPanEnded: ((CGFloat, CGFloat) -> Void)?
         ) {
             self.onTap = onTap
             self.onPanChanged = onPanChanged
@@ -62,12 +62,20 @@ struct GalleryGestureView: UIViewRepresentable {
         }
 
         @objc func handlePan(_ sender: UIPanGestureRecognizer) {
-            let translation = sender.translation(in: sender.view).x
+            let translation = sender.translation(in: sender.view)
+            let velocity = sender.velocity(in: sender.view)
+            if lockedAxis == nil {
+                lockedAxis = GallerySwipePolicy.lockedAxis(translation: translation, velocity: velocity)
+            }
+
             switch sender.state {
             case .changed:
-                onPanChanged?(translation)
-            case .ended, .cancelled:
-                onPanEnded?(translation)
+                guard lockedAxis == .horizontal else { return }
+                onPanChanged?(translation.x)
+            case .ended, .cancelled, .failed:
+                defer { lockedAxis = nil }
+                guard lockedAxis == .horizontal else { return }
+                onPanEnded?(translation.x, velocity.x)
             default:
                 break
             }
@@ -75,23 +83,110 @@ struct GalleryGestureView: UIViewRepresentable {
 
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
+            let translation = pan.translation(in: pan.view)
             let velocity = pan.velocity(in: pan.view)
-            return abs(velocity.x) > abs(velocity.y)
+            lockedAxis = GallerySwipePolicy.lockedAxis(translation: translation, velocity: velocity)
+            return lockedAxis == .horizontal
         }
 
         func gestureRecognizer(
-            _: UIGestureRecognizer,
+            _ gestureRecognizer: UIGestureRecognizer,
             shouldRecognizeSimultaneouslyWith _: UIGestureRecognizer
         ) -> Bool {
-            true
+            guard gestureRecognizer is UIPanGestureRecognizer else { return true }
+            return lockedAxis != .horizontal
         }
+    }
+}
+
+// MARK: - GallerySwipePolicy
+
+enum GalleryPanAxis: Equatable {
+    case horizontal
+    case vertical
+}
+
+enum GallerySwipeDirection: Equatable {
+    case backward
+    case forward
+}
+
+struct GallerySwipeResolution: Equatable {
+    let page: Int
+    let direction: GallerySwipeDirection?
+}
+
+enum GallerySwipePolicy {
+    private static let thresholdRatio: CGFloat = 0.22
+    private static let minimumThreshold: CGFloat = 44
+    private static let maximumThreshold: CGFloat = 90
+    private static let flickVelocity: CGFloat = 500
+    private static let horizontalDominanceRatio: CGFloat = 1
+    private static let axisLockMinimumDistance: CGFloat = 8
+
+    static func shouldBeginPan(translation: CGPoint = .zero, velocity: CGPoint) -> Bool {
+        lockedAxis(translation: translation, velocity: velocity) == .horizontal
+    }
+
+    static func lockedAxis(translation: CGPoint = .zero, velocity: CGPoint) -> GalleryPanAxis? {
+        if let axis = axis(horizontal: abs(translation.x), vertical: abs(translation.y), minimum: axisLockMinimumDistance) {
+            return axis
+        }
+
+        return axis(horizontal: abs(velocity.x), vertical: abs(velocity.y), minimum: 0)
+    }
+
+    private static func axis(horizontal: CGFloat, vertical: CGFloat, minimum: CGFloat) -> GalleryPanAxis? {
+        guard max(horizontal, vertical) > minimum else { return nil }
+        return horizontal > vertical * horizontalDominanceRatio ? .horizontal : .vertical
+    }
+
+    static func threshold(for width: CGFloat) -> CGFloat {
+        min(max(max(width, 0) * thresholdRatio, minimumThreshold), maximumThreshold)
+    }
+
+    static func targetPage(
+        currentPage: Int,
+        pages: Int,
+        width: CGFloat,
+        translation: CGFloat,
+        velocity: CGFloat
+    ) -> GallerySwipeResolution {
+        guard pages > 0 else {
+            return GallerySwipeResolution(page: 0, direction: nil)
+        }
+
+        let currentPage = max(min(currentPage, pages - 1), 0)
+        guard let direction = direction(width: width, translation: translation, velocity: velocity) else {
+            return GallerySwipeResolution(page: currentPage, direction: nil)
+        }
+
+        let nextPage = switch direction {
+        case .forward:
+            min(currentPage + 1, pages - 1)
+        case .backward:
+            max(currentPage - 1, 0)
+        }
+
+        return GallerySwipeResolution(page: nextPage, direction: direction)
+    }
+
+    private static func direction(width: CGFloat, translation: CGFloat, velocity: CGFloat) -> GallerySwipeDirection? {
+        if abs(translation) >= threshold(for: width) {
+            return translation < 0 ? .forward : .backward
+        }
+
+        if abs(velocity) >= flickVelocity {
+            return velocity < 0 ? .forward : .backward
+        }
+
+        return nil
     }
 }
 
 // MARK: - CatalogHSPageView
 
 /// Horizontal pager that tracks drag offset for interactive swipe animation.
-@available(iOS 15, *)
 struct CatalogHSPageView<Content: View>: View {
     @Binding var page: Int
     let pages: Int
@@ -136,27 +231,25 @@ struct CatalogHSPageView<Content: View>: View {
                 onPanChanged: { translation in
                     dragOffset = translation
                 },
-                onPanEnded: { translation in
-                    let threshold = geo.size.width/2
-                    var newPage = page
-                    var swipeDirection: Bool?
+                onPanEnded: { translation, velocity in
+                    let resolution = GallerySwipePolicy.targetPage(
+                        currentPage: page,
+                        pages: pages,
+                        width: geo.size.width,
+                        translation: translation,
+                        velocity: velocity
+                    )
 
-                    if translation < -threshold {
-                        newPage += 1
-                        swipeDirection = true
-                    } else if translation > threshold {
-                        newPage -= 1
-                        swipeDirection = false
-                    }
-
-                    if let direction = swipeDirection {
-                        onSwipe?(direction)
+                    if let direction = resolution.direction {
+                        onSwipe?(direction == .forward)
                     }
 
                     dragOffset = 0
-                    page = max(min(newPage, pages - 1), 0)
+                    page = resolution.page
                 }
             )
+            .frame(width: geo.size.width, height: geo.size.height)
+            .contentShape(Rectangle())
         }
     }
 
@@ -178,7 +271,6 @@ struct CatalogHSPageView<Content: View>: View {
 
 // MARK: - CatalogImageGalleryComponent
 
-@available(iOS 15, *)
 struct CatalogImageGalleryComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
