@@ -306,6 +306,123 @@ final class GalleryGestureViewTests: XCTestCase {
         XCTAssertNotNil(coordinator)
         XCTAssertNotNil(coordinator)
     }
+
+    func test_coordinator_horizontalPanLocksOutSimultaneousScroll() {
+        let coordinator = GalleryGestureView.Coordinator(onTap: { _ in }, onPanChanged: nil, onPanEnded: nil)
+        let pan = MockPanGestureRecognizer(
+            target: coordinator,
+            action: #selector(GalleryGestureView.Coordinator.handlePan(_:))
+        )
+        pan.mockTranslation = CGPoint(x: 40, y: 5)
+        pan.mockVelocity = CGPoint(x: 300, y: 40)
+
+        XCTAssertTrue(coordinator.gestureRecognizerShouldBegin(pan))
+        XCTAssertFalse(coordinator.gestureRecognizer(pan, shouldRecognizeSimultaneouslyWith: UIPanGestureRecognizer()))
+    }
+
+    func test_coordinator_verticalPanDoesNotBeginGalleryGesture() {
+        let coordinator = GalleryGestureView.Coordinator(onTap: { _ in }, onPanChanged: nil, onPanEnded: nil)
+        let pan = MockPanGestureRecognizer(
+            target: coordinator,
+            action: #selector(GalleryGestureView.Coordinator.handlePan(_:))
+        )
+        pan.mockTranslation = CGPoint(x: 5, y: 40)
+        pan.mockVelocity = CGPoint(x: 40, y: 300)
+
+        XCTAssertFalse(coordinator.gestureRecognizerShouldBegin(pan))
+    }
+}
+
+// MARK: - GallerySwipePolicy Tests
+
+final class GallerySwipePolicyTests: XCTestCase {
+
+    func test_shortSwipe_doesNotChangePage() {
+        let resolution = GallerySwipePolicy.targetPage(
+            currentPage: 1,
+            pages: 3,
+            width: 390,
+            translation: -30,
+            velocity: -120
+        )
+
+        XCTAssertEqual(resolution.page, 1)
+        XCTAssertNil(resolution.direction)
+    }
+
+    func test_naturalImageSwipe_advancesPage() {
+        let resolution = GallerySwipePolicy.targetPage(
+            currentPage: 0,
+            pages: 3,
+            width: 390,
+            translation: -100,
+            velocity: -120
+        )
+
+        XCTAssertEqual(resolution.page, 1)
+        XCTAssertEqual(resolution.direction, .forward)
+    }
+
+    func test_fastFlick_advancesPageWithShortTranslation() {
+        let resolution = GallerySwipePolicy.targetPage(
+            currentPage: 0,
+            pages: 3,
+            width: 390,
+            translation: -20,
+            velocity: -650
+        )
+
+        XCTAssertEqual(resolution.page, 1)
+        XCTAssertEqual(resolution.direction, .forward)
+    }
+
+    func test_swipeAtBounds_clampsPage() {
+        let forwardAtEnd = GallerySwipePolicy.targetPage(
+            currentPage: 2,
+            pages: 3,
+            width: 390,
+            translation: -100,
+            velocity: -120
+        )
+        let backwardAtStart = GallerySwipePolicy.targetPage(
+            currentPage: 0,
+            pages: 3,
+            width: 390,
+            translation: 100,
+            velocity: 120
+        )
+
+        XCTAssertEqual(forwardAtEnd.page, 2)
+        XCTAssertEqual(forwardAtEnd.direction, .forward)
+        XCTAssertEqual(backwardAtStart.page, 0)
+        XCTAssertEqual(backwardAtStart.direction, .backward)
+    }
+
+    func test_mostlyHorizontalDiagonalPan_canBegin() {
+        XCTAssertTrue(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 90, y: 100)))
+    }
+
+    func test_verticalDiagonalPan_doesNotBegin() {
+        XCTAssertFalse(GallerySwipePolicy.shouldBeginPan(velocity: CGPoint(x: 80, y: 200)))
+    }
+
+    func test_axisLock_usesInitialHorizontalTranslationBeforeVerticalVelocity() {
+        let axis = GallerySwipePolicy.lockedAxis(
+            translation: CGPoint(x: 40, y: 5),
+            velocity: CGPoint(x: 20, y: 500)
+        )
+
+        XCTAssertEqual(axis, .horizontal)
+    }
+
+    func test_axisLock_usesInitialVerticalTranslationBeforeHorizontalVelocity() {
+        let axis = GallerySwipePolicy.lockedAxis(
+            translation: CGPoint(x: 5, y: 40),
+            velocity: CGPoint(x: 500, y: 20)
+        )
+
+        XCTAssertEqual(axis, .vertical)
+    }
 }
 
 // MARK: - Mock Helpers
@@ -316,6 +433,19 @@ private class MockTapGestureRecognizer: UITapGestureRecognizer {
 
     override func location(in view: UIView?) -> CGPoint {
         return mockLocation
+    }
+}
+
+private class MockPanGestureRecognizer: UIPanGestureRecognizer {
+    var mockTranslation: CGPoint = .zero
+    var mockVelocity: CGPoint = .zero
+
+    override func translation(in view: UIView?) -> CGPoint {
+        return mockTranslation
+    }
+
+    override func velocity(in view: UIView?) -> CGPoint {
+        return mockVelocity
     }
 }
 
