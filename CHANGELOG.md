@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.8] - 2026-05-12
+
+### Fixed
+
+- Improve image carousel swiping in sheets ([#273](https://github.com/ROKT/rokt-ux-helper-ios/pull/273))
+
+### Changed
+
+- Upgrade trunk to 1.25.0 ([#270](https://github.com/ROKT/rokt-ux-helper-ios/pull/270))
+
 ## [0.10.7] - 2026-05-01
 
 ### Fixed
@@ -282,7 +292,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.7...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.8...HEAD
+[0.10.8]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.7...0.10.8
 [0.10.7]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.6...0.10.7
 [0.10.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.5...0.10.6
 [0.10.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.4...0.10.5
