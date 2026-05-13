@@ -1,7 +1,7 @@
 import Foundation
 import DcuiSchema
 
-struct BaseStyles: Decodable, Hashable {
+struct BaseStyles: Decodable {
     let background: BackgroundStylingProperties?
     let border: BorderStylingProperties?
     let container: ContainerStylingProperties?
