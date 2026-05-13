@@ -72,7 +72,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         return transformedUIModels
     }
 
-    func transform<T: Codable>(_ layout: T, context: Context) throws -> LayoutSchemaViewModel {
+    func transform<T: Decodable>(_ layout: T, context: Context) throws -> LayoutSchemaViewModel {
         if let layout = layout as? LayoutSchemaModel {
             return try transform(layout, context: context)
         } else if let layout = layout as? AccessibilityGroupedLayoutChildren {
@@ -278,7 +278,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         }
     }
 
-    func transformChildren<T: Codable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
+    func transformChildren<T: Decodable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
         try layouts?.map {
             try transform($0, context: context)
         }
@@ -1001,8 +1001,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         let indicatorContainerStyle = try StyleTransformer
             .updatedStyles(dataImageCarouselModel.progressIndicatorContainerStyles)
 
-        let transition = dataImageCarouselModel.transition ?? .fadeInOut(.init(speed: .medium))
-        let indicators = dataImageCarouselModel.indicators ?? .init(show: true, activeIndicatorMode: .timer)
+        let transition = dataImageCarouselModel.transition ?? .fadeInOut(CarouselFadeInOutTransitionSettings(speed: .medium))
+        let indicators = dataImageCarouselModel.indicators ?? DataImageCarouselIndicators(show: true, activeIndicatorMode: .timer)
 
         let indicatorViewModel: ImageCarouselIndicatorViewModel?
         if indicators.show ?? true {

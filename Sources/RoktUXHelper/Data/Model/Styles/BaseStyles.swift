@@ -1,7 +1,7 @@
 import Foundation
 import DcuiSchema
 
-struct BaseStyles: Codable, Hashable {
+struct BaseStyles: Decodable, Hashable {
     let background: BackgroundStylingProperties?
     let border: BorderStylingProperties?
     let container: ContainerStylingProperties?
@@ -133,7 +133,7 @@ extension CatalogImageGalleryStyles {
     }
 }
 
-extension BasicStateStylingBlock where StyleProperties: Codable {
+extension BasicStateStylingBlock where StyleProperties: Decodable {
     func mapToBaseStyles(_ transform: (StyleProperties) -> BaseStyles) -> BasicStateStylingBlock<BaseStyles> {
         BasicStateStylingBlock<BaseStyles>(
             default: transform(`default`),
@@ -146,7 +146,7 @@ extension BasicStateStylingBlock where StyleProperties: Codable {
 }
 
 extension Collection {
-    func mapToBaseStyles<T: Codable>(_ transform: (T) -> BaseStyles) -> [BasicStateStylingBlock<BaseStyles>]
+    func mapToBaseStyles<T: Decodable>(_ transform: (T) -> BaseStyles) -> [BasicStateStylingBlock<BaseStyles>]
     where Element == BasicStateStylingBlock<T> {
         self.map { $0.mapToBaseStyles(transform) }
     }
