@@ -1,5 +1,6 @@
 import UIKit
 import SwiftUI
+import Combine
 import DcuiSchema
 
 @available(iOS 15, *)
@@ -69,7 +70,9 @@ extension UIViewController {
                let bottomSheetUIModel = bottomSheetUIModel {
                 applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
                 if #available(iOS 16.0, *) {
-                    applyFixedBottomSheetHeight(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
+                    applyFixedBottomSheetHeight(modal: modal,
+                                                bottomSheetUIModel: bottomSheetUIModel,
+                                                layoutState: layoutState)
                 } else {
                     modal.sheetPresentationController?.detents = [.medium()]
                 }
@@ -105,13 +108,50 @@ extension UIViewController {
     }
 
     @available(iOS 16.0, *)
-    private func applyFixedBottomSheetHeight(modal: UIHostingController<AnyView>,
-                                             bottomSheetUIModel: BottomSheetViewModel) {
-        if let defaultStyle = bottomSheetUIModel.defaultStyle,
-           !defaultStyle.isEmpty,
-           let dimensionType = defaultStyle[0].dimension?.height,
-           let customDetents = getFixedBottomSheetDetents(dimensionType: dimensionType) {
-            modal.sheetPresentationController?.detents = customDetents
+    private func applyFixedBottomSheetHeight(modal: RoktUXSwiftUIViewController,
+                                             bottomSheetUIModel: BottomSheetViewModel,
+                                             layoutState: LayoutState) {
+        guard let defaultStyle = bottomSheetUIModel.defaultStyle,
+              !defaultStyle.isEmpty,
+              let dimensionType = defaultStyle[0].dimension?.height,
+              let sheet = modal.sheetPresentationController else {
+            return
+        }
+
+        switch dimensionType {
+        case .fixed(let value):
+            sheet.detents = [.custom { _ in CGFloat(value) }]
+        case .percentage(let value):
+            // Percentage height becomes the medium detent of an expandable sheet.
+            // The layout opts into expansion by toggling a "ExpandedState" custom state to 1
+            // (typically via a See Details button). The SDK animates between [medium, large]
+            // detents in response. If the layout never toggles ExpandedState, the sheet
+            // stays at medium and the only visible change is that the user can drag it up.
+            let mediumId = UISheetPresentationController.Detent.Identifier(Self.roktMediumDetentId)
+            let medium: UISheetPresentationController.Detent = .custom(identifier: mediumId) { context in
+                context.maximumDetentValue * CGFloat(value/100)
+            }
+            sheet.detents = [medium, .large()]
+            sheet.selectedDetentIdentifier = mediumId
+            modal.detentObserverCancellable = layoutState.itemsPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak sheet] items in
+                    guard let sheet = sheet else { return }
+                    let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
+                    let isExpanded = map?.contains(where: { entry in
+                        entry.key.key == Self.expandedStateKey && entry.value == 1
+                    }) ?? false
+                    let target: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
+                    if sheet.selectedDetentIdentifier != target {
+                        sheet.animateChanges {
+                            sheet.selectedDetentIdentifier = target
+                        }
+                    }
+                }
+        case .fit(let type):
+            if type == .fitHeight {
+                sheet.detents = [.large()]
+            }
         }
     }
 
@@ -123,26 +163,8 @@ extension UIViewController {
         modal.sheetPresentationController?.detents = zeroDetents
     }
 
-    @available(iOS 16.0, *)
-    private func getFixedBottomSheetDetents(dimensionType: DimensionHeightValue)
-    -> [UISheetPresentationController.Detent]? {
-        switch dimensionType {
-        case .fixed(let value):
-            return [.custom { _ in
-                return CGFloat(value)
-            }]
-        case .percentage(let value):
-            return [.custom { context in
-                return context.maximumDetentValue * CGFloat(value/100)
-            }]
-        case .fit(let type):
-            if type == .fitHeight {
-                return [.large()]
-            } else {
-                return nil
-            }
-        }
-    }
+    fileprivate static let expandedStateKey = "ExpandedState"
+    fileprivate static let roktMediumDetentId = "roktMediumPercentage"
 
 }
 
@@ -151,6 +173,8 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     let onUnload: (() -> Void)?
     weak var eventService: EventService?
     let layoutState: LayoutState?
+    // Subscription that mirrors layout state ExpandedState into the sheet's selected detent.
+    var detentObserverCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         self.onUnload = nil
