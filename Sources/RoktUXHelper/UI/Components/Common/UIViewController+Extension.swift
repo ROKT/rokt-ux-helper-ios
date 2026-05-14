@@ -131,10 +131,14 @@ extension UIViewController {
             let medium: UISheetPresentationController.Detent = .custom(identifier: mediumId) { context in
                 context.maximumDetentValue * CGFloat(value/100)
             }
-            sheet.detents = [medium, .large()]
+            sheet.detents = [medium]
             sheet.selectedDetentIdentifier = mediumId
-            // Mirror user-drag detent changes back into ExpandedState so the
-            // layout's expanded-state Whens render in sync with the sheet height.
+            // Mirror user-drag detent changes back into BottomSheetExpandedState so the
+            // layout's expanded-state Whens render in sync with the sheet height. With
+            // only one detent registered at a time the user can't physically drag between
+            // them, so this delegate effectively only fires for programmatic detent
+            // changes — kept around as a safety net in case iOS ever surfaces a path
+            // through dragging despite the single-detent configuration.
             let syncDelegate = BottomSheetDetentSyncDelegate(layoutState: layoutState, mediumId: mediumId)
             modal.sheetSyncDelegate = syncDelegate
             sheet.delegate = syncDelegate
@@ -147,14 +151,14 @@ extension UIViewController {
                         entry.key.key == Self.expandedStateKey && entry.value == 1
                     }) ?? false
                     let targetIdentifier: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
-                    // Once expanded we narrow the detents to [.large()] only so the user can't
-                    // drag the sheet back down to medium — exiting the expanded state has to be
-                    // driven programmatically (e.g. by a See-less ToggleButton flipping
-                    // ExpandedState back to 0, which lands us in this sink with both detents
-                    // re-registered and selectedDetentIdentifier set back to medium).
-                    let desiredDetents: [UISheetPresentationController.Detent] = isExpanded ? [.large()] : [medium, .large()]
+                    // Lock the sheet by only ever registering a single detent for the
+                    // current state. The transitions between medium and large therefore
+                    // have to be driven programmatically (a ToggleButtonStateTrigger
+                    // flipping BottomSheetExpandedState), which the SDK animates in
+                    // both directions inside the animateChanges block below.
+                    let desiredDetents: [UISheetPresentationController.Detent] = isExpanded ? [.large()] : [medium]
                     let currentlyExpanded = sheet.selectedDetentIdentifier == .large
-                    let detentsNeedUpdate = sheet.detents.count != desiredDetents.count
+                    let detentsNeedUpdate = sheet.detents.first?.identifier != desiredDetents.first?.identifier
                     if currentlyExpanded != isExpanded || detentsNeedUpdate {
                         sheet.animateChanges {
                             sheet.detents = desiredDetents
