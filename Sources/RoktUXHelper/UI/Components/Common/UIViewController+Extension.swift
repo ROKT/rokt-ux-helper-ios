@@ -123,9 +123,9 @@ extension UIViewController {
             sheet.detents = [.custom { _ in CGFloat(value) }]
         case .percentage(let value):
             // Percentage height becomes the medium detent of an expandable sheet.
-            // The layout opts into expansion by toggling a "ExpandedState" custom state to 1
+            // The layout opts into expansion by toggling a "BottomSheetExpandedState" custom state to 1
             // (typically via a See Details button). The SDK animates between [medium, large]
-            // detents in response. If the layout never toggles ExpandedState, the sheet
+            // detents in response. If the layout never toggles BottomSheetExpandedState, the sheet
             // stays at medium and the only visible change is that the user can drag it up.
             let mediumId = UISheetPresentationController.Detent.Identifier(Self.roktMediumDetentId)
             let medium: UISheetPresentationController.Detent = .custom(identifier: mediumId) { context in
@@ -177,7 +177,7 @@ extension UIViewController {
         modal.sheetPresentationController?.detents = zeroDetents
     }
 
-    fileprivate static let expandedStateKey = "ExpandedState"
+    fileprivate static let expandedStateKey = "BottomSheetExpandedState"
     fileprivate static let roktMediumDetentId = "roktMediumPercentage"
 
 }
@@ -227,7 +227,7 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     }
 }
 
-// Mirrors user-initiated detent changes back into the layout's "ExpandedState"
+// Mirrors user-initiated detent changes back into the layout's "BottomSheetExpandedState"
 // custom state so the layout re-renders to match the sheet size. The reverse
 // direction (state -> detent) is handled by the Combine subscription on
 // layoutState.itemsPublisher inside applyFixedBottomSheetHeight.
@@ -248,7 +248,7 @@ final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControll
         }
         let isLarge = sheet.selectedDetentIdentifier == .large
         let position = (layoutState.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue ?? 0
-        let identifier = CustomStateIdentifiable(position: position, key: "ExpandedState")
+        let identifier = CustomStateIdentifiable(position: position, key: "BottomSheetExpandedState")
         var map = binding.wrappedValue ?? RoktUXCustomStateMap()
         let newValue = isLarge ? 1 : 0
         if map[identifier] != newValue {
