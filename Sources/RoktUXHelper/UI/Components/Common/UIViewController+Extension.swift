@@ -133,6 +133,11 @@ extension UIViewController {
             }
             sheet.detents = [medium, .large()]
             sheet.selectedDetentIdentifier = mediumId
+            // Mirror user-drag detent changes back into ExpandedState so the
+            // layout's expanded-state Whens render in sync with the sheet height.
+            let syncDelegate = BottomSheetDetentSyncDelegate(layoutState: layoutState, mediumId: mediumId)
+            modal.sheetSyncDelegate = syncDelegate
+            sheet.delegate = syncDelegate
             modal.detentObserverCancellable = layoutState.itemsPublisher
                 .receive(on: DispatchQueue.main)
                 .sink { [weak sheet] items in
@@ -175,6 +180,8 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     let layoutState: LayoutState?
     // Subscription that mirrors layout state ExpandedState into the sheet's selected detent.
     var detentObserverCancellable: AnyCancellable?
+    // Strong reference to the sheet delegate (UISheetPresentationController holds delegate weakly).
+    var sheetSyncDelegate: NSObject?
 
     required init?(coder: NSCoder) {
         self.onUnload = nil
@@ -208,5 +215,37 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
             eventService.sendDismissalEvent()
         }
         dismiss(animated: true)
+    }
+}
+
+// Mirrors user-initiated detent changes back into the layout's "ExpandedState"
+// custom state so the layout re-renders to match the sheet size. The reverse
+// direction (state -> detent) is handled by the Combine subscription on
+// layoutState.itemsPublisher inside applyFixedBottomSheetHeight.
+@available(iOS 16.0, *)
+final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControllerDelegate {
+    weak var layoutState: LayoutState?
+    let mediumId: UISheetPresentationController.Detent.Identifier
+
+    init(layoutState: LayoutState, mediumId: UISheetPresentationController.Detent.Identifier) {
+        self.layoutState = layoutState
+        self.mediumId = mediumId
+    }
+
+    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheet: UISheetPresentationController) {
+        guard let layoutState,
+              let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> else {
+            return
+        }
+        let isLarge = sheet.selectedDetentIdentifier == .large
+        let position = (layoutState.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue ?? 0
+        let identifier = CustomStateIdentifiable(position: position, key: "ExpandedState")
+        var map = binding.wrappedValue ?? RoktUXCustomStateMap()
+        let newValue = isLarge ? 1 : 0
+        if map[identifier] != newValue {
+            map[identifier] = newValue
+            binding.wrappedValue = map
+            layoutState.publishStateChange()
+        }
     }
 }
