@@ -146,10 +146,19 @@ extension UIViewController {
                     let isExpanded = map?.contains(where: { entry in
                         entry.key.key == Self.expandedStateKey && entry.value == 1
                     }) ?? false
-                    let target: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
-                    if sheet.selectedDetentIdentifier != target {
+                    let targetIdentifier: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
+                    // Once expanded we narrow the detents to [.large()] only so the user can't
+                    // drag the sheet back down to medium — exiting the expanded state has to be
+                    // driven programmatically (e.g. by a See-less ToggleButton flipping
+                    // ExpandedState back to 0, which lands us in this sink with both detents
+                    // re-registered and selectedDetentIdentifier set back to medium).
+                    let desiredDetents: [UISheetPresentationController.Detent] = isExpanded ? [.large()] : [medium, .large()]
+                    let currentlyExpanded = sheet.selectedDetentIdentifier == .large
+                    let detentsNeedUpdate = sheet.detents.count != desiredDetents.count
+                    if currentlyExpanded != isExpanded || detentsNeedUpdate {
                         sheet.animateChanges {
-                            sheet.selectedDetentIdentifier = target
+                            sheet.detents = desiredDetents
+                            sheet.selectedDetentIdentifier = targetIdentifier
                         }
                     }
                 }
