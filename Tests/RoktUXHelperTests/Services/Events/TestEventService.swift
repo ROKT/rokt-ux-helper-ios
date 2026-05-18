@@ -455,6 +455,49 @@ final class TestEventService: XCTestCase {
         }
     }
 
+    func test_device_pay_duplicate_call_is_ignored_while_processing() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        var firstCount = 0
+        var secondCount = 0
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in firstCount += 1 }
+        )
+        let initiatedAfterFirst = events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count
+        let delegateAfterFirst = stubUXHelper.roktEvents.filter { $0 == .CartItemDevicePay }.count
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in secondCount += 1 }
+        )
+
+        XCTAssertEqual(
+            events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count,
+            initiatedAfterFirst,
+            "duplicate device-pay call must not emit a second SignalCartItemInstantPurchaseInitiated"
+        )
+        XCTAssertEqual(
+            stubUXHelper.roktEvents.filter { $0 == .CartItemDevicePay }.count,
+            delegateAfterFirst,
+            "duplicate device-pay call must not re-invoke the UX-event delegate"
+        )
+
+        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+
+        XCTAssertEqual(firstCount, 1, "first completion should still fire")
+        XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
+    }
+
     func test_send_forward_payment_initiated() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     uxEventDelegate: stubUXHelper,

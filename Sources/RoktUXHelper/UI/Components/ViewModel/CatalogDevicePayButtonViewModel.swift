@@ -2,7 +2,7 @@ import DcuiSchema
 import Foundation
 import SwiftUI
 
-class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
+class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive, ObservableObject {
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
     var children: [LayoutSchemaViewModel]?
@@ -21,6 +21,8 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let transactionData: TransactionData?
     let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
     var position: Int?
+
+    @Published var isProcessing: Bool = false
 
     init(
         catalogItem: CatalogItem?,
@@ -49,6 +51,8 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     func handleTap() {
+        guard !isProcessing else { return }
+
         guard shouldProceedAfterValidation() else {
             if let catalogItem {
                 eventService?.cartItemUserInteraction(
@@ -60,8 +64,9 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             return
         }
 
-        guard let catalogItem else { return }
-        eventService?.cartItemDevicePay(
+        guard let catalogItem, let eventService else { return }
+        isProcessing = true
+        eventService.cartItemDevicePay(
             catalogItem: catalogItem,
             paymentProvider: provider,
             transactionData: transactionData,
@@ -73,6 +78,9 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     private func handleDevicePayCompletion(status: DevicePayStatus) {
+        DispatchQueue.main.async { [weak self] in
+            self?.isProcessing = false
+        }
         switch status {
         case .success:
             setLayoutVariantCustomState(key: customStateKey, value: 1)

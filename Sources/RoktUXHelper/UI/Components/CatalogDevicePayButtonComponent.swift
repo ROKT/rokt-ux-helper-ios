@@ -7,7 +7,7 @@ struct CatalogDevicePayButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     let config: ComponentConfig
-    let model: CatalogDevicePayButtonViewModel
+    @ObservedObject var model: CatalogDevicePayButtonViewModel
 
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
@@ -92,6 +92,11 @@ struct CatalogDevicePayButtonComponent: View {
 
     var body: some View {
         buildPayButton()
+            .disabled(model.isProcessing)
+            .onChange(of: model.isProcessing) { newValue in
+                isDisabled = newValue
+                updateStyleState()
+            }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
@@ -237,6 +242,7 @@ struct CatalogDevicePayButtonComponent: View {
 
 @available(iOS 15.0, *)
 private struct LegacyApplePayButton: UIViewRepresentable {
+    @SwiftUI.Environment(\.isEnabled) private var isEnabled
     var colorScheme: ColorScheme
     var action: () -> Void
 
@@ -246,7 +252,9 @@ private struct LegacyApplePayButton: UIViewRepresentable {
         return button
     }
 
-    func updateUIView(_ uiView: PKPaymentButton, context: Context) {}
+    func updateUIView(_ uiView: PKPaymentButton, context: Context) {
+        uiView.isEnabled = isEnabled
+    }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(action: action)

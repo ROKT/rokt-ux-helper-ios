@@ -215,6 +215,14 @@ class EventService: Hashable, EventDiagnosticServicing {
         transactionData: TransactionData?,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     ) {
+        guard devicePayCompletion == nil else {
+            sendDiagnostics(
+                message: kDevicePayProcessingErrorCode,
+                callStack: "Device pay already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
+            )
+            return
+        }
+
         let objectData = [
             kCatalogItemId: catalogItem.catalogItemId,
             kQuantity: "1"
