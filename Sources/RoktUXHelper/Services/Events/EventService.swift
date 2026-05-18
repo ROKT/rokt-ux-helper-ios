@@ -220,6 +220,7 @@ class EventService: Hashable, EventDiagnosticServicing {
                 message: kDevicePayProcessingErrorCode,
                 callStack: "Device pay already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
             )
+            completion(.failure)
             return
         }
 

@@ -455,7 +455,7 @@ final class TestEventService: XCTestCase {
         }
     }
 
-    func test_device_pay_duplicate_call_is_ignored_while_processing() {
+    func test_device_pay_duplicate_call_short_circuits_with_failure_while_processing() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -463,13 +463,15 @@ final class TestEventService: XCTestCase {
             self.events.append(event)
         })
 
+        var firstStatus: DevicePayStatus?
         var firstCount = 0
+        var secondStatus: DevicePayStatus?
         var secondCount = 0
         eventService.cartItemDevicePay(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             paymentProvider: .applePay,
             transactionData: nil,
-            completion: { _ in firstCount += 1 }
+            completion: { status in firstCount += 1; firstStatus = status }
         )
         let initiatedAfterFirst = events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count
         let delegateAfterFirst = stubUXHelper.roktEvents.filter { $0 == .CartItemDevicePay }.count
@@ -478,7 +480,7 @@ final class TestEventService: XCTestCase {
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             paymentProvider: .applePay,
             transactionData: nil,
-            completion: { _ in secondCount += 1 }
+            completion: { status in secondCount += 1; secondStatus = status }
         )
 
         XCTAssertEqual(
@@ -491,11 +493,17 @@ final class TestEventService: XCTestCase {
             delegateAfterFirst,
             "duplicate device-pay call must not re-invoke the UX-event delegate"
         )
+        XCTAssertEqual(secondCount, 1, "duplicate call must invoke its completion so the caller can reset")
+        guard case .failure = secondStatus else {
+            return XCTFail("expected .failure for dropped call, got \(String(describing: secondStatus))")
+        }
 
         eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
 
-        XCTAssertEqual(firstCount, 1, "first completion should still fire")
-        XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
+        XCTAssertEqual(firstCount, 1, "first completion still fires on success")
+        guard case .success = firstStatus else {
+            return XCTFail("expected .success for first completion, got \(String(describing: firstStatus))")
+        }
     }
 
     func test_send_forward_payment_initiated() {
