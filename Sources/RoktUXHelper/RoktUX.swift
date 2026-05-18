@@ -479,9 +479,25 @@ public class RoktUX: UXEventsDelegate {
                                             eventService: EventService?,
                                             onLoad: @escaping (() -> Void),
                                             onUnload: @escaping (() -> Void),
+                                            presentationAttempt: Int = 0,
                                             @ViewBuilder builder: @escaping (((CGFloat) -> Void)?) -> Content) {
         DispatchQueue.main.async {
             if let viewController = self.getTopViewController() {
+                if let transitionCoordinator = viewController.transitionCoordinator,
+                   presentationAttempt < 3 {
+                    transitionCoordinator.animate(alongsideTransition: nil) { _ in
+                        self.showOverlay(placementType: placementType,
+                                         bottomSheetUIModel: bottomSheetUIModel,
+                                         layoutState: layoutState,
+                                         eventService: eventService,
+                                         onLoad: onLoad,
+                                         onUnload: onUnload,
+                                         presentationAttempt: presentationAttempt + 1,
+                                         builder: builder)
+                    }
+                    return
+                }
+
                 viewController.present(placementType: placementType,
                                        bottomSheetUIModel: bottomSheetUIModel,
                                        layoutState: layoutState,
@@ -494,15 +510,9 @@ public class RoktUX: UXEventsDelegate {
     }
 
     private func getTopViewController() -> UIViewController? {
-        let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let keyWindow = RoktUXPresentationResolver.keyWindow()
 
-        if var topController = keyWindow?.rootViewController {
-            while let presentedViewController = topController.presentedViewController {
-                topController = presentedViewController
-            }
-            return topController
-        }
-        return nil
+        return RoktUXPresentationResolver.stableTopViewController(startingAt: keyWindow?.rootViewController)
     }
 
     private func sendPageIntialEvents(
