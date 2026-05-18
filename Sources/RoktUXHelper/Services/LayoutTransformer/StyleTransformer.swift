@@ -272,6 +272,12 @@ struct StyleTransformer {
         } else if let defaultStyle = defaultStyle as? DataImageCarouselIndicatorStyles {
             let newStyle = newStyle as? DataImageCarouselIndicatorStyles
             return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
+        } else if let defaultStyle = defaultStyle as? CatalogDevicePayButtonStyles {
+            let newStyle = newStyle as? CatalogDevicePayButtonStyles
+            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
+        } else if let defaultStyle = defaultStyle as? CatalogResponseButtonStyles {
+            let newStyle = newStyle as? CatalogResponseButtonStyles
+            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
         }
         return nil
     }
@@ -623,6 +629,38 @@ struct StyleTransformer {
                                                                             newStyle: newStyle?.flexChild),
                                                 spacing: updatedSpacing(defaultStyle?.spacing,
                                                                         newStyle: newStyle?.spacing))
+    }
+
+    static func getUpdatedStyle(_ defaultStyle: CatalogDevicePayButtonStyles?,
+                                newStyle: CatalogDevicePayButtonStyles?) throws -> CatalogDevicePayButtonStyles {
+        return CatalogDevicePayButtonStyles(container: try updatedContainer(defaultStyle?.container,
+                                                                            newStyle: newStyle?.container),
+                                            background: try updatedBackground(defaultStyle?.background,
+                                                                              newStyle: newStyle?.background),
+                                            border: try updatedBorder(defaultStyle?.border,
+                                                                      newStyle: newStyle?.border),
+                                            dimension: updatedDimension(defaultStyle?.dimension,
+                                                                        newStyle: newStyle?.dimension),
+                                            flexChild: updatedFlexChild(defaultStyle?.flexChild,
+                                                                        newStyle: newStyle?.flexChild),
+                                            spacing: updatedSpacing(defaultStyle?.spacing,
+                                                                    newStyle: newStyle?.spacing))
+    }
+
+    static func getUpdatedStyle(_ defaultStyle: CatalogResponseButtonStyles?,
+                                newStyle: CatalogResponseButtonStyles?) throws -> CatalogResponseButtonStyles {
+        return CatalogResponseButtonStyles(container: try updatedContainer(defaultStyle?.container,
+                                                                           newStyle: newStyle?.container),
+                                           background: try updatedBackground(defaultStyle?.background,
+                                                                             newStyle: newStyle?.background),
+                                           border: try updatedBorder(defaultStyle?.border,
+                                                                     newStyle: newStyle?.border),
+                                           dimension: updatedDimension(defaultStyle?.dimension,
+                                                                       newStyle: newStyle?.dimension),
+                                           flexChild: updatedFlexChild(defaultStyle?.flexChild,
+                                                                       newStyle: newStyle?.flexChild),
+                                           spacing: updatedSpacing(defaultStyle?.spacing,
+                                                                   newStyle: newStyle?.spacing))
     }
 
     // MARK: Styling properties
