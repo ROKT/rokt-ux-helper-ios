@@ -4,12 +4,20 @@ import UIKit
 ///
 /// Supports the DCUI rich text tag surface:
 ///   `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<s>`, `<strike>`,
-///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`, `<p>`
+///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`, `<p>`,
+///   `<ul>`, `<ol>`, `<li>` (flat only — nested lists parse without crashing
+///   but the SwiftUI Text rendering pipeline does not honor the deeper indent)
 ///
 /// Also decodes common HTML entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`,
 /// `&apos;`, `&nbsp;`, `&#NNN;`, `&#xHHH;`).
 @available(iOS 15, *)
 enum LightweightHTMLParser {
+
+    // MARK: - Constants
+
+    private static let paragraphSpacing: CGFloat = 8
+    private static let listItemSpacing: CGFloat = 2
+    private static let listIndentStep: CGFloat = 20
 
     // MARK: - Public API
 
@@ -17,8 +25,10 @@ enum LightweightHTMLParser {
         let result = NSMutableAttributedString()
         var index = html.startIndex
         var tagStack: [Tag] = []
-        var paragraphRanges: [NSRange] = []
+        var styledRanges: [(NSRange, NSParagraphStyle)] = []
         var paragraphStart: Int?
+        var listStack: [ListContext] = []
+        var listItemStarts: [Int] = []
 
         while index < html.endIndex {
             if html[index] == "<" {
@@ -29,7 +39,9 @@ enum LightweightHTMLParser {
                         stack: &tagStack,
                         result: result,
                         paragraphStart: &paragraphStart,
-                        paragraphRanges: &paragraphRanges
+                        listStack: &listStack,
+                        listItemStarts: &listItemStarts,
+                        styledRanges: &styledRanges
                     )
                 } else {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
@@ -40,14 +52,14 @@ enum LightweightHTMLParser {
                 let (text, nextIndex) = scanText(in: html, from: index)
                 index = nextIndex
                 let decoded = decodeHTMLEntities(text)
-                if !decoded.isEmpty {
+                if !decoded.isEmpty, !shouldSkipTextNode(decoded, listStack: listStack, inListItem: !listItemStarts.isEmpty) {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: decoded, attributes: attrs))
                 }
             }
         }
 
-        applyParagraphSpacing(to: result, ranges: paragraphRanges)
+        applyParagraphStyles(to: result, ranges: styledRanges)
         return result
     }
 
@@ -60,6 +72,12 @@ enum LightweightHTMLParser {
         let attributes: [String: String]
     }
 
+    private struct ListContext {
+        enum Kind { case unordered, ordered }
+        let kind: Kind
+        var counter: Int
+    }
+
     // MARK: - Tag dispatch
 
     private static func handleTag(
@@ -67,47 +85,161 @@ enum LightweightHTMLParser {
         stack: inout [Tag],
         result: NSMutableAttributedString,
         paragraphStart: inout Int?,
-        paragraphRanges: inout [NSRange]
+        listStack: inout [ListContext],
+        listItemStarts: inout [Int],
+        styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         if tag.isClosing {
-            if tag.name == "p" {
-                if let start = paragraphStart {
-                    if !result.string.hasSuffix("\n") {
-                        result.append(NSAttributedString(string: "\n"))
-                    }
-                    let length = result.length - start
-                    if length > 0 {
-                        paragraphRanges.append(NSRange(location: start, length: length))
-                    }
-                    paragraphStart = nil
-                }
-            }
-            if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
-                stack.remove(at: idx)
-            }
+            handleClosingTag(
+                tag,
+                stack: &stack,
+                result: result,
+                paragraphStart: &paragraphStart,
+                listStack: &listStack,
+                listItemStarts: &listItemStarts,
+                styledRanges: &styledRanges
+            )
         } else if tag.isSelfClosing || tag.name == "br" {
             result.append(NSAttributedString(string: "\n"))
-        } else if tag.name == "p" {
-            if result.length > 0, !result.string.hasSuffix("\n") {
-                result.append(NSAttributedString(string: "\n"))
-            }
+        } else {
+            handleOpeningTag(
+                tag,
+                stack: &stack,
+                result: result,
+                paragraphStart: &paragraphStart,
+                listStack: &listStack,
+                listItemStarts: &listItemStarts
+            )
+        }
+    }
+
+    private static func handleOpeningTag(
+        _ tag: Tag,
+        stack: inout [Tag],
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        listStack: inout [ListContext],
+        listItemStarts: inout [Int]
+    ) {
+        switch tag.name {
+        case "p":
+            ensureTrailingNewline(in: result)
             paragraphStart = result.length
             stack.append(tag)
-        } else {
+        case "ul":
+            listStack.append(ListContext(kind: .unordered, counter: 1))
+            stack.append(tag)
+        case "ol":
+            listStack.append(ListContext(kind: .ordered, counter: 1))
+            stack.append(tag)
+        case "li":
+            guard !listStack.isEmpty else {
+                stack.append(tag)
+                return
+            }
+            ensureTrailingNewline(in: result)
+            listItemStarts.append(result.length)
+            let prefix = listItemPrefix(for: listStack[listStack.count - 1])
+            result.append(NSAttributedString(string: prefix))
+            stack.append(tag)
+        default:
             stack.append(tag)
         }
     }
 
-    private static func applyParagraphSpacing(
+    private static func handleClosingTag(
+        _ tag: Tag,
+        stack: inout [Tag],
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        listStack: inout [ListContext],
+        listItemStarts: inout [Int],
+        styledRanges: inout [(NSRange, NSParagraphStyle)]
+    ) {
+        switch tag.name {
+        case "p":
+            if let start = paragraphStart {
+                ensureTrailingNewline(in: result)
+                let length = result.length - start
+                if length > 0 {
+                    styledRanges.append((NSRange(location: start, length: length), paragraphStyle()))
+                }
+                paragraphStart = nil
+            }
+        case "li":
+            if let start = listItemStarts.last, !listStack.isEmpty {
+                ensureTrailingNewline(in: result)
+                let length = result.length - start
+                if length > 0 {
+                    let depth = listStack.count - 1
+                    styledRanges.append((NSRange(location: start, length: length), listItemStyle(depth: depth)))
+                }
+                listStack[listStack.count - 1].counter += 1
+                listItemStarts.removeLast()
+            }
+        case "ul", "ol":
+            if !listStack.isEmpty { listStack.removeLast() }
+        default:
+            break
+        }
+
+        if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
+            stack.remove(at: idx)
+        }
+    }
+
+    // MARK: - List helpers
+
+    private static func listItemPrefix(for context: ListContext) -> String {
+        switch context.kind {
+        case .unordered: return "•\t"
+        case .ordered: return "\(context.counter).\t"
+        }
+    }
+
+    private static func paragraphStyle() -> NSParagraphStyle {
+        let style = NSMutableParagraphStyle()
+        style.paragraphSpacing = paragraphSpacing
+        return style
+    }
+
+    private static func listItemStyle(depth: Int) -> NSParagraphStyle {
+        let indent = CGFloat(depth) * listIndentStep
+        let textIndent = indent + listIndentStep
+        let style = NSMutableParagraphStyle()
+        style.firstLineHeadIndent = indent
+        style.headIndent = textIndent
+        style.tabStops = [NSTextTab(textAlignment: .left, location: textIndent, options: [:])]
+        style.defaultTabInterval = listIndentStep
+        style.paragraphSpacing = listItemSpacing
+        return style
+    }
+
+    private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
+        guard result.length > 0, !result.string.hasSuffix("\n") else { return }
+        result.append(NSAttributedString(string: "\n"))
+    }
+
+    private static func shouldSkipTextNode(
+        _ text: String,
+        listStack: [ListContext],
+        inListItem: Bool
+    ) -> Bool {
+        // Strip whitespace-only nodes that appear between list tags (e.g. pretty-printed HTML).
+        guard !listStack.isEmpty, !inListItem else { return false }
+        return text.allSatisfy { $0.isWhitespace }
+    }
+
+    private static func applyParagraphStyles(
         to result: NSMutableAttributedString,
-        ranges: [NSRange]
+        ranges: [(NSRange, NSParagraphStyle)]
     ) {
         guard !ranges.isEmpty else { return }
 
-        let style = NSMutableParagraphStyle()
-        style.paragraphSpacing = 8
-
-        for range in ranges {
+        // Apply larger ranges first so that nested (smaller) ranges layered on top win
+        // for their subrange — `addAttribute` replaces any prior value in the targeted range.
+        let sorted = ranges.sorted { $0.0.length > $1.0.length }
+        for (range, style) in sorted {
             let clamped = NSRange(
                 location: range.location,
                 length: min(range.length, result.length - range.location)

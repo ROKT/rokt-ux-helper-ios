@@ -202,6 +202,89 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "No close tag")
     }
 
+    // MARK: - List tags
+
+    func test_ul_with_single_li() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li>One</li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tOne\n")
+
+        let style = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(style)
+        XCTAssertEqual(style?.firstLineHeadIndent, 0)
+        XCTAssertEqual(style?.headIndent, 20)
+    }
+
+    func test_ul_with_multiple_li() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li>One</li><li>Two</li><li>Three</li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n•\tThree\n")
+    }
+
+    func test_ol_numbers_items_sequentially() {
+        let result = LightweightHTMLParser.parse(html: "<ol><li>One</li><li>Two</li><li>Three</li></ol>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "1.\tOne\n2.\tTwo\n3.\tThree\n")
+    }
+
+    func test_nested_ul_deeper_indent() {
+        let html = "<ul><li>Outer<ul><li>Inner</li></ul></li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+
+        // Outer bullet at depth 0
+        let outerStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertEqual(outerStyle?.firstLineHeadIndent, 0)
+        XCTAssertEqual(outerStyle?.headIndent, 20)
+
+        // Locate inner bullet via the second "•" in the string
+        let nsString = result.string as NSString
+        let innerRange = nsString.range(of: "•", options: [], range: NSRange(location: 1, length: nsString.length - 1))
+        XCTAssertTrue(innerRange.location != NSNotFound)
+        let innerStyle = result.attribute(.paragraphStyle, at: innerRange.location, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertEqual(innerStyle?.firstLineHeadIndent, 20)
+        XCTAssertEqual(innerStyle?.headIndent, 40)
+    }
+
+    func test_li_with_inline_formatting() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li>Plain <b>bold</b></li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tPlain bold\n")
+
+        // "•\tPlain " is 8 chars (•, tab, P, l, a, i, n, space) — bold starts at index 8
+        let boldFont = result.attribute(.font, at: 8, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_whitespace_between_list_tags_stripped() {
+        let html = "<ul>\n  <li>One</li>\n  <li>Two</li>\n</ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n")
+    }
+
+    func test_li_without_enclosing_list_renders_plain() {
+        let result = LightweightHTMLParser.parse(html: "<li>orphan</li>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "orphan")
+    }
+
+    func test_list_does_not_bleed_paragraph_style_to_text_outside() {
+        let result = LightweightHTMLParser.parse(html: "Before<ul><li>Item</li></ul>After", baseFont: baseFont)
+
+        let before = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNil(before)
+
+        // Last index ('r' of After) should also be unstyled
+        let lastIdx = result.length - 1
+        let after = result.attribute(.paragraphStyle, at: lastIdx, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNil(after)
+    }
+
+    func test_unclosed_ul_does_not_crash() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li>One</li>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tOne\n")
+    }
+
+    func test_ol_counter_resets_per_list() {
+        let html = "<ol><li>A</li><li>B</li></ol><ol><li>X</li><li>Y</li></ol>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "1.\tA\n2.\tB\n1.\tX\n2.\tY\n")
+    }
+
     func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
         let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
         // Parsed string is "Before \nInside\n After"
