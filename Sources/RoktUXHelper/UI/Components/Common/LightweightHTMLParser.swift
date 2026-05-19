@@ -76,16 +76,12 @@ enum LightweightHTMLParser {
     ) {
         if tag.isClosing {
             if tag.name == paragraphTag {
-                if let start = paragraphStart {
-                    if !result.string.hasSuffix(newline) {
-                        result.append(NSAttributedString(string: newline))
-                    }
-                    let length = result.length - start
-                    if length > 0 {
-                        paragraphRanges.append(NSRange(location: start, length: length))
-                    }
-                    paragraphStart = nil
-                }
+                finalizeOpenParagraph(
+                    result: result,
+                    paragraphStart: &paragraphStart,
+                    stack: &stack,
+                    paragraphRanges: &paragraphRanges
+                )
             }
             if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
                 stack.remove(at: idx)
@@ -95,22 +91,13 @@ enum LightweightHTMLParser {
         } else if tag.name == paragraphTag {
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
-            if let start = paragraphStart {
-                if !result.string.hasSuffix(newline) {
-                    result.append(NSAttributedString(string: newline))
-                }
-                let length = result.length - start
-                if length > 0 {
-                    paragraphRanges.append(NSRange(location: start, length: length))
-                }
-                paragraphStart = nil
-                if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
-                    stack.remove(at: openP)
-                }
-            }
-            if result.length > 0, !result.string.hasSuffix(newline) {
-                result.append(NSAttributedString(string: newline))
-            }
+            finalizeOpenParagraph(
+                result: result,
+                paragraphStart: &paragraphStart,
+                stack: &stack,
+                paragraphRanges: &paragraphRanges
+            )
+            ensureTrailingNewline(in: result)
             paragraphStart = result.length
             stack.append(tag)
         } else {
@@ -118,22 +105,49 @@ enum LightweightHTMLParser {
         }
     }
 
+    // MARK: - Finalizers
+
+    private static func finalizeOpenParagraph(
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        stack: inout [Tag],
+        paragraphRanges: inout [NSRange]
+    ) {
+        guard let start = paragraphStart else { return }
+        ensureTrailingNewline(in: result)
+        let length = result.length - start
+        if length > 0 {
+            paragraphRanges.append(NSRange(location: start, length: length))
+        }
+        paragraphStart = nil
+        if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
+            stack.remove(at: openP)
+        }
+    }
+
+    private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
+        guard result.length > 0, !result.string.hasSuffix(newline) else { return }
+        result.append(NSAttributedString(string: newline))
+    }
+
+    private static let paragraphStyleForP: NSParagraphStyle = {
+        let style = NSMutableParagraphStyle()
+        style.paragraphSpacing = 8
+        return style
+    }()
+
     private static func applyParagraphSpacing(
         to result: NSMutableAttributedString,
         ranges: [NSRange]
     ) {
         guard !ranges.isEmpty else { return }
-
-        let style = NSMutableParagraphStyle()
-        style.paragraphSpacing = 8
-
         for range in ranges {
             let clamped = NSRange(
                 location: range.location,
                 length: min(range.length, result.length - range.location)
             )
             guard clamped.length > 0 else { continue }
-            result.addAttribute(.paragraphStyle, value: style, range: clamped)
+            result.addAttribute(.paragraphStyle, value: paragraphStyleForP, range: clamped)
         }
     }
 
