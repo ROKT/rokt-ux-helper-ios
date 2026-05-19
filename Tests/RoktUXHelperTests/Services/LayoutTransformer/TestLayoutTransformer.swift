@@ -637,6 +637,23 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(dataImageCarouselViewModel.images.count, 0)
     }
 
+    func test_getCatalogDevicePayButton_throwsInvalidMapping_whenContextIsNotAddToCart() {
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+        let model = ModelTestData.CatalogDevicePayButtonData.catalogDevicePayButton()
+
+        XCTAssertThrowsError(
+            try layoutTransformer.getCatalogDevicePayButton(
+                model: model,
+                children: nil,
+                context: .inner(.generic(nil))
+            )
+        ) { error in
+            guard case LayoutTransformerError.InvalidMapping = error else {
+                return XCTFail("expected InvalidMapping, got \(error)")
+            }
+        }
+    }
+
     //MARK: mock objects
 
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {

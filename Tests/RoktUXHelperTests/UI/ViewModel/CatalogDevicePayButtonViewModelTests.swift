@@ -413,27 +413,6 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         XCTAssertEqual(eventService.cartItemDevicePayCallCount, 0)
     }
 
-    func test_handleTap_doesNotSetIsProcessing_whenCatalogItemIsNil() {
-        let eventService = MockEventService()
-        let sut = CatalogDevicePayButtonViewModel(
-            catalogItem: nil,
-            children: nil,
-            provider: .applePay,
-            layoutState: MockLayoutState(),
-            eventService: eventService,
-            defaultStyle: nil,
-            pressedStyle: nil,
-            hoveredStyle: nil,
-            disabledStyle: nil,
-            validatorTriggerConfig: nil
-        )
-
-        sut.handleTap()
-
-        XCTAssertFalse(sut.isProcessing)
-        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 0)
-    }
-
     private func makeViewModel(
         eventService: MockEventService,
         validatorTriggerConfig: ValidationTriggerConfig? = nil

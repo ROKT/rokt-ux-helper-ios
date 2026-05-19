@@ -4,7 +4,7 @@ import SwiftUI
 
 class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive, ObservableObject {
     let id: UUID = UUID()
-    let catalogItem: CatalogItem?
+    let catalogItem: CatalogItem
     var children: [LayoutSchemaViewModel]?
     var provider: PaymentProvider
     weak var eventService: EventDiagnosticServicing?
@@ -25,7 +25,7 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     @Published var isProcessing: Bool = false
 
     init(
-        catalogItem: CatalogItem?,
+        catalogItem: CatalogItem,
         children: [LayoutSchemaViewModel]?,
         provider: PaymentProvider,
         layoutState: (any LayoutStateRepresenting)?,
@@ -54,17 +54,15 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         guard !isProcessing else { return }
 
         guard shouldProceedAfterValidation() else {
-            if let catalogItem {
-                eventService?.cartItemUserInteraction(
-                    itemId: catalogItem.catalogItemId,
-                    action: UserInteraction.ValidationTriggerFailed,
-                    context: UserInteractionContext.CustomStateValidationTriggerButton
-                )
-            }
+            eventService?.cartItemUserInteraction(
+                itemId: catalogItem.catalogItemId,
+                action: UserInteraction.ValidationTriggerFailed,
+                context: UserInteractionContext.CustomStateValidationTriggerButton
+            )
             return
         }
 
-        guard let catalogItem, let eventService else { return }
+        guard let eventService else { return }
         isProcessing = true
         eventService.cartItemDevicePay(
             catalogItem: catalogItem,
