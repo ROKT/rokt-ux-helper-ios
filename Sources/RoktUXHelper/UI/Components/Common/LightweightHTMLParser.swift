@@ -108,7 +108,8 @@ enum LightweightHTMLParser {
                 result: result,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
-                listItemStarts: &listItemStarts
+                listItemStarts: &listItemStarts,
+                styledRanges: &styledRanges
             )
         }
     }
@@ -119,10 +120,24 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
-        listItemStarts: inout [Int]
+        listItemStarts: inout [Int],
+        styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         switch tag.name {
         case "p":
+            // If a previous <p> is still open (no explicit </p>), finalize it
+            // so its range is preserved instead of overwritten.
+            if let start = paragraphStart {
+                ensureTrailingNewline(in: result)
+                let length = result.length - start
+                if length > 0 {
+                    styledRanges.append((NSRange(location: start, length: length), paragraphStyle()))
+                }
+                paragraphStart = nil
+                if let openP = stack.lastIndex(where: { $0.name == "p" }) {
+                    stack.remove(at: openP)
+                }
+            }
             ensureTrailingNewline(in: result)
             paragraphStart = result.length
             stack.append(tag)
