@@ -545,12 +545,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         children: [LayoutSchemaViewModel]?,
         context: Context
     ) throws -> CatalogDevicePayButtonViewModel {
-        var catalogItem: CatalogItem?
-        switch context {
-        case let .inner(.addToCart(item)):
-            catalogItem = item
-        default:
-            break
+        guard case let .inner(.addToCart(catalogItem)) = context else {
+            throw LayoutTransformerError.InvalidMapping()
         }
 
         let transactionData = (layoutState.items[LayoutState.fullOfferKey] as? OfferModel)?.transactionData

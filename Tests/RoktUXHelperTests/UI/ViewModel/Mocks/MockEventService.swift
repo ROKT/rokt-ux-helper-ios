@@ -35,6 +35,7 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemInstantPurchaseFailureCalled = false
     var cartItemUserInteractionCalled = false
     var cartItemDevicePayCalled = false
+    var cartItemDevicePayCallCount = 0
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
     var cartItemDevicePayPendingConfirmationCalled = false
@@ -133,6 +134,7 @@ class MockEventService: EventDiagnosticServicing {
         completion: @escaping (DevicePayStatus) -> Void
     ) {
         cartItemDevicePayCalled = true
+        cartItemDevicePayCallCount += 1
         cartItemDevicePayLastTransactionData = transactionData
         cartItemDevicePayLastProvider = paymentProvider
         cartItemDevicePayCompletionCallback = completion
@@ -208,6 +210,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseFailureCalled = false
         cartItemUserInteractionCalled = false
         cartItemDevicePayCalled = false
+        cartItemDevicePayCallCount = 0
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
         cartItemDevicePayPendingConfirmationCalled = false

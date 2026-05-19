@@ -2,9 +2,9 @@ import DcuiSchema
 import Foundation
 import SwiftUI
 
-class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
+class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive, ObservableObject {
     let id: UUID = UUID()
-    let catalogItem: CatalogItem?
+    let catalogItem: CatalogItem
     var children: [LayoutSchemaViewModel]?
     var provider: PaymentProvider
     weak var eventService: EventDiagnosticServicing?
@@ -22,8 +22,10 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     let customStateKey = CustomStateIdentifiable.Keys.paymentResult.rawValue
     var position: Int?
 
+    @Published var isProcessing: Bool = false
+
     init(
-        catalogItem: CatalogItem?,
+        catalogItem: CatalogItem,
         children: [LayoutSchemaViewModel]?,
         provider: PaymentProvider,
         layoutState: (any LayoutStateRepresenting)?,
@@ -49,19 +51,20 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     func handleTap() {
+        guard !isProcessing else { return }
+
         guard shouldProceedAfterValidation() else {
-            if let catalogItem {
-                eventService?.cartItemUserInteraction(
-                    itemId: catalogItem.catalogItemId,
-                    action: UserInteraction.ValidationTriggerFailed,
-                    context: UserInteractionContext.CustomStateValidationTriggerButton
-                )
-            }
+            eventService?.cartItemUserInteraction(
+                itemId: catalogItem.catalogItemId,
+                action: UserInteraction.ValidationTriggerFailed,
+                context: UserInteractionContext.CustomStateValidationTriggerButton
+            )
             return
         }
 
-        guard let catalogItem else { return }
-        eventService?.cartItemDevicePay(
+        guard let eventService else { return }
+        isProcessing = true
+        eventService.cartItemDevicePay(
             catalogItem: catalogItem,
             paymentProvider: provider,
             transactionData: transactionData,
@@ -73,6 +76,9 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
     }
 
     private func handleDevicePayCompletion(status: DevicePayStatus) {
+        DispatchQueue.main.async { [weak self] in
+            self?.isProcessing = false
+        }
         switch status {
         case .success:
             setLayoutVariantCustomState(key: customStateKey, value: 1)

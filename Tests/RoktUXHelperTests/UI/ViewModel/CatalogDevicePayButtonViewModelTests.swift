@@ -294,6 +294,143 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         )
     }
 
+    // MARK: - Multi-tap / in-flight guard
+
+    func test_handleTap_secondTapWhileInFlight_doesNotFireEventAgain() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        sut.handleTap()
+        sut.handleTap()
+
+        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 1)
+        XCTAssertTrue(sut.isProcessing)
+    }
+
+    func test_handleTap_setsIsProcessingTrueBeforeFiring() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        XCTAssertFalse(sut.isProcessing)
+        sut.handleTap()
+        XCTAssertTrue(sut.isProcessing)
+    }
+
+    func test_handleTap_secondTapAfterSuccess_firesEventAgain() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        sut.handleTap()
+        eventService.cartItemDevicePayCompletionCallback?(.success)
+
+        let exp = expectation(description: "isProcessing reset")
+        DispatchQueue.main.async {
+            XCTAssertFalse(sut.isProcessing)
+            sut.handleTap()
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+
+        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 2)
+    }
+
+    func test_handleTap_secondTapAfterFailure_firesEventAgain() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        sut.handleTap()
+        eventService.cartItemDevicePayCompletionCallback?(.failure)
+
+        let exp = expectation(description: "isProcessing reset")
+        DispatchQueue.main.async {
+            XCTAssertFalse(sut.isProcessing)
+            sut.handleTap()
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+
+        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 2)
+    }
+
+    func test_handleTap_secondTapAfterRetry_firesEventAgain() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        sut.handleTap()
+        eventService.cartItemDevicePayCompletionCallback?(.retry)
+
+        let exp = expectation(description: "isProcessing reset")
+        DispatchQueue.main.async {
+            XCTAssertFalse(sut.isProcessing)
+            sut.handleTap()
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+
+        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 2)
+    }
+
+    func test_handleTap_secondTapAfterPendingConfirmation_resetsIsProcessing() {
+        let eventService = MockEventService()
+        let sut = makeViewModel(eventService: eventService)
+
+        sut.handleTap()
+        eventService.cartItemDevicePayCompletionCallback?(.pendingConfirmation(catalogRuntimeData: [:]))
+
+        let exp = expectation(description: "isProcessing reset")
+        DispatchQueue.main.async {
+            XCTAssertFalse(sut.isProcessing)
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+    }
+
+    func test_handleTap_doesNotSetIsProcessing_whenValidationFails() {
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        layoutState.validationCoordinator.registerField(
+            key: "dropdown",
+            owner: self,
+            validation: { .invalid },
+            onStatusChange: { _ in }
+        )
+        let sut = CatalogDevicePayButtonViewModel(
+            catalogItem: makeCatalogItem(id: "item"),
+            children: nil,
+            provider: .applePay,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
+        )
+
+        sut.handleTap()
+
+        XCTAssertFalse(sut.isProcessing)
+        XCTAssertEqual(eventService.cartItemDevicePayCallCount, 0)
+    }
+
+    private func makeViewModel(
+        eventService: MockEventService,
+        validatorTriggerConfig: ValidationTriggerConfig? = nil
+    ) -> CatalogDevicePayButtonViewModel {
+        CatalogDevicePayButtonViewModel(
+            catalogItem: makeCatalogItem(id: "item"),
+            children: nil,
+            provider: .applePay,
+            layoutState: MockLayoutState(),
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: validatorTriggerConfig
+        )
+    }
+
     private func makeCatalogItem(id: String) -> CatalogItem {
         CatalogItem(
             images: [:],
