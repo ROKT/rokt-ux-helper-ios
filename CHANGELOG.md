@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.10] - 2026-05-19
+
+### Fixed
+
+- Prevent duplicate taps while payment is in flight ([#280](https://github.com/ROKT/rokt-ux-helper-ios/pull/280))
+- Avoid stale presenters for overlay layouts ([#279](https://github.com/ROKT/rokt-ux-helper-ios/pull/279))
+
+### Changed
+
+- Bump trunk-io/trunk-action from 1.2.4 to 1.3.1 ([#281](https://github.com/ROKT/rokt-ux-helper-ios/pull/281))
+- Bump actions/create-github-app-token from 3.1.1 to 3.2.0 ([#282](https://github.com/ROKT/rokt-ux-helper-ios/pull/282))
+
 ## [0.10.9] - 2026-05-14
 
 ### Added
@@ -298,7 +310,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.9...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...HEAD
+[0.10.10]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.9...0.10.10
 [0.10.9]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.8...0.10.9
 [0.10.8]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.7...0.10.8
 [0.10.7]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.6...0.10.7
