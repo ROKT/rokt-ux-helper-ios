@@ -16,6 +16,10 @@ enum LightweightHTMLParser {
     // MARK: - Constants
 
     private static let paragraphTag = "p"
+    private static let lineBreakTag = "br"
+    private static let unorderedListTag = "ul"
+    private static let orderedListTag = "ol"
+    private static let listItemTag = "li"
     private static let newline = "\n"
     private static let paragraphSpacing: CGFloat = 8
     private static let listItemSpacing: CGFloat = 2
@@ -101,7 +105,7 @@ enum LightweightHTMLParser {
                 listItemStarts: &listItemStarts,
                 styledRanges: &styledRanges
             )
-        } else if tag.isSelfClosing || tag.name == "br" {
+        } else if tag.isSelfClosing || tag.name == lineBreakTag {
             result.append(NSAttributedString(string: newline))
         } else {
             handleOpeningTag(
@@ -143,13 +147,13 @@ enum LightweightHTMLParser {
             ensureTrailingNewline(in: result)
             paragraphStart = result.length
             stack.append(tag)
-        case "ul":
+        case unorderedListTag:
             listStack.append(ListContext(kind: .unordered, counter: 1))
             stack.append(tag)
-        case "ol":
+        case orderedListTag:
             listStack.append(ListContext(kind: .ordered, counter: 1))
             stack.append(tag)
-        case "li":
+        case listItemTag:
             guard !listStack.isEmpty else {
                 stack.append(tag)
                 return
@@ -183,7 +187,7 @@ enum LightweightHTMLParser {
                 }
                 paragraphStart = nil
             }
-        case "li":
+        case listItemTag:
             if let start = listItemStarts.last, !listStack.isEmpty {
                 ensureTrailingNewline(in: result)
                 let length = result.length - start
@@ -194,7 +198,7 @@ enum LightweightHTMLParser {
                 listStack[listStack.count - 1].counter += 1
                 listItemStarts.removeLast()
             }
-        case "ul", "ol":
+        case unorderedListTag, orderedListTag:
             if !listStack.isEmpty { listStack.removeLast() }
         default:
             break
