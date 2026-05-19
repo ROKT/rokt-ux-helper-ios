@@ -88,6 +88,21 @@ enum LightweightHTMLParser {
         } else if tag.isSelfClosing || tag.name == "br" {
             result.append(NSAttributedString(string: "\n"))
         } else if tag.name == "p" {
+            // If a previous <p> is still open (no explicit </p>), finalize it
+            // so its range is preserved instead of overwritten.
+            if let start = paragraphStart {
+                if !result.string.hasSuffix("\n") {
+                    result.append(NSAttributedString(string: "\n"))
+                }
+                let length = result.length - start
+                if length > 0 {
+                    paragraphRanges.append(NSRange(location: start, length: length))
+                }
+                paragraphStart = nil
+                if let openP = stack.lastIndex(where: { $0.name == "p" }) {
+                    stack.remove(at: openP)
+                }
+            }
             if result.length > 0, !result.string.hasSuffix("\n") {
                 result.append(NSAttributedString(string: "\n"))
             }

@@ -202,6 +202,20 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "No close tag")
     }
 
+    func test_p_tag_implicit_close_preserves_previous_paragraph() {
+        // <p>First<p>Second</p> — second <p> implicitly closes the first.
+        // Both paragraphs must receive a paragraph style with spacing.
+        let result = LightweightHTMLParser.parse(html: "<p>First<p>Second</p>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "First\nSecond\n")
+
+        let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(firstStyle, "First paragraph must keep its paragraph style after implicit close")
+        XCTAssertGreaterThan(firstStyle?.paragraphSpacing ?? 0, 0)
+
+        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(secondStyle)
+    }
+
     func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
         let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
         // Parsed string is "Before \nInside\n After"
