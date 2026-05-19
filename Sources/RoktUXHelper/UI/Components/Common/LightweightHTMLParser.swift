@@ -15,6 +15,8 @@ enum LightweightHTMLParser {
 
     // MARK: - Constants
 
+    private static let paragraphTag = "p"
+    private static let newline = "\n"
     private static let paragraphSpacing: CGFloat = 8
     private static let listItemSpacing: CGFloat = 2
     private static let listIndentStep: CGFloat = 20
@@ -100,7 +102,7 @@ enum LightweightHTMLParser {
                 styledRanges: &styledRanges
             )
         } else if tag.isSelfClosing || tag.name == "br" {
-            result.append(NSAttributedString(string: "\n"))
+            result.append(NSAttributedString(string: newline))
         } else {
             handleOpeningTag(
                 tag,
@@ -124,7 +126,7 @@ enum LightweightHTMLParser {
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         switch tag.name {
-        case "p":
+        case paragraphTag:
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
             if let start = paragraphStart {
@@ -134,7 +136,7 @@ enum LightweightHTMLParser {
                     styledRanges.append((NSRange(location: start, length: length), paragraphStyle()))
                 }
                 paragraphStart = nil
-                if let openP = stack.lastIndex(where: { $0.name == "p" }) {
+                if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
                     stack.remove(at: openP)
                 }
             }
@@ -172,7 +174,7 @@ enum LightweightHTMLParser {
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         switch tag.name {
-        case "p":
+        case paragraphTag:
             if let start = paragraphStart {
                 ensureTrailingNewline(in: result)
                 let length = result.length - start
@@ -231,8 +233,8 @@ enum LightweightHTMLParser {
     }
 
     private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
-        guard result.length > 0, !result.string.hasSuffix("\n") else { return }
-        result.append(NSAttributedString(string: "\n"))
+        guard result.length > 0, !result.string.hasSuffix(newline) else { return }
+        result.append(NSAttributedString(string: newline))
     }
 
     private static func shouldSkipTextNode(
