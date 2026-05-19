@@ -34,7 +34,7 @@ enum LightweightHTMLParser {
         var styledRanges: [(NSRange, NSParagraphStyle)] = []
         var paragraphStart: Int?
         var listStack: [ListContext] = []
-        var listItemStarts: [Int] = []
+        var listItemStarts: [OpenListItem] = []
 
         while index < html.endIndex {
             if html[index] == "<" {
@@ -84,6 +84,11 @@ enum LightweightHTMLParser {
         var counter: Int
     }
 
+    private struct OpenListItem {
+        let start: Int
+        let depth: Int
+    }
+
     // MARK: - Tag dispatch
 
     private static func handleTag(
@@ -92,7 +97,7 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
-        listItemStarts: inout [Int],
+        listItemStarts: inout [OpenListItem],
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         if tag.isClosing {
@@ -126,24 +131,19 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
-        listItemStarts: inout [Int],
+        listItemStarts: inout [OpenListItem],
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         switch tag.name {
         case paragraphTag:
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
-            if let start = paragraphStart {
-                ensureTrailingNewline(in: result)
-                let length = result.length - start
-                if length > 0 {
-                    styledRanges.append((NSRange(location: start, length: length), paragraphStyle()))
-                }
-                paragraphStart = nil
-                if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
-                    stack.remove(at: openP)
-                }
-            }
+            finalizeOpenParagraph(
+                result: result,
+                paragraphStart: &paragraphStart,
+                stack: &stack,
+                styledRanges: &styledRanges
+            )
             ensureTrailingNewline(in: result)
             paragraphStart = result.length
             stack.append(tag)
@@ -158,9 +158,22 @@ enum LightweightHTMLParser {
                 stack.append(tag)
                 return
             }
+            let currentDepth = listStack.count - 1
+            // If a previous <li> at the same depth is still open (no explicit </li>),
+            // finalize it (HTML5 allows omitting </li>).
+            if let last = listItemStarts.last, last.depth == currentDepth {
+                finalizeOpenListItem(
+                    last,
+                    result: result,
+                    listStack: &listStack,
+                    listItemStarts: &listItemStarts,
+                    stack: &stack,
+                    styledRanges: &styledRanges
+                )
+            }
             ensureTrailingNewline(in: result)
-            listItemStarts.append(result.length)
-            let prefix = listItemPrefix(for: listStack[listStack.count - 1])
+            listItemStarts.append(OpenListItem(start: result.length, depth: currentDepth))
+            let prefix = listItemPrefix(for: listStack[currentDepth])
             result.append(NSAttributedString(string: prefix))
             stack.append(tag)
         default:
@@ -174,29 +187,27 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
-        listItemStarts: inout [Int],
+        listItemStarts: inout [OpenListItem],
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         switch tag.name {
         case paragraphTag:
-            if let start = paragraphStart {
-                ensureTrailingNewline(in: result)
-                let length = result.length - start
-                if length > 0 {
-                    styledRanges.append((NSRange(location: start, length: length), paragraphStyle()))
-                }
-                paragraphStart = nil
-            }
+            finalizeOpenParagraph(
+                result: result,
+                paragraphStart: &paragraphStart,
+                stack: &stack,
+                styledRanges: &styledRanges
+            )
         case listItemTag:
-            if let start = listItemStarts.last, !listStack.isEmpty {
-                ensureTrailingNewline(in: result)
-                let length = result.length - start
-                if length > 0 {
-                    let depth = listStack.count - 1
-                    styledRanges.append((NSRange(location: start, length: length), listItemStyle(depth: depth)))
-                }
-                listStack[listStack.count - 1].counter += 1
-                listItemStarts.removeLast()
+            if let last = listItemStarts.last, !listStack.isEmpty {
+                finalizeOpenListItem(
+                    last,
+                    result: result,
+                    listStack: &listStack,
+                    listItemStarts: &listItemStarts,
+                    stack: &stack,
+                    styledRanges: &styledRanges
+                )
             }
         case unorderedListTag, orderedListTag:
             if !listStack.isEmpty { listStack.removeLast() }
@@ -209,6 +220,46 @@ enum LightweightHTMLParser {
         }
     }
 
+    // MARK: - Finalizers
+
+    private static func finalizeOpenParagraph(
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        stack: inout [Tag],
+        styledRanges: inout [(NSRange, NSParagraphStyle)]
+    ) {
+        guard let start = paragraphStart else { return }
+        ensureTrailingNewline(in: result)
+        let length = result.length - start
+        if length > 0 {
+            styledRanges.append((NSRange(location: start, length: length), paragraphStyleForP))
+        }
+        paragraphStart = nil
+        if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
+            stack.remove(at: openP)
+        }
+    }
+
+    private static func finalizeOpenListItem(
+        _ item: OpenListItem,
+        result: NSMutableAttributedString,
+        listStack: inout [ListContext],
+        listItemStarts: inout [OpenListItem],
+        stack: inout [Tag],
+        styledRanges: inout [(NSRange, NSParagraphStyle)]
+    ) {
+        ensureTrailingNewline(in: result)
+        let length = result.length - item.start
+        if length > 0 {
+            styledRanges.append((NSRange(location: item.start, length: length), listItemStyle(depth: item.depth)))
+        }
+        if item.depth < listStack.count { listStack[item.depth].counter += 1 }
+        listItemStarts.removeLast()
+        if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
+            stack.remove(at: openLi)
+        }
+    }
+
     // MARK: - List helpers
 
     private static func listItemPrefix(for context: ListContext) -> String {
@@ -218,11 +269,11 @@ enum LightweightHTMLParser {
         }
     }
 
-    private static func paragraphStyle() -> NSParagraphStyle {
+    private static let paragraphStyleForP: NSParagraphStyle = {
         let style = NSMutableParagraphStyle()
         style.paragraphSpacing = paragraphSpacing
         return style
-    }
+    }()
 
     private static func listItemStyle(depth: Int) -> NSParagraphStyle {
         let indent = CGFloat(depth) * listIndentStep
@@ -257,8 +308,10 @@ enum LightweightHTMLParser {
     ) {
         guard !ranges.isEmpty else { return }
 
-        // Apply larger ranges first so that nested (smaller) ranges layered on top win
-        // for their subrange — `addAttribute` replaces any prior value in the targeted range.
+        // Apply larger ranges first so that any later overlapping smaller range
+        // wins for its subrange (`addAttribute` replaces any prior value). This is
+        // a parser-level invariant — the SwiftUI Text rendering pipeline does not
+        // honor nested paragraph indents regardless of layering.
         let sorted = ranges.sorted { $0.0.length > $1.0.length }
         for (range, style) in sorted {
             let clamped = NSRange(

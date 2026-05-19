@@ -285,6 +285,28 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "1.\tA\n2.\tB\n1.\tX\n2.\tY\n")
     }
 
+    func test_li_open_implicitly_closes_previous_sibling() {
+        // <ul><li>One<li>Two</li></ul> — second <li> implicitly closes the first
+        // (valid HTML5). Both items must receive a list paragraph style.
+        let html = "<ul><li>One<li>Two</li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n")
+
+        let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(firstStyle, "First <li> must keep its list style after implicit close")
+        XCTAssertEqual(firstStyle?.firstLineHeadIndent, 0)
+        XCTAssertEqual(firstStyle?.headIndent, 20)
+
+        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(secondStyle)
+    }
+
+    func test_ol_implicit_li_close_increments_counter() {
+        // <ol><li>A<li>B</li></ol> — implicit close must still bump the counter.
+        let result = LightweightHTMLParser.parse(html: "<ol><li>A<li>B</li></ol>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "1.\tA\n2.\tB\n")
+    }
+
     func test_p_tag_implicit_close_preserves_previous_paragraph() {
         // <p>First<p>Second</p> — second <p> implicitly closes the first.
         // Both paragraphs must receive a paragraph style with spacing.
