@@ -11,6 +11,11 @@ import UIKit
 @available(iOS 15, *)
 enum LightweightHTMLParser {
 
+    // MARK: - Constants
+
+    private static let paragraphTag = "p"
+    private static let newline = "\n"
+
     // MARK: - Public API
 
     static func parse(html: String, baseFont: UIFont?) -> NSMutableAttributedString {
@@ -70,10 +75,10 @@ enum LightweightHTMLParser {
         paragraphRanges: inout [NSRange]
     ) {
         if tag.isClosing {
-            if tag.name == "p" {
+            if tag.name == paragraphTag {
                 if let start = paragraphStart {
-                    if !result.string.hasSuffix("\n") {
-                        result.append(NSAttributedString(string: "\n"))
+                    if !result.string.hasSuffix(newline) {
+                        result.append(NSAttributedString(string: newline))
                     }
                     let length = result.length - start
                     if length > 0 {
@@ -86,25 +91,25 @@ enum LightweightHTMLParser {
                 stack.remove(at: idx)
             }
         } else if tag.isSelfClosing || tag.name == "br" {
-            result.append(NSAttributedString(string: "\n"))
-        } else if tag.name == "p" {
+            result.append(NSAttributedString(string: newline))
+        } else if tag.name == paragraphTag {
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
             if let start = paragraphStart {
-                if !result.string.hasSuffix("\n") {
-                    result.append(NSAttributedString(string: "\n"))
+                if !result.string.hasSuffix(newline) {
+                    result.append(NSAttributedString(string: newline))
                 }
                 let length = result.length - start
                 if length > 0 {
                     paragraphRanges.append(NSRange(location: start, length: length))
                 }
                 paragraphStart = nil
-                if let openP = stack.lastIndex(where: { $0.name == "p" }) {
+                if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
                     stack.remove(at: openP)
                 }
             }
-            if result.length > 0, !result.string.hasSuffix("\n") {
-                result.append(NSAttributedString(string: "\n"))
+            if result.length > 0, !result.string.hasSuffix(newline) {
+                result.append(NSAttributedString(string: newline))
             }
             paragraphStart = result.length
             stack.append(tag)
