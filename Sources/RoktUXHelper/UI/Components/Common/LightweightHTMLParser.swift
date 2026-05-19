@@ -44,6 +44,7 @@ enum LightweightHTMLParser {
                         tag,
                         stack: &tagStack,
                         result: result,
+                        baseFont: baseFont,
                         paragraphStart: &paragraphStart,
                         listStack: &listStack,
                         listItemStarts: &listItemStarts,
@@ -86,6 +87,7 @@ enum LightweightHTMLParser {
 
     private struct OpenListItem {
         let start: Int
+        let contentStart: Int
         let depth: Int
     }
 
@@ -95,6 +97,7 @@ enum LightweightHTMLParser {
         _ tag: Tag,
         stack: inout [Tag],
         result: NSMutableAttributedString,
+        baseFont: UIFont?,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -117,6 +120,7 @@ enum LightweightHTMLParser {
                 tag,
                 stack: &stack,
                 result: result,
+                baseFont: baseFont,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
                 listItemStarts: &listItemStarts,
@@ -129,6 +133,7 @@ enum LightweightHTMLParser {
         _ tag: Tag,
         stack: inout [Tag],
         result: NSMutableAttributedString,
+        baseFont: UIFont?,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -144,7 +149,12 @@ enum LightweightHTMLParser {
                 stack: &stack,
                 styledRanges: &styledRanges
             )
-            ensureTrailingNewline(in: result)
+            // Skip the leading newline when we're opening at the very start of an
+            // <li>'s content (the marker prefix was just written). Common pattern:
+            // <li><p>Text</p></li> from WYSIWYG editors.
+            if listItemStarts.last?.contentStart != result.length {
+                ensureTrailingNewline(in: result)
+            }
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
@@ -172,9 +182,13 @@ enum LightweightHTMLParser {
                 )
             }
             ensureTrailingNewline(in: result)
-            listItemStarts.append(OpenListItem(start: result.length, depth: currentDepth))
+            let itemStart = result.length
+            // Apply the active tag-stack attributes to the marker so it inherits
+            // surrounding font/color/etc. (e.g. <font color=...><ul>...).
             let prefix = listItemPrefix(for: listStack[currentDepth])
-            result.append(NSAttributedString(string: prefix))
+            let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
+            result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
+            listItemStarts.append(OpenListItem(start: itemStart, contentStart: result.length, depth: currentDepth))
             stack.append(tag)
         default:
             stack.append(tag)

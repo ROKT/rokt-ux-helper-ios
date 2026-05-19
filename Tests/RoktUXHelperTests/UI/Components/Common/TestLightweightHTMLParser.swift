@@ -307,6 +307,39 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "1.\tA\n2.\tB\n")
     }
 
+    func test_p_inside_li_does_not_break_after_marker() {
+        // <li><p>Text</p></li> is common WYSIWYG output. The <p> open must not
+        // insert a newline immediately after the marker prefix.
+        let result = LightweightHTMLParser.parse(html: "<ul><li><p>Text</p></li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tText\n")
+    }
+
+    func test_p_after_text_in_li_still_breaks() {
+        // <li>Intro<p>Body</p></li> — when the <p> is not the first content,
+        // a newline IS needed so "Intro" and "Body" don't run together.
+        let result = LightweightHTMLParser.parse(html: "<ul><li>Intro<p>Body</p></li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "•\tIntro\nBody\n")
+    }
+
+    func test_list_marker_inherits_font_color() {
+        let result = LightweightHTMLParser.parse(
+            html: "<font color=#FF0000><ul><li>Item</li></ul></font>",
+            baseFont: baseFont
+        )
+        let bulletColor = result.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor
+        XCTAssertNotNil(bulletColor, "List marker must inherit font color from surrounding context")
+    }
+
+    func test_list_marker_inherits_bold() {
+        let result = LightweightHTMLParser.parse(html: "<b><ul><li>Item</li></ul></b>", baseFont: baseFont)
+        let bulletFont = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(
+            bulletFont?.fontDescriptor.symbolicTraits.contains(.traitBold),
+            true,
+            "List marker must inherit bold from surrounding <b>"
+        )
+    }
+
     func test_p_tag_implicit_close_preserves_previous_paragraph() {
         // <p>First<p>Second</p> — second <p> implicitly closes the first.
         // Both paragraphs must receive a paragraph style with spacing.
