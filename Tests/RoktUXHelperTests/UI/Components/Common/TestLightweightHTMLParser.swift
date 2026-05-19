@@ -160,6 +160,65 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "Line1\nLine2")
     }
 
+    // MARK: - Paragraph tag
+
+    func test_p_tag_single_paragraph() {
+        let result = LightweightHTMLParser.parse(html: "<p>Hello</p>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "Hello\n")
+
+        let paragraphStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(paragraphStyle)
+        XCTAssertGreaterThan(paragraphStyle?.paragraphSpacing ?? 0, 0)
+    }
+
+    func test_p_tag_two_paragraphs_separated_by_newline() {
+        let result = LightweightHTMLParser.parse(html: "<p>First</p><p>Second</p>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "First\nSecond\n")
+
+        let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(firstStyle)
+        XCTAssertNotNil(secondStyle)
+    }
+
+    func test_p_tag_after_inline_text_adds_break() {
+        let result = LightweightHTMLParser.parse(html: "Intro<p>Body</p>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "Intro\nBody\n")
+    }
+
+    func test_p_tag_with_inline_formatting_inside() {
+        let result = LightweightHTMLParser.parse(html: "<p>Hello <b>bold</b> world</p>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "Hello bold world\n")
+
+        let plainFont = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(plainFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
+
+        let boldFont = result.attribute(.font, at: 6, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_p_tag_unclosed_still_renders() {
+        let result = LightweightHTMLParser.parse(html: "<p>No close tag", baseFont: baseFont)
+        XCTAssertEqual(result.string, "No close tag")
+    }
+
+    func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
+        let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
+        // Parsed string is "Before \nInside\n After"
+        XCTAssertEqual(result.string, "Before \nInside\n After")
+
+        let outsideBefore = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNil(outsideBefore)
+
+        // Index 8 is the first char of "Inside" — inside the <p> range.
+        let insideStyle = result.attribute(.paragraphStyle, at: 8, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNotNil(insideStyle)
+
+        // Index 16 is the space before "After" — outside the <p> range.
+        let outsideAfter = result.attribute(.paragraphStyle, at: 16, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertNil(outsideAfter)
+    }
+
     // MARK: - Nested tags (DCUI fixture)
 
     func test_dcui_fixture_strong_em_u_s() {

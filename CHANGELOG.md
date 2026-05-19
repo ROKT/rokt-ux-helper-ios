@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support `<p>` tag in RichText HTML parser. Paragraphs render with a line break and 8pt of spacing between them.
+
 ## [0.10.10] - 2026-05-19
 
 ### Fixed
