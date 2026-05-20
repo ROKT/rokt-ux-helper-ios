@@ -17,10 +17,20 @@ Instructions for AI coding agents (Claude Code, Codex, etc.) working in this rep
 ## Working on a feature branch
 
 1. **Branch naming and commits** — use conventional commit style for both branch names and PR titles (e.g. `feat(richtext): support <p> tag`, `fix(catalog-device-pay): prevent duplicate taps`). The release-draft workflow parses PR titles to generate the changelog, so accurate type/scope matters.
-2. **Tests** — open `Package.swift` in Xcode and run `⌘U`, or run tests via `swift test` / `xcodebuild test`. Add tests for new behaviour. See [TESTING.md](./TESTING.md) for the snapshot workflow.
-3. **Schema bumps** — if you change the `DcuiSchema` dependency, also bump `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` so `SchemaVersionConsistencyTests` passes. README has the full steps.
-4. **Public API changes** — update [MIGRATING.md](./MIGRATING.md) when you rename or remove public symbols.
-5. **PR template** — fill in the sections in `.github/pull_request_template.md` (background, what changed, screenshots if UI, checklist).
+2. **Tests** — open `Package.swift` in Xcode and run `⌘U`, or from the CLI:
+
+   ```bash
+   set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
+     -destination 'platform=iOS Simulator,name=iPhone 16' \
+     -derivedDataPath DerivedData test | xcbeautify
+   ```
+
+   Do **not** use `swift test` — the library imports `UIKit`, which is unavailable in the host SPM build and the command will fail. To scope to a single suite, append `-only-testing:RoktUXHelperTests/TestRowComponent`. Add tests for new behaviour.
+
+3. **Snapshot tests** — visual regressions are caught by `swift-snapshot-testing`; reference PNGs live next to each test in `__Snapshots__/`. To intentionally update a snapshot, either delete the offending PNG and re-run the test (it re-records on first run), or set `isRecording = true` in the test's `setUp()`, re-run, then **remove the flag before committing** (never commit `isRecording = true`). On CI failure, download the `snapshot-failures` artifact for actual-vs-expected diffs. See [TESTING.md](./TESTING.md) for the full workflow and coverage matrix.
+4. **Schema bumps** — if you change the `DcuiSchema` dependency, also bump `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` so `SchemaVersionConsistencyTests` passes. README has the full steps.
+5. **Public API changes** — update [MIGRATING.md](./MIGRATING.md) when you rename or remove public symbols.
+6. **PR template** — fill in the sections in `.github/pull_request_template.md` (background, what changed, screenshots if UI, checklist).
 
 ## CHANGELOG.md is auto-generated — do not edit it
 
