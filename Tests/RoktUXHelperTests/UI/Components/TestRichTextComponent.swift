@@ -223,6 +223,66 @@ final class TestRichTextComponent: XCTestCase {
         assertRichTextSnapshot(model)
     }
 
+    /// Multiple <p> blocks separated by paragraph spacing.
+    func testSnapshot_paragraphs() {
+        let model = RichTextViewModel(
+            value: "<p>First paragraph with some text.</p><p>Second paragraph follows with vertical spacing.</p><p>Third paragraph.</p>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// Unordered list — bullet markers with hanging indent on wrapped lines.
+    func testSnapshot_unorderedList() {
+        let model = RichTextViewModel(
+            value: "<ul><li>First item</li><li>Second item that is long enough to wrap onto a second line and verify the hanging indent</li><li>Third</li></ul>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// Ordered list — sequential numbering with hanging indent.
+    func testSnapshot_orderedList() {
+        let model = RichTextViewModel(
+            value: "<ol><li>First</li><li>Second item with longer text that should wrap and align with the start of this text not the number</li><li>Third</li></ol>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// WYSIWYG pattern <li><p>...</p></li> — marker and text on the same line.
+    func testSnapshot_listItemWithParagraph() {
+        let model = RichTextViewModel(
+            value: "<ul><li><p>WYSIWYG paragraph inside list item</p></li><li><p>Second paragraph item</p></li></ul>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model)
+    }
+
+    /// List marker inherits surrounding font color (<font color>).
+    func testSnapshot_listMarkerInheritsColor() {
+        let model = RichTextViewModel(
+            value: "<font color=#CC0066><ul><li>Marker and text both pink</li><li>Same on this line</li></ul></font>",
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model)
+    }
+
     // MARK: - Helpers
 
     private func assertRichTextSnapshot(
