@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support `<p>` tag in RichText HTML parser. Paragraphs render with a line break and 8pt of spacing between them.
-- Support `<ul>`, `<ol>`, `<li>` tags in RichText HTML parser. Flat lists render with bullets or numbers and hanging indents that align wrapped text. Nested lists are not currently supported visually — content still renders but without the deeper indent.
+- Support `<ul>`, `<ol>`, `<li>` tags in RichText HTML parser. Lists render with bullet (`•`) or numbered (`1.`) markers; wrapped lines fall to the left margin (SwiftUI `Text` does not honor `NSParagraphStyle` indents).
+- Insert a visible spacer line between block-level elements (`<p>`, sibling `<li>`, list-to-paragraph transitions). The spacer's height is driven by the campaign's `text.lineHeight` so the gap scales with the configured typography.
 
 ## [0.10.10] - 2026-05-19
 
