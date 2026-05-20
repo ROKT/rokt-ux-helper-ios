@@ -176,4 +176,4 @@ This workflow will:
 - Auto-generate changelog from git history (conventional commit PR titles)
 
 > [!NOTE]
-> The "Release – Draft" workflow maintains the `VERSION` file automatically. No manual changes to the `VERSION` file are needed.
+> The "Release – Draft" workflow maintains the `VERSION` file and `CHANGELOG.md` automatically. **Do not edit `CHANGELOG.md` in feature branches** — entries are generated from conventional commit PR titles at release time and any manual edits will be overwritten. See [RELEASING.md](./RELEASING.md) for details.
