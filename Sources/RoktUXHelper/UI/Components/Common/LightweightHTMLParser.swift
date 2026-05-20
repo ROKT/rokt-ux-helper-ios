@@ -4,12 +4,17 @@ import UIKit
 ///
 /// Supports the DCUI rich text tag surface:
 ///   `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<s>`, `<strike>`,
-///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`
+///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`, `<p>`
 ///
 /// Also decodes common HTML entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`,
 /// `&apos;`, `&nbsp;`, `&#NNN;`, `&#xHHH;`).
 @available(iOS 15, *)
 enum LightweightHTMLParser {
+
+    // MARK: - Constants
+
+    private static let paragraphTag = "p"
+    private static let newline = "\n"
 
     // MARK: - Public API
 
@@ -17,12 +22,20 @@ enum LightweightHTMLParser {
         let result = NSMutableAttributedString()
         var index = html.startIndex
         var tagStack: [Tag] = []
+        var paragraphRanges: [NSRange] = []
+        var paragraphStart: Int?
 
         while index < html.endIndex {
             if html[index] == "<" {
                 if let (tag, nextIndex) = scanTag(in: html, from: index) {
                     index = nextIndex
-                    handleTag(tag, stack: &tagStack, result: result)
+                    handleTag(
+                        tag,
+                        stack: &tagStack,
+                        result: result,
+                        paragraphStart: &paragraphStart,
+                        paragraphRanges: &paragraphRanges
+                    )
                 } else {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: "<", attributes: attrs))
@@ -39,6 +52,7 @@ enum LightweightHTMLParser {
             }
         }
 
+        applyParagraphSpacing(to: result, ranges: paragraphRanges)
         return result
     }
 
@@ -56,16 +70,84 @@ enum LightweightHTMLParser {
     private static func handleTag(
         _ tag: Tag,
         stack: inout [Tag],
-        result: NSMutableAttributedString
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        paragraphRanges: inout [NSRange]
     ) {
         if tag.isClosing {
+            if tag.name == paragraphTag {
+                finalizeOpenParagraph(
+                    result: result,
+                    paragraphStart: &paragraphStart,
+                    stack: &stack,
+                    paragraphRanges: &paragraphRanges
+                )
+            }
             if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
                 stack.remove(at: idx)
             }
         } else if tag.isSelfClosing || tag.name == "br" {
-            result.append(NSAttributedString(string: "\n"))
+            result.append(NSAttributedString(string: newline))
+        } else if tag.name == paragraphTag {
+            // If a previous <p> is still open (no explicit </p>), finalize it
+            // so its range is preserved instead of overwritten.
+            finalizeOpenParagraph(
+                result: result,
+                paragraphStart: &paragraphStart,
+                stack: &stack,
+                paragraphRanges: &paragraphRanges
+            )
+            ensureTrailingNewline(in: result)
+            paragraphStart = result.length
+            stack.append(tag)
         } else {
             stack.append(tag)
+        }
+    }
+
+    // MARK: - Finalizers
+
+    private static func finalizeOpenParagraph(
+        result: NSMutableAttributedString,
+        paragraphStart: inout Int?,
+        stack: inout [Tag],
+        paragraphRanges: inout [NSRange]
+    ) {
+        guard let start = paragraphStart else { return }
+        ensureTrailingNewline(in: result)
+        let length = result.length - start
+        if length > 0 {
+            paragraphRanges.append(NSRange(location: start, length: length))
+        }
+        paragraphStart = nil
+        if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
+            stack.remove(at: openP)
+        }
+    }
+
+    private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
+        guard result.length > 0, !result.string.hasSuffix(newline) else { return }
+        result.append(NSAttributedString(string: newline))
+    }
+
+    private static let paragraphStyleForP: NSParagraphStyle = {
+        let style = NSMutableParagraphStyle()
+        style.paragraphSpacing = 8
+        return style
+    }()
+
+    private static func applyParagraphSpacing(
+        to result: NSMutableAttributedString,
+        ranges: [NSRange]
+    ) {
+        guard !ranges.isEmpty else { return }
+        for range in ranges {
+            let clamped = NSRange(
+                location: range.location,
+                length: min(range.length, result.length - range.location)
+            )
+            guard clamped.length > 0 else { continue }
+            result.addAttribute(.paragraphStyle, value: paragraphStyleForP, range: clamped)
         }
     }
 
