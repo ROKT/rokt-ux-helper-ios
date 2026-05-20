@@ -8,7 +8,8 @@ internal extension StringProtocol {
         textColorHex: String?,
         uiFont: UIFont?,
         linkStyles: InlineTextStylingProperties?,
-        colorScheme: ColorScheme
+        colorScheme: ColorScheme,
+        blockSpacerHeight: CGFloat? = nil
     ) -> NSAttributedString {
         var convertedText = String(self)
 
@@ -16,7 +17,11 @@ internal extension StringProtocol {
             convertedText = "<font color=\(textColorHex)>" + self + "</font>"
         }
 
-        let parsed = LightweightHTMLParser.parse(html: convertedText, baseFont: uiFont)
+        let parsed = LightweightHTMLParser.parse(
+            html: convertedText,
+            baseFont: uiFont,
+            blockSpacerHeight: blockSpacerHeight
+        )
 
         return updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
     }

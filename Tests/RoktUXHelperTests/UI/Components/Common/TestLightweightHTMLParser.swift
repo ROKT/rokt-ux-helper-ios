@@ -173,17 +173,18 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_p_tag_two_paragraphs_separated_by_newline() {
         let result = LightweightHTMLParser.parse(html: "<p>First</p><p>Second</p>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "First\nSecond\n")
+        // Spacer line (tiny-font NBSP) inserted between paragraphs to render the gap.
+        XCTAssertEqual(result.string, "First\n\u{00A0}\nSecond\n")
 
         let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
-        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        let secondStyle = result.attribute(.paragraphStyle, at: 8, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(firstStyle)
         XCTAssertNotNil(secondStyle)
     }
 
     func test_p_tag_after_inline_text_adds_break() {
         let result = LightweightHTMLParser.parse(html: "Intro<p>Body</p>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "Intro\nBody\n")
+        XCTAssertEqual(result.string, "Intro\n\u{00A0}\nBody\n")
     }
 
     func test_p_tag_with_inline_formatting_inside() {
@@ -206,47 +207,25 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_ul_with_single_li() {
         let result = LightweightHTMLParser.parse(html: "<ul><li>One</li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tOne\n")
-
-        let style = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertNotNil(style)
-        XCTAssertEqual(style?.firstLineHeadIndent, 0)
-        XCTAssertEqual(style?.headIndent, 20)
+        XCTAssertEqual(result.string, "• One\n")
     }
 
     func test_ul_with_multiple_li() {
         let result = LightweightHTMLParser.parse(html: "<ul><li>One</li><li>Two</li><li>Three</li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n•\tThree\n")
+        // Spacer line between sibling items.
+        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n\u{00A0}\n• Three\n")
     }
 
     func test_ol_numbers_items_sequentially() {
         let result = LightweightHTMLParser.parse(html: "<ol><li>One</li><li>Two</li><li>Three</li></ol>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "1.\tOne\n2.\tTwo\n3.\tThree\n")
-    }
-
-    func test_nested_ul_deeper_indent() {
-        let html = "<ul><li>Outer<ul><li>Inner</li></ul></li></ul>"
-        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-
-        // Outer bullet at depth 0
-        let outerStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertEqual(outerStyle?.firstLineHeadIndent, 0)
-        XCTAssertEqual(outerStyle?.headIndent, 20)
-
-        // Locate inner bullet via the second "•" in the string
-        let nsString = result.string as NSString
-        let innerRange = nsString.range(of: "•", options: [], range: NSRange(location: 1, length: nsString.length - 1))
-        XCTAssertTrue(innerRange.location != NSNotFound)
-        let innerStyle = result.attribute(.paragraphStyle, at: innerRange.location, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertEqual(innerStyle?.firstLineHeadIndent, 20)
-        XCTAssertEqual(innerStyle?.headIndent, 40)
+        XCTAssertEqual(result.string, "1. One\n\u{00A0}\n2. Two\n\u{00A0}\n3. Three\n")
     }
 
     func test_li_with_inline_formatting() {
         let result = LightweightHTMLParser.parse(html: "<ul><li>Plain <b>bold</b></li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tPlain bold\n")
+        XCTAssertEqual(result.string, "• Plain bold\n")
 
-        // "•\tPlain " is 8 chars (•, tab, P, l, a, i, n, space) — bold starts at index 8
+        // "• Plain " is 8 chars (•, space, P, l, a, i, n, space) — bold starts at index 8
         let boldFont = result.attribute(.font, at: 8, effectiveRange: nil) as? UIFont
         XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
     }
@@ -254,7 +233,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     func test_whitespace_between_list_tags_stripped() {
         let html = "<ul>\n  <li>One</li>\n  <li>Two</li>\n</ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n")
+        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n")
     }
 
     func test_li_without_enclosing_list_renders_plain() {
@@ -262,63 +241,45 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "orphan")
     }
 
-    func test_list_does_not_bleed_paragraph_style_to_text_outside() {
-        let result = LightweightHTMLParser.parse(html: "Before<ul><li>Item</li></ul>After", baseFont: baseFont)
-
-        let before = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertNil(before)
-
-        // Last index ('r' of After) should also be unstyled
-        let lastIdx = result.length - 1
-        let after = result.attribute(.paragraphStyle, at: lastIdx, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertNil(after)
-    }
-
     func test_unclosed_ul_does_not_crash() {
         let result = LightweightHTMLParser.parse(html: "<ul><li>One</li>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tOne\n")
+        XCTAssertEqual(result.string, "• One\n")
     }
 
     func test_ol_counter_resets_per_list() {
         let html = "<ol><li>A</li><li>B</li></ol><ol><li>X</li><li>Y</li></ol>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "1.\tA\n2.\tB\n1.\tX\n2.\tY\n")
+        // Spacer between sibling items AND between consecutive lists.
+        XCTAssertEqual(result.string, "1. A\n\u{00A0}\n2. B\n\u{00A0}\n1. X\n\u{00A0}\n2. Y\n")
     }
 
     func test_li_open_implicitly_closes_previous_sibling() {
         // <ul><li>One<li>Two</li></ul> — second <li> implicitly closes the first
-        // (valid HTML5). Both items must receive a list paragraph style.
+        // (valid HTML5). Both items must render with the marker prefix.
         let html = "<ul><li>One<li>Two</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tOne\n•\tTwo\n")
-
-        let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertNotNil(firstStyle, "First <li> must keep its list style after implicit close")
-        XCTAssertEqual(firstStyle?.firstLineHeadIndent, 0)
-        XCTAssertEqual(firstStyle?.headIndent, 20)
-
-        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
-        XCTAssertNotNil(secondStyle)
+        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n")
     }
 
     func test_ol_implicit_li_close_increments_counter() {
         // <ol><li>A<li>B</li></ol> — implicit close must still bump the counter.
         let result = LightweightHTMLParser.parse(html: "<ol><li>A<li>B</li></ol>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "1.\tA\n2.\tB\n")
+        XCTAssertEqual(result.string, "1. A\n\u{00A0}\n2. B\n")
     }
 
     func test_p_inside_li_does_not_break_after_marker() {
         // <li><p>Text</p></li> is common WYSIWYG output. The <p> open must not
         // insert a newline immediately after the marker prefix.
         let result = LightweightHTMLParser.parse(html: "<ul><li><p>Text</p></li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tText\n")
+        XCTAssertEqual(result.string, "• Text\n")
     }
 
     func test_p_after_text_in_li_still_breaks() {
         // <li>Intro<p>Body</p></li> — when the <p> is not the first content,
-        // a newline IS needed so "Intro" and "Body" don't run together.
+        // a newline IS needed so "Intro" and "Body" don't run together. A
+        // spacer line is also inserted between them (see paragraphSpacer).
         let result = LightweightHTMLParser.parse(html: "<ul><li>Intro<p>Body</p></li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "•\tIntro\nBody\n")
+        XCTAssertEqual(result.string, "• Intro\n\u{00A0}\nBody\n")
     }
 
     func test_list_marker_inherits_font_color() {
@@ -342,32 +303,34 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_p_tag_implicit_close_preserves_previous_paragraph() {
         // <p>First<p>Second</p> — second <p> implicitly closes the first.
-        // Both paragraphs must receive a paragraph style with spacing.
+        // Both paragraphs must receive a paragraph style with spacing; a
+        // spacer line is inserted between them.
         let result = LightweightHTMLParser.parse(html: "<p>First<p>Second</p>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "First\nSecond\n")
+        XCTAssertEqual(result.string, "First\n\u{00A0}\nSecond\n")
 
         let firstStyle = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(firstStyle, "First paragraph must keep its paragraph style after implicit close")
         XCTAssertGreaterThan(firstStyle?.paragraphSpacing ?? 0, 0)
 
-        let secondStyle = result.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        let secondStyle = result.attribute(.paragraphStyle, at: 8, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(secondStyle)
     }
 
     func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
         let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
-        // Parsed string is "Before \nInside\n After"
-        XCTAssertEqual(result.string, "Before \nInside\n After")
+        // Spacer line inserted between "Before " and "Inside":
+        // "Before \n\u{00A0}\nInside\n After"
+        XCTAssertEqual(result.string, "Before \n\u{00A0}\nInside\n After")
 
         let outsideBefore = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideBefore)
 
-        // Index 8 is the first char of "Inside" — inside the <p> range.
-        let insideStyle = result.attribute(.paragraphStyle, at: 8, effectiveRange: nil) as? NSParagraphStyle
+        // Index 10 is the first char of "Inside" — inside the <p> range.
+        let insideStyle = result.attribute(.paragraphStyle, at: 10, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(insideStyle)
 
-        // Index 16 is the space before "After" — outside the <p> range.
-        let outsideAfter = result.attribute(.paragraphStyle, at: 16, effectiveRange: nil) as? NSParagraphStyle
+        // Index 18 is the space before "After" — outside the <p> range.
+        let outsideAfter = result.attribute(.paragraphStyle, at: 18, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideAfter)
     }
 

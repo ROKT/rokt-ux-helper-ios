@@ -5,8 +5,9 @@ import UIKit
 /// Supports the DCUI rich text tag surface:
 ///   `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<s>`, `<strike>`,
 ///   `<a href="…" target="…">`, `<font color="…">`, `<br>`, `<br/>`, `<p>`,
-///   `<ul>`, `<ol>`, `<li>` (flat only — nested lists parse without crashing
-///   but the SwiftUI Text rendering pipeline does not honor the deeper indent)
+///   `<ul>`, `<ol>`, `<li>` (markers only — wrapped lines fall to the left
+///   margin because SwiftUI's `Text(AttributedString)` does not honor
+///   `NSParagraphStyle` indent attributes)
 ///
 /// Also decodes common HTML entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`,
 /// `&apos;`, `&nbsp;`, `&#NNN;`, `&#xHHH;`).
@@ -22,12 +23,30 @@ enum LightweightHTMLParser {
     private static let listItemTag = "li"
     private static let newline = "\n"
     private static let paragraphSpacing: CGFloat = 8
-    private static let listItemSpacing: CGFloat = 2
-    private static let listIndentStep: CGFloat = 20
+    /// Whitespace inserted between a list marker (• or 1.) and the item content.
+    /// Widen or tighten the visual gap by editing this string.
+    ///     "•Item"   ←  ""
+    ///     "• Item"  ←  " "
+    ///     "•   Item" ← "   "
+    private static let listMarkerSeparator = " "
+    /// Font size used for the invisible spacer line inserted between paragraphs.
+    /// SwiftUI's `Text(AttributedString)` does not honor `NSParagraphStyle.paragraphSpacing`,
+    /// so we fake the gap by emitting a tiny-font NBSP on its own line.
+    private static let paragraphSpacerFontSize: CGFloat = 6
+    private static let paragraphSpacerCharacter = "\u{00A0}"
 
     // MARK: - Public API
 
-    static func parse(html: String, baseFont: UIFont?) -> NSMutableAttributedString {
+    /// - Parameter blockSpacerHeight: Optional override for the font size used by
+    ///   the invisible spacer line inserted between `<p>` blocks and between
+    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` so the
+    ///   gap scales with the campaign's typography. `nil` falls back to the
+    ///   default 6pt.
+    static func parse(
+        html: String,
+        baseFont: UIFont?,
+        blockSpacerHeight: CGFloat? = nil
+    ) -> NSMutableAttributedString {
         let result = NSMutableAttributedString()
         var index = html.startIndex
         var tagStack: [Tag] = []
@@ -35,6 +54,7 @@ enum LightweightHTMLParser {
         var paragraphStart: Int?
         var listStack: [ListContext] = []
         var listItemStarts: [OpenListItem] = []
+        let spacerFontSize = blockSpacerHeight ?? paragraphSpacerFontSize
 
         while index < html.endIndex {
             if html[index] == "<" {
@@ -45,6 +65,7 @@ enum LightweightHTMLParser {
                         stack: &tagStack,
                         result: result,
                         baseFont: baseFont,
+                        spacerFontSize: spacerFontSize,
                         paragraphStart: &paragraphStart,
                         listStack: &listStack,
                         listItemStarts: &listItemStarts,
@@ -86,7 +107,6 @@ enum LightweightHTMLParser {
     }
 
     private struct OpenListItem {
-        let start: Int
         let contentStart: Int
         let depth: Int
     }
@@ -98,6 +118,7 @@ enum LightweightHTMLParser {
         stack: inout [Tag],
         result: NSMutableAttributedString,
         baseFont: UIFont?,
+        spacerFontSize: CGFloat,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -121,6 +142,7 @@ enum LightweightHTMLParser {
                 stack: &stack,
                 result: result,
                 baseFont: baseFont,
+                spacerFontSize: spacerFontSize,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
                 listItemStarts: &listItemStarts,
@@ -134,6 +156,7 @@ enum LightweightHTMLParser {
         stack: inout [Tag],
         result: NSMutableAttributedString,
         baseFont: UIFont?,
+        spacerFontSize: CGFloat,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -149,18 +172,27 @@ enum LightweightHTMLParser {
                 stack: &stack,
                 styledRanges: &styledRanges
             )
-            // Skip the leading newline when we're opening at the very start of an
-            // <li>'s content (the marker prefix was just written). Common pattern:
-            // <li><p>Text</p></li> from WYSIWYG editors.
-            if listItemStarts.last?.contentStart != result.length {
-                ensureTrailingNewline(in: result)
-            }
+            insertBlockSeparatorIfNeeded(
+                in: result,
+                listItemStarts: listItemStarts,
+                spacerFontSize: spacerFontSize
+            )
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
+            insertBlockSeparatorIfNeeded(
+                in: result,
+                listItemStarts: listItemStarts,
+                spacerFontSize: spacerFontSize
+            )
             listStack.append(ListContext(kind: .unordered, counter: 1))
             stack.append(tag)
         case orderedListTag:
+            insertBlockSeparatorIfNeeded(
+                in: result,
+                listItemStarts: listItemStarts,
+                spacerFontSize: spacerFontSize
+            )
             listStack.append(ListContext(kind: .ordered, counter: 1))
             stack.append(tag)
         case listItemTag:
@@ -182,13 +214,17 @@ enum LightweightHTMLParser {
                 )
             }
             ensureTrailingNewline(in: result)
-            let itemStart = result.length
+            // counter is bumped on close, so > 1 means at least one sibling
+            // already closed at this depth — insert a spacer line between them.
+            if listStack[currentDepth].counter > 1 {
+                appendBlockSpacer(to: result, fontSize: spacerFontSize)
+            }
             // Apply the active tag-stack attributes to the marker so it inherits
             // surrounding font/color/etc. (e.g. <font color=...><ul>...).
             let prefix = listItemPrefix(for: listStack[currentDepth])
             let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
             result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
-            listItemStarts.append(OpenListItem(start: itemStart, contentStart: result.length, depth: currentDepth))
+            listItemStarts.append(OpenListItem(contentStart: result.length, depth: currentDepth))
             stack.append(tag)
         default:
             stack.append(tag)
@@ -263,10 +299,6 @@ enum LightweightHTMLParser {
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         ensureTrailingNewline(in: result)
-        let length = result.length - item.start
-        if length > 0 {
-            styledRanges.append((NSRange(location: item.start, length: length), listItemStyle(depth: item.depth)))
-        }
         if item.depth < listStack.count { listStack[item.depth].counter += 1 }
         listItemStarts.removeLast()
         if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
@@ -278,8 +310,8 @@ enum LightweightHTMLParser {
 
     private static func listItemPrefix(for context: ListContext) -> String {
         switch context.kind {
-        case .unordered: return "•\t"
-        case .ordered: return "\(context.counter).\t"
+        case .unordered: return "•" + listMarkerSeparator
+        case .ordered: return "\(context.counter)." + listMarkerSeparator
         }
     }
 
@@ -289,21 +321,36 @@ enum LightweightHTMLParser {
         return style
     }()
 
-    private static func listItemStyle(depth: Int) -> NSParagraphStyle {
-        let indent = CGFloat(depth) * listIndentStep
-        let textIndent = indent + listIndentStep
-        let style = NSMutableParagraphStyle()
-        style.firstLineHeadIndent = indent
-        style.headIndent = textIndent
-        style.tabStops = [NSTextTab(textAlignment: .left, location: textIndent, options: [:])]
-        style.defaultTabInterval = listIndentStep
-        style.paragraphSpacing = listItemSpacing
-        return style
-    }
-
     private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
         guard result.length > 0, !result.string.hasSuffix(newline) else { return }
         result.append(NSAttributedString(string: newline))
+    }
+
+    /// Appends a small-font NBSP + newline so SwiftUI Text renders a visible
+    /// gap between block-level elements (`<p>`, `<li>`). Used because
+    /// `NSParagraphStyle.paragraphSpacing` is ignored by `Text(AttributedString)`.
+    private static func appendBlockSpacer(to result: NSMutableAttributedString, fontSize: CGFloat) {
+        let spacer = NSAttributedString(
+            string: paragraphSpacerCharacter + newline,
+            attributes: [.font: UIFont.systemFont(ofSize: fontSize)]
+        )
+        result.append(spacer)
+    }
+
+    /// Ensures a visible gap precedes a block-level element opening (`<p>`,
+    /// `<ul>`, `<ol>`) when there's already content above it. No-op when:
+    /// - the document is empty (block is the very first content);
+    /// - we're inside an `<li>` whose marker prefix was just emitted (the
+    ///   block flows into the marker line; common WYSIWYG pattern).
+    private static func insertBlockSeparatorIfNeeded(
+        in result: NSMutableAttributedString,
+        listItemStarts: [OpenListItem],
+        spacerFontSize: CGFloat
+    ) {
+        if listItemStarts.last?.contentStart == result.length { return }
+        ensureTrailingNewline(in: result)
+        guard result.length > newline.count else { return }
+        appendBlockSpacer(to: result, fontSize: spacerFontSize)
     }
 
     private static func shouldSkipTextNode(
@@ -320,14 +367,7 @@ enum LightweightHTMLParser {
         to result: NSMutableAttributedString,
         ranges: [(NSRange, NSParagraphStyle)]
     ) {
-        guard !ranges.isEmpty else { return }
-
-        // Apply larger ranges first so that any later overlapping smaller range
-        // wins for its subrange (`addAttribute` replaces any prior value). This is
-        // a parser-level invariant — the SwiftUI Text rendering pipeline does not
-        // honor nested paragraph indents regardless of layering.
-        let sorted = ranges.sorted { $0.0.length > $1.0.length }
-        for (range, style) in sorted {
+        for (range, style) in ranges {
             let clamped = NSRange(
                 location: range.location,
                 length: min(range.length, result.length - range.location)
