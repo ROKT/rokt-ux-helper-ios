@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support `<ul>`, `<ol>`, `<li>` tags in RichText HTML parser. Lists render with bullet (`•`) or numbered (`1.`) markers; wrapped lines fall to the left margin (SwiftUI `Text` does not honor `NSParagraphStyle` indents).
 - Insert a visible spacer line between block-level elements (`<p>`, sibling `<li>`, list-to-paragraph transitions). The spacer's height is driven by the campaign's `text.lineHeight` so the gap scales with the configured typography.
 
+## [0.10.11] - 2026-05-20
+
+### Added
+
+- Support <ul>, <ol>, <li> in HTML parser ([#285](https://github.com/ROKT/rokt-ux-helper-ios/pull/285))
+- Support <p> tag in HTML parser ([#284](https://github.com/ROKT/rokt-ux-helper-ios/pull/284))
+
 ## [0.10.10] - 2026-05-19
 
 ### Fixed
@@ -316,7 +323,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...HEAD
+[0.10.11]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...0.10.11
 [0.10.10]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.9...0.10.10
 [0.10.9]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.8...0.10.9
 [0.10.8]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.7...0.10.8
