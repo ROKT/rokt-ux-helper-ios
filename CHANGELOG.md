@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support <ul>, <ol>, <li> in HTML parser ([#285](https://github.com/ROKT/rokt-ux-helper-ios/pull/285))
-- Support <p> tag in HTML parser ([#284](https://github.com/ROKT/rokt-ux-helper-ios/pull/284))
+- Support `<ul>`, `<ol>`, `<li>` in HTML parser ([#285](https://github.com/ROKT/rokt-ux-helper-ios/pull/285))
+- Support `<p>` tag in HTML parser ([#284](https://github.com/ROKT/rokt-ux-helper-ios/pull/284))
 
 ## [0.10.10] - 2026-05-19
 
