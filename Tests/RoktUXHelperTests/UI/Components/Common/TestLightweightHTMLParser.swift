@@ -212,13 +212,13 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_ul_with_multiple_li() {
         let result = LightweightHTMLParser.parse(html: "<ul><li>One</li><li>Two</li><li>Three</li></ul>", baseFont: baseFont)
-        // Spacer line between sibling items.
-        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n\u{00A0}\n• Three\n")
+        // Bare <li> siblings sit flush (CSS analogue: li.margin = 0).
+        XCTAssertEqual(result.string, "• One\n• Two\n• Three\n")
     }
 
     func test_ol_numbers_items_sequentially() {
         let result = LightweightHTMLParser.parse(html: "<ol><li>One</li><li>Two</li><li>Three</li></ol>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "1. One\n\u{00A0}\n2. Two\n\u{00A0}\n3. Three\n")
+        XCTAssertEqual(result.string, "1. One\n2. Two\n3. Three\n")
     }
 
     func test_li_with_inline_formatting() {
@@ -233,7 +233,7 @@ final class TestLightweightHTMLParser: XCTestCase {
     func test_whitespace_between_list_tags_stripped() {
         let html = "<ul>\n  <li>One</li>\n  <li>Two</li>\n</ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n")
+        XCTAssertEqual(result.string, "• One\n• Two\n")
     }
 
     func test_li_without_enclosing_list_renders_plain() {
@@ -249,8 +249,9 @@ final class TestLightweightHTMLParser: XCTestCase {
     func test_ol_counter_resets_per_list() {
         let html = "<ol><li>A</li><li>B</li></ol><ol><li>X</li><li>Y</li></ol>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        // Spacer between sibling items AND between consecutive lists.
-        XCTAssertEqual(result.string, "1. A\n\u{00A0}\n2. B\n\u{00A0}\n1. X\n\u{00A0}\n2. Y\n")
+        // Bare items sit flush; the spacer between the two consecutive lists
+        // comes from <ol> opening (block separator), not inter-item spacing.
+        XCTAssertEqual(result.string, "1. A\n2. B\n\u{00A0}\n1. X\n2. Y\n")
     }
 
     func test_li_open_implicitly_closes_previous_sibling() {
@@ -258,13 +259,13 @@ final class TestLightweightHTMLParser: XCTestCase {
         // (valid HTML5). Both items must render with the marker prefix.
         let html = "<ul><li>One<li>Two</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n")
+        XCTAssertEqual(result.string, "• One\n• Two\n")
     }
 
     func test_ol_implicit_li_close_increments_counter() {
         // <ol><li>A<li>B</li></ol> — implicit close must still bump the counter.
         let result = LightweightHTMLParser.parse(html: "<ol><li>A<li>B</li></ol>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "1. A\n\u{00A0}\n2. B\n")
+        XCTAssertEqual(result.string, "1. A\n2. B\n")
     }
 
     func test_p_inside_li_does_not_break_after_marker() {
@@ -272,6 +273,34 @@ final class TestLightweightHTMLParser: XCTestCase {
         // insert a newline immediately after the marker prefix.
         let result = LightweightHTMLParser.parse(html: "<ul><li><p>Text</p></li></ul>", baseFont: baseFont)
         XCTAssertEqual(result.string, "• Text\n")
+    }
+
+    func test_li_with_p_siblings_get_inter_item_spacer() {
+        // CSS analogue: <p>'s `margin: 1em 0` shows through `<li>`'s zero
+        // margin, producing a gap between adjacent items. We approximate
+        // that gap with the block spacer.
+        let html = "<ul><li><p>One</p></li><li><p>Two</p></li><li><p>Three</p></li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n\u{00A0}\n• Three\n")
+    }
+
+    func test_mixed_bare_then_p_li_no_spacer() {
+        // <li>A</li><li><p>B</p></li> — previous sibling had no block child,
+        // so no spacer is emitted before the second marker. (Edge case: a
+        // browser would still show a gap from the second <p>'s top margin.
+        // The simpler "previous-sibling-only" rule keeps the parser local
+        // and is good enough for the WYSIWYG patterns we see in practice.)
+        let html = "<ul><li>A</li><li><p>B</p></li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• A\n• B\n")
+    }
+
+    func test_mixed_p_then_bare_li_emits_spacer() {
+        // <li><p>A</p></li><li>B</li> — previous sibling had a <p> child, so
+        // its trailing margin must show through. Spacer emitted before B.
+        let html = "<ul><li><p>A</p></li><li>B</li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• A\n\u{00A0}\n• B\n")
     }
 
     func test_p_after_text_in_li_still_breaks() {

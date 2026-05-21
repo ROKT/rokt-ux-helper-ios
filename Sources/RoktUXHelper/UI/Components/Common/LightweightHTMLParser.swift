@@ -34,14 +34,20 @@ enum LightweightHTMLParser {
     /// so we fake the gap by emitting a tiny-font NBSP on its own line.
     private static let paragraphSpacerFontSize: CGFloat = 6
     private static let paragraphSpacerCharacter = "\u{00A0}"
+    /// Fraction of the caller-provided `blockSpacerHeight` used as the actual
+    /// spacer font size. Callers pass their full text `lineHeight`; a 1.0
+    /// ratio renders an entire blank line between blocks, which is too loose.
+    /// ~0.4 approximates the visual gap of CSS `margin: 0.5em 0` on `<p>`
+    /// once the parser's surrounding newlines are accounted for.
+    private static let blockSpacerLineHeightRatio: CGFloat = 0.4
 
     // MARK: - Public API
 
-    /// - Parameter blockSpacerHeight: Optional override for the font size used by
+    /// - Parameter blockSpacerHeight: Optional line-height hint used to size
     ///   the invisible spacer line inserted between `<p>` blocks and between
-    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` so the
-    ///   gap scales with the campaign's typography. `nil` falls back to the
-    ///   default 6pt.
+    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` and the
+    ///   parser scales it down (see `blockSpacerLineHeightRatio`) to a
+    ///   paragraph-sized gap. `nil` falls back to the default 6pt spacer.
     static func parse(
         html: String,
         baseFont: UIFont?,
@@ -54,7 +60,8 @@ enum LightweightHTMLParser {
         var paragraphStart: Int?
         var listStack: [ListContext] = []
         var listItemStarts: [OpenListItem] = []
-        let spacerFontSize = blockSpacerHeight ?? paragraphSpacerFontSize
+        let spacerFontSize = blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio }
+            ?? paragraphSpacerFontSize
 
         while index < html.endIndex {
             if html[index] == "<" {
@@ -104,11 +111,18 @@ enum LightweightHTMLParser {
         enum Kind { case unordered, ordered }
         let kind: Kind
         var counter: Int
+        /// Whether the most recently closed `<li>` at this depth contained a
+        /// block-level child (currently `<p>`). Drives the CSS-style rule
+        /// that bare `<li>` siblings sit flush (no inter-item gap) while
+        /// `<li><p>...</p></li>` siblings get a spacer from the `<p>`'s
+        /// implied margin.
+        var lastClosedHadBlock: Bool
     }
 
     private struct OpenListItem {
         let contentStart: Int
         let depth: Int
+        var containedBlock: Bool
     }
 
     // MARK: - Tag dispatch
@@ -177,6 +191,11 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
+            // Mark the innermost open <li> as block-bearing so its closing
+            // propagates the flag to ListContext.lastClosedHadBlock.
+            if !listItemStarts.isEmpty {
+                listItemStarts[listItemStarts.count - 1].containedBlock = true
+            }
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
@@ -185,7 +204,7 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
-            listStack.append(ListContext(kind: .unordered, counter: 1))
+            listStack.append(ListContext(kind: .unordered, counter: 1, lastClosedHadBlock: false))
             stack.append(tag)
         case orderedListTag:
             insertBlockSeparatorIfNeeded(
@@ -193,7 +212,7 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
-            listStack.append(ListContext(kind: .ordered, counter: 1))
+            listStack.append(ListContext(kind: .ordered, counter: 1, lastClosedHadBlock: false))
             stack.append(tag)
         case listItemTag:
             guard !listStack.isEmpty else {
@@ -214,9 +233,10 @@ enum LightweightHTMLParser {
                 )
             }
             ensureTrailingNewline(in: result)
-            // counter is bumped on close, so > 1 means at least one sibling
-            // already closed at this depth — insert a spacer line between them.
-            if listStack[currentDepth].counter > 1 {
+            // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
+            // child contributes its own margin. We emit the spacer only when
+            // the prior sibling at this depth contained a block child.
+            if listStack[currentDepth].counter > 1, listStack[currentDepth].lastClosedHadBlock {
                 appendBlockSpacer(to: result, fontSize: spacerFontSize)
             }
             // Apply the active tag-stack attributes to the marker so it inherits
@@ -224,7 +244,9 @@ enum LightweightHTMLParser {
             let prefix = listItemPrefix(for: listStack[currentDepth])
             let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
             result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
-            listItemStarts.append(OpenListItem(contentStart: result.length, depth: currentDepth))
+            listItemStarts.append(
+                OpenListItem(contentStart: result.length, depth: currentDepth, containedBlock: false)
+            )
             stack.append(tag)
         default:
             stack.append(tag)
@@ -299,7 +321,10 @@ enum LightweightHTMLParser {
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         ensureTrailingNewline(in: result)
-        if item.depth < listStack.count { listStack[item.depth].counter += 1 }
+        if item.depth < listStack.count {
+            listStack[item.depth].counter += 1
+            listStack[item.depth].lastClosedHadBlock = item.containedBlock
+        }
         listItemStarts.removeLast()
         if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
             stack.remove(at: openLi)

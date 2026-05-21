@@ -283,7 +283,169 @@ final class TestRichTextComponent: XCTestCase {
         assertRichTextSnapshot(model)
     }
 
+    // MARK: - Block spacing regression snapshots
+
+    //
+    // These tests pin the inter-block spacing produced when a caller provides
+    // a non-trivial `lineHeight` on the RichText style — the codepath fixed
+    // by the `blockSpacerLineHeightRatio` scaling in `LightweightHTMLParser`.
+    // Without the scaling, the invisible spacer between blocks renders at
+    // the full lineHeight font size, producing a near-blank-line gap.
+
+    /// Three `<p>` blocks rendered with a 20pt lineHeight.
+    func testSnapshot_paragraphs_withLineHeight() {
+        let model = RichTextViewModel(
+            value: "<p>Alpha paragraph with text long enough to wrap onto a second line.</p><p>Bravo paragraph.</p><p>Charlie paragraph.</p>",
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 300)
+    }
+
+    /// Mixed `<p>` + `<ul>` + `<p>` with a non-trivial lineHeight.
+    func testSnapshot_mixedParagraphsAndUnorderedList_withLineHeight() {
+        let value = """
+        <p>Alpha paragraph.</p>\
+        <p>Bravo paragraph introducing a list:</p>\
+        <ul>\
+        <li>First item</li>\
+        <li>Second item</li>\
+        <li>Third item</li>\
+        </ul>\
+        <p>Charlie paragraph.</p>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 400)
+    }
+
+    /// Same shape as the mixed unordered test but with `<ol>` to lock
+    /// numbered-list inter-item spacing at the same lineHeight.
+    func testSnapshot_mixedParagraphsAndOrderedList_withLineHeight() {
+        let value = """
+        <p>Alpha paragraph introducing a numbered list:</p>\
+        <ol>\
+        <li>First step</li>\
+        <li>Second step</li>\
+        <li>Third step</li>\
+        </ol>\
+        <p>Bravo paragraph.</p>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 350)
+    }
+
+    /// Larger lineHeight (32pt) — heading-style typography. Confirms the
+    /// gap scales with typography without becoming a blank line.
+    func testSnapshot_paragraphs_withLargeLineHeight() {
+        let model = RichTextViewModel(
+            value: "<p>Alpha heading paragraph.</p><p>Bravo heading paragraph.</p>",
+            defaultStyle: [richTextStyle(fontSize: 20, lineHeight: 32)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    // MARK: - List item CSS-margin parity snapshots
+
+    //
+    // CSS analogue: bare `<li>` has `margin: 0` so adjacent items sit flush.
+    // A `<p>` child contributes its own margin, producing a visible gap
+    // between adjacent `<li>` items. These snapshots pin both shapes with
+    // a non-trivial lineHeight so the difference is visible.
+
+    /// Bare `<li>` siblings — no inter-item gap, even with lineHeight set.
+    func testSnapshot_bareListItems_withLineHeight() {
+        let model = RichTextViewModel(
+            value: "<ul><li>First bare item</li><li>Second bare item</li><li>Third bare item</li></ul>",
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// `<li><p>...</p></li>` siblings — gap from the inherited `<p>` margin.
+    func testSnapshot_listItemsWithParagraphs_withLineHeight() {
+        let value = """
+        <ul>\
+        <li><p>First item with paragraph</p></li>\
+        <li><p>Second item with paragraph</p></li>\
+        <li><p>Third item with paragraph</p></li>\
+        </ul>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// Mixed siblings — locks the "previous-sibling carries the margin" rule:
+    /// `<li><p>`-then-bare gets a gap (from the prior `<p>`), bare-then-`<li><p>`
+    /// does not (the heuristic doesn't look ahead).
+    func testSnapshot_mixedBareAndParagraphListItems_withLineHeight() {
+        let value = """
+        <ul>\
+        <li><p>Paragraph item one</p></li>\
+        <li>Bare item two</li>\
+        <li>Bare item three</li>\
+        <li><p>Paragraph item four</p></li>\
+        </ul>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 300)
+    }
+
     // MARK: - Helpers
+
+    private func richTextStyle(fontSize: Float = 14, lineHeight: Float) -> RichTextStyle {
+        RichTextStyle(
+            dimension: nil,
+            flexChild: nil,
+            spacing: nil,
+            background: nil,
+            text: TextStylingProperties(
+                textColor: nil,
+                fontSize: fontSize,
+                fontFamily: nil,
+                fontWeight: nil,
+                lineHeight: lineHeight,
+                horizontalTextAlign: nil,
+                baselineTextAlign: nil,
+                fontStyle: nil,
+                textTransform: nil,
+                letterSpacing: nil,
+                textDecoration: nil,
+                lineLimit: nil
+            )
+        )
+    }
 
     private func assertRichTextSnapshot(
         _ model: RichTextViewModel,
