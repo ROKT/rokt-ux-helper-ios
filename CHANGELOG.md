@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.12] - 2026-05-21
+
+### Fixed
+
+- Scale inter-block spacer by lineHeight ratio ([#288](https://github.com/ROKT/rokt-ux-helper-ios/pull/288))
+
 ## [0.10.11] - 2026-05-20
 
 ### Added
@@ -317,7 +323,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...HEAD
+[0.10.12]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...0.10.12
 [0.10.11]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...0.10.11
 [0.10.10]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.9...0.10.10
 [0.10.9]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.8...0.10.9
