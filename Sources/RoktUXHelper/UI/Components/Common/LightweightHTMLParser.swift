@@ -34,14 +34,20 @@ enum LightweightHTMLParser {
     /// so we fake the gap by emitting a tiny-font NBSP on its own line.
     private static let paragraphSpacerFontSize: CGFloat = 6
     private static let paragraphSpacerCharacter = "\u{00A0}"
+    /// Fraction of the caller-provided `blockSpacerHeight` used as the actual
+    /// spacer font size. Callers pass their full text `lineHeight`; a 1.0
+    /// ratio renders an entire blank line between blocks, which is too loose.
+    /// ~0.4 approximates the visual gap of CSS `margin: 0.5em 0` on `<p>`
+    /// once the parser's surrounding newlines are accounted for.
+    private static let blockSpacerLineHeightRatio: CGFloat = 0.4
 
     // MARK: - Public API
 
-    /// - Parameter blockSpacerHeight: Optional override for the font size used by
+    /// - Parameter blockSpacerHeight: Optional line-height hint used to size
     ///   the invisible spacer line inserted between `<p>` blocks and between
-    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` so the
-    ///   gap scales with the campaign's typography. `nil` falls back to the
-    ///   default 6pt.
+    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` and the
+    ///   parser scales it down (see `blockSpacerLineHeightRatio`) to a
+    ///   paragraph-sized gap. `nil` falls back to the default 6pt spacer.
     static func parse(
         html: String,
         baseFont: UIFont?,
@@ -54,7 +60,8 @@ enum LightweightHTMLParser {
         var paragraphStart: Int?
         var listStack: [ListContext] = []
         var listItemStarts: [OpenListItem] = []
-        let spacerFontSize = blockSpacerHeight ?? paragraphSpacerFontSize
+        let spacerFontSize = blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio }
+            ?? paragraphSpacerFontSize
 
         while index < html.endIndex {
             if html[index] == "<" {
