@@ -361,6 +361,67 @@ final class TestRichTextComponent: XCTestCase {
         assertRichTextSnapshot(model, height: 250)
     }
 
+    // MARK: - List item CSS-margin parity snapshots
+
+    //
+    // CSS analogue: bare `<li>` has `margin: 0` so adjacent items sit flush.
+    // A `<p>` child contributes its own margin, producing a visible gap
+    // between adjacent `<li>` items. These snapshots pin both shapes with
+    // a non-trivial lineHeight so the difference is visible.
+
+    /// Bare `<li>` siblings — no inter-item gap, even with lineHeight set.
+    func testSnapshot_bareListItems_withLineHeight() {
+        let model = RichTextViewModel(
+            value: "<ul><li>First bare item</li><li>Second bare item</li><li>Third bare item</li></ul>",
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// `<li><p>...</p></li>` siblings — gap from the inherited `<p>` margin.
+    func testSnapshot_listItemsWithParagraphs_withLineHeight() {
+        let value = """
+        <ul>\
+        <li><p>First item with paragraph</p></li>\
+        <li><p>Second item with paragraph</p></li>\
+        <li><p>Third item with paragraph</p></li>\
+        </ul>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 250)
+    }
+
+    /// Mixed siblings — locks the "previous-sibling carries the margin" rule:
+    /// `<li><p>`-then-bare gets a gap (from the prior `<p>`), bare-then-`<li><p>`
+    /// does not (the heuristic doesn't look ahead).
+    func testSnapshot_mixedBareAndParagraphListItems_withLineHeight() {
+        let value = """
+        <ul>\
+        <li><p>Paragraph item one</p></li>\
+        <li>Bare item two</li>\
+        <li>Bare item three</li>\
+        <li><p>Paragraph item four</p></li>\
+        </ul>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: [richTextStyle(lineHeight: 20)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 300)
+    }
+
     // MARK: - Helpers
 
     private func richTextStyle(fontSize: Float = 14, lineHeight: Float) -> RichTextStyle {

@@ -111,11 +111,18 @@ enum LightweightHTMLParser {
         enum Kind { case unordered, ordered }
         let kind: Kind
         var counter: Int
+        /// Whether the most recently closed `<li>` at this depth contained a
+        /// block-level child (currently `<p>`). Drives the CSS-style rule
+        /// that bare `<li>` siblings sit flush (no inter-item gap) while
+        /// `<li><p>...</p></li>` siblings get a spacer from the `<p>`'s
+        /// implied margin.
+        var lastClosedHadBlock: Bool
     }
 
     private struct OpenListItem {
         let contentStart: Int
         let depth: Int
+        var containedBlock: Bool
     }
 
     // MARK: - Tag dispatch
@@ -184,6 +191,11 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
+            // Mark the innermost open <li> as block-bearing so its closing
+            // propagates the flag to ListContext.lastClosedHadBlock.
+            if !listItemStarts.isEmpty {
+                listItemStarts[listItemStarts.count - 1].containedBlock = true
+            }
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
@@ -192,7 +204,7 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
-            listStack.append(ListContext(kind: .unordered, counter: 1))
+            listStack.append(ListContext(kind: .unordered, counter: 1, lastClosedHadBlock: false))
             stack.append(tag)
         case orderedListTag:
             insertBlockSeparatorIfNeeded(
@@ -200,7 +212,7 @@ enum LightweightHTMLParser {
                 listItemStarts: listItemStarts,
                 spacerFontSize: spacerFontSize
             )
-            listStack.append(ListContext(kind: .ordered, counter: 1))
+            listStack.append(ListContext(kind: .ordered, counter: 1, lastClosedHadBlock: false))
             stack.append(tag)
         case listItemTag:
             guard !listStack.isEmpty else {
@@ -221,9 +233,10 @@ enum LightweightHTMLParser {
                 )
             }
             ensureTrailingNewline(in: result)
-            // counter is bumped on close, so > 1 means at least one sibling
-            // already closed at this depth — insert a spacer line between them.
-            if listStack[currentDepth].counter > 1 {
+            // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
+            // child contributes its own margin. We emit the spacer only when
+            // the prior sibling at this depth contained a block child.
+            if listStack[currentDepth].counter > 1, listStack[currentDepth].lastClosedHadBlock {
                 appendBlockSpacer(to: result, fontSize: spacerFontSize)
             }
             // Apply the active tag-stack attributes to the marker so it inherits
@@ -231,7 +244,9 @@ enum LightweightHTMLParser {
             let prefix = listItemPrefix(for: listStack[currentDepth])
             let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
             result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
-            listItemStarts.append(OpenListItem(contentStart: result.length, depth: currentDepth))
+            listItemStarts.append(
+                OpenListItem(contentStart: result.length, depth: currentDepth, containedBlock: false)
+            )
             stack.append(tag)
         default:
             stack.append(tag)
@@ -306,7 +321,10 @@ enum LightweightHTMLParser {
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
         ensureTrailingNewline(in: result)
-        if item.depth < listStack.count { listStack[item.depth].counter += 1 }
+        if item.depth < listStack.count {
+            listStack[item.depth].counter += 1
+            listStack[item.depth].lastClosedHadBlock = item.containedBlock
+        }
         listItemStarts.removeLast()
         if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
             stack.remove(at: openLi)
