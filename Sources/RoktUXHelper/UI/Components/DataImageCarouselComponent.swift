@@ -236,7 +236,7 @@ struct DataImageCarouselComponent: View {
         AsyncImageView(
             imageUrl: ThemeUrl(light: image.light ?? "", dark: image.dark ?? ""),
             scale: .fit,
-            alt: image.alt,
+            alt: image.accessibilityAltText,
             imageLoader: model.imageLoader,
             isImageValid: .constant(true)
         )

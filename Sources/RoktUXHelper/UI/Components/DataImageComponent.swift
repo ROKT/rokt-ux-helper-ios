@@ -84,7 +84,7 @@ struct DataImageViewComponent: View {
         AsyncImageView(imageUrl: ThemeUrl(light: model.image?.light ?? "",
                                           dark: model.image?.dark ?? ""),
                        scale: .fit,
-                       alt: model.image?.alt,
+                       alt: model.image?.accessibilityAltText,
                        imageLoader: model.imageLoader,
                        isImageValid: $isImageValid)
     }

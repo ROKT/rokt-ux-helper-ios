@@ -42,6 +42,30 @@ final class TestDataImageComponent: XCTestCase {
         XCTAssertNil(try? image.find(AsyncImageView.self))
     }
 
+    func test_data_image_withGenericBackendAlt_isHiddenFromAccessibility() throws {
+        let imageURL = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
+        let slot = get_slot(image: imageURL, alt: "image")
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: [slot]))
+        let model = try transformer.getDataImage(
+            ModelTestData.DataImageData.dataImage(),
+            context: .inner(.generic(slot.offer!))
+        )
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(model))
+
+        let asyncImage = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(DataImageViewComponent.self)
+            .actualView()
+            .inspect()
+            .find(AsyncImageView.self)
+            .asyncImage()
+
+        XCTAssertEqual(try asyncImage.accessibilityLabel().string(), "")
+        XCTAssertEqual(try asyncImage.accessibilityHidden(), true)
+    }
+
     func test_data_image_with_fallback() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(try get_model(isValid: true, isFallback: true)))
 
@@ -96,7 +120,7 @@ final class TestDataImageComponent: XCTestCase {
         )
     }
 
-    func get_slot(image: String) -> SlotModel {
+    func get_slot(image: String, alt: String? = "") -> SlotModel {
         return SlotModel(instanceGuid: "",
                          offer: OfferModel(campaignId: "", creative:
                                             CreativeModel(referralCreativeId: "",
@@ -105,7 +129,8 @@ final class TestDataImageComponent: XCTestCase {
                                                           images: [
                                                               "creativeImage": CreativeImage(
                                                                   light: image,
-                                                                  dark: nil, alt: "",
+                                                                  dark: nil,
+                                                                  alt: alt,
                                                                   title: nil
                                                               )
                                                           ],
