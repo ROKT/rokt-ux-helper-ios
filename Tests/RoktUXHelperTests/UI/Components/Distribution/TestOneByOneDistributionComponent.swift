@@ -40,7 +40,8 @@ final class TestOneByOneDistributionComponent: XCTestCase {
         let padding = try oneByOne.padding()
         XCTAssertEqual(padding, EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 4.0))
 
-        XCTAssertEqual(try group.accessibilityLabel().string(), "Offer 1 of 1")
+        XCTAssertEqual(oneByOneComponent.accessibilityAnnouncement, "Offer 1 of 1")
+        XCTAssertThrowsError(try group.accessibilityLabel())
 
         oneByOneComponent.goToNextOffer()
         XCTAssertTrue(closeActionCalled)

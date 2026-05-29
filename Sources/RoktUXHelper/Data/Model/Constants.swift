@@ -72,6 +72,21 @@ let kPageAnnouncement = "Page %d of %d"
 let kOneByOneAnnouncement = "Offer %d of %d"
 let kProgressIndicatorAnnouncement = "%d of %d"
 
+/// Generic `creative.images` alt strings from the backend that are not meaningful for VoiceOver.
+let kNonDescriptiveCreativeImageAltTexts: Set<String> = [
+    "image",
+    "img",
+    "photo",
+    "picture",
+    "1.91:1 image",
+    "transparent 1.91:1 image",
+    "logo image",
+    "1.91:1 logo image",
+    "transparent 1.91:1 logo image",
+    "transparent logo image",
+    "transparent image"
+]
+
 // MARK: Cart Item Instant purchase constants
 
 let kCartItemId = "cartItemId"

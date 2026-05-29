@@ -33,7 +33,6 @@ struct OneByOneDistributionComponent: View {
     @State private var toggleTransition = false
     @State var customStateMap: RoktUXCustomStateMap?
 
-    @AccessibilityFocusState private var shouldFocusAccessibility: Bool
     var accessibilityAnnouncement: String {
         String(format: kOneByOneAnnouncement,
                currentOffer + 1,
@@ -116,13 +115,13 @@ struct OneByOneDistributionComponent: View {
                     registerActions()
                     toggleTransition = true
                     model.sendImpressionEvents(currentOffer: currentOffer)
-                    shouldFocusAccessibility = true
+                    UIAccessibility.post(notification: .announcement,
+                                         argument: accessibilityAnnouncement)
                 }
                 .onChange(of: currentOffer) { newValue in
                     model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     transitionIn()
                     model.sendImpressionEvents(currentOffer: newValue)
-                    shouldFocusAccessibility = true
                     UIAccessibility.post(notification: .announcement,
                                          argument: accessibilityAnnouncement)
                 }
@@ -144,9 +143,6 @@ struct OneByOneDistributionComponent: View {
                     model.sendCreativeViewedEvent(currentOffer: currentOffer)
                 }
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityFocused($shouldFocusAccessibility)
-            .accessibilityLabel(accessibilityAnnouncement)
         }
     }
 
