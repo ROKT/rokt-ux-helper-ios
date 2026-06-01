@@ -123,6 +123,15 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
             return decimalValue as! U
         }
 
+        // Last resort: if the caller wants a String but the value is something
+        // we can't stringify (e.g. a struct like CreativeImage reached when a
+        // placeholder path stops short of a leaf field), surface as empty so
+        // downstream placeholder logic treats it as "not present" rather than
+        // crashing on the trailing as! cast.
+        if type == String.self {
+            return "" as! U
+        }
+
         return value as! U
     }
 

@@ -40,6 +40,47 @@ final class DataReflectorTests: XCTestCase {
             14.99
         )
     }
+
+    func test_getReflectedValue_dictOfStructs_resolvesLeafField() {
+        // images is a [String: ReflectorTestImage] map. Resolving
+        // images.<key>.<field> must drill through the struct value, since the
+        // joined-key lookup ("catalogItemImage2.light") would otherwise miss.
+        let catalogMirror = Mirror(reflecting: ReflectorTestCatalog(images: [
+            "catalogItemImage0": ReflectorTestImage(light: "url0", dark: nil),
+            "catalogItemImage2": ReflectorTestImage(light: "url2", dark: "dark2")
+        ]))
+
+        XCTAssertEqual(
+            sut.getReflectedValue(data: catalogMirror, keys: ["images", "catalogItemImage2", "light"]) as? String,
+            "url2"
+        )
+        XCTAssertEqual(
+            sut.getReflectedValue(data: catalogMirror, keys: ["images", "catalogItemImage2", "dark"]) as? String,
+            "dark2"
+        )
+    }
+
+    func test_getReflectedValue_dictOfStructs_missingDictKey_returnsNil() {
+        let catalogMirror = Mirror(reflecting: ReflectorTestCatalog(images: [
+            "catalogItemImage0": ReflectorTestImage(light: "url0", dark: nil)
+        ]))
+
+        XCTAssertNil(
+            sut.getReflectedValue(data: catalogMirror, keys: ["images", "catalogItemImage2", "light"])
+        )
+    }
+
+    func test_getReflectedValue_dictOfStructs_missingLeafField_returnsNil() {
+        // Optional<String> with .none should surface as nil after the leaf lookup.
+        let catalogMirror = Mirror(reflecting: ReflectorTestCatalog(images: [
+            "catalogItemImage2": ReflectorTestImage(light: nil, dark: nil)
+        ]))
+
+        let result = sut.getReflectedValue(data: catalogMirror, keys: ["images", "catalogItemImage2", "light"])
+        // The reflector returns the raw Optional<String>.none here; callers
+        // (CatalogDataExtractor.unwrapOptional) collapse that to nil.
+        XCTAssertNil(result as? String)
+    }
 }
 
 struct Pet {
@@ -60,6 +101,15 @@ struct Suburb {
 
 struct ProductDetails {
     let copy: [String: Any]
+}
+
+struct ReflectorTestImage {
+    let light: String?
+    let dark: String?
+}
+
+struct ReflectorTestCatalog {
+    let images: [String: ReflectorTestImage]
 }
 
 let fakePet = Pet(name: "Ginger")

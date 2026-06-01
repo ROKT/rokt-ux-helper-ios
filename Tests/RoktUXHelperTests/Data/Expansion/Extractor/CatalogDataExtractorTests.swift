@@ -168,13 +168,75 @@ final class CatalogDataExtractorTests: XCTestCase {
         )
     }
 
+    func test_extractDataRepresentedBy_usingImageLeafField_returnsLightURL() {
+        // Validates the DataReflector dict-of-struct recursion end-to-end
+        // through the catalog extractor. This is the placeholder shape that
+        // the new layout uses to drive its When predicates:
+        //   %^DATA.catalogItem.images.catalogItemImage2.light^%
+        let catalogItem = makeCatalogItem(images: [
+            "catalogItemImage0": CreativeImage(light: "url0", dark: nil, alt: nil, title: nil),
+            "catalogItemImage2": CreativeImage(light: "url2", dark: nil, alt: nil, title: nil)
+        ])
+
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.images.catalogItemImage2.light",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("url2")
+        )
+    }
+
+    func test_extractDataRepresentedBy_usingImageLeafField_missingKey_returnsEmptyString() {
+        // Missing dict key → resolveValue returns nil → mandatoryKeyEmpty is
+        // thrown when there's no `| default`. PlaceholderPredicateResolver
+        // turns that into nil for the caller (covered separately in
+        // PlaceholderPredicateResolverTests).
+        let catalogItem = makeCatalogItem(images: [
+            "catalogItemImage0": CreativeImage(light: "url0", dark: nil, alt: nil, title: nil)
+        ])
+
+        // Add `|` trailing default to suppress mandatoryKeyEmpty so we can
+        // observe the empty-string surface from the extractor directly.
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.images.catalogItemImage2.light|",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("")
+        )
+    }
+
+    func test_extractDataRepresentedBy_usingImagePathStoppingAtStruct_returnsEmptyString() {
+        // If a placeholder stops at the struct level instead of a leaf field,
+        // coerce(String.self) now returns "" instead of crashing on `as! U`.
+        let catalogItem = makeCatalogItem(images: [
+            "catalogItemImage2": CreativeImage(light: "url2", dark: nil, alt: nil, title: nil)
+        ])
+
+        XCTAssertEqual(
+            try sut?.extractDataRepresentedBy(
+                String.self,
+                propertyChain: "DATA.catalogItem.images.catalogItemImage2",
+                responseKey: nil,
+                from: catalogItem
+            ),
+            .value("")
+        )
+    }
+
     private func makeCatalogItem(
         copy: [String: String]? = nil,
         price: Decimal? = 14.99,
-        minItemCount: Int? = nil
+        minItemCount: Int? = nil,
+        images: [String: CreativeImage] = [:]
     ) -> CatalogItem {
         .init(
-            images: [:],
+            images: images,
             catalogItemId: "catalog-item-id",
             cartItemId: "cart-item-id",
             instanceGuid: "instance-guid",
