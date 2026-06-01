@@ -130,6 +130,18 @@ final class TestDataImageComponent: XCTestCase {
         XCTAssertFalse(try get_data_image_component(for: nil).clipsToBounds)
     }
 
+    func test_dataImageDefaultWidth_defaultsToWrapContentForFitScale() throws {
+        XCTAssertEqual(try get_data_image_component(for: .fit).defaultWidth, .wrapContent)
+    }
+
+    func test_dataImageDefaultWidth_usesFitWidthForFillScale() throws {
+        XCTAssertEqual(try get_data_image_component(for: .fill).defaultWidth, .fitWidth)
+    }
+
+    func test_dataImageDefaultWidth_usesFitWidthForCropScale() throws {
+        XCTAssertEqual(try get_data_image_component(for: .crop).defaultWidth, .fitWidth)
+    }
+
     func get_model(isValid: Bool = true, isFallback: Bool = false) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""

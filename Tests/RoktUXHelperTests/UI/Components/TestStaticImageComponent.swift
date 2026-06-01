@@ -94,6 +94,18 @@ final class TestStaticImageComponent: XCTestCase {
     func test_staticImageClipsToBounds_defaultsToFalse() throws {
         XCTAssertFalse(try get_static_image_component(for: nil).clipsToBounds)
     }
+
+    func test_staticImageDefaultWidth_defaultsToWrapContentForFitScale() throws {
+        XCTAssertEqual(try get_static_image_component(for: .fit).defaultWidth, .wrapContent)
+    }
+
+    func test_staticImageDefaultWidth_usesFitWidthForFillScale() throws {
+        XCTAssertEqual(try get_static_image_component(for: .fill).defaultWidth, .fitWidth)
+    }
+
+    func test_staticImageDefaultWidth_usesFitWidthForCropScale() throws {
+        XCTAssertEqual(try get_static_image_component(for: .crop).defaultWidth, .fitWidth)
+    }
     
     func get_model(_ layoutName: LayoutName) throws -> StaticImageViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())

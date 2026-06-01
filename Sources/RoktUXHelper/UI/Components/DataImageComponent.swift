@@ -28,6 +28,7 @@ struct DataImageViewComponent: View {
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
     var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
+    var defaultWidth: WidthFitProperty { imageScale == .fit ? .wrapContent : .fitWidth }
     var clipsToBounds: Bool { imageScale != .fit || (borderStyle?.borderRadius ?? 0) > 0 }
 
     let config: ComponentConfig
@@ -69,7 +70,7 @@ struct DataImageViewComponent: View {
                     parentHeight: $parentHeight,
                     parentOverride: parentOverride,
                     defaultHeight: .wrapContent,
-                    defaultWidth: .wrapContent,
+                    defaultWidth: defaultWidth,
                     expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign,
                     clipsToBounds: clipsToBounds,
                     imageLoader: model.imageLoader
