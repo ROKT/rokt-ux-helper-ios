@@ -183,13 +183,18 @@ final class TestStyleTransformer: XCTestCase {
                                                                                  maxHeight: nil,
                                                                                  height: nil, 
                                                                                  rotateZ: nil),
+                                           image: ImageStylingProperties(scale: .fit),
                                            flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                                            spacing: nil)
         
         let pressed = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
                                                                                                           dark: nil),
                                                                               backgroundImage: nil),
-                                      border: nil, dimension: nil, flexChild: nil, spacing: nil)
+                                      border: nil,
+                                      dimension: nil,
+                                      image: ImageStylingProperties(scale: .fill),
+                                      flexChild: nil,
+                                      spacing: nil)
         
         let expectedStyle = DataImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
                                                                                                                 dark: nil),
@@ -202,6 +207,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                   maxHeight: nil,
                                                                                   height: nil,
                                                                                   rotateZ: nil),
+                                            image: ImageStylingProperties(scale: .fill),
                                             flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                                             spacing: nil)
         
@@ -214,6 +220,7 @@ final class TestStyleTransformer: XCTestCase {
         XCTAssertEqual(transformedStyle.flexChild, expectedStyle.flexChild)
         XCTAssertEqual(transformedStyle.spacing, expectedStyle.spacing)
         XCTAssertEqual(transformedStyle.border, expectedStyle.border)
+        XCTAssertEqual(transformedStyle.image, expectedStyle.image)
     }
     
     func test_get_updated_style_static_image() throws {
@@ -227,13 +234,18 @@ final class TestStyleTransformer: XCTestCase {
                                                                                    maxHeight: nil,
                                                                                    height: nil, 
                                                                                  rotateZ: nil),
+                                             image: ImageStylingProperties(scale: .fit),
                                              flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                                              spacing: nil)
         
         let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
                                                                                                             dark: nil),
                                                                                 backgroundImage: nil),
-                                        border: nil, dimension: nil, flexChild: nil, spacing: nil)
+                                        border: nil,
+                                        dimension: nil,
+                                        image: ImageStylingProperties(scale: .fill),
+                                        flexChild: nil,
+                                        spacing: nil)
         
         let expectedStyle =
             StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
@@ -247,6 +259,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                     maxHeight: nil,
                                                                     height: nil, 
                                                                                   rotateZ: nil),
+                              image: ImageStylingProperties(scale: .fill),
                               flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                               spacing: nil)
         
@@ -259,6 +272,7 @@ final class TestStyleTransformer: XCTestCase {
         XCTAssertEqual(transformedStyle?.flexChild, expectedStyle.flexChild)
         XCTAssertEqual(transformedStyle?.spacing, expectedStyle.spacing)
         XCTAssertEqual(transformedStyle?.border, expectedStyle.border)
+        XCTAssertEqual(transformedStyle?.image, expectedStyle.image)
     }
     
     func test_get_updated_style_static_image_with_breakpoints() throws {
@@ -272,13 +286,18 @@ final class TestStyleTransformer: XCTestCase {
                                                                                    maxHeight: nil,
                                                                                    height: nil, 
                                                                                  rotateZ: nil),
+                                             image: ImageStylingProperties(scale: .fit),
                                              flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                                              spacing: nil)
         
         let pressed = StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
                                                                                                             dark: nil),
                                                                                 backgroundImage: nil),
-                                        border: nil, dimension: nil, flexChild: nil, spacing: nil)
+                                        border: nil,
+                                        dimension: nil,
+                                        image: ImageStylingProperties(scale: .fill),
+                                        flexChild: nil,
+                                        spacing: nil)
         
         let expectedStyle =
             StaticImageStyles(background: BackgroundStylingProperties(backgroundColor: ThemeColor(light: "#000000",
@@ -292,6 +311,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                     maxHeight: nil,
                                                                     height: nil, 
                                                                                   rotateZ: nil),
+                              image: ImageStylingProperties(scale: .fill),
                               flexChild: FlexChildStylingProperties(weight: 0, order: 0, alignSelf: nil),
                               spacing: nil)
         let styles = [BasicStateStylingBlock<StaticImageStyles>(default: defaultStyle,
@@ -314,12 +334,14 @@ final class TestStyleTransformer: XCTestCase {
         XCTAssertEqual(transformedStyle.first?.default.flexChild, defaultStyle.flexChild)
         XCTAssertEqual(transformedStyle.first?.default.spacing, defaultStyle.spacing)
         XCTAssertEqual(transformedStyle.first?.default.border, defaultStyle.border)
+        XCTAssertEqual(transformedStyle.first?.default.image, defaultStyle.image)
         // The pressed styles should be the same as default
         XCTAssertEqual(transformedStyle.first?.pressed?.background, defaultStyle.background)
         XCTAssertEqual(transformedStyle.first?.pressed?.dimension, defaultStyle.dimension)
         XCTAssertEqual(transformedStyle.first?.pressed?.flexChild, defaultStyle.flexChild)
         XCTAssertEqual(transformedStyle.first?.pressed?.spacing, defaultStyle.spacing)
         XCTAssertEqual(transformedStyle.first?.pressed?.border, defaultStyle.border)
+        XCTAssertEqual(transformedStyle.first?.pressed?.image, defaultStyle.image)
         
         // Check the second bereakpoint
         XCTAssertEqual(transformedStyle[1].default.background, defaultStyle.background)
@@ -327,12 +349,14 @@ final class TestStyleTransformer: XCTestCase {
         XCTAssertEqual(transformedStyle[1].default.flexChild, defaultStyle.flexChild)
         XCTAssertEqual(transformedStyle[1].default.spacing, defaultStyle.spacing)
         XCTAssertEqual(transformedStyle[1].default.border, defaultStyle.border)
+        XCTAssertEqual(transformedStyle[1].default.image, defaultStyle.image)
         // Check the pressed style on the second bereakpoint 
         XCTAssertEqual(transformedStyle[1].pressed?.background, expectedStyle.background)
         XCTAssertEqual(transformedStyle[1].pressed?.dimension, expectedStyle.dimension)
         XCTAssertEqual(transformedStyle[1].pressed?.flexChild, expectedStyle.flexChild)
         XCTAssertEqual(transformedStyle[1].pressed?.spacing, expectedStyle.spacing)
         XCTAssertEqual(transformedStyle[1].pressed?.border, expectedStyle.border)
+        XCTAssertEqual(transformedStyle[1].pressed?.image, expectedStyle.image)
     }
     
     func test_get_updated_style_progress_indicator() throws {

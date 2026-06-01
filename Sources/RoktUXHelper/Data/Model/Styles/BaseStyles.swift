@@ -7,6 +7,7 @@ struct BaseStyles: Codable, Hashable {
     let container: ContainerStylingProperties?
     let dimension: DimensionStylingProperties?
     let flexChild: FlexChildStylingProperties?
+    let image: ImageStylingProperties?
     let spacing: SpacingStylingProperties?
     let text: TextStylingProperties?
 
@@ -16,6 +17,7 @@ struct BaseStyles: Codable, Hashable {
         container: ContainerStylingProperties? = nil,
         dimension: DimensionStylingProperties? = nil,
         flexChild: FlexChildStylingProperties? = nil,
+        image: ImageStylingProperties? = nil,
         spacing: SpacingStylingProperties? = nil,
         text: TextStylingProperties? = nil
     ) {
@@ -24,6 +26,7 @@ struct BaseStyles: Codable, Hashable {
         self.container = container
         self.dimension = dimension
         self.flexChild = flexChild
+        self.image = image
         self.spacing = spacing
         self.text = text
     }
@@ -40,6 +43,7 @@ extension BaseStyles {
             container: try? StyleTransformer.updatedContainer(style?.container, newStyle: diff.container),
             dimension: StyleTransformer.updatedDimension(style?.dimension, newStyle: diff.dimension),
             flexChild: StyleTransformer.updatedFlexChild(style?.flexChild, newStyle: diff.flexChild),
+            image: StyleTransformer.updatedImage(style?.image, newStyle: diff.image),
             spacing: StyleTransformer.updatedSpacing(style?.spacing, newStyle: diff.spacing),
             text: try? StyleTransformer.updatedText(style?.text, newStyle: diff.text)
         )
@@ -54,6 +58,7 @@ extension BaseStyles {
             border: style.border,
             dimension: style.dimension,
             flexChild: style.flexChild,
+            image: style.image,
             spacing: style.spacing
         )
     }
@@ -121,6 +126,7 @@ extension CatalogImageGalleryStyles {
             background: background,
             border: border,
             dimension: dimension,
+            image: nil,
             flexChild: flexChild,
             spacing: spacing
         )

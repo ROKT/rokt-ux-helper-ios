@@ -27,6 +27,7 @@ struct StaticImageViewComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
 
     let config: ComponentConfig
     let model: StaticImageViewModel
@@ -81,7 +82,7 @@ struct StaticImageViewComponent: View {
     func build() -> some View {
         AsyncImageView(
             imageUrl: toThemeUrl(model.url),
-            scale: .fit,
+            scale: imageScale,
             alt: model.alt,
             imageLoader: model.imageLoader,
             isImageValid: $isImageValid

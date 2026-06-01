@@ -27,6 +27,7 @@ struct DataImageViewComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
 
     let config: ComponentConfig
     let model: DataImageViewModel
@@ -83,7 +84,7 @@ struct DataImageViewComponent: View {
     func build() -> some View {
         AsyncImageView(imageUrl: ThemeUrl(light: model.image?.light ?? "",
                                           dark: model.image?.dark ?? ""),
-                       scale: .fit,
+                       scale: imageScale,
                        alt: model.image?.accessibilityAltText,
                        imageLoader: model.imageLoader,
                        isImageValid: $isImageValid)

@@ -53,7 +53,7 @@ struct BackgroundImageModifier: ViewModifier {
         content.background(alignment: bgAlignment) {
             hasBackgroundImage ?
                 AnyView(AsyncImageView(imageUrl: backgroundImage?.url,
-                                       scale: backgroundImage?.scale,
+                                       scale: backgroundImage?.scale?.asImageRenderScale,
                                        imageLoader: imageLoader,
                                        isImageValid: $isImageValid)) :
                 AnyView(EmptyView())

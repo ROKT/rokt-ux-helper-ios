@@ -1,16 +1,22 @@
 import SwiftUI
-import DcuiSchema
 
 @available(iOS 15.0, *)
 extension Image {
-    func scaleIfNeeded(scale: BackgroundImageScale?) -> some View {
-        switch scale {
+    func scaleIfNeeded(scale: ImageRenderScale?) -> some View {
+        let imageScale = scale ?? .fit
+
+        switch imageScale {
         case .crop:
             return AnyView(self) // No resizing or scaling
-        default:
+        case .fill:
             return AnyView(self
                 .resizable()
-                .aspectRatio(contentMode: scale?.getScale() ?? .fit))
+                .aspectRatio(contentMode: imageScale.contentMode)
+                .clipped())
+        case .fit:
+            return AnyView(self
+                .resizable()
+                .aspectRatio(contentMode: imageScale.contentMode))
         }
     }
 }

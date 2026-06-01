@@ -108,6 +108,16 @@ final class TestDataImageComponent: XCTestCase {
                        ))
     }
 
+    func test_dataImageScale_defaultsToFit() throws {
+        XCTAssertEqual(try get_async_image_scale(for: nil), .fit)
+    }
+
+    func test_dataImageScale_usesConfiguredScale() throws {
+        XCTAssertEqual(try get_async_image_scale(for: .fit), .fit)
+        XCTAssertEqual(try get_async_image_scale(for: .fill), .fill)
+        XCTAssertEqual(try get_async_image_scale(for: .crop), .crop)
+    }
+
     func get_model(isValid: Bool = true, isFallback: Bool = false) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""
@@ -142,5 +152,45 @@ final class TestDataImageComponent: XCTestCase {
                                            transactionData: nil),
                          layoutVariant: nil,
                          jwtToken: "slot-token")
+    }
+
+    func get_async_image_scale(for scale: DcuiSchema.ImageScale?) throws -> ImageRenderScale? {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(get_model(scale: scale)))
+
+        return try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(DataImageViewComponent.self)
+            .actualView()
+            .inspect()
+            .find(AsyncImageView.self)
+            .actualView()
+            .scale
+    }
+
+    func get_model(scale: DcuiSchema.ImageScale?) -> DataImageViewModel {
+        DataImageViewModel(
+            image: CreativeImage(
+                light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
+                dark: nil,
+                alt: "",
+                title: nil
+            ),
+            defaultStyle: [
+                DataImageStyles(
+                    background: nil,
+                    border: nil,
+                    dimension: nil,
+                    image: scale.map { ImageStylingProperties(scale: $0) },
+                    flexChild: nil,
+                    spacing: nil
+                )
+            ],
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            layoutState: nil
+        )
     }
 }
