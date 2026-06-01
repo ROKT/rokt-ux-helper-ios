@@ -82,6 +82,18 @@ final class TestStaticImageComponent: XCTestCase {
         XCTAssertEqual(try get_async_image_scale(for: .fill), .fill)
         XCTAssertEqual(try get_async_image_scale(for: .crop), .crop)
     }
+
+    func test_staticImageClipsToBounds_forFillScale() throws {
+        XCTAssertTrue(try get_static_image_component(for: .fill).clipsToBounds)
+    }
+
+    func test_staticImageClipsToBounds_forBorderRadius() throws {
+        XCTAssertTrue(try get_static_image_component(for: nil, borderRadius: 16).clipsToBounds)
+    }
+
+    func test_staticImageClipsToBounds_defaultsToFalse() throws {
+        XCTAssertFalse(try get_static_image_component(for: nil).clipsToBounds)
+    }
     
     func get_model(_ layoutName: LayoutName) throws -> StaticImageViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
@@ -97,7 +109,20 @@ final class TestStaticImageComponent: XCTestCase {
     }
 
     func get_async_image_scale(for scale: DcuiSchema.ImageScale?) throws -> ImageRenderScale? {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(get_model(scale: scale)))
+        try get_static_image_component(for: scale)
+            .inspect()
+            .find(AsyncImageView.self)
+            .actualView()
+            .scale
+    }
+
+    func get_static_image_component(
+        for scale: DcuiSchema.ImageScale?,
+        borderRadius: Float? = nil
+    ) throws -> StaticImageViewComponent {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.staticImage(
+            get_model(scale: scale, borderRadius: borderRadius)
+        ))
 
         return try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -105,13 +130,9 @@ final class TestStaticImageComponent: XCTestCase {
             .view(LayoutSchemaComponent.self)
             .view(StaticImageViewComponent.self)
             .actualView()
-            .inspect()
-            .find(AsyncImageView.self)
-            .actualView()
-            .scale
     }
 
-    func get_model(scale: DcuiSchema.ImageScale?) -> StaticImageViewModel {
+    func get_model(scale: DcuiSchema.ImageScale?, borderRadius: Float? = nil) -> StaticImageViewModel {
         StaticImageViewModel(
             url: StaticImageUrl(
                 light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
@@ -120,7 +141,15 @@ final class TestStaticImageComponent: XCTestCase {
             alt: "",
             stylingProperties: [
                 BasicStateStylingBlock<BaseStyles>(
-                    default: BaseStyles(image: scale.map { ImageStylingProperties(scale: $0) }),
+                    default: BaseStyles(
+                        border: borderRadius.map {
+                            BorderStylingProperties(borderRadius: $0,
+                                                    borderColor: nil,
+                                                    borderWidth: nil,
+                                                    borderStyle: nil)
+                        },
+                        image: scale.map { ImageStylingProperties(scale: $0) }
+                    ),
                     pressed: nil,
                     hovered: nil,
                     focussed: nil,

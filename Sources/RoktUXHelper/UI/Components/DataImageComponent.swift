@@ -28,6 +28,7 @@ struct DataImageViewComponent: View {
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
     var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
+    var clipsToBounds: Bool { imageScale != .fit || (borderStyle?.borderRadius ?? 0) > 0 }
 
     let config: ComponentConfig
     let model: DataImageViewModel
@@ -70,6 +71,7 @@ struct DataImageViewComponent: View {
                     defaultHeight: .wrapContent,
                     defaultWidth: .wrapContent,
                     expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign,
+                    clipsToBounds: clipsToBounds,
                     imageLoader: model.imageLoader
                 )
                 .onChange(of: globalScreenSize.width) { newSize in

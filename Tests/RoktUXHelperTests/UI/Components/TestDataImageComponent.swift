@@ -118,6 +118,18 @@ final class TestDataImageComponent: XCTestCase {
         XCTAssertEqual(try get_async_image_scale(for: .crop), .crop)
     }
 
+    func test_dataImageClipsToBounds_forFillScale() throws {
+        XCTAssertTrue(try get_data_image_component(for: .fill).clipsToBounds)
+    }
+
+    func test_dataImageClipsToBounds_forBorderRadius() throws {
+        XCTAssertTrue(try get_data_image_component(for: nil, borderRadius: 16).clipsToBounds)
+    }
+
+    func test_dataImageClipsToBounds_defaultsToFalse() throws {
+        XCTAssertFalse(try get_data_image_component(for: nil).clipsToBounds)
+    }
+
     func get_model(isValid: Bool = true, isFallback: Bool = false) throws -> DataImageViewModel {
         let validImage = "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png"
         let invalidImage = ""
@@ -155,7 +167,20 @@ final class TestDataImageComponent: XCTestCase {
     }
 
     func get_async_image_scale(for scale: DcuiSchema.ImageScale?) throws -> ImageRenderScale? {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(get_model(scale: scale)))
+        try get_data_image_component(for: scale)
+            .inspect()
+            .find(AsyncImageView.self)
+            .actualView()
+            .scale
+    }
+
+    func get_data_image_component(
+        for scale: DcuiSchema.ImageScale?,
+        borderRadius: Float? = nil
+    ) throws -> DataImageViewComponent {
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.dataImage(
+            get_model(scale: scale, borderRadius: borderRadius)
+        ))
 
         return try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
@@ -163,13 +188,9 @@ final class TestDataImageComponent: XCTestCase {
             .view(LayoutSchemaComponent.self)
             .view(DataImageViewComponent.self)
             .actualView()
-            .inspect()
-            .find(AsyncImageView.self)
-            .actualView()
-            .scale
     }
 
-    func get_model(scale: DcuiSchema.ImageScale?) -> DataImageViewModel {
+    func get_model(scale: DcuiSchema.ImageScale?, borderRadius: Float? = nil) -> DataImageViewModel {
         DataImageViewModel(
             image: CreativeImage(
                 light: "https://docs.rokt.com/assets/images/embedded-placement-1-5ab04a718fe7dda94ac24aa7b89aac92.png",
@@ -180,7 +201,12 @@ final class TestDataImageComponent: XCTestCase {
             defaultStyle: [
                 DataImageStyles(
                     background: nil,
-                    border: nil,
+                    border: borderRadius.map {
+                        BorderStylingProperties(borderRadius: $0,
+                                                borderColor: nil,
+                                                borderWidth: nil,
+                                                borderStyle: nil)
+                    },
                     dimension: nil,
                     image: scale.map { ImageStylingProperties(scale: $0) },
                     flexChild: nil,
