@@ -33,7 +33,21 @@ struct DataReflector: DataReflecting {
                 let remainingKeys = Array(keys.dropFirst())
                 let remainingKeysAsString = remainingKeys.joined(separator: BNFSeparator.namespace.rawValue)
 
-                targetProperty = valueDict[remainingKeysAsString]
+                if let directValue = valueDict[remainingKeysAsString] {
+                    // existing path: dict key contains the full dotted name
+                    // (e.g. copy["provider.discountPercent"])
+                    targetProperty = directValue
+                } else if remainingKeys.count > 1,
+                          let nestedValue = valueDict[remainingKeys[0]] {
+                    // dict value is itself a struct/object — recurse into it
+                    // with the leftover keys, so e.g. images["catalogItemImage2"].light
+                    // resolves through CreativeImage.light.
+                    let nestedMirror = Mirror(reflecting: nestedValue)
+                    targetProperty = getReflectedValue(
+                        data: nestedMirror,
+                        keys: Array(remainingKeys.dropFirst())
+                    )
+                }
 
                 break
             } else {
