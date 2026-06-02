@@ -27,6 +27,9 @@ struct DataImageViewComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
+    var defaultWidth: WidthFitProperty { imageScale == .fit ? .wrapContent : .fitWidth }
+    var clipsToBounds: Bool { imageScale != .fit || (borderStyle?.borderRadius ?? 0) > 0 }
 
     let config: ComponentConfig
     let model: DataImageViewModel
@@ -67,8 +70,9 @@ struct DataImageViewComponent: View {
                     parentHeight: $parentHeight,
                     parentOverride: parentOverride,
                     defaultHeight: .wrapContent,
-                    defaultWidth: .wrapContent,
+                    defaultWidth: defaultWidth,
                     expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign,
+                    clipsToBounds: clipsToBounds,
                     imageLoader: model.imageLoader
                 )
                 .onChange(of: globalScreenSize.width) { newSize in
@@ -83,7 +87,7 @@ struct DataImageViewComponent: View {
     func build() -> some View {
         AsyncImageView(imageUrl: ThemeUrl(light: model.image?.light ?? "",
                                           dark: model.image?.dark ?? ""),
-                       scale: .fit,
+                       scale: imageScale,
                        alt: model.image?.accessibilityAltText,
                        imageLoader: model.imageLoader,
                        isImageValid: $isImageValid)

@@ -32,6 +32,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
     let applyAlignSelf: Bool
     let applyMargin: Bool
     @Binding var frameChangeIndex: Int
+    let clipsToBounds: Bool
     let imageLoader: RoktUXImageLoader?
 
     func body(content: Content) -> some View {
@@ -51,6 +52,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
                    parentOverride: parentOverride,
                    margin: getMargin())
             .background(backgroundStyle: background, imageLoader: imageLoader)
+            .clipToBounds(clipsToBounds, borderRadius: border?.borderRadius)
             .border(
                 borderRadius: border?.borderRadius,
                 borderColor: border?.borderColor,
@@ -117,6 +119,7 @@ internal extension View {
         applyAlignSelf: Bool = true,
         applyMargin: Bool = true,
         frameChangeIndex: Binding<Int> = .constant(0),
+        clipsToBounds: Bool = false,
         imageLoader: RoktUXImageLoader?
     ) -> some View {
         modifier(LayoutSchemaModifier(
@@ -142,6 +145,7 @@ internal extension View {
             applyAlignSelf: applyAlignSelf,
             applyMargin: applyMargin,
             frameChangeIndex: frameChangeIndex,
+            clipsToBounds: clipsToBounds,
             imageLoader: imageLoader
         ))
     }

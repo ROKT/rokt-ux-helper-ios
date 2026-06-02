@@ -445,6 +445,8 @@ struct StyleTransformer {
                                                            newStyle: newStyle?.border),
                                  dimension: updatedDimension(defaultStyle?.dimension,
                                                              newStyle: newStyle?.dimension),
+                                 image: updatedImage(defaultStyle?.image,
+                                                     newStyle: newStyle?.image),
                                  flexChild: updatedFlexChild(defaultStyle?.flexChild,
                                                              newStyle: newStyle?.flexChild),
                                  spacing: updatedSpacing(defaultStyle?.spacing,
@@ -459,6 +461,8 @@ struct StyleTransformer {
                                                          newStyle: newStyle?.border),
                                dimension: updatedDimension(defaultStyle?.dimension,
                                                            newStyle: newStyle?.dimension),
+                               image: updatedImage(defaultStyle?.image,
+                                                   newStyle: newStyle?.image),
                                flexChild: updatedFlexChild(defaultStyle?.flexChild,
                                                            newStyle: newStyle?.flexChild),
                                spacing: updatedSpacing(defaultStyle?.spacing,
@@ -721,6 +725,12 @@ struct StyleTransformer {
         return SpacingStylingProperties(padding: newStyle?.padding ?? defaultStyle?.padding,
                                         margin: newStyle?.margin ?? defaultStyle?.margin,
                                         offset: newStyle?.offset ?? defaultStyle?.offset)
+    }
+
+    static func updatedImage(_ defaultStyle: ImageStylingProperties?,
+                             newStyle: ImageStylingProperties?) -> ImageStylingProperties? {
+        guard defaultStyle != nil || newStyle != nil else { return nil }
+        return ImageStylingProperties(scale: newStyle?.scale ?? defaultStyle?.scale)
     }
 
     static func updatedBorder(_ defaultStyle: BorderStylingProperties?,

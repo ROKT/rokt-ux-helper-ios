@@ -7,7 +7,7 @@ struct AsyncImageView: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
 
     let imageUrl: ThemeUrl?
-    let scale: BackgroundImageScale?
+    let scale: ImageRenderScale?
     var alt: String?
     var imageLoader: RoktUXImageLoader?
 

@@ -77,6 +77,14 @@ extension View {
             self
         }
     }
+
+    @ViewBuilder func clipToBounds(_ shouldClip: Bool, borderRadius: Float?) -> some View {
+        if shouldClip {
+            clipShape(RoundedRectangle(cornerRadius: CGFloat(borderRadius ?? 0)))
+        } else {
+            self
+        }
+    }
 }
 
 private struct SizePreferenceKey: PreferenceKey {

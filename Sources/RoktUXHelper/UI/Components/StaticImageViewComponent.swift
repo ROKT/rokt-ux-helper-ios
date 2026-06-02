@@ -27,6 +27,9 @@ struct StaticImageViewComponent: View {
     var borderStyle: BorderStylingProperties? { style?.border }
     var spacingStyle: SpacingStylingProperties? { style?.spacing }
     var backgroundStyle: BackgroundStylingProperties? { style?.background }
+    var imageScale: ImageRenderScale { style?.image?.scale?.asImageRenderScale ?? .fit }
+    var defaultWidth: WidthFitProperty { imageScale == .fit ? .wrapContent : .fitWidth }
+    var clipsToBounds: Bool { imageScale != .fit || (borderStyle?.borderRadius ?? 0) > 0 }
 
     let config: ComponentConfig
     let model: StaticImageViewModel
@@ -64,8 +67,9 @@ struct StaticImageViewComponent: View {
                     parentHeight: $parentHeight,
                     parentOverride: parentOverride,
                     defaultHeight: .wrapContent,
-                    defaultWidth: .wrapContent,
+                    defaultWidth: defaultWidth,
                     expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign,
+                    clipsToBounds: clipsToBounds,
                     imageLoader: model.imageLoader
                 )
                 .onChange(of: globalScreenSize.width) { newSize in
@@ -81,7 +85,7 @@ struct StaticImageViewComponent: View {
     func build() -> some View {
         AsyncImageView(
             imageUrl: toThemeUrl(model.url),
-            scale: .fit,
+            scale: imageScale,
             alt: model.alt,
             imageLoader: model.imageLoader,
             isImageValid: $isImageValid
