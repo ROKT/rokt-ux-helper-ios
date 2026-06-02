@@ -59,6 +59,14 @@ jobs:
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
+  size-report:
+    if: github.event_name == 'pull_request'
+    name: Size Report
+    uses: ./.github/workflows/ci-size-report.yml
+    permissions:
+      contents: read
+      pull-requests: write
+
   pr-notify:
     if: >
       github.event_name == 'pull_request' &&
