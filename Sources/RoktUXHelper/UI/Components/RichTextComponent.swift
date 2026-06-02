@@ -145,6 +145,13 @@ struct RichTextComponent: View {
                 }
                 .onAppear {
                     model.onAppear(textStyle: style)
+                    // The attributed string colour is baked once at layout-transform time using
+                    // `UITraitCollection.current` (the device appearance). `onChange(of: colorScheme)`
+                    // only re-bakes when the scheme *changes*, so an offer that is revealed later
+                    // (e.g. carousel navigation) while the host keeps a constant, forced appearance
+                    // never re-syncs and can render with the wrong colour. Re-bake against the live
+                    // SwiftUI environment on appear so RichText matches the rest of the layout.
+                    model.updateAttributedString(colorScheme)
                 }
         }
     }
