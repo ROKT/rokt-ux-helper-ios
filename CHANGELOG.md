@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-06-03
+
+### Added
+
+- Relax Codable→Decodable to unlock schema drop-Encodable tier ([#275](https://github.com/ROKT/rokt-ux-helper-ios/pull/275))
+- Add PR app size impact report ([#296](https://github.com/ROKT/rokt-ux-helper-ios/pull/296))
+- Resolve nested image fields in catalog placeholders ([#294](https://github.com/ROKT/rokt-ux-helper-ios/pull/294))
+- Support image scale styles ([#293](https://github.com/ROKT/rokt-ux-helper-ios/pull/293))
+
+### Fixed
+
+- Re-sync RichText colour to live colour scheme on appear ([#295](https://github.com/ROKT/rokt-ux-helper-ios/pull/295))
+- Ignore invalid alt text for images ([#290](https://github.com/ROKT/rokt-ux-helper-ios/pull/290))
+
+### Changed
+
+- Bump actions/checkout from 6.0.2 to 6.0.3 ([#297](https://github.com/ROKT/rokt-ux-helper-ios/pull/297))
+- Upgrade trunk ([#292](https://github.com/ROKT/rokt-ux-helper-ios/pull/292))
+- Add public-repo confidentiality guidance ([#291](https://github.com/ROKT/rokt-ux-helper-ios/pull/291))
+- Add AGENTS.md and clarify CHANGELOG is auto-generated ([#287](https://github.com/ROKT/rokt-ux-helper-ios/pull/287))
+
 ## [0.10.12] - 2026-05-21
 
 ### Fixed
@@ -323,7 +344,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...HEAD
+[0.11.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...0.11.0
 [0.10.12]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...0.10.12
 [0.10.11]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...0.10.11
 [0.10.10]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.9...0.10.10
