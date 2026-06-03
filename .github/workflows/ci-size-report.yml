@@ -1,0 +1,210 @@
+name: CI – Size Report
+
+on:
+  workflow_call:
+
+concurrency:
+  group: size-report-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  COMMENT_IDENTIFIER: <!-- ux-helper-size-report -->
+
+jobs:
+  measure-size:
+    runs-on: macos-15
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: pr-branch
+
+      - name: Checkout target branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          path: base-branch
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
+        with:
+          xcode-version: "26.2"
+
+      # The base branch may not have the size tooling yet (e.g. before this
+      # merges, or if the script is relocated); both steps fall back to an empty
+      # result so the job degrades to "N/A" instead of failing.
+      - name: Build and measure target branch
+        id: base-size
+        working-directory: base-branch
+        continue-on-error: true
+        run: |
+          RESULT='{}'
+          if [[ -f Tests/SizeReport/measure_size.sh ]]; then
+            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null) || RESULT='{}'
+          fi
+          echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
+          echo "$RESULT" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("helper_impact_kb=%d" % int(d.get("helper_impact_kb", 0))); print("helper_exec_kb=%d" % (int(d.get("helper_executable_impact_bytes", 0)) // 1024)); print("exists=" + ("true" if d else "false"))' >> "$GITHUB_OUTPUT"
+
+      - name: Build and measure PR branch
+        id: pr-size
+        working-directory: pr-branch
+        continue-on-error: true
+        run: |
+          RESULT='{}'
+          if [[ -f Tests/SizeReport/measure_size.sh ]]; then
+            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null) || RESULT='{}'
+          fi
+          echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
+          echo "$RESULT" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("helper_impact_kb=%d" % int(d.get("helper_impact_kb", 0))); print("helper_exec_kb=%d" % (int(d.get("helper_executable_impact_bytes", 0)) // 1024)); print("exists=" + ("true" if d else "false"))' >> "$GITHUB_OUTPUT"
+
+      - name: Calculate size delta
+        id: delta
+        run: |
+          BASE_EXISTS=${{ steps.base-size.outputs.exists }}
+          PR_EXISTS=${{ steps.pr-size.outputs.exists }}
+          BASE_IMPACT=${{ steps.base-size.outputs.helper_impact_kb }}
+          PR_IMPACT=${{ steps.pr-size.outputs.helper_impact_kb }}
+          BASE_EXEC=${{ steps.base-size.outputs.helper_exec_kb }}
+          PR_EXEC=${{ steps.pr-size.outputs.helper_exec_kb }}
+
+          if [[ "$BASE_EXISTS" != "true" ]] || [[ "$PR_EXISTS" != "true" ]] || [[ "$BASE_IMPACT" -eq 0 ]]; then
+            echo "delta_kb=N/A" >> "$GITHUB_OUTPUT"
+            echo "delta_exec=N/A" >> "$GITHUB_OUTPUT"
+            echo "status=unavailable" >> "$GITHUB_OUTPUT"
+          else
+            DELTA_KB=$((PR_IMPACT - BASE_IMPACT))
+            DELTA_EXEC=$((PR_EXEC - BASE_EXEC))
+            echo "delta_kb=${DELTA_KB}" >> "$GITHUB_OUTPUT"
+            echo "delta_exec=${DELTA_EXEC}" >> "$GITHUB_OUTPUT"
+
+            if [[ "$DELTA_KB" -gt 5 ]]; then
+              echo "status=increase" >> "$GITHUB_OUTPUT"
+            elif [[ "$DELTA_KB" -lt -5 ]]; then
+              echo "status=decrease" >> "$GITHUB_OUTPUT"
+            else
+              echo "status=neutral" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Format sizes for display
+        id: format
+        run: |
+          format_size() {
+            local kb="$1"
+            if [[ "$kb" == "N/A" ]]; then
+              echo "N/A"
+            elif [[ "$kb" -ge 1024 || "$kb" -le -1024 ]]; then
+              awk "BEGIN {printf \"%.2f MB\", $kb / 1024}"
+            else
+              echo "${kb} KB"
+            fi
+          }
+
+          format_delta() {
+            local kb="$1"
+            if [[ "$kb" == "N/A" ]]; then
+              echo "N/A"
+            elif [[ "$kb" -ge 0 ]]; then
+              echo "+$(format_size "$kb")"
+            else
+              echo "$(format_size "$kb")"
+            fi
+          }
+
+          if [[ "${{ steps.base-size.outputs.exists }}" == "true" ]]; then
+            echo "base_impact=$(format_size ${{ steps.base-size.outputs.helper_impact_kb }})" >> "$GITHUB_OUTPUT"
+            echo "base_exec=$(format_size ${{ steps.base-size.outputs.helper_exec_kb }})" >> "$GITHUB_OUTPUT"
+          else
+            echo "base_impact=N/A" >> "$GITHUB_OUTPUT"
+            echo "base_exec=N/A" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [[ "${{ steps.pr-size.outputs.exists }}" == "true" ]]; then
+            echo "pr_impact=$(format_size ${{ steps.pr-size.outputs.helper_impact_kb }})" >> "$GITHUB_OUTPUT"
+            echo "pr_exec=$(format_size ${{ steps.pr-size.outputs.helper_exec_kb }})" >> "$GITHUB_OUTPUT"
+          else
+            echo "pr_impact=N/A" >> "$GITHUB_OUTPUT"
+            echo "pr_exec=N/A" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "delta_impact=$(format_delta "${{ steps.delta.outputs.delta_kb }}")" >> "$GITHUB_OUTPUT"
+          echo "delta_exec_fmt=$(format_delta "${{ steps.delta.outputs.delta_exec }}")" >> "$GITHUB_OUTPUT"
+
+      - name: Generate size report
+        id: report
+        run: |
+          REPORT_FILE="${RUNNER_TEMP}/size-report.md"
+          STATUS="${{ steps.delta.outputs.status }}"
+          case "$STATUS" in
+            increase) STATUS_MSG="⚠️ This change increases RoktUXHelper size impact." ;;
+            decrease) STATUS_MSG="✅ This change decreases RoktUXHelper size impact." ;;
+            neutral) STATUS_MSG="➡️ RoktUXHelper size impact change is minimal." ;;
+            unavailable) STATUS_MSG="ℹ️ Size report tooling is not available on one or both branches." ;;
+            *) STATUS_MSG="" ;;
+          esac
+
+          cat > "$REPORT_FILE" << EOF
+          ${{ env.COMMENT_IDENTIFIER }}
+          ## 📦 RoktUXHelper Size Impact Report
+
+          How much RoktUXHelper adds to an app's size, measured as the difference
+          between a bare SwiftUI app and the same app with the dependency added.
+
+          | Metric | Target Branch | This PR | Change |
+          |--------|---------------|---------|--------|
+          | App Bundle Impact | ${{ steps.format.outputs.base_impact }} | ${{ steps.format.outputs.pr_impact }} | ${{ steps.format.outputs.delta_impact }} |
+          | Executable Impact | ${{ steps.format.outputs.base_exec }} | ${{ steps.format.outputs.pr_exec }} | ${{ steps.format.outputs.delta_exec_fmt }} |
+
+          ${STATUS_MSG}
+
+          <details>
+          <summary>Raw measurements</summary>
+
+          **Target branch (${{ github.base_ref || 'main' }}):**
+          \`\`\`json
+          ${{ steps.base-size.outputs.json }}
+          \`\`\`
+
+          **This PR:**
+          \`\`\`json
+          ${{ steps.pr-size.outputs.json }}
+          \`\`\`
+          </details>
+          EOF
+
+          sed -i.bak 's/^          //' "$REPORT_FILE" && rm -f "${REPORT_FILE}.bak"
+          echo "path=${REPORT_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: Find comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: ${{ env.COMMENT_IDENTIFIER }}
+
+      - name: Create or update PR comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: ${{ steps.report.outputs.path }}
+
+      - name: Upload size report artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: size-report
+          path: ${{ steps.report.outputs.path }}
+
+      - name: Write job summary
+        run: cat "${{ steps.report.outputs.path }}" >> "$GITHUB_STEP_SUMMARY"
