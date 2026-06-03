@@ -20,10 +20,6 @@ struct LayoutVariantModel: Decodable {
             layoutVariantSchema = nil
         } else {
             let layoutVariantSchemaData = layoutVariantSchemaString.data(using: .utf8)
-            // Validate the json to be LayoutVariantChildren
-            _ = try JSONDecoder().decode(LayoutVariantChildren.self,
-                                         from: layoutVariantSchemaData ?? Data())
-            // Decode it as generic LayoutSchemaModel
             layoutVariantSchema = try JSONDecoder().decode(LayoutSchemaModel.self,
                                                            from: layoutVariantSchemaData ?? Data())
         }

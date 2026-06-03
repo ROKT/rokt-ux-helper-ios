@@ -4,7 +4,7 @@ import DcuiSchema
 @available(iOS 13, *)
 struct StyleTransformer {
 
-    static func updatedStyles<T: Codable>(
+    static func updatedStyles<T: Decodable>(
         _ styles: [BasicStateStylingBlock<T>]?,
         transform: (T) -> BaseStyles
     ) throws -> [BasicStateStylingBlock<BaseStyles>] {
@@ -18,7 +18,7 @@ struct StyleTransformer {
         }
     }
 
-    static func updatedStyles<T: Codable>(
+    static func updatedStyles<T: Decodable>(
         _ styles: [BasicStateStylingBlock<T>]?
     ) throws -> [BasicStateStylingBlock<T>] {
         var updatedStyles: [BasicStateStylingBlock<T>] = []
@@ -70,7 +70,7 @@ struct StyleTransformer {
         return updatedStyles
     }
 
-    static func updatedStyles<T: Codable>(
+    static func updatedStyles<T: Decodable>(
         _ styles: [FormStateStylingBlock<T>]?
     ) throws -> [FormStateStylingBlock<T>] {
         var updatedStyles: [FormStateStylingBlock<T>] = []
@@ -108,7 +108,7 @@ struct StyleTransformer {
         return updatedStyles
     }
 
-    static func updatedStyles<T: Codable>(_ styles: [StatelessStylingBlock<T>]?) throws -> [StatelessStylingBlock<T>] {
+    static func updatedStyles<T: Decodable>(_ styles: [StatelessStylingBlock<T>]?) throws -> [StatelessStylingBlock<T>] {
         var updatedStyles: [StatelessStylingBlock<T>] = []
         guard let styles, !styles.isEmpty else { return updatedStyles }
 
@@ -130,7 +130,7 @@ struct StyleTransformer {
         return updatedStyles
     }
 
-    static func updatedIndicatorStyles<T: Codable>(
+    static func updatedIndicatorStyles<T: Decodable>(
         _ styles: [BasicStateStylingBlock<T>]?,
         newStyles: [BasicStateStylingBlock<T>]?
     ) throws -> [BasicStateStylingBlock<T>] {
@@ -204,8 +204,8 @@ struct StyleTransformer {
         return resultStyles
     }
 
-    static func updatedStyle<T: Codable>(_ defaultStyle: T?,
-                                         newStyle: T?) throws -> T? {
+    static func updatedStyle<T: Decodable>(_ defaultStyle: T?,
+                                           newStyle: T?) throws -> T? {
         if let defaultStyle = defaultStyle as? StylingPropertiesModel {
             let newStyle = newStyle as? StylingPropertiesModel
             return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
