@@ -34,3 +34,5 @@ vendor/
 repositories
 checkouts
 workspace-state.json
+# Size-report test apps resolve transitively from the root Package.swift
+Tests/SizeReport/**/xcshareddata/swiftpm/Package.resolved
