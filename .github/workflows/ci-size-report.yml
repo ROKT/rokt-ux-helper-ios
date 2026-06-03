@@ -37,61 +37,32 @@ jobs:
         with:
           xcode-version: "26.2"
 
+      # The base branch may not have the size tooling yet (e.g. before this
+      # merges, or if the script is relocated); both steps fall back to an empty
+      # result so the job degrades to "N/A" instead of failing.
       - name: Build and measure target branch
         id: base-size
         working-directory: base-branch
         continue-on-error: true
         run: |
-          if [[ -f "Tests/SizeReport/measure_size.sh" ]]; then
-            chmod +x Tests/SizeReport/measure_size.sh
-            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null)
-            if [[ $? -eq 0 ]] && [[ -n "$RESULT" ]]; then
-              HELPER_IMPACT_KB=$(echo "$RESULT" | python3 -c 'import json,sys; print(int(json.load(sys.stdin).get("helper_impact_kb", 0)))')
-              HELPER_EXEC_KB=$(echo "$RESULT" | python3 -c 'import json,sys; print(int(json.load(sys.stdin).get("helper_executable_impact_bytes", 0)) // 1024)')
-              echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
-              echo "helper_impact_kb=${HELPER_IMPACT_KB}" >> "$GITHUB_OUTPUT"
-              echo "helper_exec_kb=${HELPER_EXEC_KB}" >> "$GITHUB_OUTPUT"
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "json={\"helper_impact_kb\": 0, \"helper_executable_impact_bytes\": 0}" >> "$GITHUB_OUTPUT"
-              echo "helper_impact_kb=0" >> "$GITHUB_OUTPUT"
-              echo "helper_exec_kb=0" >> "$GITHUB_OUTPUT"
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "json={\"helper_impact_kb\": 0, \"helper_executable_impact_bytes\": 0}" >> "$GITHUB_OUTPUT"
-            echo "helper_impact_kb=0" >> "$GITHUB_OUTPUT"
-            echo "helper_exec_kb=0" >> "$GITHUB_OUTPUT"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+          RESULT='{}'
+          if [[ -f Tests/SizeReport/measure_size.sh ]]; then
+            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null) || RESULT='{}'
           fi
+          echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
+          echo "$RESULT" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("helper_impact_kb=%d" % int(d.get("helper_impact_kb", 0))); print("helper_exec_kb=%d" % (int(d.get("helper_executable_impact_bytes", 0)) // 1024)); print("exists=" + ("true" if d else "false"))' >> "$GITHUB_OUTPUT"
 
       - name: Build and measure PR branch
         id: pr-size
         working-directory: pr-branch
         continue-on-error: true
         run: |
-          if [[ -f "Tests/SizeReport/measure_size.sh" ]]; then
-            chmod +x Tests/SizeReport/measure_size.sh
-            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null)
-            if [[ $? -eq 0 ]] && [[ -n "$RESULT" ]]; then
-              HELPER_IMPACT_KB=$(echo "$RESULT" | python3 -c 'import json,sys; print(int(json.load(sys.stdin).get("helper_impact_kb", 0)))')
-              HELPER_EXEC_KB=$(echo "$RESULT" | python3 -c 'import json,sys; print(int(json.load(sys.stdin).get("helper_executable_impact_bytes", 0)) // 1024)')
-              echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
-              echo "helper_impact_kb=${HELPER_IMPACT_KB}" >> "$GITHUB_OUTPUT"
-              echo "helper_exec_kb=${HELPER_EXEC_KB}" >> "$GITHUB_OUTPUT"
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "json={\"helper_impact_kb\": 0, \"helper_executable_impact_bytes\": 0}" >> "$GITHUB_OUTPUT"
-              echo "helper_impact_kb=0" >> "$GITHUB_OUTPUT"
-              echo "helper_exec_kb=0" >> "$GITHUB_OUTPUT"
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "json={\"helper_impact_kb\": 0, \"helper_executable_impact_bytes\": 0}" >> "$GITHUB_OUTPUT"
-            echo "helper_impact_kb=0" >> "$GITHUB_OUTPUT"
-            echo "helper_exec_kb=0" >> "$GITHUB_OUTPUT"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+          RESULT='{}'
+          if [[ -f Tests/SizeReport/measure_size.sh ]]; then
+            RESULT=$(Tests/SizeReport/measure_size.sh --json 2>/dev/null) || RESULT='{}'
           fi
+          echo "json=${RESULT}" >> "$GITHUB_OUTPUT"
+          echo "$RESULT" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("helper_impact_kb=%d" % int(d.get("helper_impact_kb", 0))); print("helper_exec_kb=%d" % (int(d.get("helper_executable_impact_bytes", 0)) // 1024)); print("exists=" + ("true" if d else "false"))' >> "$GITHUB_OUTPUT"
 
       - name: Calculate size delta
         id: delta
