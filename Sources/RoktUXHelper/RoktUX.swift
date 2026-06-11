@@ -233,13 +233,11 @@ public class RoktUX: UXEventsDelegate {
         RoktUXLogger.shared.verbose("loadLayout called with pre-parsed page model")
         let processor = EventProcessor(integrationType: .sdk,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
-        let responseReceivedDate = Self.preParsedResponseReceivedDate(pageModel: pageModel,
-                                                                      startDate: startDate)
 
         sendPageIntialEvents(
             pageModel: pageModel,
             startDate: startDate,
-            responseReceivedDate: responseReceivedDate,
+            responseReceivedDate: pageModel.responseReceivedDate,
             processor: processor
         )
 
@@ -255,7 +253,6 @@ public class RoktUX: UXEventsDelegate {
             defaultLayoutLoader: defaultLayoutLoader,
             layoutLoaders: layoutLoaders,
             config: config,
-            responseReceivedDate: responseReceivedDate,
             onLoad: {},
             onUnload: {},
             onEmbeddedSizeChange: onEmbeddedSizeChange,
@@ -263,10 +260,6 @@ public class RoktUX: UXEventsDelegate {
             onPluginViewStateChange: onPluginViewStateChange,
             processor: processor
         )
-    }
-
-    static func preParsedResponseReceivedDate(pageModel: RoktUXPageModel, startDate: Date) -> Date {
-        max(pageModel.responseReceivedDate, startDate)
     }
 
     /**
@@ -394,7 +387,6 @@ public class RoktUX: UXEventsDelegate {
         defaultLayoutLoader: LayoutLoader?,
         layoutLoaders: [String: LayoutLoader?]?,
         config: RoktUXConfig?,
-        responseReceivedDate: Date? = nil,
         onLoad: @escaping (() -> Void),
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
@@ -403,7 +395,6 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         if let layoutPlugins = page.layoutPlugins {
-            let layoutResponseReceivedDate = responseReceivedDate ?? page.responseReceivedDate
             RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
             for layoutPlugin in layoutPlugins {
                 let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
@@ -416,7 +407,7 @@ public class RoktUX: UXEventsDelegate {
                     layoutPlugin: layoutPlugin,
                     layoutPluginViewState: layoutPluginViewState,
                     startDate: startDate,
-                    responseReceivedDate: layoutResponseReceivedDate,
+                    responseReceivedDate: page.responseReceivedDate,
                     layoutLoader: layoutLoader,
                     config: config,
                     onLoad: onLoad,

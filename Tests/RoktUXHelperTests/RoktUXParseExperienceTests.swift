@@ -109,34 +109,6 @@ final class RoktUXParseExperienceTests: XCTestCase {
         // Generous timeout: the first layout render on a cold simulator can be slow.
         wait(for: [loaderInvoked], timeout: 30)
     }
-
-    func test_preParsedResponseReceivedDate_whenParseTimeIsOlder_usesStartDate() throws {
-        let response = makeExperienceResponse(pluginsJSON: try pluginsFromEmbeddedFixture())
-        let parseResult = try XCTUnwrap(RoktUX.parseExperience(response))
-        let pageModel = try XCTUnwrap(parseResult.pageModel)
-        let renderStart = parseResult.parseEnd.addingTimeInterval(60)
-
-        let responseReceivedDate = RoktUX.preParsedResponseReceivedDate(
-            pageModel: pageModel,
-            startDate: renderStart
-        )
-
-        XCTAssertEqual(responseReceivedDate, renderStart)
-    }
-
-    func test_preParsedResponseReceivedDate_whenResponseTimeIsNewer_preservesResponseDate() throws {
-        let response = makeExperienceResponse(pluginsJSON: try pluginsFromEmbeddedFixture())
-        let parseResult = try XCTUnwrap(RoktUX.parseExperience(response))
-        let pageModel = try XCTUnwrap(parseResult.pageModel)
-        let renderStart = parseResult.parseStart.addingTimeInterval(-60)
-
-        let responseReceivedDate = RoktUX.preParsedResponseReceivedDate(
-            pageModel: pageModel,
-            startDate: renderStart
-        )
-
-        XCTAssertEqual(responseReceivedDate, pageModel.responseReceivedDate)
-    }
 }
 
 private final class MockLayoutLoader: LayoutLoader {
