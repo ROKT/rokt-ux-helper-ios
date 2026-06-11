@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-06-11
+
+### Added
+
+- Add pre-parsed experience rendering ([#303](https://github.com/ROKT/rokt-ux-helper-ios/pull/303))
+
+### Changed
+
+- Bump actions/checkout from 6.0.2 to 6.0.3 ([#300](https://github.com/ROKT/rokt-ux-helper-ios/pull/300))
+- Bump actions/upload-artifact from 4.6.2 to 7.0.1 ([#301](https://github.com/ROKT/rokt-ux-helper-ios/pull/301))
+
 ## [0.11.0] - 2026-06-03
 
 ### Added
@@ -344,7 +355,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.0...HEAD
+[0.12.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...0.11.0
 [0.10.12]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...0.10.12
 [0.10.11]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...0.10.11
