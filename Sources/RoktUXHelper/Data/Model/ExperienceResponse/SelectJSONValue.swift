@@ -2,9 +2,8 @@ import Foundation
 
 /// A minimal opaque JSON value, used for v2 selection-response fields the
 /// renderer does not (yet) consume in a typed way — `catalog_items` and the
-/// per-entity `event_data.events` payloads. This is the iOS analog of Android's
-/// `JsonObject` / `JsonElement`: it round-trips arbitrary JSON without imposing
-/// a schema.
+/// per-entity `event_data.events` payloads. It round-trips arbitrary JSON
+/// without imposing a schema.
 enum SelectJSONValue: Decodable, Equatable {
     case string(String)
     case number(Double)

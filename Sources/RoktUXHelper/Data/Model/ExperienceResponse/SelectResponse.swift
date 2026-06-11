@@ -7,8 +7,7 @@ import DcuiSchema
 /// `LayoutSchemaModel` (the SDK-side wire model keeps the same fields as raw
 /// strings instead).
 ///
-/// This is the iOS port of the Android `SelectResponse` (rokt-ux-helper-android
-/// PR #275). It is response-side only and not yet wired into rendering.
+/// It is response-side only and not yet wired into rendering.
 @available(iOS 13, *)
 struct SelectResponse: Decodable {
     let sessionId: String
@@ -31,7 +30,7 @@ struct SelectResponse: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         sessionId = try container.decode(String.self, forKey: .sessionId)
         sessionToken = try container.decode(SessionToken.self, forKey: .sessionToken)
-        // Mirror Android's `= ""` default when the key is absent.
+        // Defaults to an empty string when the key is absent.
         pageInstanceGuid = try container.decodeIfPresent(String.self, forKey: .pageInstanceGuid) ?? ""
         pageContext = try container.decodeIfPresent(SelectPageContext.self, forKey: .pageContext)
         plugins = try container.decodeIfPresent([SelectPlugin].self, forKey: .plugins)
@@ -89,7 +88,7 @@ struct SelectPluginConfig: Decodable {
     let slots: [SelectSlot]
     let instanceGuid: String?
     /// Parsed from the `outer_layout_schema` JSON string into the renderer's typed
-    /// schema model. Nullable, mirroring Android.
+    /// schema model. Nullable.
     let outerLayoutSchema: OuterLayoutSchemaNetworkModel?
     let token: String?
 
@@ -102,7 +101,7 @@ struct SelectPluginConfig: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        // Android defaults `slots` to an empty list when the key is absent.
+        // Defaults `slots` to an empty list when the key is absent.
         slots = try container.decodeIfPresent([SelectSlot].self, forKey: .slots) ?? []
         instanceGuid = try container.decodeIfPresent(String.self, forKey: .instanceGuid)
         token = try container.decodeIfPresent(String.self, forKey: .token)
@@ -131,7 +130,7 @@ struct SelectLayoutVariant: Decodable {
     let layoutVariantId: String?
     let moduleName: String?
     /// Parsed from the `layout_variant_schema` JSON string into the renderer's
-    /// typed `LayoutSchemaModel`. Nullable, mirroring Android.
+    /// typed `LayoutSchemaModel`. Nullable.
     let layoutVariantSchema: LayoutSchemaModel?
 
     enum CodingKeys: String, CodingKey {
@@ -152,7 +151,7 @@ struct SelectLayoutVariant: Decodable {
 struct SelectOffer: Decodable {
     let campaignId: String?
     let creative: SelectCreative?
-    /// Opaque catalog item payloads — mirrors Android's `List<JsonObject>`.
+    /// Opaque catalog item payloads.
     let catalogItems: [SelectJSONValue]?
 
     enum CodingKeys: String, CodingKey {
@@ -221,7 +220,7 @@ struct SelectResponseOption: Decodable {
         shortLabel = try container.decodeIfPresent(String.self, forKey: .shortLabel)
         longLabel = try container.decodeIfPresent(String.self, forKey: .longLabel)
         shortSuccessLabel = try container.decodeIfPresent(String.self, forKey: .shortSuccessLabel)
-        // Android defaults `is_positive` to false when absent.
+        // Defaults `is_positive` to false when absent.
         isPositive = try container.decodeIfPresent(Bool.self, forKey: .isPositive) ?? false
         url = try container.decodeIfPresent(String.self, forKey: .url)
         ignoreBranch = try container.decodeIfPresent(Bool.self, forKey: .ignoreBranch)
@@ -246,6 +245,6 @@ struct SelectIcon: Decodable {
 
 struct SelectEventDataEntry: Decodable {
     let token: String
-    /// Opaque per-event payloads — mirrors Android's `Map<String, JsonElement>`.
+    /// Opaque per-event payloads.
     let events: [String: SelectJSONValue]?
 }

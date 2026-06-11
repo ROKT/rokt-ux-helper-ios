@@ -3,15 +3,14 @@ import DcuiSchema
 
 /// Helpers for decoding the v2 selection-response layout-schema fields, which
 /// arrive on the wire as JSON **strings** and are parsed into the renderer's
-/// typed schema models. This mirrors Android's `RootSchemaModelSerializer` /
-/// `NetworkLayoutSchemaSerializer`, and matches the existing v1 pattern in
+/// typed schema models. This matches the existing v1 pattern in
 /// ``LayoutVariantModel`` / `PluginConfig`.
 @available(iOS 13, *)
 enum SelectSchemaParsing {
 
     /// Decodes the `outer_layout_schema` field — a JSON string — into the typed
     /// ``OuterLayoutSchemaNetworkModel``. Returns `nil` when the field is absent
-    /// or an empty string, mirroring Android's nullable schema field.
+    /// or an empty string.
     static func decodeOuterLayoutSchema<Key: CodingKey>(
         from container: KeyedDecodingContainer<Key>,
         forKey key: Key
@@ -25,7 +24,7 @@ enum SelectSchemaParsing {
 
     /// Decodes the `layout_variant_schema` field — a JSON string — into the typed
     /// `LayoutSchemaModel`. Returns `nil` when the field is absent or an empty
-    /// string, mirroring Android's nullable schema field.
+    /// string.
     static func decodeLayoutVariantSchema<Key: CodingKey>(
         from container: KeyedDecodingContainer<Key>,
         forKey key: Key
