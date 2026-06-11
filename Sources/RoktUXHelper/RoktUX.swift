@@ -159,8 +159,12 @@ public class RoktUX: UXEventsDelegate {
     /**
      Parses (and times) an SDK experience response exactly once.
 
-     Use together with ``loadLayout(startDate:pageModel:layoutPluginViewStates:defaultLayoutLoader:layoutLoaders:config:onLoad:onUnload:onEmbeddedSizeChange:onRoktUXEvent:onRoktPlatformEvent:onPluginViewStateChange:)``
+     Use together with ``loadLayout(startDate:pageModel:layoutPluginViewStates:defaultLayoutLoader:layoutLoaders:config:onEmbeddedSizeChange:onRoktUXEvent:onRoktPlatformEvent:onPluginViewStateChange:)``
      to avoid decoding the experience response a second time when rendering.
+
+     > Important: Intended for use by the Rokt mobile SDK. It is `public` only so the SDK
+     > can call it across the module boundary; it is not a supported public integration
+     > entry point and may change without notice.
 
      - Parameter experienceResponse: The raw experience response JSON string.
      - Returns: A ``RoktUXParseResult`` containing the session/page identifiers, the decoded
@@ -192,6 +196,12 @@ public class RoktUX: UXEventsDelegate {
      Page initial events are sent from here so event semantics match the
      `loadLayout(experienceResponse:)` overloads.
 
+     > Important: Intended for use by the Rokt mobile SDK. It is `public` only so the SDK
+     > can call it across the module boundary; it is not a supported public integration
+     > entry point and may change without notice. Placement load/unload is observed via the
+     > `RoktUXEvent` stream (`LayoutInteractive` / `LayoutClosed` / `LayoutCompleted` /
+     > `LayoutFailure`), which is why this overload takes no `onLoad`/`onUnload` closures.
+
      - Parameters:
        - startDate: The start date for the process. Default is current date.
        - pageModel: A page model previously produced by ``parseExperience(_:)``.
@@ -199,8 +209,6 @@ public class RoktUX: UXEventsDelegate {
        - defaultLayoutLoader: Default loader for the layout.
        - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
        - config: Configuration for the RoktUX.
-       - onLoad: Closure to handle the loading process.
-       - onUnload: Closure to handle the unloading process.
        - onEmbeddedSizeChange: Closure to handle changes in embedded layout size.
        - onRoktUXEvent: Closure to handle RoktUX events.
        - onRoktPlatformEvent: Closure to handle platform events. Platform events are an essential part of integration and it has to be sent to Rokt via your backend.
@@ -214,8 +222,6 @@ public class RoktUX: UXEventsDelegate {
         defaultLayoutLoader: LayoutLoader? = nil,
         layoutLoaders: [String: LayoutLoader?]? = nil,
         config: RoktUXConfig? = nil,
-        onLoad: @escaping (() -> Void),
-        onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
         onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
         onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
@@ -227,14 +233,21 @@ public class RoktUX: UXEventsDelegate {
         RoktUXLogger.shared.verbose("loadLayout called with pre-parsed page model")
         let processor = EventProcessor(integrationType: .sdk,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
+        let responseReceivedDate = Self.preParsedResponseReceivedDate(pageModel: pageModel,
+                                                                      startDate: startDate)
 
         sendPageIntialEvents(
             pageModel: pageModel,
             startDate: startDate,
-            responseReceivedDate: pageModel.responseReceivedDate,
+            responseReceivedDate: responseReceivedDate,
             processor: processor
         )
 
+        // This pre-parsed (SDK-only) overload takes no onLoad/onUnload closures.
+        // Placement load/unload is observed by the consumer through the RoktUXEvent
+        // stream (LayoutInteractive / LayoutClosed / LayoutCompleted / LayoutFailure),
+        // which fire independently of these view-lifecycle hooks. No-ops are passed so
+        // the shared rendering path (still used by the string-based overloads) is unchanged.
         displayLayoutPlugins(
             page: pageModel,
             startDate: startDate,
@@ -242,13 +255,18 @@ public class RoktUX: UXEventsDelegate {
             defaultLayoutLoader: defaultLayoutLoader,
             layoutLoaders: layoutLoaders,
             config: config,
-            onLoad: onLoad,
-            onUnload: onUnload,
+            responseReceivedDate: responseReceivedDate,
+            onLoad: {},
+            onUnload: {},
             onEmbeddedSizeChange: onEmbeddedSizeChange,
             onRoktUXEvent: onRoktUXEvent,
             onPluginViewStateChange: onPluginViewStateChange,
             processor: processor
         )
+    }
+
+    static func preParsedResponseReceivedDate(pageModel: RoktUXPageModel, startDate: Date) -> Date {
+        max(pageModel.responseReceivedDate, startDate)
     }
 
     /**
@@ -376,6 +394,7 @@ public class RoktUX: UXEventsDelegate {
         defaultLayoutLoader: LayoutLoader?,
         layoutLoaders: [String: LayoutLoader?]?,
         config: RoktUXConfig?,
+        responseReceivedDate: Date? = nil,
         onLoad: @escaping (() -> Void),
         onUnload: @escaping (() -> Void),
         onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
@@ -384,6 +403,7 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         if let layoutPlugins = page.layoutPlugins {
+            let layoutResponseReceivedDate = responseReceivedDate ?? page.responseReceivedDate
             RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
             for layoutPlugin in layoutPlugins {
                 let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
@@ -396,7 +416,7 @@ public class RoktUX: UXEventsDelegate {
                     layoutPlugin: layoutPlugin,
                     layoutPluginViewState: layoutPluginViewState,
                     startDate: startDate,
-                    responseReceivedDate: page.responseReceivedDate,
+                    responseReceivedDate: layoutResponseReceivedDate,
                     layoutLoader: layoutLoader,
                     config: config,
                     onLoad: onLoad,

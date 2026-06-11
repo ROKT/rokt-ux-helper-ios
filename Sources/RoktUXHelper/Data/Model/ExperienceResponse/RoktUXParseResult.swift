@@ -1,9 +1,14 @@
 import Foundation
 
+/// Internal, for rokt-sdk-ios.
 /// The result of parsing an experience response via ``RoktUX/parseExperience(_:)``.
 ///
-/// Carries the decoded page model alongside the parse window so hosts can reuse the
-/// model for rendering (avoiding a second decode) and report JSON parse timing metrics.
+/// Carries the decoded page model alongside the parse window so the Rokt SDK can reuse
+/// the model for rendering (avoiding a second decode) and report JSON parse timing metrics.
+///
+/// > Important: This type is intended for use by the Rokt mobile SDK. It is `public` only
+/// > so the SDK can consume it across the module boundary; it is not a supported public
+/// > integration API and may change without notice.
 public struct RoktUXParseResult {
     /// The session identifier from the experience response. Available whenever the
     /// response decodes successfully, even if it contains no renderable layouts.
