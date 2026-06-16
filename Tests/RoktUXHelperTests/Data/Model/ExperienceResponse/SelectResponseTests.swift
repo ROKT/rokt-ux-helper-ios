@@ -36,7 +36,13 @@ final class SelectResponseTests: XCTestCase {
         let offer = try XCTUnwrap(slot.offer)
         XCTAssertEqual(offer.campaignId, "campaign-1")
         XCTAssertEqual(offer.catalogItems?.count, 1)
-        XCTAssertEqual(offer.catalogItems?.first?["id"]?.stringValue, "catalog-1")
+        let catalogItem = try XCTUnwrap(offer.catalogItems?.first)
+        XCTAssertEqual(catalogItem.instanceGuid, "catalog-instance-1")
+        XCTAssertEqual(catalogItem.title, "Catalog title")
+        // Campaign-specific fields are not surfaced as typed properties but remain
+        // available via `raw`.
+        XCTAssertEqual(catalogItem.raw["price"], .number(9.99))
+        XCTAssertEqual(catalogItem.raw["custom_field"]?.stringValue, "varies-by-campaign")
 
         let creative = try XCTUnwrap(offer.creative)
         XCTAssertEqual(creative.referralCreativeId, "creative-1")
@@ -79,6 +85,22 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertNil(responseOption.ignoreBranch)
     }
 
+    func test_catalog_item_decodes_when_guaranteed_fields_are_absent() throws {
+        // The catalog-item schema is open and campaign-specific; only `instance_guid`
+        // and `title` are guaranteed. Decoding must not fail when they are absent —
+        // the guaranteed properties are nil and the payload is retained in `raw`.
+        let json = """
+        { "campaign_only_field": 7, "nested": { "k": "v" } }
+        """.data(using: .utf8)!
+
+        let catalogItem = try decoder.decode(SelectCatalogItem.self, from: json)
+
+        XCTAssertNil(catalogItem.instanceGuid)
+        XCTAssertNil(catalogItem.title)
+        XCTAssertEqual(catalogItem.raw["campaign_only_field"], .number(7))
+        XCTAssertEqual(catalogItem.raw["nested"], .object(["k": .string("v")]))
+    }
+
     // MARK: - Fixtures
 
     private static let fullPayload = """
@@ -103,7 +125,7 @@ final class SelectResponseTests: XCTestCase {
                   "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1" },
                   "offer": {
                     "campaign_id": "campaign-1",
-                    "catalog_items": [ { "id": "catalog-1" } ],
+                    "catalog_items": [ { "instance_guid": "catalog-instance-1", "title": "Catalog title", "price": 9.99, "custom_field": "varies-by-campaign" } ],
                     "creative": {
                       "referral_creative_id": "creative-1",
                       "instance_guid": "creative-instance-1",

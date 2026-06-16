@@ -151,8 +151,7 @@ struct SelectLayoutVariant: Decodable {
 struct SelectOffer: Decodable {
     let campaignId: String?
     let creative: SelectCreative?
-    /// Opaque catalog item payloads.
-    let catalogItems: [SelectJSONValue]?
+    let catalogItems: [SelectCatalogItem]?
 
     enum CodingKeys: String, CodingKey {
         case campaignId = "campaign_id"

@@ -1,7 +1,8 @@
 import Foundation
 
 /// A minimal opaque JSON value, used for v2 selection-response fields the
-/// renderer does not (yet) consume in a typed way — `catalog_items` and the
+/// renderer does not (yet) consume in a typed way — the campaign-specific
+/// portion of a ``SelectCatalogItem`` (``SelectCatalogItem/raw``) and the
 /// per-entity `event_data.events` payloads. It round-trips arbitrary JSON
 /// without imposing a schema.
 enum SelectJSONValue: Decodable, Equatable {
