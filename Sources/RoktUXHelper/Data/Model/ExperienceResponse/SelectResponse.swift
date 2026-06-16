@@ -158,6 +158,25 @@ struct SelectOffer: Decodable {
         case creative
         case catalogItems = "catalog_items"
     }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        campaignId = try container.decodeIfPresent(String.self, forKey: .campaignId)
+        creative = try container.decodeIfPresent(SelectCreative.self, forKey: .creative)
+        // Decode `catalog_items` as opaque JSON values first so a non-object element
+        // (a bare string, number, null, etc.) does not fail the whole response
+        // decode — consistent with the "never fail on shape drift" promise. Only the
+        // object-shaped elements become typed `SelectCatalogItem`s; anything else is
+        // skipped. An absent key stays `nil`; an empty array stays an empty array.
+        if let rawItems = try container.decodeIfPresent([SelectJSONValue].self, forKey: .catalogItems) {
+            catalogItems = rawItems.compactMap { value in
+                guard case let .object(object) = value else { return nil }
+                return SelectCatalogItem(raw: object)
+            }
+        } else {
+            catalogItems = nil
+        }
+    }
 }
 
 struct SelectCreative: Decodable {
