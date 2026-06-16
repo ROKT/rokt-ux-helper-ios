@@ -1,6 +1,6 @@
 import Foundation
 
-/// A minimal opaque JSON value, used for v2 selection-response fields the
+/// A minimal opaque JSON value, used for selection-response fields the
 /// renderer does not (yet) consume in a typed way — the campaign-specific
 /// portion of a ``SelectCatalogItem`` (``SelectCatalogItem/raw``) and the
 /// per-entity `event_data.events` payloads. It round-trips arbitrary JSON
@@ -30,7 +30,7 @@ enum SelectJSONValue: Decodable, Equatable {
         } else {
             throw DecodingError.dataCorruptedError(
                 in: container,
-                debugDescription: "Unsupported JSON value in v2 selection response"
+                debugDescription: "Unsupported JSON value in selection response"
             )
         }
     }

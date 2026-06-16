@@ -1,8 +1,8 @@
 import Foundation
 import DcuiSchema
 
-/// Selection response for a v2 offers request — the model the renderer consumes,
-/// alongside the v1 ``RoktUXExperienceResponse``. The layout-schema fields are
+/// Selection response for an offers request — the model the renderer consumes,
+/// alongside ``RoktUXExperienceResponse``. The layout-schema fields are
 /// parsed into the renderer's typed ``OuterLayoutSchemaNetworkModel`` /
 /// `LayoutSchemaModel` (the SDK-side wire model keeps the same fields as raw
 /// strings instead).

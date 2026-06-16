@@ -1,6 +1,6 @@
 import Foundation
 
-/// A catalog item from a v2 offers selection response.
+/// A catalog item from an offers selection response.
 ///
 /// The transactions backend does not expose a stable catalog-item schema: the
 /// object is open (`additionalProperties: true`) and only `instance_guid` and
