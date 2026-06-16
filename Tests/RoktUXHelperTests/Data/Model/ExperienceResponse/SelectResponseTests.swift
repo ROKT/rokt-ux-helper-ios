@@ -1,7 +1,11 @@
 import XCTest
 @testable import RoktUXHelper
 
-@available(iOS 15, *)
+// Matches the `@available(iOS 13, *)` gate on the models under test (SelectResponse
+// and friends). The SPM package minimum is iOS 15, so this gate never actually
+// excludes a supported run; it is aligned to the code under test rather than left
+// stricter than the symbols it exercises.
+@available(iOS 13, *)
 final class SelectResponseTests: XCTestCase {
 
     private let decoder = JSONDecoder()
@@ -40,8 +44,13 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertEqual(catalogItem.instanceGuid, "catalog-instance-1")
         XCTAssertEqual(catalogItem.title, "Catalog title")
         // Campaign-specific fields are not surfaced as typed properties but remain
-        // available via `raw`.
-        XCTAssertEqual(catalogItem.raw["price"], .number(9.99))
+        // available via `raw`. NOTE: `SelectJSONValue` models every JSON number as
+        // `.number(Double)`, so both fractional and integer literals land in the same
+        // case — `9.99` and (elsewhere) `7` are both `.number`. If an `.int` case is
+        // ever added to `SelectJSONValue`, integer literals would decode differently
+        // and these `.number` expectations would need revisiting. The helper below
+        // makes that assumption explicit instead of hard-coding `.number(...)`.
+        assertNumber(catalogItem.raw["price"], equals: 9.99)
         XCTAssertEqual(catalogItem.raw["custom_field"]?.stringValue, "varies-by-campaign")
 
         let creative = try XCTUnwrap(offer.creative)
@@ -99,6 +108,83 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertNil(catalogItem.title)
         XCTAssertEqual(catalogItem.raw["campaign_only_field"], .number(7))
         XCTAssertEqual(catalogItem.raw["nested"], .object(["k": .string("v")]))
+    }
+
+    func test_catalog_item_narrows_non_string_guaranteed_field_to_nil_but_retains_it_in_raw() throws {
+        // A guaranteed field arriving as a non-string is a server contract violation.
+        // Decoding deliberately tolerates it: the typed property narrows to nil (the
+        // narrowing is lossy and pinned here on purpose), while the original value is
+        // always preserved untyped in `raw`.
+        let json = """
+        { "instance_guid": 12345, "title": true }
+        """.data(using: .utf8)!
+
+        let catalogItem = try decoder.decode(SelectCatalogItem.self, from: json)
+
+        XCTAssertNil(catalogItem.instanceGuid)
+        XCTAssertNil(catalogItem.title)
+        assertNumber(catalogItem.raw["instance_guid"], equals: 12345)
+        XCTAssertEqual(catalogItem.raw["title"], .bool(true))
+    }
+
+    func test_offer_skips_non_object_catalog_items_without_failing_the_decode() throws {
+        // `catalog_items` is open; a non-object element (string, number, null, array)
+        // must not fail the whole response decode. Only object-shaped elements become
+        // typed items; everything else is skipped.
+        let json = """
+        {
+          "campaign_id": "campaign-x",
+          "catalog_items": [
+            { "instance_guid": "keep-1", "title": "Kept" },
+            "bare-string",
+            42,
+            null,
+            ["nested", "array"],
+            { "instance_guid": "keep-2" }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let offer = try decoder.decode(SelectOffer.self, from: json)
+
+        XCTAssertEqual(offer.catalogItems?.count, 2)
+        XCTAssertEqual(offer.catalogItems?.map(\.instanceGuid), ["keep-1", "keep-2"])
+    }
+
+    func test_offer_distinguishes_empty_catalog_items_array_from_absent_field() throws {
+        let absent = """
+        { "campaign_id": "campaign-absent" }
+        """.data(using: .utf8)!
+        let empty = """
+        { "campaign_id": "campaign-empty", "catalog_items": [] }
+        """.data(using: .utf8)!
+
+        let absentOffer = try decoder.decode(SelectOffer.self, from: absent)
+        let emptyOffer = try decoder.decode(SelectOffer.self, from: empty)
+
+        // Absent key → nil; present-but-empty array → empty (non-nil) collection.
+        XCTAssertNil(absentOffer.catalogItems)
+        XCTAssertEqual(emptyOffer.catalogItems?.count, 0)
+    }
+
+    // MARK: - Helpers
+
+    /// Asserts a `SelectJSONValue` is a number equal to `expected`.
+    ///
+    /// `SelectJSONValue` models every JSON number as `.number(Double)`, so both
+    /// integer and fractional literals land in the same case. This helper makes that
+    /// assumption explicit at the call site rather than hard-coding `.number(...)`,
+    /// so that if an `.int` case is ever added the failure points here.
+    private func assertNumber(_ value: SelectJSONValue?,
+                              equals expected: Double,
+                              file: StaticString = #filePath,
+                              line: UInt = #line) {
+        guard case let .number(actual) = value else {
+            XCTFail("Expected .number(\(expected)) but got \(String(describing: value))",
+                    file: file, line: line)
+            return
+        }
+        XCTAssertEqual(actual, expected, accuracy: 0.000_001, file: file, line: line)
     }
 
     // MARK: - Fixtures
