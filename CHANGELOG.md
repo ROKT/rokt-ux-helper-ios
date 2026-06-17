@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-06-17
+
+### Fixed
+
+- Walk modal chain for detached key-window root ([#310](https://github.com/ROKT/rokt-ux-helper-ios/pull/310))
+
 ## [0.12.1] - 2026-06-16
 
 ### Fixed
@@ -361,7 +367,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...HEAD
+[0.12.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...0.12.2
 [0.12.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.0...0.12.1
 [0.12.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...0.11.0
