@@ -16,7 +16,32 @@ import UIKit
 
 class SampleViewController: UIViewController {
 
+    /// Rokt bottom-sheet / overlay layouts present their own modal on top of the host.
+    /// `OpenUrl` must present Safari (or another UI) from the **topmost** controller in that chain;
+    /// calling `present` on `self` while `presentedViewController` is non-nil is unreliable and
+    /// often results in no visible browser — which looks like “links don’t work”.
+    private func topMostPresentingViewController() -> UIViewController {
+        var top: UIViewController = self
+        while let presented = top.presentedViewController {
+            top = presented
+        }
+        return top
+    }
+
+    private let experienceResource: String
+    private let layoutLocation: String
     private var roktView: RoktLayoutUIView?
+
+    init(experienceResource: String = "experience", layoutLocation: String = "#target_element") {
+        self.experienceResource = experienceResource
+        self.layoutLocation = layoutLocation
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,14 +50,14 @@ class SampleViewController: UIViewController {
 
     @objc func setupView() {
         view.backgroundColor = .white
-        guard let experience = String.getExperienceResponse(for: "experience") else {
+        guard let experience = String.getExperienceResponse(for: experienceResource) else {
             return
         }
 
         RoktUX.setLogLevel(.verbose)
         let roktView = RoktLayoutUIView(
             experienceResponse: experience,
-            location: "#target_element" // "targetElementSelector" in experience JSON file
+            location: layoutLocation
         ) { [weak self] uxEvent in
             guard let self else { return }
 
@@ -48,7 +73,7 @@ class SampleViewController: UIViewController {
                 default:
                     let safariVC = SFSafariViewController(url: url)
                     safariVC.modalPresentationStyle = .pageSheet
-                    present(safariVC, animated: true) {
+                    topMostPresentingViewController().present(safariVC, animated: true) {
                         event.onClose?(event.id)
                     }
                 }

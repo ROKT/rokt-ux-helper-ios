@@ -9,12 +9,15 @@
 /* Begin PBXBuildFile section */
 		B34E89512F7D84F3003A0ADE /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = B34E89502F7D84F3003A0ADE /* RoktUXHelper */; };
 		B81DDBF92CC9B28C00B3D090 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBF82CC9B28C00B3D090 /* HomeView.swift */; };
+		C92F00102F8B000100B3D091 /* FullScreenCheckoutExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92F00112F8B000100B3D091 /* FullScreenCheckoutExamples.swift */; };
 		B81DDBFB2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFA2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift */; };
 		B81DDBFD2CC9B2C800B3D090 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFC2CC9B2C800B3D090 /* Font+Extensions.swift */; };
 		B81DDBFF2CC9B2DE00B3D090 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81DDBFE2CC9B2DE00B3D090 /* Color+Extensions.swift */; };
 		B8B9FFBF2CBF32F300C61F88 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B9FFBE2CBF32F300C61F88 /* ExampleApp.swift */; };
 		B8B9FFC82CBF32F400C61F88 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B8B9FFC72CBF32F400C61F88 /* Assets.xcassets */; };
 		B8B9FFD62CBF3A3C00C61F88 /* experience.json in Resources */ = {isa = PBXBuildFile; fileRef = B8B9FFD52CBF3A3C00C61F88 /* experience.json */; };
+		C92F00202F8C000100B3D091 /* experience-overlay.json in Resources */ = {isa = PBXBuildFile; fileRef = C92F00212F8C000100B3D091 /* experience-overlay.json */; };
+		C92F00222F8C000100B3D091 /* experience-bottomsheet.json in Resources */ = {isa = PBXBuildFile; fileRef = C92F00232F8C000100B3D091 /* experience-bottomsheet.json */; };
 		B8B9FFD92CBF3CA000C61F88 /* RoktUXHelper in Frameworks */ = {isa = PBXBuildFile; productRef = B8B9FFD82CBF3CA000C61F88 /* RoktUXHelper */; };
 		B8C1F5B12CBF860E004EEF06 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B02CBF860E004EEF06 /* String+Extensions.swift */; };
 		B8C1F5B42CC07944004EEF06 /* SampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C1F5B32CC07944004EEF06 /* SampleViewController.swift */; };
@@ -27,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		B81DDBF82CC9B28C00B3D090 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C92F00112F8B000100B3D091 /* FullScreenCheckoutExamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenCheckoutExamples.swift; sourceTree = "<group>"; };
 		B81DDBFA2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonDefaultOutlined.swift; sourceTree = "<group>"; };
 		B81DDBFC2CC9B2C800B3D090 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		B81DDBFE2CC9B2DE00B3D090 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -35,6 +39,8 @@
 		B8B9FFC72CBF32F400C61F88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B8B9FFCC2CBF32F400C61F88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8B9FFD52CBF3A3C00C61F88 /* experience.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = experience.json; sourceTree = "<group>"; };
+		C92F00212F8C000100B3D091 /* experience-overlay.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "experience-overlay.json"; sourceTree = "<group>"; };
+		C92F00232F8C000100B3D091 /* experience-bottomsheet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "experience-bottomsheet.json"; sourceTree = "<group>"; };
 		B8C1F5B02CBF860E004EEF06 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		B8C1F5B32CC07944004EEF06 /* SampleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleViewController.swift; sourceTree = "<group>"; };
 		B8C1F5B52CC07976004EEF06 /* SampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleView.swift; sourceTree = "<group>"; };
@@ -80,6 +86,7 @@
 				B8B9FFCC2CBF32F400C61F88 /* Info.plist */,
 				B8B9FFBE2CBF32F300C61F88 /* ExampleApp.swift */,
 				B81DDBF82CC9B28C00B3D090 /* HomeView.swift */,
+				C92F00112F8B000100B3D091 /* FullScreenCheckoutExamples.swift */,
 				B8C1F5B32CC07944004EEF06 /* SampleViewController.swift */,
 				B8C1F5B52CC07976004EEF06 /* SampleView.swift */,
 				B8C1F5B72CC0916F004EEF06 /* SampleViewModel.swift */,
@@ -93,6 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				B8B9FFD52CBF3A3C00C61F88 /* experience.json */,
+				C92F00212F8C000100B3D091 /* experience-overlay.json */,
+				C92F00232F8C000100B3D091 /* experience-bottomsheet.json */,
 				B8B9FFC72CBF32F400C61F88 /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -186,6 +195,8 @@
 			files = (
 				B8B9FFC82CBF32F400C61F88 /* Assets.xcassets in Resources */,
 				B8B9FFD62CBF3A3C00C61F88 /* experience.json in Resources */,
+				C92F00202F8C000100B3D091 /* experience-overlay.json in Resources */,
+				C92F00222F8C000100B3D091 /* experience-bottomsheet.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +211,7 @@
 				B8C1F5B12CBF860E004EEF06 /* String+Extensions.swift in Sources */,
 				B8C1F5B42CC07944004EEF06 /* SampleViewController.swift in Sources */,
 				B81DDBF92CC9B28C00B3D090 /* HomeView.swift in Sources */,
+				C92F00102F8B000100B3D091 /* FullScreenCheckoutExamples.swift in Sources */,
 				B81DDBFB2CC9B2A900B3D090 /* ButtonDefaultOutlined.swift in Sources */,
 				B81DDBFD2CC9B2C800B3D090 /* Font+Extensions.swift in Sources */,
 				B81DDBFF2CC9B2DE00B3D090 /* Color+Extensions.swift in Sources */,

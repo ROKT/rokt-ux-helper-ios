@@ -16,6 +16,7 @@ struct HomeView: View {
 
     @State private var isShowingSwiftUIView = false
     @State private var isShowingUIKitView = false
+    @State private var isShowingFullScreenCheckoutSwiftUI = false
     @State private var showToast = false
 
     var body: some View {
@@ -52,6 +53,38 @@ struct HomeView: View {
                     .padding(.top)
                     .buttonStyle(ButtonDefaultOutlined())
 
+                    Button {
+                        isShowingFullScreenCheckoutSwiftUI = true
+                    } label: {
+                        Text("SwiftUI — overlay (full-screen)")
+                    }
+                    .padding(.top)
+                    .buttonStyle(ButtonDefaultOutlined())
+
+                    Button {
+                        ExampleFullScreenCheckoutLauncher.presentSwiftUIOverlayClientTopologyFromKeyWindow()
+                    } label: {
+                        Text("SwiftUI — overlay (nested, client topology)")
+                    }
+                    .padding(.top)
+                    .buttonStyle(ButtonDefaultOutlined())
+
+                    Button {
+                        ExampleFullScreenCheckoutLauncher.presentUIKitBottomSheetFlatFullScreenFromKeyWindow()
+                    } label: {
+                        Text("UIKit — bottom sheet (flat .fullScreen)")
+                    }
+                    .padding(.top)
+                    .buttonStyle(ButtonDefaultOutlined())
+
+                    Button {
+                        ExampleFullScreenCheckoutLauncher.presentUIKitBottomSheetClientTopologyFromKeyWindow()
+                    } label: {
+                        Text("UIKit — bottom sheet (nested, client topology)")
+                    }
+                    .padding(.top)
+                    .buttonStyle(ButtonDefaultOutlined())
+
                     Spacer()
                     Text("® Rokt 2024 — All rights reserved")
                         .font(.defaultFont(.subtitle2))
@@ -78,6 +111,16 @@ struct HomeView: View {
         }
         .sheet(isPresented: $isShowingUIKitView) {
             SampleVCRepresentable()
+        }
+        .fullScreenCover(isPresented: $isShowingFullScreenCheckoutSwiftUI) {
+            FullScreenCheckoutEntryView(
+                experienceResource: "experience-overlay",
+                layoutLocation: "",
+                navigationTitle: "Overlay",
+                onLayoutFailure: {
+                    showToastMessage()
+                }
+            )
         }
     }
 

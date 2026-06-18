@@ -644,6 +644,11 @@ public class RoktUX: UXEventsDelegate {
                                        onLoad: onLoad,
                                        onUnLoad: onUnload,
                                        builder: builder)
+            } else {
+                RoktUXLogger.shared.warning(
+                    "Overlay was not presented: no suitable top view controller was found. "
+                        + "Enable RoktUX logging (.warning or lower) for resolver details."
+                )
             }
         }
     }
