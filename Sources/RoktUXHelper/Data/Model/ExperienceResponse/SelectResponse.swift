@@ -1,8 +1,8 @@
 import Foundation
 import DcuiSchema
 
-/// Selection response for a v2 offers request — the model the renderer consumes,
-/// alongside the v1 ``RoktUXExperienceResponse``. The layout-schema fields are
+/// Selection response for an offers request — the model the renderer consumes,
+/// alongside ``RoktUXExperienceResponse``. The layout-schema fields are
 /// parsed into the renderer's typed ``OuterLayoutSchemaNetworkModel`` /
 /// `LayoutSchemaModel` (the SDK-side wire model keeps the same fields as raw
 /// strings instead).
@@ -51,15 +51,25 @@ struct SessionToken: Decodable {
 }
 
 struct SelectPageContext: Decodable {
+    let roktTagId: String?
     let pageInstanceGuid: String?
     let pageId: String?
+    let pageType: String?
     let language: String?
+    let isPageDetected: Bool?
+    let pageVariantName: String?
+    let partnerContentTemplate: String?
     let token: String?
 
     enum CodingKeys: String, CodingKey {
+        case roktTagId = "rokt_tag_id"
         case pageInstanceGuid = "page_instance_guid"
         case pageId = "page_id"
+        case pageType = "page_type"
         case language
+        case isPageDetected = "is_page_detected"
+        case pageVariantName = "page_variant_name"
+        case partnerContentTemplate = "partner_content_template"
         case token
     }
 }
@@ -151,8 +161,7 @@ struct SelectLayoutVariant: Decodable {
 struct SelectOffer: Decodable {
     let campaignId: String?
     let creative: SelectCreative?
-    /// Opaque catalog item payloads.
-    let catalogItems: [SelectJSONValue]?
+    let catalogItems: [SelectCatalogItem]?
 
     enum CodingKeys: String, CodingKey {
         case campaignId = "campaign_id"

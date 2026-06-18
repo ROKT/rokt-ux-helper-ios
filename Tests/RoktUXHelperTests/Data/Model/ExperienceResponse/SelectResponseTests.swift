@@ -1,7 +1,7 @@
 import XCTest
 @testable import RoktUXHelper
 
-@available(iOS 15, *)
+@available(iOS 13, *)
 final class SelectResponseTests: XCTestCase {
 
     private let decoder = JSONDecoder()
@@ -13,8 +13,13 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertEqual(response.sessionToken.token, "token-1")
         XCTAssertEqual(response.sessionToken.expiresAt, 1_711_038_600_000)
         XCTAssertEqual(response.pageInstanceGuid, "page-instance-1")
+        XCTAssertEqual(response.pageContext?.roktTagId, "tag-1")
         XCTAssertEqual(response.pageContext?.pageId, "page-1")
+        XCTAssertEqual(response.pageContext?.pageType, "checkout")
         XCTAssertEqual(response.pageContext?.language, "en")
+        XCTAssertEqual(response.pageContext?.isPageDetected, true)
+        XCTAssertEqual(response.pageContext?.pageVariantName, "variant-a")
+        XCTAssertEqual(response.pageContext?.partnerContentTemplate, "template-1")
 
         let plugin = try XCTUnwrap(response.plugins?.first?.plugin)
         XCTAssertEqual(plugin.id, "plugin-1")
@@ -36,7 +41,11 @@ final class SelectResponseTests: XCTestCase {
         let offer = try XCTUnwrap(slot.offer)
         XCTAssertEqual(offer.campaignId, "campaign-1")
         XCTAssertEqual(offer.catalogItems?.count, 1)
-        XCTAssertEqual(offer.catalogItems?.first?["id"]?.stringValue, "catalog-1")
+        // Only `instance_guid` and `title` are part of the agreed contract; any
+        // campaign-specific fields in the payload are ignored.
+        let catalogItem = try XCTUnwrap(offer.catalogItems?.first)
+        XCTAssertEqual(catalogItem.instanceGuid, "catalog-instance-1")
+        XCTAssertEqual(catalogItem.title, "Catalog title")
 
         let creative = try XCTUnwrap(offer.creative)
         XCTAssertEqual(creative.referralCreativeId, "creative-1")
@@ -79,6 +88,36 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertNil(responseOption.ignoreBranch)
     }
 
+    func test_catalog_item_decodes_when_guaranteed_fields_are_absent() throws {
+        // Only `instance_guid` and `title` are modelled; both are optional, so
+        // decoding succeeds (with nil values) when they are absent and any other
+        // fields in the payload are ignored.
+        let json = """
+        { "campaign_only_field": 7, "nested": { "k": "v" } }
+        """.data(using: .utf8)!
+
+        let catalogItem = try decoder.decode(SelectCatalogItem.self, from: json)
+
+        XCTAssertNil(catalogItem.instanceGuid)
+        XCTAssertNil(catalogItem.title)
+    }
+
+    func test_offer_distinguishes_empty_catalog_items_array_from_absent_field() throws {
+        let absent = """
+        { "campaign_id": "campaign-absent" }
+        """.data(using: .utf8)!
+        let empty = """
+        { "campaign_id": "campaign-empty", "catalog_items": [] }
+        """.data(using: .utf8)!
+
+        let absentOffer = try decoder.decode(SelectOffer.self, from: absent)
+        let emptyOffer = try decoder.decode(SelectOffer.self, from: empty)
+
+        // Absent key → nil; present-but-empty array → empty (non-nil) collection.
+        XCTAssertNil(absentOffer.catalogItems)
+        XCTAssertEqual(emptyOffer.catalogItems?.count, 0)
+    }
+
     // MARK: - Fixtures
 
     private static let fullPayload = """
@@ -86,7 +125,7 @@ final class SelectResponseTests: XCTestCase {
       "session_id": "session-1",
       "session_token": { "token": "token-1", "expires_at": 1711038600000 },
       "page_instance_guid": "page-instance-1",
-      "page_context": { "page_instance_guid": "page-instance-1", "page_id": "page-1", "language": "en", "token": "ctx-token" },
+      "page_context": { "rokt_tag_id": "tag-1", "page_instance_guid": "page-instance-1", "page_id": "page-1", "page_type": "checkout", "language": "en", "is_page_detected": true, "page_variant_name": "variant-a", "partner_content_template": "template-1", "token": "ctx-token" },
       "plugins": [
         {
           "plugin": {
@@ -103,7 +142,7 @@ final class SelectResponseTests: XCTestCase {
                   "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1" },
                   "offer": {
                     "campaign_id": "campaign-1",
-                    "catalog_items": [ { "id": "catalog-1" } ],
+                    "catalog_items": [ { "instance_guid": "catalog-instance-1", "title": "Catalog title", "price": 9.99, "custom_field": "varies-by-campaign" } ],
                     "creative": {
                       "referral_creative_id": "creative-1",
                       "instance_guid": "creative-instance-1",
