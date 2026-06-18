@@ -13,8 +13,13 @@ final class SelectResponseTests: XCTestCase {
         XCTAssertEqual(response.sessionToken.token, "token-1")
         XCTAssertEqual(response.sessionToken.expiresAt, 1_711_038_600_000)
         XCTAssertEqual(response.pageInstanceGuid, "page-instance-1")
+        XCTAssertEqual(response.pageContext?.roktTagId, "tag-1")
         XCTAssertEqual(response.pageContext?.pageId, "page-1")
+        XCTAssertEqual(response.pageContext?.pageType, "checkout")
         XCTAssertEqual(response.pageContext?.language, "en")
+        XCTAssertEqual(response.pageContext?.isPageDetected, true)
+        XCTAssertEqual(response.pageContext?.pageVariantName, "variant-a")
+        XCTAssertEqual(response.pageContext?.partnerContentTemplate, "template-1")
 
         let plugin = try XCTUnwrap(response.plugins?.first?.plugin)
         XCTAssertEqual(plugin.id, "plugin-1")
@@ -120,7 +125,7 @@ final class SelectResponseTests: XCTestCase {
       "session_id": "session-1",
       "session_token": { "token": "token-1", "expires_at": 1711038600000 },
       "page_instance_guid": "page-instance-1",
-      "page_context": { "page_instance_guid": "page-instance-1", "page_id": "page-1", "language": "en", "token": "ctx-token" },
+      "page_context": { "rokt_tag_id": "tag-1", "page_instance_guid": "page-instance-1", "page_id": "page-1", "page_type": "checkout", "language": "en", "is_page_detected": true, "page_variant_name": "variant-a", "partner_content_template": "template-1", "token": "ctx-token" },
       "plugins": [
         {
           "plugin": {

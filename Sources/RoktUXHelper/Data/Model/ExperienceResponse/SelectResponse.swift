@@ -51,15 +51,25 @@ struct SessionToken: Decodable {
 }
 
 struct SelectPageContext: Decodable {
+    let roktTagId: String?
     let pageInstanceGuid: String?
     let pageId: String?
+    let pageType: String?
     let language: String?
+    let isPageDetected: Bool?
+    let pageVariantName: String?
+    let partnerContentTemplate: String?
     let token: String?
 
     enum CodingKeys: String, CodingKey {
+        case roktTagId = "rokt_tag_id"
         case pageInstanceGuid = "page_instance_guid"
         case pageId = "page_id"
+        case pageType = "page_type"
         case language
+        case isPageDetected = "is_page_detected"
+        case pageVariantName = "page_variant_name"
+        case partnerContentTemplate = "partner_content_template"
         case token
     }
 }
