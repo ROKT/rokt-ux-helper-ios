@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - maintenance/*
     paths:
       - VERSION
 
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   build-and-release:
+    if: ${{ !github.event.created && !github.event.deleted }}
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -24,6 +26,17 @@ jobs:
         run: |
           version_from_file=$(head -n 1 VERSION)
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+
+      - name: Check release stability
+        id: release-stability
+        env:
+          RELEASE_VERSION: ${{ steps.version-file.outputs.release-version }}
+        run: |
+          if [[ "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "is-stable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-stable=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Resolve Packages
         run: swift package resolve --verbose
@@ -49,7 +62,7 @@ jobs:
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
-          makeLatest: true
+          makeLatest: ${{ steps.release-stability.outputs.is-stable == 'true' && github.ref_name == 'main' }}
           tag: ${{ steps.version-file.outputs.release-version }}
           body: |
             ## Release notes:
