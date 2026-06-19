@@ -102,3 +102,21 @@ NSLayoutConstraint.activate([
 ])
 
 ```
+
+## Overlay / bottom sheet (full-screen flows)
+
+The home screen includes **SwiftUI** and **UIKit** buttons that present a full-screen modal and load JSON from the bundle:
+
+- `Example/Resources/experience-overlay.json` — **S2S** experience with a fullscreen **overlay** (`standard-marketing` carousel / multi-offer). Converted from a captured placement payload into `sessionId` + `pageContext` + `plugins`, with JWTs cleared, `targetElementSelector` set to `""` (matches `location: ""` in the Example), Rokt CDN / API URLs replaced with `https://example.invalid/...`, and `rclid` fields removed for public-repo hygiene.
+- `Example/Resources/experience-bottomsheet.json` — **BottomSheet** outer layout with real preview-style slot content, converted from a placement response to **S2S** for the Example app (JWTs cleared, `targetElementSelector` empty to match `location: ""`).
+
+Both use an empty `targetElementSelector` and `location: ""` when calling `RoktLayoutView` / `RoktLayoutUIView`. The wiring (`experienceResource` / `layoutLocation`) lives in `SampleView`, `SampleViewModel`, `SampleViewController`, and `FullScreenCheckoutExamples`.
+
+### UIKit bottom sheet — two presenters
+
+- **Flat .fullScreen** — the key window’s top presenter presents `UINavigationController` → `SampleViewController` directly. Easy smoke test; overlay resolution still finds a presenter because checkout sits on the shallow `presentedViewController` chain from the window root.
+- **Nested (client topology)** — a `UITabBarController` → `UINavigationController` → landing screen is presented full screen; **checkout** (same `SampleViewController` + bottom sheet JSON) is presented **from the navigation leaf**. That matches partner apps where checkout is not the window root’s next modal, so it exercises overlay presenter resolution the way a full-screen checkout under tab + nav does. Open **Open full-screen checkout (loads Rokt)** on the landing screen to load Rokt.
+
+### SwiftUI overlay — nested (client topology)
+
+- Same **tab → nav → leaf** UIKit shell as the UIKit nested flow, but checkout is `UIHostingController` → SwiftUI `SampleView` / `RoktLayoutView` with `experience-overlay.json`. Use this to stress overlay presenter resolution when Rokt is hosted in SwiftUI under a nested controller stack (`ExampleFullScreenCheckoutLauncher.presentSwiftUIOverlayClientTopologyFromKeyWindow()` in `FullScreenCheckoutExamples.swift`).

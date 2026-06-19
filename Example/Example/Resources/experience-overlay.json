@@ -1,0 +1,701 @@
+{
+    "sessionId": "dc5535be-ae43-46d6-b8ff-7826b3a571d8",
+    "pageContext": {
+        "pageInstanceGuid": "b46d00fd-45b7-440a-9b06-10f6f53ee941",
+        "pageId": "1a232576-e728-4796-bc73-60c687a2aea2",
+        "language": "en",
+        "isPageDetected": true,
+        "pageVariantName": "OverlayExample",
+        "token": ""
+    },
+    "plugins": [
+        {
+            "plugin": {
+                "id": "1000000000000000001",
+                "name": "Example overlay placement (S2S)",
+                "targetElementSelector": "",
+                "config": {
+                    "slots": [
+                        {
+                            "instanceGuid": "b46d00fd-45b9-4284-9b8a-7f3da19f300b",
+                            "layoutVariant": {
+                                "layoutVariantId": "3586775795186925767",
+                                "moduleName": "standard-marketing",
+                                "layoutVariantSchema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}",
+                                "childLayouts": []
+                            },
+                            "offer": {
+                                "campaignId": "1",
+                                "creativeId": "3484428650226843648",
+                                "maxTotalItemsQtyInOffer": 0,
+                                "creative": {
+                                    "referralCreativeId": "3484428650226843648",
+                                    "instanceGuid": "d7eb0871-19bc-4ad1-b233-aa32ab99c7ec",
+                                    "copy": {
+                                        "creative.disclaimer": "This is a disclaimer message.",
+                                        "creative.title": "Enjoy a special offer on your order.",
+                                        "creative.copy": "This is a normal creative with very standard length of information.",
+                                        "creative.headline.standalone": "This is a standalone title.",
+                                        "callout.1.text": "1 Month Free",
+                                        "callout.1.type": "promotion",
+                                        "callout.2.text": "Limited Time",
+                                        "callout.2.type": "offerGuarantee",
+                                        "creative.privacyPolicy.close.copy": "Close",
+                                        "creative.privacyPolicy.title": "Privacy Policy",
+                                        "creative.tag": "Footwear",
+                                        "creative.brandName": "Rokt",
+                                        "creative.image.src": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.close.copy": "Close",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.privacyPolicy.link": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.link": "https://example.invalid/creative-asset",
+                                        "creative.socialProof.number": "1000"
+                                    },
+                                    "responseOptionsMap": {
+                                        "positive": {
+                                            "id": "3484717293503971328",
+                                            "action": "Url",
+                                            "instanceGuid": "c51f8730-3197-4ebc-a7ab-9745505d4988",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Yes please",
+                                            "longLabel": "Yes please",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": true,
+                                            "url": "https://example.invalid/creative-asset",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        },
+                                        "negative": {
+                                            "id": "3484717293503971329",
+                                            "action": "CaptureOnly",
+                                            "instanceGuid": "8000ff3d-c81b-4d23-ba01-5e9a126d8403",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Decline",
+                                            "longLabel": "Decline",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": false,
+                                            "url": "",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        }
+                                    },
+                                    "links": {
+                                        "privacyPolicy": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Privacy Policy"
+                                        },
+                                        "termsAndConditions": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Image",
+                                            "title": "Opaque Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Image",
+                                            "title": "Opaque 1.91:1 Image"
+                                        },
+                                        "creativeImage.product": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Product Image",
+                                            "title": "Product Image"
+                                        },
+                                        "creativeImage.product.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Product Image",
+                                            "title": "Opaque Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1.1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 1",
+                                            "title": "1.91:1 Product Image 1"
+                                        },
+                                        "creativeImage.product.1_91to1.2": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 2",
+                                            "title": "1.91:1 Product Image 2"
+                                        },
+                                        "creativeImage.product.1_91to1.3": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 3",
+                                            "title": "1.91:1 Product Image 3"
+                                        },
+                                        "creativeImage.product.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image",
+                                            "title": "1.91:1 Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Product Image",
+                                            "title": "Opaque 1.91:1 Product Image"
+                                        },
+                                        "creativeImage.hero": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Hero Image",
+                                            "title": "Hero Image"
+                                        },
+                                        "creativeImage.hero.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Hero Image",
+                                            "title": "Opaque Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1.1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 1",
+                                            "title": "1.91:1 Hero Image 1"
+                                        },
+                                        "creativeImage.hero.1_91to1.2": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 2",
+                                            "title": "1.91:1 Hero Image 2"
+                                        },
+                                        "creativeImage.hero.1_91to1.3": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 3",
+                                            "title": "1.91:1 Hero Image 3"
+                                        },
+                                        "creativeImage.hero.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image",
+                                            "title": "1.91:1 Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Hero Image",
+                                            "title": "Opaque 1.91:1 Hero Image"
+                                        }
+                                    },
+                                    "icons": {},
+                                    "token": "",
+                                    "advertiser": {
+                                        "name": "Example advertiser",
+                                        "brand": "Rokt"
+                                    }
+                                }
+                            },
+                            "token": ""
+                        },
+                        {
+                            "instanceGuid": "b46d00fd-45b9-494c-bf84-403a5e476f5a",
+                            "layoutVariant": {
+                                "layoutVariantId": "3586775795186925767",
+                                "moduleName": "standard-marketing",
+                                "layoutVariantSchema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}",
+                                "childLayouts": []
+                            },
+                            "offer": {
+                                "campaignId": "2",
+                                "creativeId": "3478028740928602112",
+                                "maxTotalItemsQtyInOffer": 0,
+                                "creative": {
+                                    "referralCreativeId": "3478028740928602112",
+                                    "instanceGuid": "d001d6b1-2cbe-41b4-8873-2babf2d49bea",
+                                    "copy": {
+                                        "creative.disclaimer": "Disclaimer text strikes again. ",
+                                        "creative.title": "Unlock exclusive videos with Laura Geller.",
+                                        "creative.copy": "This is an uneditable creative copy that will come from the advertiser. This is where they show case their offer.",
+                                        "creative.headline.standalone": "You've unlocked 90$ in this standalone title",
+                                        "callout.1.text": "BFF Purchased",
+                                        "callout.1.type": "socialProof",
+                                        "callout.2.text": "Gone Soon",
+                                        "callout.2.type": "promotion",
+                                        "creative.privacyPolicy.close.copy": "Close",
+                                        "creative.privacyPolicy.title": "Privacy Policy",
+                                        "creative.tag": "Footwear",
+                                        "creative.brandName": "Rokt",
+                                        "creative.image.src": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.close.copy": "Close",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.privacyPolicy.link": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.link": "https://example.invalid/creative-asset",
+                                        "creative.socialProof.number": "1000"
+                                    },
+                                    "responseOptionsMap": {
+                                        "positive": {
+                                            "id": "3478041234988466176",
+                                            "action": "Url",
+                                            "instanceGuid": "d6cde28d-bcf7-4425-ac07-abb4880868ee",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Yes please",
+                                            "longLabel": "Yes please",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": true,
+                                            "url": "https://example.invalid/creative-asset",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        },
+                                        "negative": {
+                                            "id": "3478041234988466177",
+                                            "action": "CaptureOnly",
+                                            "instanceGuid": "67decca1-9751-45c1-bab4-a84d2a9cbe98",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Decline",
+                                            "longLabel": "Decline",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": false,
+                                            "url": "",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        }
+                                    },
+                                    "links": {
+                                        "privacyPolicy": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Privacy Policy"
+                                        },
+                                        "termsAndConditions": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent Image",
+                                            "title": "Transparent Image"
+                                        },
+                                        "creativeImage.1to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1:1 Image",
+                                            "title": "1:1 Image"
+                                        },
+                                        "creativeImage.1to1.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent 1:1 Image",
+                                            "title": "Transparent 1:1 Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent Logo Image",
+                                            "title": "Transparent Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1:1 Logo Image",
+                                            "title": "1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent 1:1 Logo Image",
+                                            "title": "Transparent 1:1 Logo Image"
+                                        }
+                                    },
+                                    "icons": {},
+                                    "token": "",
+                                    "advertiser": {
+                                        "name": "Example advertiser",
+                                        "brand": "Rokt"
+                                    }
+                                }
+                            },
+                            "token": ""
+                        },
+                        {
+                            "instanceGuid": "b46d00fd-45b9-41b1-ba90-bb6e26e50ba5",
+                            "layoutVariant": {
+                                "layoutVariantId": "3586775795186925767",
+                                "moduleName": "standard-marketing",
+                                "layoutVariantSchema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}",
+                                "childLayouts": []
+                            },
+                            "offer": {
+                                "campaignId": "3",
+                                "creativeId": "3484428650226843648",
+                                "maxTotalItemsQtyInOffer": 0,
+                                "creative": {
+                                    "referralCreativeId": "3484428650226843648",
+                                    "instanceGuid": "712aa583-6acf-4ad6-90b4-9b59fd35d69a",
+                                    "copy": {
+                                        "creative.disclaimer": "This is a disclaimer message.",
+                                        "creative.title": "Enjoy a special offer on your order.",
+                                        "creative.copy": "This is a normal creative with very standard length of information.",
+                                        "creative.headline.standalone": "This is a standalone title.",
+                                        "callout.1.text": "1 Month Free",
+                                        "callout.1.type": "promotion",
+                                        "callout.2.text": "Limited Time",
+                                        "callout.2.type": "offerGuarantee",
+                                        "creative.privacyPolicy.close.copy": "Close",
+                                        "creative.privacyPolicy.title": "Privacy Policy",
+                                        "creative.tag": "Footwear",
+                                        "creative.brandName": "Rokt",
+                                        "creative.image.src": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.close.copy": "Close",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.privacyPolicy.link": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.link": "https://example.invalid/creative-asset",
+                                        "creative.socialProof.number": "1000"
+                                    },
+                                    "responseOptionsMap": {
+                                        "positive": {
+                                            "id": "3484717293503971328",
+                                            "action": "Url",
+                                            "instanceGuid": "497b0148-2235-4043-90b1-5a1b71f697dc",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Yes please",
+                                            "longLabel": "Yes please",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": true,
+                                            "url": "https://example.invalid/creative-asset",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        },
+                                        "negative": {
+                                            "id": "3484717293503971329",
+                                            "action": "CaptureOnly",
+                                            "instanceGuid": "1a95bcb6-9473-4665-9cbc-ddf3908d4a63",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Decline",
+                                            "longLabel": "Decline",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": false,
+                                            "url": "",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        }
+                                    },
+                                    "links": {
+                                        "privacyPolicy": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Privacy Policy"
+                                        },
+                                        "termsAndConditions": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Image",
+                                            "title": "Opaque Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Image",
+                                            "title": "Opaque 1.91:1 Image"
+                                        },
+                                        "creativeImage.product": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Product Image",
+                                            "title": "Product Image"
+                                        },
+                                        "creativeImage.product.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Product Image",
+                                            "title": "Opaque Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1.1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 1",
+                                            "title": "1.91:1 Product Image 1"
+                                        },
+                                        "creativeImage.product.1_91to1.2": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 2",
+                                            "title": "1.91:1 Product Image 2"
+                                        },
+                                        "creativeImage.product.1_91to1.3": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image 3",
+                                            "title": "1.91:1 Product Image 3"
+                                        },
+                                        "creativeImage.product.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Product Image",
+                                            "title": "1.91:1 Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Product Image",
+                                            "title": "Opaque 1.91:1 Product Image"
+                                        },
+                                        "creativeImage.hero": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Hero Image",
+                                            "title": "Hero Image"
+                                        },
+                                        "creativeImage.hero.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque Hero Image",
+                                            "title": "Opaque Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1.1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 1",
+                                            "title": "1.91:1 Hero Image 1"
+                                        },
+                                        "creativeImage.hero.1_91to1.2": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 2",
+                                            "title": "1.91:1 Hero Image 2"
+                                        },
+                                        "creativeImage.hero.1_91to1.3": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image 3",
+                                            "title": "1.91:1 Hero Image 3"
+                                        },
+                                        "creativeImage.hero.1_91to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1.91:1 Hero Image",
+                                            "title": "1.91:1 Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1.opaque": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Opaque 1.91:1 Hero Image",
+                                            "title": "Opaque 1.91:1 Hero Image"
+                                        }
+                                    },
+                                    "icons": {},
+                                    "token": "",
+                                    "advertiser": {
+                                        "name": "Example advertiser",
+                                        "brand": "Rokt"
+                                    }
+                                }
+                            },
+                            "token": ""
+                        },
+                        {
+                            "instanceGuid": "b46d00fd-45b9-4f4a-9082-f022e4cc608c",
+                            "layoutVariant": {
+                                "layoutVariantId": "3586775795186925767",
+                                "moduleName": "standard-marketing",
+                                "layoutVariantSchema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}",
+                                "childLayouts": []
+                            },
+                            "offer": {
+                                "campaignId": "4",
+                                "creativeId": "3478028740928602112",
+                                "maxTotalItemsQtyInOffer": 0,
+                                "creative": {
+                                    "referralCreativeId": "3478028740928602112",
+                                    "instanceGuid": "5759244d-8c0d-4543-8480-34135fe45a21",
+                                    "copy": {
+                                        "creative.disclaimer": "Disclaimer text strikes again. ",
+                                        "creative.title": "Unlock exclusive videos with Laura Geller.",
+                                        "creative.copy": "This is an uneditable creative copy that will come from the advertiser. This is where they show case their offer.",
+                                        "creative.headline.standalone": "You've unlocked 90$ in this standalone title",
+                                        "callout.1.text": "BFF Purchased",
+                                        "callout.1.type": "socialProof",
+                                        "callout.2.text": "Gone Soon",
+                                        "callout.2.type": "promotion",
+                                        "creative.privacyPolicy.close.copy": "Close",
+                                        "creative.privacyPolicy.title": "Privacy Policy",
+                                        "creative.tag": "Footwear",
+                                        "creative.brandName": "Rokt",
+                                        "creative.image.src": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.close.copy": "Close",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.privacyPolicy.link": "https://example.invalid/creative-asset",
+                                        "creative.termsAndConditions.link": "https://example.invalid/creative-asset",
+                                        "creative.socialProof.number": "1000"
+                                    },
+                                    "responseOptionsMap": {
+                                        "positive": {
+                                            "id": "3478041234988466176",
+                                            "action": "Url",
+                                            "instanceGuid": "26e04226-b6ba-40d4-9dc3-d4451822553c",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Yes please",
+                                            "longLabel": "Yes please",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": true,
+                                            "url": "https://example.invalid/creative-asset",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        },
+                                        "negative": {
+                                            "id": "3478041234988466177",
+                                            "action": "CaptureOnly",
+                                            "instanceGuid": "7f97867f-d66b-4b9b-959b-fa2fb0bdde08",
+                                            "signalType": "SignalResponse",
+                                            "shortLabel": "Decline",
+                                            "longLabel": "Decline",
+                                            "shortSuccessLabel": "",
+                                            "isPositive": false,
+                                            "url": "",
+                                            "ignoreBranch": false,
+                                            "urlBehavior": "newTab",
+                                            "token": "",
+                                            "conversionType": "Default"
+                                        }
+                                    },
+                                    "links": {
+                                        "privacyPolicy": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Privacy Policy"
+                                        },
+                                        "termsAndConditions": {
+                                            "url": "https://example.invalid/creative-asset",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent Image",
+                                            "title": "Transparent Image"
+                                        },
+                                        "creativeImage.1to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1:1 Image",
+                                            "title": "1:1 Image"
+                                        },
+                                        "creativeImage.1to1.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent 1:1 Image",
+                                            "title": "Transparent 1:1 Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent Logo Image",
+                                            "title": "Transparent Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "1:1 Logo Image",
+                                            "title": "1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1.transparent": {
+                                            "light": "https://example.invalid/creative-asset",
+                                            "dark": "",
+                                            "alt": "Transparent 1:1 Logo Image",
+                                            "title": "Transparent 1:1 Logo Image"
+                                        }
+                                    },
+                                    "icons": {},
+                                    "token": "",
+                                    "advertiser": {
+                                        "name": "Example advertiser",
+                                        "brand": "Rokt"
+                                    }
+                                }
+                            },
+                            "token": ""
+                        }
+                    ],
+                    "instanceGuid": "b46d00fd-45b7-4302-8bb2-5eab2251fcef",
+                    "outerLayoutSchema": "{\"breakpoints\":{\"tablet\":512.0,\"desktop\":640.0},\"layout\":{\"type\":\"Overlay\",\"node\":{\"allowBackdropToClose\":true,\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"maxWidth\":650.0,\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"alignSelf\":\"flex-start\"},\"spacing\":{\"margin\":\"10 10 10 10\"}}}],\"wrapper\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":\"#80000000\"}}}}]}},\"children\":[{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"24 16 16 8\"},\"text\":{\"textColor\":{\"light\":\"#2E3136\",\"dark\":\"#2E3136\"},\"fontSize\":24.0,\"fontFamily\":\"System\",\"fontWeight\":\"700\",\"horizontalTextAlign\":\"left\"}}}]}},\"value\":\"Order confirmed\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":14.0},\"height\":{\"type\":\"fixed\",\"value\":14.0}},\"spacing\":{\"margin\":\"0 16 0 0\"}}}]}},\"children\":[{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABgSURBVHgBrZLRCcAgDESPTpJRu0HdsKPYVOKH4HmiBg5B3wsSAgDmeeJU9TN3ZZMne14hWzA5nOaCyZQZybJxD5ASk6eknkylC4fKsPBVw8JwRgB9k10Zs7VyCfNLXtgP3EZAtmnzLFUAAAAASUVORK5CYII=\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABgSURBVHgBrZLRCcAgDESPTpJRu0HdsKPYVOKH4HmiBg5B3wsSAgDmeeJU9TN3ZZMne14hWzA5nOaCyZQZybJxD5ASk6eknkylC4fKsPBVw8JwRgB9k10Zs7VyCfNLXtgP3EZAtmnzLFUAAAAASUVORK5CYII=\"}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16 10 10\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"OneByOneDistribution\",\"node\":{\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}}}]}}]}},{\"type\":\"ProgressIndicator\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22.0},\"height\":{\"type\":\"fixed\",\"value\":5.5}},\"spacing\":{\"margin\":\"0 4 0 0\"}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}]}},\"indicator\":\"\u200f\u200f\u200e \u200e\",\"accessibilityHidden\":true}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"flex-start\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 16 24 8\"},\"text\":{\"textColor\":{\"light\":\"#999999\",\"dark\":\"#999999\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"horizontalTextAlign\":\"left\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#266DCC\",\"dark\":\"#266DCC\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"<a href=\\\"https://example.invalid/privacy-policy\\\">Privacy Policy</a>\"}}]}}]}}]}},\"display\":\"FULLSCREEN\"}",
+                    "layoutVersion": "2.0",
+                    "layoutSchemaVersion": "2.0",
+                    "token": ""
+                }
+            }
+        }
+    ],
+    "options": {
+        "useDiagnosticEvents": false
+    },
+    "success": true
+}
