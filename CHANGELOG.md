@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.3] - 2026-06-19
+
+### Fixed
+
+- Resolve top presenter through tab/nav/split stacks ([#312](https://github.com/ROKT/rokt-ux-helper-ios/pull/312))
+
 ## [0.12.2] - 2026-06-17
 
 ### Fixed
@@ -367,7 +373,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...HEAD
+[0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3
 [0.12.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...0.12.2
 [0.12.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.0...0.12.1
 [0.12.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...0.12.0
