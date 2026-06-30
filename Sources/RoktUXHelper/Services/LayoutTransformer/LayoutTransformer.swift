@@ -951,7 +951,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     func getToggleButton(customStateKey: String,
                          styles: LayoutStyle<ToggleButtonStateTriggerElements,
                                              ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
-                         children: [LayoutSchemaViewModel]?) throws -> ToggleButtonViewModel {
+                         children: [LayoutSchemaViewModel]?,
+                         eventService: EventDiagnosticServicing? = nil) throws -> ToggleButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return ToggleButtonViewModel(children: children,
                                      customStateKey: customStateKey,
@@ -959,6 +960,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                      pressedStyle: updateStyles.compactMap {$0.pressed},
                                      hoveredStyle: updateStyles.compactMap {$0.hovered},
                                      disabledStyle: updateStyles.compactMap {$0.disabled},
+                                     eventService: eventService ?? self.eventService,
                                      layoutState: layoutState)
     }
 

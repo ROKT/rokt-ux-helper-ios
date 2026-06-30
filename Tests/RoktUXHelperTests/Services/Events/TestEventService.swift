@@ -107,6 +107,30 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(events.first?.eventType, .SignalActivation)
         XCTAssertEqual(events.first?.pageInstanceGuid, mockPageInstanceGuid)
     }
+
+    func test_sendUserInteraction_shouldSendLayoutScopedSignal() throws {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.sendUserInteraction(
+            action: .ToggleButtonStateTriggerClick,
+            context: .ToggleButtonStateTrigger
+        )
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        XCTAssertEqual(event?.parentGuid, mockPluginInstanceGuid)
+        XCTAssertEqual(event?.jwtToken, mockPluginConfigJWTToken)
+        XCTAssertEqual(event?.objectData?[kAction], UserInteraction.ToggleButtonStateTriggerClick.rawValue)
+        XCTAssertEqual(event?.objectData?[kContext], UserInteractionContext.ToggleButtonStateTrigger.rawValue)
+    }
     
     func test_sendSignalResponse_onPositive_engagementEventsAndSignals_shouldSend() throws {
         // Arrange

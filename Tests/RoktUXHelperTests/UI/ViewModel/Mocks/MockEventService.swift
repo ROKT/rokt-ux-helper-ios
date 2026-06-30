@@ -33,6 +33,7 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemInstantPurchaseCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
+    var userInteractionCalled = false
     var cartItemUserInteractionCalled = false
     var cartItemDevicePayCalled = false
     var cartItemDevicePayCallCount = 0
@@ -110,6 +111,15 @@ class MockEventService: EventDiagnosticServicing {
 
     func cartItemInstantPurchaseFailure(itemId: String) {
         cartItemInstantPurchaseFailureCalled = true
+    }
+
+    var lastLayoutUserInteractionAction: UserInteraction?
+    var lastLayoutUserInteractionContext: UserInteractionContext?
+
+    func sendUserInteraction(action: UserInteraction, context: UserInteractionContext) {
+        userInteractionCalled = true
+        lastLayoutUserInteractionAction = action
+        lastLayoutUserInteractionContext = context
     }
 
     var lastUserInteractionItemId: String?
@@ -208,6 +218,9 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseCalled = false
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
+        userInteractionCalled = false
+        lastLayoutUserInteractionAction = nil
+        lastLayoutUserInteractionContext = nil
         cartItemUserInteractionCalled = false
         cartItemDevicePayCalled = false
         cartItemDevicePayCallCount = 0

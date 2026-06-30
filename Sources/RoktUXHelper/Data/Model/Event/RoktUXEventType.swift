@@ -45,10 +45,12 @@ enum UserInteraction: String, Codable, CaseIterable {
     case MainImageScrollIconRightClick
     case MainImageSwipeLeft
     case MainImageSwipeRight
+    case ToggleButtonStateTriggerClick
 }
 
 enum UserInteractionContext: String, Codable, CaseIterable {
     case CustomStateValidationTriggerButton
     case CatalogDropDown
     case CatalogImageGallery
+    case ToggleButtonStateTrigger
 }

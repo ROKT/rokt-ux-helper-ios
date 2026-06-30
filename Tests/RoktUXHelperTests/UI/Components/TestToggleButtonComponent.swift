@@ -38,6 +38,26 @@ final class TestToggleButtonComponent: XCTestCase {
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#FFFFFF", dark: "#000000"))
     }
 
+    func test_tapGesture_sendsUserInteraction() throws {
+        let eventService = MockEventService()
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.toggleButton(try get_model(eventService: eventService)))
+
+        let sut = try view.inspect().view(TestPlaceHolder.self)
+            .view(EmbeddedComponent.self)
+            .vStack()[0]
+            .view(LayoutSchemaComponent.self)
+            .view(ToggleButtonComponent.self)
+            .actualView()
+
+        XCTAssertFalse(eventService.userInteractionCalled)
+
+        try sut.inspect().find(ViewType.HStack.self).callOnTapGesture()
+
+        XCTAssertTrue(eventService.userInteractionCalled)
+        XCTAssertEqual(eventService.lastLayoutUserInteractionAction, .ToggleButtonStateTriggerClick)
+        XCTAssertEqual(eventService.lastLayoutUserInteractionContext, .ToggleButtonStateTrigger)
+    }
+
     // MARK: - Snapshots
 
     func testSnapshot() throws {
@@ -50,12 +70,13 @@ final class TestToggleButtonComponent: XCTestCase {
 
     // MARK: - Helpers
 
-    func get_model() throws -> ToggleButtonViewModel {
+    func get_model(eventService: EventDiagnosticServicing? = nil) throws -> ToggleButtonViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let model = ModelTestData.ToggleButtonData.basicToggleButton()
         return try transformer.getToggleButton(customStateKey: model.customStateKey,
                                                styles: model.styles,
-                                               children: transformer.transformChildren(model.children, context: .outer([])))
+                                               children: transformer.transformChildren(model.children, context: .outer([])),
+                                               eventService: eventService)
     }
 
     func get_snapshot_model() throws -> ToggleButtonViewModel {

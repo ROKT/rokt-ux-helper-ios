@@ -415,6 +415,26 @@ final class TestLayoutTransformer: XCTestCase {
         XCTAssertEqual(transformedToggleButton.defaultStyle?[1].background?.backgroundColor?.light, "#F2A7AB")
     }
 
+    func test_toggleButton_transformedWithEventService() throws {
+        // Arrange
+        let model = ModelTestData.ToggleButtonData.basicToggleButton()
+        let eventService = MockEventService()
+        let layoutTransformer = LayoutTransformer(
+            layoutPlugin: get_layout_plugin(layout: nil, slots: []),
+            eventService: eventService
+        )
+
+        // Act
+        let transformedToggleButton = try layoutTransformer.getToggleButton(
+            customStateKey: model.customStateKey,
+            styles: model.styles,
+            children: nil
+        )
+
+        // Assert
+        XCTAssertTrue(transformedToggleButton.eventService === eventService)
+    }
+
     func test_expand_withValidBNF_updatesNestedValues() throws {
         let bnfPageModel = ModelTestData.PageModelData.withBNF()
 
