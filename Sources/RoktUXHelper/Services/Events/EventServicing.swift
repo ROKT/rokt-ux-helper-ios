@@ -15,6 +15,7 @@ protocol EventServicing: AnyObject {
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void)
     func cartItemInstantPurchase(catalogItem: CatalogItem)
     func cartItemInstantPurchaseSuccess(itemId: String)
+    func sendUserInteraction(action: UserInteraction, context: UserInteractionContext)
     func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext)
     func cartItemInstantPurchaseFailure(itemId: String)
     func cartItemDevicePay(
