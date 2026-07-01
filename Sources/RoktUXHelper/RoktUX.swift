@@ -285,10 +285,20 @@ public class RoktUX: UXEventsDelegate {
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the purchase succeeded or failed.
+       - retryable: when `true` and `success` is `false`, the failure is treated as transient —
+         the offer stays re-tappable and no terminal failure signal is emitted. Ignored when
+         `success` is `true`. Defaults to `false`.
      */
-    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+    public func devicePayFinalized(
+        layoutId: String,
+        catalogItemId: String,
+        success: Bool,
+        retryable: Bool = false
+    ) {
         if success {
             eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+        } else if retryable {
+            eventServices[layoutId]?.cartItemDevicePayRetry(itemId: catalogItemId)
         } else {
             eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
         }

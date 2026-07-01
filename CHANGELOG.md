@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-07-01
+
+### Added
+
+- Add a `retryable` parameter to `devicePayFinalized` (on `RoktUX` and `RoktLayoutUIView`). When a Step-1 device-pay failure is transient, it resolves the button with `DevicePayStatus.retry` so the offer stays re-tappable and no terminal `SignalCartItemInstantPurchaseFailure` signal is emitted. Backward-compatible: defaults to `false`.
+
 ## [0.12.3] - 2026-06-19
 
 ### Fixed

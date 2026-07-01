@@ -261,6 +261,20 @@ class EventService: Hashable, EventDiagnosticServicing {
         devicePayCompletion = nil
     }
 
+    /// Retryable device-pay failure — a transient Step-1 `/v1/cart/initialize-purchase` error
+    /// (network / timeout / HTTP 429 / 5xx). Resolves the button completion with
+    /// ``DevicePayStatus/retry`` so the offer stays re-tappable, and — unlike
+    /// ``cartItemDevicePayFailure`` — does NOT emit the terminal `SignalCartItemInstantPurchaseFailure`
+    /// platform signal, since the buyer can still complete the purchase on a retry.
+    func cartItemDevicePayRetry(itemId: String) {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
+        // Symmetric guard with cartItemDevicePayFailure — once the flow transitioned to
+        // forward-payment Step-2, that branch owns the terminal state.
+        guard let completion = devicePayCompletion else { return }
+        completion(.retry)
+        devicePayCompletion = nil
+    }
+
     /// Invoked when the host SDK has fetched the order breakdown from
     /// `/v1/cart/initialize-purchase` (or equivalent) and wants the UX to display the
     /// confirmation screen. Resolves the stored `devicePayCompletion` with the breakdown

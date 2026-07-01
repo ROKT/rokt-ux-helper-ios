@@ -455,6 +455,64 @@ final class TestEventService: XCTestCase {
         }
     }
 
+    /// A retryable Step-1 failure resolves the completion with `.retry` so the offer stays
+    /// re-tappable, and must NOT emit the terminal `SignalCartItemInstantPurchaseFailure` signal.
+    func test_devicePayRetry_whenCompletionPending_resolvesRetryWithoutFailureSignal() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        var completionStatus: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .paypal,
+            transactionData: nil,
+            completion: { status in completionStatus = status }
+        )
+        events.removeAll()
+
+        // Act
+        eventService.cartItemDevicePayRetry(itemId: "catalogItemId")
+
+        // Assert
+        XCTAssertFalse(events.contains { $0.eventType == .SignalCartItemInstantPurchaseFailure })
+        if case .retry = completionStatus {} else {
+            XCTFail("Expected completion to fire with .retry, got \(String(describing: completionStatus))")
+        }
+    }
+
+    /// After the flow transitioned to `.pendingConfirmation` (completion cleared), a late retry
+    /// must be a no-op — no signal, no completion.
+    func test_devicePayRetry_afterPendingConfirmation_isNoOp() {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .paypal,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "USD 10.00"]
+        )
+        events.removeAll()
+
+        // Act
+        eventService.cartItemDevicePayRetry(itemId: "catalogItemId")
+
+        // Assert
+        XCTAssertFalse(events.contains { $0.eventType == .SignalCartItemInstantPurchaseFailure })
+    }
+
     func test_device_pay_duplicate_call_short_circuits_with_failure_while_processing() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],

@@ -104,8 +104,21 @@ import SwiftUI
     ///   - layoutId: layout Id for the relevant displayed catalog item.
     ///   - catalogItemId: Id of the catalog item that was selected.
     ///   - success: whether the purchase succeeded or failed.
-    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
-        uxHelper?.devicePayFinalized(layoutId: layoutId, catalogItemId: catalogItemId, success: success)
+    ///   - retryable: when `true` and `success` is `false`, the failure is treated as transient —
+    ///     the offer stays re-tappable and no terminal failure signal is emitted. Ignored when
+    ///     `success` is `true`. Defaults to `false`.
+    public func devicePayFinalized(
+        layoutId: String,
+        catalogItemId: String,
+        success: Bool,
+        retryable: Bool = false
+    ) {
+        uxHelper?.devicePayFinalized(
+            layoutId: layoutId,
+            catalogItemId: catalogItemId,
+            success: success,
+            retryable: retryable
+        )
     }
 
     /// Call after the host SDK has fetched the runtime catalog data (e.g. an order breakdown
