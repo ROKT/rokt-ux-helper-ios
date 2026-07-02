@@ -43,6 +43,30 @@ final class CatalogDropdownViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.persistedSelectedIndex)
     }
 
+    func test_selectItem_emitsDropDownItemSelected() {
+        let (layoutState, _) = makeLayoutStateWithGroup()
+        let eventService = MockEventService()
+        let viewModel = makeViewModel(layoutState: layoutState, eventService: eventService)
+
+        viewModel.selectItem(at: 0)
+
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled)
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item1")
+        XCTAssertEqual(eventService.lastUserInteractionAction, .DropDownItemSelected)
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CatalogDropDown)
+    }
+
+    func test_selectItem_disabledOption_doesNotEmit() {
+        let (layoutState, _) = makeLayoutStateWithGroup()
+        let eventService = MockEventService()
+        let viewModel = makeViewModel(layoutState: layoutState, eventService: eventService)
+
+        // Option 1 is out of stock — ignored, so no signal.
+        viewModel.selectItem(at: 1)
+
+        XCTAssertFalse(eventService.cartItemUserInteractionCalled)
+    }
+
     func test_displayText_showsPlaceholderWhenNothingSelected() {
         let (layoutState, _) = makeLayoutStateWithGroup()
         let viewModel = makeViewModel(layoutState: layoutState, placeholderValue: "Please select")
