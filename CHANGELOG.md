@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-07-02
+
+### Added
+
+- Emit DropDownItemSelected on catalog dropdown selection ([#319](https://github.com/ROKT/rokt-ux-helper-ios/pull/319))
+- Emit OfferProgression on buy-now success ([#318](https://github.com/ROKT/rokt-ux-helper-ios/pull/318))
+
+### Fixed
+
+- Retryable Stripe Support ([#320](https://github.com/ROKT/rokt-ux-helper-ios/pull/320))
+- Send user interaction signal ([#316](https://github.com/ROKT/rokt-ux-helper-ios/pull/316))
+
+### Changed
+
+- Support maintenance patch releases ([#314](https://github.com/ROKT/rokt-ux-helper-ios/pull/314))
+
 ## [0.12.3] - 2026-06-19
 
 ### Fixed
@@ -373,7 +389,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
 [0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3
 [0.12.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...0.12.2
 [0.12.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.0...0.12.1
