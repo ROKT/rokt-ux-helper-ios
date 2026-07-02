@@ -26,6 +26,7 @@ protocol EventServicing: AnyObject {
     )
     func cartItemDevicePaySuccess(itemId: String)
     func cartItemDevicePayFailure(itemId: String)
+    func cartItemDevicePayRetry(itemId: String)
     func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String])
     func cartItemForwardPayment(
         catalogItem: CatalogItem,

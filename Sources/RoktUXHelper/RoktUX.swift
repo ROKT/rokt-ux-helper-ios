@@ -295,6 +295,15 @@ public class RoktUX: UXEventsDelegate {
     }
 
     /**
+     Call when the user cancels device pay (e.g. dismisses the Stripe payment sheet)
+     without completing the purchase. Returns the layout to the product detail state
+     without emitting a purchase-failure signal.
+     */
+    public func devicePayRetry(layoutId: String, catalogItemId: String) {
+        eventServices[layoutId]?.cartItemDevicePayRetry(itemId: catalogItemId)
+    }
+
+    /**
      Call after `/v1/cart/initialize-purchase` returns to display the confirmation screen
      for a device-pay flow (e.g. PayPal). The catalog-runtime dictionary is published into the
      layout's reactive state and resolved against `%^DATA.catalogRuntime.<key>^%` placeholders.

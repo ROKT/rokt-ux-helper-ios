@@ -274,6 +274,13 @@ class EventService: Hashable, EventDiagnosticServicing {
         devicePayCompletion = nil
     }
 
+    func cartItemDevicePayRetry(itemId: String) {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
+        guard let completion = devicePayCompletion else { return }
+        completion(.retry)
+        devicePayCompletion = nil
+    }
+
     /// Invoked when the host SDK has fetched the order breakdown from
     /// `/v1/cart/initialize-purchase` (or equivalent) and wants the UX to display the
     /// confirmation screen. Resolves the stored `devicePayCompletion` with the breakdown
