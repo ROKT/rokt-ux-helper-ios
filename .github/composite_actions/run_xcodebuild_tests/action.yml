@@ -1,5 +1,5 @@
 name: Run unit tests
-description: Action runs `xcodebuild test` on xcode 16.x
+description: Action runs `xcodebuild test` on xcode 26.x
 
 inputs:
   codecov-token:
@@ -18,7 +18,7 @@ runs:
       uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd # v4
       id: simulator
       with:
-        model: iPhone 16
+        model: iPhone 17
         os: iOS
         os_version: ">=18.0"
         wait_for_boot: true

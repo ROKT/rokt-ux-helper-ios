@@ -7,6 +7,10 @@ on:
       - maintenance/*
     paths:
       - VERSION
+  # Manual re-run for when a publish run fails on an infra/CI issue after
+  # VERSION was already merged. Runs the workflow file from the selected
+  # branch and publishes the version currently in that branch's VERSION file.
+  workflow_dispatch:
 
 permissions:
   contents: write
