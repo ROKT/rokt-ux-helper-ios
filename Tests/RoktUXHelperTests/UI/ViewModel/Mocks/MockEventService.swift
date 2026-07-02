@@ -39,6 +39,7 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemDevicePayCallCount = 0
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemDevicePayRetryCalled = false
     var cartItemDevicePayPendingConfirmationCalled = false
     var lastDevicePayPendingConfirmationItemId: String?
     var lastDevicePayPendingConfirmationData: [String: String]?
@@ -158,6 +159,10 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayFailureCalled = true
     }
 
+    func cartItemDevicePayRetry(itemId: String) {
+        cartItemDevicePayRetryCalled = true
+    }
+
     func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String]) {
         cartItemDevicePayPendingConfirmationCalled = true
         lastDevicePayPendingConfirmationItemId = itemId
@@ -226,6 +231,7 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCallCount = 0
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemDevicePayRetryCalled = false
         cartItemDevicePayPendingConfirmationCalled = false
         cartItemDevicePayLastProvider = nil
         lastDevicePayPendingConfirmationItemId = nil

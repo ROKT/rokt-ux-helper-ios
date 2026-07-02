@@ -184,7 +184,7 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
         )
     }
 
-    func test_devicePayRetry_setsLayoutVariantCustomState() {
+    func test_devicePayRetry_doesNotSetPaymentResult() {
         let layoutState = MockLayoutState()
         let eventService = MockEventService()
         let isValid = true
@@ -225,12 +225,11 @@ final class CatalogDevicePayButtonViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertEqual(
+        XCTAssertNil(
             layoutState.layoutVariantCustomStateValue(
                 for: CustomStateIdentifiable.Keys.paymentResult.rawValue,
                 position: 0
-            ),
-            -1
+            )
         )
     }
 
