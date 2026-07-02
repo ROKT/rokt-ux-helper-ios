@@ -178,6 +178,15 @@ class CatalogDropdownViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
             layoutState?.items[LayoutState.activeCatalogItemKey] = resolvedItem
         }
 
+        // Signal the selection, scoped to the catalog item behind the chosen option.
+        if let selectedItem = resolveActiveCatalogItem() ?? catalogItem(for: options[index]) {
+            eventService?.cartItemUserInteraction(
+                itemId: selectedItem.catalogItemId,
+                action: .DropDownItemSelected,
+                context: .CatalogDropDown
+            )
+        }
+
         layoutState?.publishStateChange()
     }
 
