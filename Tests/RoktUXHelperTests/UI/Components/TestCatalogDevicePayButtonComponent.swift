@@ -115,6 +115,42 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
 
         XCTAssertFalse(eventService.cartItemDevicePayCalled)
         XCTAssertTrue(eventService.cartItemUserInteractionCalled)
+        XCTAssertEqual(eventService.lastUserInteractionAction, .ValidationTriggerFailed)
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CustomStateValidationTriggerButton)
+    }
+
+    func test_handleTap_validationPasses_sendsOfferProgression() {
+        let layoutState = MockLayoutState()
+        let eventService = MockEventService()
+        let catalogItem = CatalogItem.mock(catalogItemId: "item-1")
+
+        layoutState.validationCoordinator.registerField(
+            key: "dropdown",
+            owner: self,
+            validation: { .valid },
+            onStatusChange: { _ in }
+        )
+
+        let sut = CatalogDevicePayButtonViewModel(
+            catalogItem: catalogItem,
+            children: nil,
+            provider: .applePay,
+            layoutState: layoutState,
+            eventService: eventService,
+            defaultStyle: nil,
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: ValidationTriggerConfig(validatorFieldKeys: ["dropdown"])
+        )
+
+        sut.handleTap()
+
+        XCTAssertTrue(eventService.cartItemUserInteractionCalled)
+        XCTAssertEqual(eventService.lastUserInteractionItemId, "item-1")
+        XCTAssertEqual(eventService.lastUserInteractionAction, .OfferProgression)
+        XCTAssertEqual(eventService.lastUserInteractionContext, .CustomStateValidationTriggerButton)
+        XCTAssertTrue(eventService.cartItemDevicePayCalled)
     }
 
     func test_devicePayCompletion_success_setsCustomState() {

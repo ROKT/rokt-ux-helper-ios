@@ -39,6 +39,7 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
 
 enum UserInteraction: String, Codable, CaseIterable {
     case ValidationTriggerFailed
+    case OfferProgression
     case DropDownItemSelected
     case ThumbnailClick
     case MainImageScrollIconLeftClick
