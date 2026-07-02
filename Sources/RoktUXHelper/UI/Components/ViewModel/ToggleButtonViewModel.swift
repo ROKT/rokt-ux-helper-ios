@@ -10,6 +10,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let pressedStyle: [ToggleButtonStateTriggerStyle]?
     let hoveredStyle: [ToggleButtonStateTriggerStyle]?
     let disabledStyle: [ToggleButtonStateTriggerStyle]?
+    weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -21,6 +22,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          pressedStyle: [ToggleButtonStateTriggerStyle]?,
          hoveredStyle: [ToggleButtonStateTriggerStyle]?,
          disabledStyle: [ToggleButtonStateTriggerStyle]?,
+         eventService: EventDiagnosticServicing? = nil,
          layoutState: (any LayoutStateRepresenting)?) {
         self.children = children
         self.customStateKey = customStateKey
@@ -28,6 +30,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle
         self.disabledStyle = disabledStyle
+        self.eventService = eventService
         self.layoutState = layoutState
     }
 }
