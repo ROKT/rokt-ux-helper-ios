@@ -62,6 +62,12 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             return
         }
 
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: UserInteraction.OfferProgression,
+            context: UserInteractionContext.CustomStateValidationTriggerButton
+        )
+
         guard let eventService else { return }
         isProcessing = true
         eventService.cartItemDevicePay(
