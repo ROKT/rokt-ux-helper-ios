@@ -1,17 +1,8 @@
 name: Run unit tests
 description: Action runs `xcodebuild test`
 
-# The Xcode/simulator toolchain is configured entirely by the repository variables
-# CI_XCODE_VERSION, CI_SIMULATOR_MODEL and CI_SIMULATOR_OS — the single source of
-# truth. Change them in Settings → Secrets and variables → Actions → Variables to
-# react to a GitHub runner-image change without opening a code PR.
-#
-# The `vars` context is NOT available inside a composite action, so these are not
-# read here directly: the caller workflow (which can read `vars`) passes each repo
-# variable through as the matching input below. The inputs are internal plumbing,
-# not tunable knobs, and carry no defaults so the repo variables remain the only
-# place a value is defined. Keep CI_SIMULATOR_OS aligned with the iOS runtime
-# CI_XCODE_VERSION bundles (e.g. Xcode 26.2 → iOS 26.2).
+# Toolchain config lives in the CI_* repo variables (the caller passes them in as
+# inputs, since `vars` isn't readable inside a composite action).
 
 inputs:
   codecov-token:
@@ -41,15 +32,8 @@ runs:
       with:
         model: ${{ inputs.simulator-model }}
         os: iOS
-        # os_version is pinned to the iOS runtime bundled with the pinned Xcode
-        # (Xcode 26.2 → iOS 26.2) so snapshot rendering is deterministic and the
-        # runtime is guaranteed present on the image. A loose range (">=18.0") let the
-        # action pick among whichever iOS runtimes the image happened to ship, which
-        # broke exact-pixel snapshot references across point-release text rendering.
-        # The value comes from repo variable CI_SIMULATOR_OS (resolved by the caller
-        # workflow into the input below) so the image can be re-pointed without a code
-        # change — but bumping the iOS version (or Xcode version) requires re-recording
-        # snapshots.
+        # Pinned OS (not a range) so snapshot rendering is deterministic; bumping it
+        # requires re-recording snapshots.
         os_version: ${{ inputs.simulator-os }}
         wait_for_boot: true
         shutdown_after_job: true
