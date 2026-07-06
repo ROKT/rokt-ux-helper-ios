@@ -132,7 +132,7 @@ When snapshot tests fail in CI:
 Snapshot images are sensitive to the OS version and simulator device. The CI uses:
 
 - **Xcode**: 26.2
-- **Simulator**: iPhone 17, iOS >= 18.0
+- **Simulator**: iPhone 17, iOS 26.4 (pinned)
 - **Viewport**: Set by `snapshotDevice` (currently `ViewImageConfig.iPhone13Pro(.portrait)`)
 
 The `ViewImageConfig` sets the rendering viewport explicitly, so the simulator model doesn't affect output. However, font rendering can vary across OS versions. If you see unexpected diffs, ensure your local Xcode and simulator match CI.

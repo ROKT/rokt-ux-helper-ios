@@ -20,7 +20,12 @@ runs:
       with:
         model: iPhone 17
         os: iOS
-        os_version: ">=18.0"
+        # Pinned to a single iOS 26 runtime so snapshot rendering is deterministic.
+        # The runner image ships multiple iOS 26 runtimes (e.g. 26.2 / 26.4 / 26.5);
+        # a loose range (">=18.0") let the action pick one non-deterministically, which
+        # broke exact-pixel snapshot references across point-release text rendering.
+        # Bump this together with re-recording the snapshots when the image changes.
+        os_version: "26.4"
         wait_for_boot: true
         shutdown_after_job: true
 
