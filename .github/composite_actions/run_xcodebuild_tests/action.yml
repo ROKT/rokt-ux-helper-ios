@@ -11,10 +11,11 @@ inputs:
     default: iPhone 17
   simulator-os:
     description: >-
-      Simulator iOS runtime version. Pinned to a single iOS 26 point release so
-      snapshot rendering is deterministic — see the note in the simulator step.
+      Simulator iOS runtime version. Pinned to the runtime bundled with the
+      pinned Xcode (26.2 → iOS 26.2) so snapshot rendering is deterministic and
+      the runtime is always present on the image — see the note in the simulator step.
     required: false
-    default: "26.4"
+    default: "26.2"
 
 runs:
   using: composite
@@ -30,14 +31,14 @@ runs:
       with:
         model: ${{ inputs.simulator-model }}
         os: iOS
-        # os_version is pinned to a single iOS 26 runtime so snapshot rendering is
-        # deterministic. The runner image ships multiple iOS 26 runtimes (e.g. 26.2 /
-        # 26.4 / 26.5); a loose range (">=18.0") let the action pick one
-        # non-deterministically, which broke exact-pixel snapshot references across
-        # point-release text rendering. The value is supplied by the caller (repo
-        # variable CI_SIMULATOR_OS, defaulting to the input below) so the runner image
-        # can be re-pointed without a code change — but bumping the iOS version still
-        # requires re-recording the snapshots.
+        # os_version is pinned to the iOS runtime bundled with the pinned Xcode
+        # (Xcode 26.2 → iOS 26.2) so snapshot rendering is deterministic and the
+        # runtime is guaranteed present on the image. A loose range (">=18.0") let the
+        # action pick among whichever iOS runtimes the image happened to ship, which
+        # broke exact-pixel snapshot references across point-release text rendering.
+        # The value is supplied by the caller (repo variable CI_SIMULATOR_OS, defaulting
+        # to the input below) so the image can be re-pointed without a code change — but
+        # bumping the iOS version (or the Xcode version) requires re-recording snapshots.
         os_version: ${{ inputs.simulator-os }}
         wait_for_boot: true
         shutdown_after_job: true
