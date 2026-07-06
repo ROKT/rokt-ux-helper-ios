@@ -50,9 +50,6 @@ jobs:
         timeout-minutes: 15
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-          xcode-version: ${{ vars.CI_XCODE_VERSION || '26.2' }}
-          simulator-model: ${{ vars.CI_SIMULATOR_MODEL || 'iPhone 17' }}
-          simulator-os: ${{ vars.CI_SIMULATOR_OS || '26.2' }}
 
       - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
         id: extract-release-notes
