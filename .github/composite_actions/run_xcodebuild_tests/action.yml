@@ -5,6 +5,12 @@ inputs:
   codecov-token:
     description: Codecov token
     required: false
+  xcode-version:
+    description: >-
+      Xcode version to select. Keep the simulator-os input aligned with the iOS
+      runtime this Xcode bundles (e.g. Xcode 26.2 → iOS 26.2).
+    required: false
+    default: "26.2"
   simulator-model:
     description: Simulator device model to run tests on
     required: false
@@ -20,10 +26,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Set up Xcode 16
+    - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
       with:
-        xcode-version: 26.2
+        xcode-version: ${{ inputs.xcode-version }}
 
     - name: Setup iOS Simulator
       uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd # v4

@@ -183,11 +183,11 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         )
         .frame(width: width, height: height)
         let hostingController = UIHostingController(rootView: view)
-        // perceptualPrecision tolerates sub-pixel text rendering differences between
-        // simulator iOS versions (CI runs `os_version: ">=18.0"` so the runtime drifts).
+        // Uses the shared precision/perceptualPrecision tolerance (see SnapshotConfig)
+        // to absorb non-deterministic sub-pixel text anti-aliasing.
         assertSnapshot(
             of: hostingController,
-            as: .image(on: snapshotDevice, perceptualPrecision: 0.98),
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision),
             file: file,
             testName: testName,
             line: line

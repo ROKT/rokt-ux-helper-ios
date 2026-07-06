@@ -137,7 +137,10 @@ final class TestRowComponent: XCTestCase {
             .frame(width: 350, height: 200)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
     }
 
     // MARK: - Helpers
