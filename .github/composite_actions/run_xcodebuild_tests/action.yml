@@ -1,33 +1,31 @@
 name: Run unit tests
 description: Action runs `xcodebuild test`
 
-# The Xcode/simulator toolchain is driven by repository variables so a GitHub
-# runner-image change can be handled from Settings → Secrets and variables →
-# Actions → Variables without opening a code PR. The `vars` context is NOT
-# available inside a composite action, so the caller workflow resolves the
-# variables (with in-repo defaults) and passes them in as the inputs below:
-#   CI_XCODE_VERSION   (default 26.2)      — Xcode selected by setup-xcode
-#   CI_SIMULATOR_MODEL (default iPhone 17) — simulator device model
-#   CI_SIMULATOR_OS    (default 26.2)      — simulator iOS runtime
-# Keep CI_SIMULATOR_OS aligned with the iOS runtime CI_XCODE_VERSION bundles
-# (e.g. Xcode 26.2 → iOS 26.2).
+# The Xcode/simulator toolchain is configured entirely by the repository variables
+# CI_XCODE_VERSION, CI_SIMULATOR_MODEL and CI_SIMULATOR_OS — the single source of
+# truth. Change them in Settings → Secrets and variables → Actions → Variables to
+# react to a GitHub runner-image change without opening a code PR.
+#
+# The `vars` context is NOT available inside a composite action, so these are not
+# read here directly: the caller workflow (which can read `vars`) passes each repo
+# variable through as the matching input below. The inputs are internal plumbing,
+# not tunable knobs, and carry no defaults so the repo variables remain the only
+# place a value is defined. Keep CI_SIMULATOR_OS aligned with the iOS runtime
+# CI_XCODE_VERSION bundles (e.g. Xcode 26.2 → iOS 26.2).
 
 inputs:
   codecov-token:
     description: Codecov token
     required: false
   xcode-version:
-    description: Xcode version to select (caller passes vars.CI_XCODE_VERSION).
-    required: false
-    default: "26.2"
+    description: Wired from repo variable CI_XCODE_VERSION by the caller workflow.
+    required: true
   simulator-model:
-    description: Simulator device model (caller passes vars.CI_SIMULATOR_MODEL).
-    required: false
-    default: iPhone 17
+    description: Wired from repo variable CI_SIMULATOR_MODEL by the caller workflow.
+    required: true
   simulator-os:
-    description: Simulator iOS runtime (caller passes vars.CI_SIMULATOR_OS).
-    required: false
-    default: "26.2"
+    description: Wired from repo variable CI_SIMULATOR_OS by the caller workflow.
+    required: true
 
 runs:
   using: composite
