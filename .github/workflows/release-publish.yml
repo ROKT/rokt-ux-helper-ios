@@ -32,6 +32,14 @@ jobs:
         id: version-file
         run: |
           version_from_file=$(head -n 1 VERSION | tr -d '\r\n ')
+          # Validate before propagating: this value flows into branch names, commit
+          # messages and PR titles/bodies downstream, so reject anything that isn't a
+          # plain semver (optionally with a pre-release suffix). This also prevents
+          # GITHUB_OUTPUT injection via crafted VERSION content.
+          if [[ ! "$version_from_file" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::VERSION file contains an invalid version string: '$version_from_file'"
+            exit 1
+          fi
           echo "release-version=$version_from_file" >> "$GITHUB_OUTPUT"
 
       - name: Skip if version already released
