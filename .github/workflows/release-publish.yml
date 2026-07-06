@@ -87,10 +87,6 @@ jobs:
           set -o pipefail
           version=$(head -n 1 VERSION)
 
-          # `pod trunk push` is not idempotent: a re-run, or a transient trunk
-          # error that occurs *after* the spec was already accepted, leaves the
-          # version published yet reports the job as failed. Skip the push when
-          # the version is already on trunk so those cases stay green.
           if pod trunk info RoktUXHelper 2>/dev/null | grep -qE "^[[:space:]]*-[[:space:]]*${version//./\\.}([[:space:]].*)?$"; then
             echo "RoktUXHelper ${version} is already published to CocoaPods trunk; skipping push."
             exit 0
