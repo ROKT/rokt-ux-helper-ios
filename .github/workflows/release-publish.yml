@@ -12,8 +12,44 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  # Guard: if the version in VERSION already has a GitHub release, stop before doing
+  # anything. This makes any VERSION change to an already-released version a no-op, so a
+  # rollback (or a re-run) can never re-publish an existing version.
+  preflight:
+    name: Preflight – skip if already released
     if: ${{ !github.event.created && !github.event.deleted }}
+    runs-on: ubuntu-latest
+    outputs:
+      release-version: ${{ steps.version-file.outputs.release-version }}
+      should-release: ${{ steps.guard.outputs.should-release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Get current version
+        id: version-file
+        run: |
+          version_from_file=$(head -n 1 VERSION | tr -d '\r\n ')
+          echo "release-version=$version_from_file" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if version already released
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.version-file.outputs.release-version }}
+        run: |
+          if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
+            echo "::notice::Version $RELEASE_VERSION already has a GitHub release — skipping publish."
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should-release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-and-release:
+    needs: preflight
+    if: ${{ needs.preflight.outputs.should-release == 'true' }}
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout code
@@ -72,7 +108,8 @@ jobs:
             ${{ steps.extract-release-notes.outputs.release_notes }}
 
   publish-cocoapods:
-    needs: build-and-release
+    needs: [preflight, build-and-release]
+    if: ${{ needs.preflight.outputs.should-release == 'true' }}
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout code
@@ -84,3 +121,55 @@ jobs:
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: pod trunk push RoktUXHelper.podspec --allow-warnings
+
+  # If the release build/tag creation fails, open a PR that reverts VERSION to the
+  # previously-released value so the release line is not left stuck on a version that
+  # never shipped. Merging that PR is safe because the preflight guard stops a re-release
+  # of an already-tagged version.
+  rollback-on-failure:
+    name: Roll back VERSION on failed release
+    needs: [preflight, build-and-release]
+    if: ${{ always() && needs.preflight.outputs.should-release == 'true' && needs.build-and-release.result == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Determine previous version
+        id: prev
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          prev=$(git show "$BEFORE:VERSION" 2>/dev/null | head -n1 | tr -d '\r\n ' || true)
+          if [ -z "$prev" ]; then
+            prev=$(git show HEAD~1:VERSION | head -n1 | tr -d '\r\n ')
+          fi
+          echo "previous-version=$prev" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back VERSION file
+        env:
+          PREV: ${{ steps.prev.outputs.previous-version }}
+        run: printf '%s\n' "$PREV" > VERSION
+
+      - name: Open rollback pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: rollback/version-${{ needs.preflight.outputs.release-version }}
+          base: ${{ github.ref_name }}
+          commit-message: "Roll back VERSION to ${{ steps.prev.outputs.previous-version }} after failed release of ${{ needs.preflight.outputs.release-version }}"
+          title: "Roll back VERSION to ${{ steps.prev.outputs.previous-version }} after failed release ${{ needs.preflight.outputs.release-version }}"
+          body: |
+            The `Release – Publish` run for `${{ needs.preflight.outputs.release-version }}` failed before completing:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            This PR reverts `VERSION` back to `${{ steps.prev.outputs.previous-version }}` so the release line reflects the last successfully-published version.
+
+            **Merging is safe:** the `preflight` guard stops `Release – Publish` when the version in `VERSION` already has a GitHub release, so restoring `${{ steps.prev.outputs.previous-version }}` will not start another release.
+
+            To retry `${{ needs.preflight.outputs.release-version }}`, re-run the failed workflow run, or re-run `Release – Draft` after this merges.
