@@ -32,7 +32,7 @@ Describe client-side behavior only — what the SDK sends and receives and why, 
 
    ```bash
    set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
-     -destination 'platform=iOS Simulator,name=iPhone 16' \
+     -destination 'platform=iOS Simulator,name=iPhone 17' \
      -derivedDataPath DerivedData test | xcbeautify
    ```
 

@@ -59,7 +59,10 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
         .frame(width: 390, height: 500)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
     }
 
     // MARK: - Image Navigation

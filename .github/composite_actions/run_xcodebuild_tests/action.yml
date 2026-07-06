@@ -1,26 +1,40 @@
 name: Run unit tests
-description: Action runs `xcodebuild test` on xcode 16.x
+description: Action runs `xcodebuild test`
+
+# Toolchain config lives in the CI_* repo variables (the caller passes them in as
+# inputs, since `vars` isn't readable inside a composite action).
 
 inputs:
   codecov-token:
     description: Codecov token
     required: false
+  xcode-version:
+    description: Wired from repo variable CI_XCODE_VERSION by the caller workflow.
+    required: true
+  simulator-model:
+    description: Wired from repo variable CI_SIMULATOR_MODEL by the caller workflow.
+    required: true
+  simulator-os:
+    description: Wired from repo variable CI_SIMULATOR_OS by the caller workflow.
+    required: true
 
 runs:
   using: composite
   steps:
-    - name: Set up Xcode 16
+    - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
       with:
-        xcode-version: 26.2
+        xcode-version: ${{ inputs.xcode-version }}
 
     - name: Setup iOS Simulator
       uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd # v4
       id: simulator
       with:
-        model: iPhone 16
+        model: ${{ inputs.simulator-model }}
         os: iOS
-        os_version: ">=18.0"
+        # Pinned OS (not a range) so snapshot rendering is deterministic; bumping it
+        # requires re-recording snapshots.
+        os_version: ${{ inputs.simulator-os }}
         wait_for_boot: true
         shutdown_after_job: true
 

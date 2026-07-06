@@ -22,7 +22,10 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         .frame(width: 350, height: 80)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
     }
 
     func testSnapshot_afterpay() throws {
@@ -38,7 +41,10 @@ final class TestCatalogDevicePayButtonComponent: XCTestCase {
         .frame(width: 350, height: 120)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
     }
 
     func test_handleTap_callsDevicePay_whenNoValidation() {

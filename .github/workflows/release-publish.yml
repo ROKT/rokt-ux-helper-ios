@@ -14,7 +14,7 @@ permissions:
 jobs:
   build-and-release:
     if: ${{ !github.event.created && !github.event.deleted }}
-    runs-on: macos-latest
+    runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -50,6 +50,9 @@ jobs:
         timeout-minutes: 15
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
+          xcode-version: ${{ vars.CI_XCODE_VERSION }}
+          simulator-model: ${{ vars.CI_SIMULATOR_MODEL }}
+          simulator-os: ${{ vars.CI_SIMULATOR_OS }}
 
       - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
         id: extract-release-notes
@@ -70,7 +73,7 @@ jobs:
 
   publish-cocoapods:
     needs: build-and-release
-    runs-on: macos-15
+    runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3

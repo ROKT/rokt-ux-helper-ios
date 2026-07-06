@@ -16,7 +16,7 @@ env:
 
 jobs:
   measure-size:
-    runs-on: macos-15
+    runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -35,7 +35,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
         with:
-          xcode-version: "26.2"
+          xcode-version: ${{ vars.CI_XCODE_VERSION || '26.2' }}
 
       # The base branch may not have the size tooling yet (e.g. before this
       # merges, or if the script is relocated); both steps fall back to an empty

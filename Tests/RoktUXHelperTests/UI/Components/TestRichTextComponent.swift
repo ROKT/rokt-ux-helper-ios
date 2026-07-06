@@ -463,7 +463,13 @@ final class TestRichTextComponent: XCTestCase {
             .frame(width: width, height: height)
 
         let hostingController = UIHostingController(rootView: view)
-        assertSnapshot(of: hostingController, as: .image(on: snapshotDevice), file: file, testName: testName, line: line)
+        assertSnapshot(
+            of: hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision),
+            file: file,
+            testName: testName,
+            line: line
+        )
     }
     
     // MARK: - Nil / empty defaultStyle tests
