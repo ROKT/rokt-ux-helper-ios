@@ -135,7 +135,13 @@ Snapshot images are sensitive to the OS version and simulator device. The CI use
 - **Simulator**: iPhone 17, iOS 26.4 (pinned)
 - **Viewport**: Set by `snapshotDevice` (currently `ViewImageConfig.iPhone13Pro(.portrait)`)
 
-The `ViewImageConfig` sets the rendering viewport explicitly, so the simulator model doesn't affect output. However, font rendering can vary across OS versions. If you see unexpected diffs, ensure your local Xcode and simulator match CI.
+The CI runner label, simulator model, and iOS runtime are supplied by repository variables so a runner-image change can be handled without a code PR (defaults in parentheses):
+
+- `CI_MACOS_RUNNER` (`macos-latest`) — `runs-on` for the test jobs
+- `CI_SIMULATOR_MODEL` (`iPhone 17`) — simulator device model
+- `CI_SIMULATOR_OS` (`26.4`) — simulator iOS runtime
+
+Set these under **Settings → Secrets and variables → Actions → Variables**. Changing `CI_MACOS_RUNNER` or `CI_SIMULATOR_MODEL` does not affect rendering (the `ViewImageConfig` sets the viewport explicitly). **Changing `CI_SIMULATOR_OS` does** — font rendering varies across OS versions, so the reference PNGs must be re-recorded on the new runtime in the same PR. If you see unexpected diffs, ensure your local Xcode and simulator match CI.
 
 ### Async Considerations
 
