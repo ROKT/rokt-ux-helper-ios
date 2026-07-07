@@ -33,11 +33,13 @@ class MockEventService: EventDiagnosticServicing {
     var cartItemInstantPurchaseCalled = false
     var cartItemInstantPurchaseSuccessCalled = false
     var cartItemInstantPurchaseFailureCalled = false
+    var userInteractionCalled = false
     var cartItemUserInteractionCalled = false
     var cartItemDevicePayCalled = false
     var cartItemDevicePayCallCount = 0
     var cartItemDevicePaySuccessCalled = false
     var cartItemDevicePayFailureCalled = false
+    var cartItemDevicePayRetryCalled = false
     var cartItemDevicePayPendingConfirmationCalled = false
     var lastDevicePayPendingConfirmationItemId: String?
     var lastDevicePayPendingConfirmationData: [String: String]?
@@ -112,6 +114,15 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseFailureCalled = true
     }
 
+    var lastLayoutUserInteractionAction: UserInteraction?
+    var lastLayoutUserInteractionContext: UserInteractionContext?
+
+    func sendUserInteraction(action: UserInteraction, context: UserInteractionContext) {
+        userInteractionCalled = true
+        lastLayoutUserInteractionAction = action
+        lastLayoutUserInteractionContext = context
+    }
+
     var lastUserInteractionItemId: String?
     var lastUserInteractionAction: UserInteraction?
     var lastUserInteractionContext: UserInteractionContext?
@@ -146,6 +157,10 @@ class MockEventService: EventDiagnosticServicing {
 
     func cartItemDevicePayFailure(itemId: String) {
         cartItemDevicePayFailureCalled = true
+    }
+
+    func cartItemDevicePayRetry(itemId: String) {
+        cartItemDevicePayRetryCalled = true
     }
 
     func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String]) {
@@ -208,11 +223,15 @@ class MockEventService: EventDiagnosticServicing {
         cartItemInstantPurchaseCalled = false
         cartItemInstantPurchaseSuccessCalled = false
         cartItemInstantPurchaseFailureCalled = false
+        userInteractionCalled = false
+        lastLayoutUserInteractionAction = nil
+        lastLayoutUserInteractionContext = nil
         cartItemUserInteractionCalled = false
         cartItemDevicePayCalled = false
         cartItemDevicePayCallCount = 0
         cartItemDevicePaySuccessCalled = false
         cartItemDevicePayFailureCalled = false
+        cartItemDevicePayRetryCalled = false
         cartItemDevicePayPendingConfirmationCalled = false
         cartItemDevicePayLastProvider = nil
         lastDevicePayPendingConfirmationItemId = nil

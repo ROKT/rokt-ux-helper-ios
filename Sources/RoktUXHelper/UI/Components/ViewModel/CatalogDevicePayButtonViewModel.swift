@@ -62,6 +62,12 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
             return
         }
 
+        eventService?.cartItemUserInteraction(
+            itemId: catalogItem.catalogItemId,
+            action: UserInteraction.OfferProgression,
+            context: UserInteractionContext.CustomStateValidationTriggerButton
+        )
+
         guard let eventService else { return }
         isProcessing = true
         eventService.cartItemDevicePay(
@@ -82,8 +88,10 @@ class CatalogDevicePayButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptiv
         switch status {
         case .success:
             setLayoutVariantCustomState(key: customStateKey, value: 1)
-        case .failure, .retry:
+        case .failure:
             setLayoutVariantCustomState(key: customStateKey, value: -1)
+        case .retry:
+            break
         case .pendingConfirmation(let catalogRuntimeData):
             // Publish runtime data first so reactive text resolution sees the values when the
             // confirmation subtree mounts on the devicePayState=1 transition.

@@ -209,6 +209,10 @@ struct ToggleButtonComponent: View {
                 key: model.customStateKey
             )
         )
+        model.eventService?.sendUserInteraction(
+            action: .ToggleButtonStateTriggerClick,
+            context: .ToggleButtonStateTrigger
+        )
     }
 
     private func updateStyleState() {

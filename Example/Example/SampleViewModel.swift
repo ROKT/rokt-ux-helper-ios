@@ -16,7 +16,15 @@ import SwiftUI
 
 class SampleViewModel: ObservableObject {
 
-    let experienceResponse: String = String.getExperienceResponse(for: "experience")!
+    let experienceResponse: String
+
+    /// - Parameter experienceResource: Bundle JSON name without extension (e.g. `experience`, `experience-overlay`).
+    init(experienceResource: String = "experience") {
+        guard let json = String.getExperienceResponse(for: experienceResource) else {
+            fatalError("Example app: missing experience JSON resource `\(experienceResource).json` in bundle.")
+        }
+        experienceResponse = json
+    }
 
     @Published var urlToOpen: URL?
     private var cancellable: AnyCancellable?

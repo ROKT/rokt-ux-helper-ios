@@ -200,6 +200,19 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
     }
 
+    func sendUserInteraction(action: UserInteraction, context: UserInteractionContext) {
+        let objectData = [
+            kAction: action.rawValue,
+            kContext: context.rawValue
+        ]
+        sendEvent(
+            .SignalUserInteraction,
+            parentGuid: pluginInstanceGuid,
+            objectData: objectData,
+            jwtToken: pluginConfigJWTToken
+        )
+    }
+
     func cartItemUserInteraction(itemId: String, action: UserInteraction, context: UserInteractionContext) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         let objectData = [
@@ -258,6 +271,13 @@ class EventService: Hashable, EventDiagnosticServicing {
         guard let completion = devicePayCompletion else { return }
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
         completion(.failure)
+        devicePayCompletion = nil
+    }
+
+    func cartItemDevicePayRetry(itemId: String) {
+        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
+        guard let completion = devicePayCompletion else { return }
+        completion(.retry)
         devicePayCompletion = nil
     }
 

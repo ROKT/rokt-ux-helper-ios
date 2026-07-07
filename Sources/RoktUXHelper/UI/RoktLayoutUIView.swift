@@ -108,6 +108,11 @@ import SwiftUI
         uxHelper?.devicePayFinalized(layoutId: layoutId, catalogItemId: catalogItemId, success: success)
     }
 
+    /// Call when the user cancels device pay without completing the purchase.
+    public func devicePayRetry(layoutId: String, catalogItemId: String) {
+        uxHelper?.devicePayRetry(layoutId: layoutId, catalogItemId: catalogItemId)
+    }
+
     /// Call after the host SDK has fetched the runtime catalog data (e.g. an order breakdown
     /// from `/v1/cart/initialize-purchase`) to display the confirmation screen.
     /// - Parameters:

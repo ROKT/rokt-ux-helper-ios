@@ -9,6 +9,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-07-02
+
+### Added
+
+- Emit DropDownItemSelected on catalog dropdown selection ([#319](https://github.com/ROKT/rokt-ux-helper-ios/pull/319))
+- Emit OfferProgression on buy-now success ([#318](https://github.com/ROKT/rokt-ux-helper-ios/pull/318))
+
+### Fixed
+
+- Retryable Stripe Support ([#320](https://github.com/ROKT/rokt-ux-helper-ios/pull/320))
+- Send user interaction signal ([#316](https://github.com/ROKT/rokt-ux-helper-ios/pull/316))
+
+### Changed
+
+- Support maintenance patch releases ([#314](https://github.com/ROKT/rokt-ux-helper-ios/pull/314))
+
+## [0.12.3] - 2026-06-19
+
+### Fixed
+
+- Resolve top presenter through tab/nav/split stacks ([#312](https://github.com/ROKT/rokt-ux-helper-ios/pull/312))
+
+## [0.12.2] - 2026-06-17
+
+### Fixed
+
+- Walk modal chain for detached key-window root ([#310](https://github.com/ROKT/rokt-ux-helper-ios/pull/310))
+
+## [0.12.1] - 2026-06-16
+
+### Fixed
+
+- Guard Against 0 Height Preventing Dynamic Bottom Sheet From Appe… ([#307](https://github.com/ROKT/rokt-ux-helper-ios/pull/307))
+
+## [0.12.0] - 2026-06-11
+
+### Added
+
+- Add pre-parsed experience rendering ([#303](https://github.com/ROKT/rokt-ux-helper-ios/pull/303))
+
+### Changed
+
+- Bump actions/checkout from 6.0.2 to 6.0.3 ([#300](https://github.com/ROKT/rokt-ux-helper-ios/pull/300))
+- Bump actions/upload-artifact from 4.6.2 to 7.0.1 ([#301](https://github.com/ROKT/rokt-ux-helper-ios/pull/301))
+
 ## [0.11.0] - 2026-06-03
 
 ### Added
@@ -344,7 +389,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
+[0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3
+[0.12.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...0.12.2
+[0.12.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.0...0.12.1
+[0.12.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.12...0.11.0
 [0.10.12]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.11...0.10.12
 [0.10.11]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.10.10...0.10.11

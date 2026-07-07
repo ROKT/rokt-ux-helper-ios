@@ -1,13 +1,13 @@
 {
-  "originHash" : "76dfd71c4977dba3d21b217714aa06d90676a280846f4cb16698ae1acf6c4e31",
+  "originHash" : "5776a0a3a8ab92b75220f512aea8aeb25171c9ae7f7d323bc37fe03b05098f57",
   "pins" : [
     {
       "identity" : "dcui-swift-schema",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ROKT/dcui-swift-schema.git",
       "state" : {
-        "revision" : "4f7a71eca08710d8f3a5d624b7fffe3bf1a265c6",
-        "version" : "2.8.0"
+        "revision" : "1e69ee148840e67e658c57f001d8fa0017278f06",
+        "version" : "2.8.1"
       }
     }
   ],

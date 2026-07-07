@@ -107,6 +107,30 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(events.first?.eventType, .SignalActivation)
         XCTAssertEqual(events.first?.pageInstanceGuid, mockPageInstanceGuid)
     }
+
+    func test_sendUserInteraction_shouldSendLayoutScopedSignal() throws {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.sendUserInteraction(
+            action: .ToggleButtonStateTriggerClick,
+            context: .ToggleButtonStateTrigger
+        )
+
+        // Assert
+        let event = events.first
+        XCTAssertEqual(event?.eventType, .SignalUserInteraction)
+        XCTAssertEqual(event?.pageInstanceGuid, mockPageInstanceGuid)
+        XCTAssertEqual(event?.parentGuid, mockPluginInstanceGuid)
+        XCTAssertEqual(event?.jwtToken, mockPluginConfigJWTToken)
+        XCTAssertEqual(event?.objectData?[kAction], UserInteraction.ToggleButtonStateTriggerClick.rawValue)
+        XCTAssertEqual(event?.objectData?[kContext], UserInteractionContext.ToggleButtonStateTrigger.rawValue)
+    }
     
     func test_sendSignalResponse_onPositive_engagementEventsAndSignals_shouldSend() throws {
         // Arrange
@@ -452,6 +476,30 @@ final class TestEventService: XCTestCase {
         XCTAssertTrue(events.contains { $0.eventType == .SignalCartItemInstantPurchase })
         if case .success = completionStatus {} else {
             XCTFail("Expected completion to fire with .success, got \(String(describing: completionStatus))")
+        }
+    }
+
+    func test_devicePayRetry_invokesCompletionWithoutFailureSignal() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        var completionStatus: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { status in completionStatus = status }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayRetry(itemId: "catalogItemId")
+
+        XCTAssertTrue(events.isEmpty, "retry must not emit SignalCartItemInstantPurchaseFailure")
+        guard case .retry = completionStatus else {
+            return XCTFail("expected .retry completion, got \(String(describing: completionStatus))")
         }
     }
 

@@ -133,37 +133,20 @@ public class RoktUX: UXEventsDelegate {
                                                    experienceResponse: experienceResponse,
                                                    processor: processor)
 
-            if let layoutPlugins = layoutPage.layoutPlugins {
-                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
-                for layoutPlugin in layoutPlugins {
-                    let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
-                        .first { $0.key == layoutPlugin.targetElementSelector }?
-                        .value
-                    let layoutPluginViewState = layoutPluginViewStates?
-                        .first { viewState in viewState.pluginId == layoutPlugin.pluginId }
-                    displayLayout(
-                        page: layoutPage,
-                        layoutPlugin: layoutPlugin,
-                        layoutPluginViewState: layoutPluginViewState,
-                        startDate: startDate,
-                        responseReceivedDate: layoutPage.responseReceivedDate,
-                        layoutLoader: layoutLoader,
-                        config: config,
-                        onLoad: onLoad,
-                        onUnload: onUnload,
-                        onEmbeddedSizeChange: onEmbeddedSizeChange,
-                        onRoktUXEvent: onRoktUXEvent,
-                        onPluginViewStateChange: onPluginViewStateChange,
-                        processor: processor
-                    )
-                }
-            } else {
-                sendDiagnostics(code: kAPIExecuteErrorCode,
-                                callStack: kEmptyResponse,
-                                processor: processor)
-                RoktUXLogger.shared.warning("No layouts found in experience response")
-                onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
-            }
+            displayLayoutPlugins(
+                page: layoutPage,
+                startDate: startDate,
+                layoutPluginViewStates: layoutPluginViewStates,
+                defaultLayoutLoader: defaultLayoutLoader,
+                layoutLoaders: layoutLoaders,
+                config: config,
+                onLoad: onLoad,
+                onUnload: onUnload,
+                onEmbeddedSizeChange: onEmbeddedSizeChange,
+                onRoktUXEvent: onRoktUXEvent,
+                onPluginViewStateChange: onPluginViewStateChange,
+                processor: processor
+            )
         } catch {
             sendDiagnostics(code: kValidationErrorCode,
                             callStack: error.localizedDescription,
@@ -171,6 +154,112 @@ public class RoktUX: UXEventsDelegate {
             RoktUXLogger.shared.error("Failed to parse experience response", error: error)
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
         }
+    }
+
+    /**
+     Parses (and times) an SDK experience response exactly once.
+
+     Use together with ``loadLayout(startDate:pageModel:layoutPluginViewStates:defaultLayoutLoader:layoutLoaders:config:onEmbeddedSizeChange:onRoktUXEvent:onRoktPlatformEvent:onPluginViewStateChange:)``
+     to avoid decoding the experience response a second time when rendering.
+
+     > Important: Intended for use by the Rokt mobile SDK. It is `public` only so the SDK
+     > can call it across the module boundary; it is not a supported public integration
+     > entry point and may change without notice.
+
+     - Parameter experienceResponse: The raw experience response JSON string.
+     - Returns: A ``RoktUXParseResult`` containing the session/page identifiers, the decoded
+       page model (`nil` when the response has no renderable layouts) and the parse
+       start/end timestamps, or `nil` if the response cannot be decoded.
+     */
+    public static func parseExperience(_ experienceResponse: String) -> RoktUXParseResult? {
+        let parseStart = Date()
+        guard let response = try? RoktDecoder()
+            .decode(RoktUXExperienceResponse.self, experienceResponse)
+        else {
+            return nil
+        }
+        let pageModel = response.getPageModel()
+        let parseEnd = Date()
+        return RoktUXParseResult(
+            sessionId: response.sessionId,
+            pageId: pageModel?.pageId ?? response.page?.pageId,
+            pageModel: pageModel,
+            parseStart: parseStart,
+            parseEnd: parseEnd
+        )
+    }
+
+    /**
+     Loads and displays the layout from a pre-parsed page model, skipping the decode step.
+
+     Use together with ``parseExperience(_:)`` so the experience response is parsed exactly once.
+     Page initial events are sent from here so event semantics match the
+     `loadLayout(experienceResponse:)` overloads.
+
+     > Important: Intended for use by the Rokt mobile SDK. It is `public` only so the SDK
+     > can call it across the module boundary; it is not a supported public integration
+     > entry point and may change without notice. Placement load/unload is observed via the
+     > `RoktUXEvent` stream (`LayoutInteractive` / `LayoutClosed` / `LayoutCompleted` /
+     > `LayoutFailure`), which is why this overload takes no `onLoad`/`onUnload` closures.
+
+     - Parameters:
+       - startDate: The start date for the process. Default is current date.
+       - pageModel: A page model previously produced by ``parseExperience(_:)``.
+       - layoutPluginViewStates: Plugin view states ([RoktPluginViewState]) to be restored.
+       - defaultLayoutLoader: Default loader for the layout.
+       - layoutLoaders: A dictionary mapping layout element selectors to their loaders.
+       - config: Configuration for the RoktUX.
+       - onEmbeddedSizeChange: Closure to handle changes in embedded layout size.
+       - onRoktUXEvent: Closure to handle RoktUX events.
+       - onRoktPlatformEvent: Closure to handle platform events. Platform events are an essential part of integration and it has to be sent to Rokt via your backend.
+            For ease of use, platformEvent is defined as [String: Any]
+       - onPluginViewStateChange: Closure to handle changes to the RoktPluginViewState.
+     */
+    public func loadLayout(
+        startDate: Date = Date(),
+        pageModel: RoktUXPageModel,
+        layoutPluginViewStates: [RoktPluginViewState]? = nil,
+        defaultLayoutLoader: LayoutLoader? = nil,
+        layoutLoaders: [String: LayoutLoader?]? = nil,
+        config: RoktUXConfig? = nil,
+        onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
+        onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
+        onRoktPlatformEvent: @escaping ([String: Any]) -> Void,
+        onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void
+    ) {
+        if let configLogLevel = config?.logLevel, configLogLevel != .none {
+            RoktUXLogger.shared.logLevel = configLogLevel
+        }
+        RoktUXLogger.shared.verbose("loadLayout called with pre-parsed page model")
+        let processor = EventProcessor(integrationType: .sdk,
+                                       onRoktPlatformEvent: onRoktPlatformEvent)
+
+        sendPageIntialEvents(
+            pageModel: pageModel,
+            startDate: startDate,
+            responseReceivedDate: pageModel.responseReceivedDate,
+            processor: processor
+        )
+
+        // This pre-parsed (SDK-only) overload takes no onLoad/onUnload closures.
+        // Placement load/unload is observed by the consumer through the RoktUXEvent
+        // stream (LayoutInteractive / LayoutClosed / LayoutCompleted / LayoutFailure),
+        // which fire independently of these view-lifecycle hooks. No-ops are passed so
+        // the shared rendering path (still used by the string-based overloads) is unchanged.
+        displayLayoutPlugins(
+            page: pageModel,
+            startDate: startDate,
+            layoutPluginViewStates: layoutPluginViewStates,
+            defaultLayoutLoader: defaultLayoutLoader,
+            layoutLoaders: layoutLoaders,
+            config: config,
+            onLoad: {},
+            onUnload: {},
+            onEmbeddedSizeChange: onEmbeddedSizeChange,
+            onRoktUXEvent: onRoktUXEvent,
+            onPluginViewStateChange: onPluginViewStateChange,
+            processor: processor
+        )
     }
 
     /**
@@ -203,6 +292,15 @@ public class RoktUX: UXEventsDelegate {
         } else {
             eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
         }
+    }
+
+    /**
+     Call when the user cancels device pay (e.g. dismisses the Stripe payment sheet)
+     without completing the purchase. Returns the layout to the product detail state
+     without emitting a purchase-failure signal.
+     */
+    public func devicePayRetry(layoutId: String, catalogItemId: String) {
+        eventServices[layoutId]?.cartItemDevicePayRetry(itemId: catalogItemId)
     }
 
     /**
@@ -286,6 +384,56 @@ public class RoktUX: UXEventsDelegate {
             processor: processor
         )
         return layoutPage
+    }
+
+    /// Displays every layout plugin on the given page (SDK integration shape).
+    /// Shared by `loadLayout(experienceResponse:)` and `loadLayout(pageModel:)` so the
+    /// pre-parsed path renders identically without re-decoding.
+    private func displayLayoutPlugins(
+        page: RoktUXPageModel,
+        startDate: Date,
+        layoutPluginViewStates: [RoktPluginViewState]?,
+        defaultLayoutLoader: LayoutLoader?,
+        layoutLoaders: [String: LayoutLoader?]?,
+        config: RoktUXConfig?,
+        onLoad: @escaping (() -> Void),
+        onUnload: @escaping (() -> Void),
+        onEmbeddedSizeChange: @escaping (String, CGFloat) -> Void,
+        onRoktUXEvent: @escaping (RoktUXEvent) -> Void,
+        onPluginViewStateChange: @escaping (RoktPluginViewState) -> Void,
+        processor: EventProcessing
+    ) {
+        if let layoutPlugins = page.layoutPlugins {
+            RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
+            for layoutPlugin in layoutPlugins {
+                let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
+                    .first { $0.key == layoutPlugin.targetElementSelector }?
+                    .value
+                let layoutPluginViewState = layoutPluginViewStates?
+                    .first { viewState in viewState.pluginId == layoutPlugin.pluginId }
+                displayLayout(
+                    page: page,
+                    layoutPlugin: layoutPlugin,
+                    layoutPluginViewState: layoutPluginViewState,
+                    startDate: startDate,
+                    responseReceivedDate: page.responseReceivedDate,
+                    layoutLoader: layoutLoader,
+                    config: config,
+                    onLoad: onLoad,
+                    onUnload: onUnload,
+                    onEmbeddedSizeChange: onEmbeddedSizeChange,
+                    onRoktUXEvent: onRoktUXEvent,
+                    onPluginViewStateChange: onPluginViewStateChange,
+                    processor: processor
+                )
+            }
+        } else {
+            sendDiagnostics(code: kAPIExecuteErrorCode,
+                            callStack: kEmptyResponse,
+                            processor: processor)
+            RoktUXLogger.shared.warning("No layouts found in experience response")
+            onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: nil))
+        }
     }
 
     private func displayLayout(
@@ -505,6 +653,11 @@ public class RoktUX: UXEventsDelegate {
                                        onLoad: onLoad,
                                        onUnLoad: onUnload,
                                        builder: builder)
+            } else {
+                RoktUXLogger.shared.warning(
+                    "Overlay was not presented: no suitable top view controller was found. "
+                        + "Enable RoktUX logging (.warning or lower) for resolver details."
+                )
             }
         }
     }

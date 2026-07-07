@@ -18,18 +18,28 @@ import SafariServices
 struct SampleView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var vm: SampleViewModel = .init()
+    @StateObject private var vm: SampleViewModel
 
+    let layoutLocation: String
     let onLayoutFailure: (() -> Void)?
 
-    init(onLayoutFailure: (() -> Void)? = nil) {
+    /// - Parameters:
+    ///   - experienceResource: Bundle JSON name without extension.
+    ///   - layoutLocation: Must match `targetElementSelector` for embedded layouts; use `""` for overlay/bottom-sheet stubs.
+    init(
+        experienceResource: String = "experience",
+        layoutLocation: String = "#target_element",
+        onLayoutFailure: (() -> Void)? = nil
+    ) {
+        self.layoutLocation = layoutLocation
         self.onLayoutFailure = onLayoutFailure
+        _vm = StateObject(wrappedValue: SampleViewModel(experienceResource: experienceResource))
     }
 
     var body: some View {
         RoktLayoutView(
             experienceResponse: vm.experienceResponse,
-            location: "#target_element", // "targetElementSelector" in experience JSON file
+            location: layoutLocation,
             config: RoktUXConfig.Builder().colorMode(.system).imageLoader(vm).build()
         ) { uxEvent in
             if uxEvent is RoktUXEvent.LayoutCompleted {

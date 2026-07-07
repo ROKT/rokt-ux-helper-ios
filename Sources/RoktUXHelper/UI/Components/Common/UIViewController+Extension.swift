@@ -35,18 +35,18 @@ extension UIViewController {
            let bottomSheetUIModel = bottomSheetUIModel {
             // Only for iOS 16+ dynamic bottomsheet
             var isOnLoadCalled = false
-            let onSizeChange = { [weak modal] size in
+            let onSizeChange = { [weak modal] (size: CGFloat) in
                 DispatchQueue.main.async {
-                    if let sheet = modal?.sheetPresentationController {
-                        sheet.animateChanges {
-                            sheet.detents = [.custom { _ in
-                                return size
-                            }]
-                        }
-                        if !isOnLoadCalled {
-                            isOnLoadCalled = true
-                            onLoad()
-                        }
+                    let detentHeight = max(size, 1)
+                    guard let sheet = modal?.sheetPresentationController else {
+                        return
+                    }
+                    sheet.animateChanges {
+                        sheet.detents = [.custom { _ in detentHeight }]
+                    }
+                    if !isOnLoadCalled {
+                        isOnLoadCalled = true
+                        onLoad()
                     }
                 }
             }
@@ -57,7 +57,10 @@ extension UIViewController {
 
             applyBottomSheetStyles(modal: modal, bottomSheetUIModel: bottomSheetUIModel)
             applyInitialDynamicBottomSheetHeight(modal: modal)
-            self.present(modal, animated: true)
+            self.present(modal, animated: true, completion: {
+                modal.view.setNeedsLayout()
+                modal.view.layoutIfNeeded()
+            })
 
         } else {
             modal.rootView = AnyView(
@@ -175,10 +178,14 @@ extension UIViewController {
 
     @available(iOS 16.0, *)
     private func applyInitialDynamicBottomSheetHeight(modal: UIHostingController<AnyView>) {
-        let zeroDetents: [UISheetPresentationController.Detent] = [.custom { _ in
-            return CGFloat(0)
-        }]
-        modal.sheetPresentationController?.detents = zeroDetents
+        // A pure zero-height custom detent can prevent the hosted SwiftUI tree from receiving
+        // a non-zero layout proposal on some OS versions. Geometry/readSize then never reaches
+        // wrap-content height, onSizeChange never runs, and impression events never fire.
+        // Start from the system medium detent so content can measure; onSizeChange then replaces
+        // detents with an exact-height custom detent.
+        guard let sheet = modal.sheetPresentationController else { return }
+        sheet.detents = [.medium()]
+        sheet.selectedDetentIdentifier = .medium
     }
 
     fileprivate static let expandedStateKey = "BottomSheetExpandedState"
