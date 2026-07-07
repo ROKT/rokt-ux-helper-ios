@@ -83,4 +83,13 @@ jobs:
       - name: Publish to CocoaPods
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: pod trunk push RoktUXHelper.podspec --allow-warnings
+        run: |
+          set -o pipefail
+          version=$(head -n 1 VERSION)
+
+          if pod trunk info RoktUXHelper 2>/dev/null | grep -qE "^[[:space:]]*-[[:space:]]*${version//./\\.}([[:space:]].*)?$"; then
+            echo "RoktUXHelper ${version} is already published to CocoaPods trunk; skipping push."
+            exit 0
+          fi
+
+          pod trunk push RoktUXHelper.podspec --allow-warnings
