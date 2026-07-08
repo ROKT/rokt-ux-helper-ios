@@ -182,9 +182,9 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertNotNil(secondStyle)
     }
 
-    func test_p_tag_after_inline_text_adds_break() {
+    func test_p_tag_after_inline_text_adds_boundary() {
         let result = LightweightHTMLParser.parse(html: "Intro<p>Body</p>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "Intro\n\u{00A0}\nBody\n")
+        XCTAssertEqual(result.string, "Intro\nBody\n")
     }
 
     func test_p_tag_with_inline_formatting_inside() {
@@ -250,7 +250,7 @@ final class TestLightweightHTMLParser: XCTestCase {
         let html = "<ol><li>A</li><li>B</li></ol><ol><li>X</li><li>Y</li></ol>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
         // Bare items sit flush; the spacer between the two consecutive lists
-        // comes from <ol> opening (block separator), not inter-item spacing.
+        // comes from the first </ol> closing, not inter-item spacing.
         XCTAssertEqual(result.string, "1. A\n2. B\n\u{00A0}\n1. X\n2. Y\n")
     }
 
@@ -270,45 +270,53 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_p_inside_li_does_not_break_after_marker() {
         // <li><p>Text</p></li> is common WYSIWYG output. The <p> open must not
-        // insert a newline immediately after the marker prefix.
+        // insert a newline immediately after the marker prefix, and the </p>
+        // close must not add a spacer before the parent </li>.
         let result = LightweightHTMLParser.parse(html: "<ul><li><p>Text</p></li></ul>", baseFont: baseFont)
         XCTAssertEqual(result.string, "• Text\n")
     }
 
-    func test_li_with_p_siblings_get_inter_item_spacer() {
-        // CSS analogue: <p>'s `margin: 1em 0` shows through `<li>`'s zero
-        // margin, producing a gap between adjacent items. We approximate
-        // that gap with the block spacer.
+    func test_p_inside_li_skips_closing_inline_tags_before_suppressing_spacer() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li><b><p>A</p></b></li></ul>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "• A\n")
+    }
+
+    func test_li_with_final_p_children_do_not_get_inter_item_spacer() {
+        // Each <p> is the last meaningful child of its <li>, so its trailing
+        // spacer is suppressed before the next list item.
         let html = "<ul><li><p>One</p></li><li><p>Two</p></li><li><p>Three</p></li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "• One\n\u{00A0}\n• Two\n\u{00A0}\n• Three\n")
+        XCTAssertEqual(result.string, "• One\n• Two\n• Three\n")
+    }
+
+    func test_li_with_p_siblings_keeps_spacing_between_paragraphs() {
+        let html = "<ul><li><p>A</p><p>B</p></li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• A\n\u{00A0}\nB\n")
     }
 
     func test_mixed_bare_then_p_li_no_spacer() {
-        // <li>A</li><li><p>B</p></li> — previous sibling had no block child,
-        // so no spacer is emitted before the second marker. (Edge case: a
-        // browser would still show a gap from the second <p>'s top margin.
-        // The simpler "previous-sibling-only" rule keeps the parser local
-        // and is good enough for the WYSIWYG patterns we see in practice.)
+        // <li>A</li><li><p>B</p></li> — the second <p> starts immediately
+        // after its marker and is the last meaningful child of its <li>.
         let html = "<ul><li>A</li><li><p>B</p></li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
         XCTAssertEqual(result.string, "• A\n• B\n")
     }
 
-    func test_mixed_p_then_bare_li_emits_spacer() {
-        // <li><p>A</p></li><li>B</li> — previous sibling had a <p> child, so
-        // its trailing margin must show through. Spacer emitted before B.
+    func test_mixed_p_then_bare_li_no_spacer_after_final_block_child() {
+        // <li><p>A</p></li><li>B</li> — the <p> is the last meaningful child
+        // of the first <li>, so it does not emit a trailing visual spacer.
         let html = "<ul><li><p>A</p></li><li>B</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
-        XCTAssertEqual(result.string, "• A\n\u{00A0}\n• B\n")
+        XCTAssertEqual(result.string, "• A\n• B\n")
     }
 
     func test_p_after_text_in_li_still_breaks() {
         // <li>Intro<p>Body</p></li> — when the <p> is not the first content,
-        // a newline IS needed so "Intro" and "Body" don't run together. A
-        // spacer line is also inserted between them (see paragraphSpacer).
+        // a newline IS needed so "Intro" and "Body" don't run together. The
+        // final <p> does not add a trailing spacer before </li>.
         let result = LightweightHTMLParser.parse(html: "<ul><li>Intro<p>Body</p></li></ul>", baseFont: baseFont)
-        XCTAssertEqual(result.string, "• Intro\n\u{00A0}\nBody\n")
+        XCTAssertEqual(result.string, "• Intro\nBody\n")
     }
 
     func test_list_marker_inherits_font_color() {
@@ -347,19 +355,19 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
         let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
-        // Spacer line inserted between "Before " and "Inside":
-        // "Before \n\u{00A0}\nInside\n After"
-        XCTAssertEqual(result.string, "Before \n\u{00A0}\nInside\n After")
+        // The opening <p> inserts a boundary after "Before "; the closing
+        // </p> owns the spacer before the following " After" text.
+        XCTAssertEqual(result.string, "Before \nInside\n\u{00A0}\n After")
 
         let outsideBefore = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideBefore)
 
-        // Index 10 is the first char of "Inside" — inside the <p> range.
-        let insideStyle = result.attribute(.paragraphStyle, at: 10, effectiveRange: nil) as? NSParagraphStyle
+        // Index 8 is the first char of "Inside" — inside the <p> range.
+        let insideStyle = result.attribute(.paragraphStyle, at: 8, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(insideStyle)
 
-        // Index 18 is the space before "After" — outside the <p> range.
-        let outsideAfter = result.attribute(.paragraphStyle, at: 18, effectiveRange: nil) as? NSParagraphStyle
+        // Index 17 is the space before "After" — outside the <p> range.
+        let outsideAfter = result.attribute(.paragraphStyle, at: 17, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideAfter)
     }
 

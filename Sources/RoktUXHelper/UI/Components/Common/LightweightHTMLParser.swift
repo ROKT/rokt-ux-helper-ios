@@ -44,10 +44,10 @@ enum LightweightHTMLParser {
     // MARK: - Public API
 
     /// - Parameter blockSpacerHeight: Optional line-height hint used to size
-    ///   the invisible spacer line inserted between `<p>` blocks and between
-    ///   sibling `<li>` items. Pass the DCUI `style?.text?.lineHeight` and the
-    ///   parser scales it down (see `blockSpacerLineHeightRatio`) to a
-    ///   paragraph-sized gap. `nil` falls back to the default 6pt spacer.
+    ///   the invisible spacer line inserted between adjacent block elements.
+    ///   Pass the DCUI `style?.text?.lineHeight` and the parser scales it down
+    ///   (see `blockSpacerLineHeightRatio`) to a paragraph-sized gap. `nil`
+    ///   falls back to the default 6pt spacer.
     static func parse(
         html: String,
         baseFont: UIFont?,
@@ -69,6 +69,8 @@ enum LightweightHTMLParser {
                     index = nextIndex
                     handleTag(
                         tag,
+                        html: html,
+                        currentIndex: index,
                         stack: &tagStack,
                         result: result,
                         baseFont: baseFont,
@@ -111,24 +113,20 @@ enum LightweightHTMLParser {
         enum Kind { case unordered, ordered }
         let kind: Kind
         var counter: Int
-        /// Whether the most recently closed `<li>` at this depth contained a
-        /// block-level child (currently `<p>`). Drives the CSS-style rule
-        /// that bare `<li>` siblings sit flush (no inter-item gap) while
-        /// `<li><p>...</p></li>` siblings get a spacer from the `<p>`'s
-        /// implied margin.
-        var lastClosedHadBlock: Bool
+        let contentStart: Int
     }
 
     private struct OpenListItem {
         let contentStart: Int
         let depth: Int
-        var containedBlock: Bool
     }
 
     // MARK: - Tag dispatch
 
     private static func handleTag(
         _ tag: Tag,
+        html: String,
+        currentIndex: String.Index,
         stack: inout [Tag],
         result: NSMutableAttributedString,
         baseFont: UIFont?,
@@ -141,8 +139,11 @@ enum LightweightHTMLParser {
         if tag.isClosing {
             handleClosingTag(
                 tag,
+                html: html,
+                currentIndex: currentIndex,
                 stack: &stack,
                 result: result,
+                spacerFontSize: spacerFontSize,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
                 listItemStarts: &listItemStarts,
@@ -180,39 +181,24 @@ enum LightweightHTMLParser {
         case paragraphTag:
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
-            finalizeOpenParagraph(
+            if finalizeOpenParagraph(
                 result: result,
                 paragraphStart: &paragraphStart,
                 stack: &stack,
                 styledRanges: &styledRanges
-            )
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            // Mark the innermost open <li> as block-bearing so its closing
-            // propagates the flag to ListContext.lastClosedHadBlock.
-            if !listItemStarts.isEmpty {
-                listItemStarts[listItemStarts.count - 1].containedBlock = true
+            ) {
+                appendBlockSpacerIfPossible(to: result, fontSize: spacerFontSize)
             }
+            insertBlockBoundaryIfNeeded(in: result, listItemStarts: listItemStarts)
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            listStack.append(ListContext(kind: .unordered, counter: 1, lastClosedHadBlock: false))
+            insertBlockBoundaryIfNeeded(in: result, listItemStarts: listItemStarts)
+            listStack.append(ListContext(kind: .unordered, counter: 1, contentStart: result.length))
             stack.append(tag)
         case orderedListTag:
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            listStack.append(ListContext(kind: .ordered, counter: 1, lastClosedHadBlock: false))
+            insertBlockBoundaryIfNeeded(in: result, listItemStarts: listItemStarts)
+            listStack.append(ListContext(kind: .ordered, counter: 1, contentStart: result.length))
             stack.append(tag)
         case listItemTag:
             guard !listStack.isEmpty else {
@@ -233,19 +219,13 @@ enum LightweightHTMLParser {
                 )
             }
             ensureTrailingNewline(in: result)
-            // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
-            // child contributes its own margin. We emit the spacer only when
-            // the prior sibling at this depth contained a block child.
-            if listStack[currentDepth].counter > 1, listStack[currentDepth].lastClosedHadBlock {
-                appendBlockSpacer(to: result, fontSize: spacerFontSize)
-            }
             // Apply the active tag-stack attributes to the marker so it inherits
             // surrounding font/color/etc. (e.g. <font color=...><ul>...).
             let prefix = listItemPrefix(for: listStack[currentDepth])
             let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
             result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
             listItemStarts.append(
-                OpenListItem(contentStart: result.length, depth: currentDepth, containedBlock: false)
+                OpenListItem(contentStart: result.length, depth: currentDepth)
             )
             stack.append(tag)
         default:
@@ -255,16 +235,21 @@ enum LightweightHTMLParser {
 
     private static func handleClosingTag(
         _ tag: Tag,
+        html: String,
+        currentIndex: String.Index,
         stack: inout [Tag],
         result: NSMutableAttributedString,
+        spacerFontSize: CGFloat,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
         styledRanges: inout [(NSRange, NSParagraphStyle)]
     ) {
+        var shouldConsiderTrailingSpacer = false
+
         switch tag.name {
         case paragraphTag:
-            finalizeOpenParagraph(
+            shouldConsiderTrailingSpacer = finalizeOpenParagraph(
                 result: result,
                 paragraphStart: &paragraphStart,
                 stack: &stack,
@@ -282,9 +267,17 @@ enum LightweightHTMLParser {
                 )
             }
         case unorderedListTag, orderedListTag:
-            if !listStack.isEmpty { listStack.removeLast() }
+            if let context = listStack.last {
+                shouldConsiderTrailingSpacer = context.contentStart < result.length
+                listStack.removeLast()
+            }
         default:
             break
+        }
+
+        if shouldConsiderTrailingSpacer,
+           shouldAppendBlockSpacerAfterClosingTag(in: html, from: currentIndex) {
+            appendBlockSpacerIfPossible(to: result, fontSize: spacerFontSize)
         }
 
         if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
@@ -299,8 +292,8 @@ enum LightweightHTMLParser {
         paragraphStart: inout Int?,
         stack: inout [Tag],
         styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        guard let start = paragraphStart else { return }
+    ) -> Bool {
+        guard let start = paragraphStart else { return false }
         ensureTrailingNewline(in: result)
         let length = result.length - start
         if length > 0 {
@@ -310,6 +303,7 @@ enum LightweightHTMLParser {
         if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
             stack.remove(at: openP)
         }
+        return length > 0
     }
 
     private static func finalizeOpenListItem(
@@ -323,7 +317,6 @@ enum LightweightHTMLParser {
         ensureTrailingNewline(in: result)
         if item.depth < listStack.count {
             listStack[item.depth].counter += 1
-            listStack[item.depth].lastClosedHadBlock = item.containedBlock
         }
         listItemStarts.removeLast()
         if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
@@ -352,7 +345,7 @@ enum LightweightHTMLParser {
     }
 
     /// Appends a small-font NBSP + newline so SwiftUI Text renders a visible
-    /// gap between block-level elements (`<p>`, `<li>`). Used because
+    /// gap between block-level elements. Used because
     /// `NSParagraphStyle.paragraphSpacing` is ignored by `Text(AttributedString)`.
     private static func appendBlockSpacer(to result: NSMutableAttributedString, fontSize: CGFloat) {
         let spacer = NSAttributedString(
@@ -362,20 +355,63 @@ enum LightweightHTMLParser {
         result.append(spacer)
     }
 
-    /// Ensures a visible gap precedes a block-level element opening (`<p>`,
-    /// `<ul>`, `<ol>`) when there's already content above it. No-op when:
+    private static func appendBlockSpacerIfPossible(to result: NSMutableAttributedString, fontSize: CGFloat) {
+        guard result.length > newline.count else { return }
+        appendBlockSpacer(to: result, fontSize: fontSize)
+    }
+
+    /// Ensures a structural newline precedes a block-level element opening
+    /// (`<p>`, `<ul>`, `<ol>`) when there's already content above it. No-op when:
     /// - the document is empty (block is the very first content);
     /// - we're inside an `<li>` whose marker prefix was just emitted (the
     ///   block flows into the marker line; common WYSIWYG pattern).
-    private static func insertBlockSeparatorIfNeeded(
+    private static func insertBlockBoundaryIfNeeded(
         in result: NSMutableAttributedString,
-        listItemStarts: [OpenListItem],
-        spacerFontSize: CGFloat
+        listItemStarts: [OpenListItem]
     ) {
         if listItemStarts.last?.contentStart == result.length { return }
         ensureTrailingNewline(in: result)
-        guard result.length > newline.count else { return }
-        appendBlockSpacer(to: result, fontSize: spacerFontSize)
+    }
+
+    private static func shouldAppendBlockSpacerAfterClosingTag(
+        in html: String,
+        from start: String.Index
+    ) -> Bool {
+        var idx = start
+
+        while idx < html.endIndex {
+            if html[idx] == "<" {
+                guard let (tag, nextIndex) = scanTag(in: html, from: idx) else {
+                    return true
+                }
+                if tag.isClosing {
+                    if isInlineTag(tag.name) {
+                        idx = nextIndex
+                        continue
+                    }
+                    return false
+                }
+                return true
+            }
+
+            let (text, nextIndex) = scanText(in: html, from: idx)
+            if text.allSatisfy(\.isWhitespace) {
+                idx = nextIndex
+                continue
+            }
+            return true
+        }
+
+        return false
+    }
+
+    private static func isInlineTag(_ name: String) -> Bool {
+        switch name {
+        case "b", "strong", "i", "em", "u", "s", "strike", "a", "font":
+            return true
+        default:
+            return false
+        }
     }
 
     private static func shouldSkipTextNode(
