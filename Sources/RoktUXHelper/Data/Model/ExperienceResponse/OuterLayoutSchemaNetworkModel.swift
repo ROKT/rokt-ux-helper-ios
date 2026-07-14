@@ -3,9 +3,9 @@ import DcuiSchema
 
 @available(iOS 13, *)
 struct OuterLayoutSchemaNetworkModel: Decodable {
-    public let breakpoints: BreakPoint?
-    public let layout: LayoutSchemaModel?
-    public let settings: LayoutSettings?
+    let breakpoints: BreakPoint?
+    let layout: LayoutSchemaModel?
+    let settings: LayoutSettings?
 }
 
 @available(iOS 13, *)

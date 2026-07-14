@@ -39,20 +39,6 @@ class RoktUXConfigTests: XCTestCase {
             .build()
         XCTAssertEqual(config.logLevel, .verbose)
     }
-
-    func testDeprecatedEnableLogging() {
-        let config = RoktUXConfig.Builder()
-            .enableLogging(true)
-            .build()
-        XCTAssertEqual(config.logLevel, .debug)
-    }
-
-    func testDeprecatedEnableLoggingFalse() {
-        let config = RoktUXConfig.Builder()
-            .enableLogging(false)
-            .build()
-        XCTAssertEqual(config.logLevel, .none)
-    }
 }
 
 class MockImageLoader: RoktUXImageLoader {

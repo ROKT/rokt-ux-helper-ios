@@ -56,7 +56,7 @@ class LayoutState: LayoutStateRepresenting {
         config?.imageLoader
     }
 
-    public let initialPluginViewState: RoktPluginViewState?
+    let initialPluginViewState: RoktPluginViewState?
     private let pluginId: String?
     private let onPluginViewStateChange: ((RoktPluginViewState) -> Void)?
 
