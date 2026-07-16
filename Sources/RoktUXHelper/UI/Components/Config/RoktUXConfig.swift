@@ -51,15 +51,6 @@ public struct RoktUXConfig {
             return self
         }
 
-        /// Enables or disables debug logging for the RoktUXConfig.
-        /// - Parameter enable: A Boolean value indicating whether debug logging should be enabled.
-        /// - Returns: The Builder instance with the updated logging configuration.
-        @available(*, deprecated, message: "Use logLevel(_:) instead")
-        public func enableLogging(_ enable: Bool) -> Builder {
-            self.logLevel = enable ? .debug : RoktUXLogLevel.none
-            return self
-        }
-
         /// Sets the log level for the RoktUXConfig.
         /// - Parameter logLevel: The log level to be set.
         /// - Returns: The Builder instance with the updated log level configuration.

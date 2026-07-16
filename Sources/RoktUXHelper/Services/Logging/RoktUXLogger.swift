@@ -10,9 +10,9 @@ import Foundation
 /// RoktUXLogger.shared.logLevel = .debug
 /// RoktUXLogger.shared.debug("Layout loaded")
 /// ```
-public final class RoktUXLogger: @unchecked Sendable {
+final class RoktUXLogger: @unchecked Sendable {
     /// Shared singleton instance
-    public private(set) static var shared = RoktUXLogger()
+    private(set) static var shared = RoktUXLogger()
 
     /// Replaces the shared instance. Primarily for testing.
     /// - Parameter logger: The logger instance to use as shared
@@ -29,7 +29,7 @@ public final class RoktUXLogger: @unchecked Sendable {
 
     /// The current log level. Messages below this level will not be logged.
     /// Default is `.none` (no logging).
-    public var logLevel: RoktUXLogLevel {
+    var logLevel: RoktUXLogLevel {
         get { lock.withLock { _logLevel } }
         set { lock.withLock { _logLevel = newValue } }
     }
@@ -42,7 +42,7 @@ public final class RoktUXLogger: @unchecked Sendable {
     ///   - file: Source file (automatically captured)
     ///   - function: Source function (automatically captured)
     ///   - line: Source line (automatically captured)
-    public func verbose(
+    func verbose(
         _ message: String,
         error: Error? = nil,
         file: String = #file,
@@ -60,7 +60,7 @@ public final class RoktUXLogger: @unchecked Sendable {
     ///   - file: Source file (automatically captured)
     ///   - function: Source function (automatically captured)
     ///   - line: Source line (automatically captured)
-    public func debug(
+    func debug(
         _ message: String,
         error: Error? = nil,
         file: String = #file,
@@ -77,7 +77,7 @@ public final class RoktUXLogger: @unchecked Sendable {
     ///   - file: Source file (automatically captured)
     ///   - function: Source function (automatically captured)
     ///   - line: Source line (automatically captured)
-    public func info(
+    func info(
         _ message: String,
         error: Error? = nil,
         file: String = #file,
@@ -94,7 +94,7 @@ public final class RoktUXLogger: @unchecked Sendable {
     ///   - file: Source file (automatically captured)
     ///   - function: Source function (automatically captured)
     ///   - line: Source line (automatically captured)
-    public func warning(
+    func warning(
         _ message: String,
         error: Error? = nil,
         file: String = #file,
@@ -111,7 +111,7 @@ public final class RoktUXLogger: @unchecked Sendable {
     ///   - file: Source file (automatically captured)
     ///   - function: Source function (automatically captured)
     ///   - line: Source line (automatically captured)
-    public func error(
+    func error(
         _ message: String,
         error: Error? = nil,
         file: String = #file,
