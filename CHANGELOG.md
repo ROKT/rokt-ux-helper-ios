@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-16
+
+### Fixed
+
+- Make CocoaPods publish idempotent to avoid false failures ([#326](https://github.com/ROKT/rokt-ux-helper-ios/pull/326))
+
+### Changed
+
+- Feat!(transactions): add selection response models and trim public API ([#330](https://github.com/ROKT/rokt-ux-helper-ios/pull/330))
+
 ## [0.13.0] - 2026-07-02
 
 ### Added
@@ -389,7 +399,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...1.0.0
 [0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
 [0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3
 [0.12.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.1...0.12.2
