@@ -203,7 +203,10 @@ class EventService: Hashable, EventDiagnosticServicing {
     func sendUserInteraction(action: UserInteraction, context: UserInteractionContext) {
         let objectData = [
             kAction: action.rawValue,
-            kContext: context.rawValue
+            kContext: context.rawValue,
+            // Canonical classification the ledger reads; mirrors action so downstream
+            // consumers get a populated interactionType without SDK-side derivation.
+            kInteractionType: action.rawValue
         ]
         sendEvent(
             .SignalUserInteraction,
@@ -217,7 +220,10 @@ class EventService: Hashable, EventDiagnosticServicing {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         let objectData = [
             kAction: action.rawValue,
-            kContext: context.rawValue
+            kContext: context.rawValue,
+            // Canonical classification the ledger reads; mirrors action so downstream
+            // consumers get a populated interactionType without SDK-side derivation.
+            kInteractionType: action.rawValue
         ]
         sendCartItemEvent(eventType: .SignalUserInteraction, catalogItem: catalogItem, objectData: objectData)
     }

@@ -130,6 +130,8 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(event?.jwtToken, mockPluginConfigJWTToken)
         XCTAssertEqual(event?.objectData?[kAction], UserInteraction.ToggleButtonStateTriggerClick.rawValue)
         XCTAssertEqual(event?.objectData?[kContext], UserInteractionContext.ToggleButtonStateTrigger.rawValue)
+        // interactionType mirrors action so the canonical ledger key is populated at the source.
+        XCTAssertEqual(event?.objectData?[kInteractionType], UserInteraction.ToggleButtonStateTriggerClick.rawValue)
     }
     
     func test_sendSignalResponse_onPositive_engagementEventsAndSignals_shouldSend() throws {
