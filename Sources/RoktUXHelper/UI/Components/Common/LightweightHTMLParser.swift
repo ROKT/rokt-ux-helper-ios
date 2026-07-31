@@ -94,7 +94,7 @@ enum LightweightHTMLParser {
                     after: result.string,
                     pendingCollapsedWhitespace: &pendingCollapsedWhitespace
                 )
-                if !collapsed.isEmpty, !shouldSkipTextNode(collapsed, listStack: listStack, inListItem: !listItemStarts.isEmpty) {
+                if !collapsed.isEmpty {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: collapsed, attributes: attrs))
                 }
@@ -398,16 +398,6 @@ enum LightweightHTMLParser {
         ensureTrailingNewline(in: result)
         guard result.length > newline.count else { return }
         appendBlockSpacer(to: result, fontSize: spacerFontSize)
-    }
-
-    private static func shouldSkipTextNode(
-        _ text: String,
-        listStack: [ListContext],
-        inListItem: Bool
-    ) -> Bool {
-        // Strip whitespace-only nodes that appear between list tags (e.g. pretty-printed HTML).
-        guard !listStack.isEmpty, !inListItem else { return false }
-        return text.allSatisfy { $0.isWhitespace }
     }
 
     private static func collapseHTMLWhitespace(
