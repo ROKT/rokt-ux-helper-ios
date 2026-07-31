@@ -248,6 +248,12 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "• First Second\n")
     }
 
+    func test_trailing_space_before_inline_closing_tags_collapses_between_words() {
+        let html = "<ul><li>Prepare your skin and <strong><em>keep your face clear </em></strong>with our headband</li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• Prepare your skin and keep your face clear with our headband\n")
+    }
+
     func test_whitespace_after_br_in_li_does_not_add_extra_blank_line() {
         let html = "<ul><li><span>Routine<br></span>\n</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
