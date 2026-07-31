@@ -236,6 +236,24 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "• One\n• Two\n")
     }
 
+    func test_pretty_printed_li_with_span_content_collapses_whitespace() {
+        let html = "<ul>\n<li>\n<span><em><strong>High-quality</strong></em> </span><span>cares for your hair</span>\n</li>\n</ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• High-quality cares for your hair\n")
+    }
+
+    func test_whitespace_between_inline_span_siblings_collapses_to_space() {
+        let html = "<ul><li><span>First</span>\n<span>Second</span></li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• First Second\n")
+    }
+
+    func test_whitespace_after_br_in_li_does_not_add_extra_blank_line() {
+        let html = "<ul><li><span>Routine<br></span>\n</li></ul>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "• Routine\n")
+    }
+
     func test_li_without_enclosing_list_renders_plain() {
         let result = LightweightHTMLParser.parse(html: "<li>orphan</li>", baseFont: baseFont)
         XCTAssertEqual(result.string, "orphan")
@@ -347,19 +365,19 @@ final class TestLightweightHTMLParser: XCTestCase {
 
     func test_p_tag_paragraph_style_does_not_apply_to_text_outside() {
         let result = LightweightHTMLParser.parse(html: "Before <p>Inside</p> After", baseFont: baseFont)
-        // Spacer line inserted between "Before " and "Inside":
-        // "Before \n\u{00A0}\nInside\n After"
-        XCTAssertEqual(result.string, "Before \n\u{00A0}\nInside\n After")
+        // HTML whitespace around the block boundary collapses away, while the
+        // synthetic spacer line still separates the inline and paragraph text.
+        XCTAssertEqual(result.string, "Before\n\u{00A0}\nInside\nAfter")
 
         let outsideBefore = result.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideBefore)
 
-        // Index 10 is the first char of "Inside" — inside the <p> range.
-        let insideStyle = result.attribute(.paragraphStyle, at: 10, effectiveRange: nil) as? NSParagraphStyle
+        // Index 9 is the first char of "Inside" — inside the <p> range.
+        let insideStyle = result.attribute(.paragraphStyle, at: 9, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNotNil(insideStyle)
 
-        // Index 18 is the space before "After" — outside the <p> range.
-        let outsideAfter = result.attribute(.paragraphStyle, at: 18, effectiveRange: nil) as? NSParagraphStyle
+        // Index 16 is the first char of "After" — outside the <p> range.
+        let outsideAfter = result.attribute(.paragraphStyle, at: 16, effectiveRange: nil) as? NSParagraphStyle
         XCTAssertNil(outsideAfter)
     }
 

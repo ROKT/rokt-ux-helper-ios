@@ -87,9 +87,10 @@ enum LightweightHTMLParser {
                 let (text, nextIndex) = scanText(in: html, from: index)
                 index = nextIndex
                 let decoded = decodeHTMLEntities(text)
-                if !decoded.isEmpty, !shouldSkipTextNode(decoded, listStack: listStack, inListItem: !listItemStarts.isEmpty) {
+                let collapsed = collapseHTMLWhitespace(decoded, after: result.string)
+                if !collapsed.isEmpty, !shouldSkipTextNode(collapsed, listStack: listStack, inListItem: !listItemStarts.isEmpty) {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
-                    result.append(NSAttributedString(string: decoded, attributes: attrs))
+                    result.append(NSAttributedString(string: collapsed, attributes: attrs))
                 }
             }
         }
@@ -347,6 +348,7 @@ enum LightweightHTMLParser {
     }()
 
     private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
+        trimTrailingCollapsedSpace(in: result)
         guard result.length > 0, !result.string.hasSuffix(newline) else { return }
         result.append(NSAttributedString(string: newline))
     }
@@ -386,6 +388,44 @@ enum LightweightHTMLParser {
         // Strip whitespace-only nodes that appear between list tags (e.g. pretty-printed HTML).
         guard !listStack.isEmpty, !inListItem else { return false }
         return text.allSatisfy { $0.isWhitespace }
+    }
+
+    private static func collapseHTMLWhitespace(_ text: String, after existingText: String) -> String {
+        var collapsed = ""
+        var previousWasCollapsibleWhitespace = existingText.last.map(isCollapsedWhitespaceBoundary) ?? true
+
+        for character in text {
+            if isCollapsibleHTMLWhitespace(character) {
+                if !previousWasCollapsibleWhitespace {
+                    collapsed.append(" ")
+                    previousWasCollapsibleWhitespace = true
+                }
+            } else {
+                collapsed.append(character)
+                previousWasCollapsibleWhitespace = false
+            }
+        }
+
+        return collapsed
+    }
+
+    private static func trimTrailingCollapsedSpace(in result: NSMutableAttributedString) {
+        while result.string.last == " " {
+            result.deleteCharacters(in: NSRange(location: result.length - 1, length: 1))
+        }
+    }
+
+    private static func isCollapsedWhitespaceBoundary(_ character: Character) -> Bool {
+        character == " " || character == "\n"
+    }
+
+    private static func isCollapsibleHTMLWhitespace(_ character: Character) -> Bool {
+        switch character {
+        case " ", "\n", "\t", "\r", "\u{000C}":
+            return true
+        default:
+            return false
+        }
     }
 
     private static func applyParagraphStyles(
