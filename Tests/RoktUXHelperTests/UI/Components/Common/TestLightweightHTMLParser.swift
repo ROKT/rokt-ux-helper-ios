@@ -252,6 +252,16 @@ final class TestLightweightHTMLParser: XCTestCase {
         let html = "<ul><li>Prepare your skin and <strong><em>keep your face clear </em></strong>with our headband</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
         XCTAssertEqual(result.string, "• Prepare your skin and keep your face clear with our headband\n")
+
+        let clearWithRange = (result.string as NSString).range(of: "clear with")
+        let spaceIndex = clearWithRange.location + "clear".count
+        let clearFont = result.attribute(.font, at: spaceIndex - 1, effectiveRange: nil) as? UIFont
+        let spaceFont = result.attribute(.font, at: spaceIndex, effectiveRange: nil) as? UIFont
+
+        XCTAssertEqual(clearFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+        XCTAssertEqual(clearFont?.fontDescriptor.symbolicTraits.contains(.traitItalic), true)
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitItalic), false)
     }
 
     func test_whitespace_after_br_in_li_does_not_add_extra_blank_line() {
