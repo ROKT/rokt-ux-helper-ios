@@ -28,6 +28,8 @@ class MockEventService: EventDiagnosticServicing {
     var signalViewedEventCalled = false
     var signalResponseEventCalled = false
     var gatedSignalResponseEventCalled = false
+    var lastSignalResponseDestinationURL: String?
+    var lastGatedSignalResponseDestinationURL: String?
     var dismissalEventCalled = false
     var openURLCalled = false
     var cartItemInstantPurchaseCalled = false
@@ -85,12 +87,14 @@ class MockEventService: EventDiagnosticServicing {
         signalViewedEventCalled = true
     }
 
-    func sendSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool) {
+    func sendSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool, destinationURL: String?) {
         signalResponseEventCalled = true
+        lastSignalResponseDestinationURL = destinationURL
     }
 
-    func sendGatedSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool) {
+    func sendGatedSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool, destinationURL: String?) {
         gatedSignalResponseEventCalled = true
+        lastGatedSignalResponseDestinationURL = destinationURL
     }
 
     func sendDismissalEvent() {
@@ -218,6 +222,8 @@ class MockEventService: EventDiagnosticServicing {
         signalViewedEventCalled = false
         signalResponseEventCalled = false
         gatedSignalResponseEventCalled = false
+        lastSignalResponseDestinationURL = nil
+        lastGatedSignalResponseDestinationURL = nil
         dismissalEventCalled = false
         openURLCalled = false
         cartItemInstantPurchaseCalled = false

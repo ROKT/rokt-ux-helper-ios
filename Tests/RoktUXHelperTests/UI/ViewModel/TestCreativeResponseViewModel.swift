@@ -29,6 +29,68 @@ final class TestCreativeResponseViewModel: XCTestCase {
         XCTAssertEqual(events.first?.eventType, .SignalResponse)
         XCTAssertEqual(events.first?.parentGuid, "creativeInstance")
         XCTAssertEqual(events.first?.jwtToken, "response-jwt")
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
+    }
+
+    func test_send_signal_response_with_url_includes_transformed_traffic_url() throws {
+        // Arrange
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(url: "https://example.com/offer", action: .url, eventService: eventService)
+
+        // Act
+        viewModel.sendSignalResponseEvent()
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalResponse)
+        XCTAssertEqual(
+            events.first?.metadata.first { $0.name == kTransformedTrafficURL }?.value,
+            "https://example.com/offer"
+        )
+    }
+
+    func test_send_signal_response_with_empty_url_omits_transformed_traffic_url() throws {
+        // Arrange
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(url: "", action: .url, eventService: eventService)
+
+        // Act
+        viewModel.sendSignalResponseEvent()
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalResponse)
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
+    }
+
+    func test_send_signal_response_capture_only_omits_transformed_traffic_url() throws {
+        // Arrange
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(
+            url: "https://example.com/offer",
+            action: .captureOnly,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.sendSignalResponseEvent()
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalResponse)
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
     }
     
     func test_send_signal_gated_impression_event() throws {
@@ -48,6 +110,33 @@ final class TestCreativeResponseViewModel: XCTestCase {
         XCTAssertEqual(events.first?.eventType, .SignalGatedResponse)
         XCTAssertEqual(events.first?.parentGuid, "creativeInstance")
         XCTAssertEqual(events.first?.jwtToken, "response-jwt")
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
+    }
+
+    func test_send_signal_gated_response_with_url_includes_transformed_traffic_url() throws {
+        // Arrange
+        eventService = get_mock_event_processor(
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { event in
+                self.events.append(event)
+            }
+        )
+        let viewModel = get_model(
+            signalType: .signalGatedResponse,
+            url: "https://example.com/offer",
+            action: .url,
+            eventService: eventService
+        )
+
+        // Act
+        viewModel.sendSignalResponseEvent()
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalGatedResponse)
+        XCTAssertEqual(
+            events.first?.metadata.first { $0.name == kTransformedTrafficURL }?.value,
+            "https://example.com/offer"
+        )
     }
     
     func test_get_valid_url() throws {

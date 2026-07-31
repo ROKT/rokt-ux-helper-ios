@@ -112,19 +112,39 @@ class EventService: Hashable, EventDiagnosticServicing {
         sendEvent(.SignalViewed, parentGuid: instanceGuid, jwtToken: jwtToken)
     }
 
-    func sendSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool) {
+    func sendSignalResponseEvent(
+        instanceGuid: String,
+        jwtToken: String,
+        isPositive: Bool,
+        destinationURL: String?
+    ) {
         sendEngagementEventCallback(isPositive: isPositive)
         sendEvent(
             .SignalResponse,
             parentGuid: instanceGuid,
+            extraMetadata: clickDestinationMetadata(destinationURL),
             jwtToken: jwtToken
         )
     }
-    func sendGatedSignalResponseEvent(instanceGuid: String, jwtToken: String, isPositive: Bool) {
+
+    func sendGatedSignalResponseEvent(
+        instanceGuid: String,
+        jwtToken: String,
+        isPositive: Bool,
+        destinationURL: String?
+    ) {
         sendEngagementEventCallback(isPositive: isPositive)
-        sendEvent(.SignalGatedResponse,
-                  parentGuid: instanceGuid,
-                  jwtToken: jwtToken)
+        sendEvent(
+            .SignalGatedResponse,
+            parentGuid: instanceGuid,
+            extraMetadata: clickDestinationMetadata(destinationURL),
+            jwtToken: jwtToken
+        )
+    }
+
+    private func clickDestinationMetadata(_ destinationURL: String?) -> [RoktEventNameValue] {
+        guard let destinationURL, !destinationURL.isEmpty else { return [] }
+        return [RoktEventNameValue(name: kTransformedTrafficURL, value: destinationURL)]
     }
 
     func sendDismissalEvent() {
