@@ -143,11 +143,17 @@ final class TestEventService: XCTestCase {
         })
         
         // Act
-        eventService.sendSignalResponseEvent(instanceGuid: "instanceGuid", jwtToken: "plugin-token", isPositive: true)
+        eventService.sendSignalResponseEvent(
+            instanceGuid: "instanceGuid",
+            jwtToken: "plugin-token",
+            isPositive: true,
+            destinationURL: nil
+        )
 
         // Assert
         XCTAssertEqual(events.first?.eventType, .SignalResponse)
         XCTAssertEqual(events.first?.parentGuid, "instanceGuid")
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
         // Rokt callbacks
         XCTAssertEqual(stubUXHelper.roktEvents.count, 3)
         XCTAssertTrue(stubUXHelper.roktEvents.contains(.PositiveEngagement))
@@ -157,6 +163,51 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(stubUXHelper.jwtToken, "plugin-config-token")
         XCTAssertEqual(stubUXHelper.pluginInstanceGuid, "pluginInstanceGuid")
         XCTAssertEqual(stubUXHelper.layoutId, "pluginId")
+    }
+
+    func test_sendSignalResponse_withDestinationURL_includesTransformedTrafficURLMetadata() throws {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.sendSignalResponseEvent(
+            instanceGuid: "instanceGuid",
+            jwtToken: "plugin-token",
+            isPositive: true,
+            destinationURL: "https://example.com/offer"
+        )
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalResponse)
+        XCTAssertEqual(
+            events.first?.metadata.first { $0.name == kTransformedTrafficURL }?.value,
+            "https://example.com/offer"
+        )
+    }
+
+    func test_sendSignalResponse_withEmptyDestinationURL_omitsTransformedTrafficURLMetadata() throws {
+        // Arrange
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+
+        // Act
+        eventService.sendSignalResponseEvent(
+            instanceGuid: "instanceGuid",
+            jwtToken: "plugin-token",
+            isPositive: true,
+            destinationURL: ""
+        )
+
+        // Assert
+        XCTAssertEqual(events.first?.eventType, .SignalResponse)
+        XCTAssertNil(events.first?.metadata.first { $0.name == kTransformedTrafficURL })
     }
 
     func test_sendDismissal_onNoMoreOffer_dismissalEventsAndSignals_shouldSend() throws {

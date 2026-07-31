@@ -43,23 +43,33 @@ class CreativeResponseViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
 
     func sendSignalResponseEvent() {
         guard let responseJWTToken = responseOptions?.responseJWTToken else { return }
+        let destinationURL = clickDestinationURL()
 
         switch responseOptions?.signalType {
         case .signalGatedResponse:
             eventService?.sendGatedSignalResponseEvent(
                 instanceGuid: responseOptions?.instanceGuid ?? "",
                 jwtToken: responseJWTToken,
-                isPositive: responseKey == .positive
+                isPositive: responseKey == .positive,
+                destinationURL: destinationURL
             )
         case .signalResponse:
             eventService?.sendSignalResponseEvent(
                 instanceGuid: responseOptions?.instanceGuid ?? "",
                 jwtToken: responseJWTToken,
-                isPositive: responseKey == .positive
+                isPositive: responseKey == .positive,
+                destinationURL: destinationURL
             )
         default:
             break
         }
+    }
+
+    private func clickDestinationURL() -> String? {
+        guard responseOptions?.action == .url,
+              let url = responseOptions?.url,
+              !url.isEmpty else { return nil }
+        return url
     }
 
     func getOfferUrl() -> URL? {
