@@ -155,36 +155,35 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCompletionCallback = completion
     }
 
-    func cartItemDevicePaySuccess(itemId: String, paymentAttemptId: String?) {
+    func cartItemDevicePaySuccess(itemId: String) {
         cartItemDevicePaySuccessCalled = true
     }
 
-    func cartItemDevicePayFailure(itemId: String, failureReason: String?, paymentAttemptId: String?) {
+    func cartItemDevicePayFailure(itemId: String, failureReason: String?) {
         cartItemDevicePayFailureCalled = true
     }
 
-    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?, paymentAttemptId: String?) {
+    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?) {
         cartItemDevicePayFailureCalled = true
     }
 
-    func cartItemDevicePayRetryableFailure(itemId: String, paymentAttemptId: String?) {
+    func cartItemDevicePayRetryableFailure(itemId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
-    func cartItemDevicePayRetry(itemId: String, paymentAttemptId: String?) {
+    func cartItemDevicePayRetry(itemId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
-    func cartItemDevicePayDetailsOpened(itemId: String, paymentAttemptId: String?) {}
+    func cartItemDevicePayDetailsOpened(itemId: String) {}
 
-    func cartItemDevicePayDetailsClosed(itemId: String, paymentAttemptId: String?) {
+    func cartItemDevicePayDetailsClosed(itemId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
     func cartItemDevicePayPendingConfirmation(
         itemId: String,
-        catalogRuntimeData: [String: String],
-        paymentAttemptId: String?
+        catalogRuntimeData: [String: String]
     ) {
         cartItemDevicePayPendingConfirmationCalled = true
         lastDevicePayPendingConfirmationItemId = itemId

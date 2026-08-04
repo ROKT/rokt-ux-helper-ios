@@ -109,28 +109,24 @@ import SwiftUI
         layoutId: String,
         catalogItemId: String,
         success: Bool,
-        failureReason: String? = nil,
-        paymentAttemptId: String? = nil
+        failureReason: String? = nil
     ) {
         uxHelper?.devicePayFinalized(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
             success: success,
-            failureReason: failureReason,
-            paymentAttemptId: paymentAttemptId
+            failureReason: failureReason
         )
     }
 
     /// Call when the user cancels device pay without completing the purchase.
     public func devicePayRetry(
         layoutId: String,
-        catalogItemId: String,
-        paymentAttemptId: String? = nil
+        catalogItemId: String
     ) {
         uxHelper?.devicePayRetry(
             layoutId: layoutId,
-            catalogItemId: catalogItemId,
-            paymentAttemptId: paymentAttemptId
+            catalogItemId: catalogItemId
         )
     }
 
@@ -138,27 +134,23 @@ import SwiftUI
     public func devicePayLoadingFailed(
         layoutId: String,
         catalogItemId: String,
-        failureReason: String? = nil,
-        paymentAttemptId: String? = nil
+        failureReason: String? = nil
     ) {
         uxHelper?.devicePayLoadingFailed(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
-            failureReason: failureReason,
-            paymentAttemptId: paymentAttemptId
+            failureReason: failureReason
         )
     }
 
     /// Call when the customer may retry after a decline.
     public func devicePayRetryableFailure(
         layoutId: String,
-        catalogItemId: String,
-        paymentAttemptId: String? = nil
+        catalogItemId: String
     ) {
         uxHelper?.devicePayRetryableFailure(
             layoutId: layoutId,
-            catalogItemId: catalogItemId,
-            paymentAttemptId: paymentAttemptId
+            catalogItemId: catalogItemId
         )
     }
 
@@ -166,26 +158,22 @@ import SwiftUI
     /// confirmation UI is recorded automatically by `devicePayShowConfirmation`.
     public func devicePayDetailsOpened(
         layoutId: String,
-        catalogItemId: String,
-        paymentAttemptId: String? = nil
+        catalogItemId: String
     ) {
         uxHelper?.devicePayDetailsOpened(
             layoutId: layoutId,
-            catalogItemId: catalogItemId,
-            paymentAttemptId: paymentAttemptId
+            catalogItemId: catalogItemId
         )
     }
 
     /// Call when the customer dismisses the provider payment UI without purchasing.
     public func devicePayDetailsClosed(
         layoutId: String,
-        catalogItemId: String,
-        paymentAttemptId: String? = nil
+        catalogItemId: String
     ) {
         uxHelper?.devicePayDetailsClosed(
             layoutId: layoutId,
-            catalogItemId: catalogItemId,
-            paymentAttemptId: paymentAttemptId
+            catalogItemId: catalogItemId
         )
     }
 
@@ -200,14 +188,12 @@ import SwiftUI
     public func devicePayShowConfirmation(
         layoutId: String,
         catalogItemId: String,
-        catalogRuntimeData: [String: String],
-        paymentAttemptId: String? = nil
+        catalogRuntimeData: [String: String]
     ) {
         uxHelper?.devicePayShowConfirmation(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
-            catalogRuntimeData: catalogRuntimeData,
-            paymentAttemptId: paymentAttemptId
+            catalogRuntimeData: catalogRuntimeData
         )
     }
 

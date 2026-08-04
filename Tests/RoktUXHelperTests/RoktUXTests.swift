@@ -81,9 +81,7 @@ final class RoktUXTests: XCTestCase {
             layoutId,
             catalogItem: catalogItem,
             paymentProvider: .applePay,
-            transactionData: nil,
-            paymentFlowId: "flow-id",
-            paymentAttemptId: "attempt-id"
+            transactionData: nil
         )
 
         let event = try? XCTUnwrap(captured)
@@ -91,8 +89,6 @@ final class RoktUXTests: XCTestCase {
         XCTAssertEqual(event?.totalPrice, Decimal(57.5))
         XCTAssertNotEqual(event?.unitPrice, Decimal(130.0))
         XCTAssertNotEqual(event?.totalPrice, Decimal(130.0))
-        XCTAssertEqual(event?.paymentFlowId, "flow-id")
-        XCTAssertEqual(event?.paymentAttemptId, "attempt-id")
     }
 
     // MARK: - onCartItemForwardPayment
