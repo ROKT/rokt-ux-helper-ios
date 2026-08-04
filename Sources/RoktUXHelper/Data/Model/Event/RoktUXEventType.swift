@@ -47,6 +47,8 @@ enum UserInteraction: String, Codable, CaseIterable {
     case MainImageSwipeLeft
     case MainImageSwipeRight
     case ToggleButtonStateTriggerClick
+    case PaymentDetailsOpened
+    case PaymentDetailsClosed
 }
 
 enum UserInteractionContext: String, Codable, CaseIterable {
@@ -54,4 +56,5 @@ enum UserInteractionContext: String, Codable, CaseIterable {
     case CatalogDropDown
     case CatalogImageGallery
     case ToggleButtonStateTrigger
+    case DevicePay
 }

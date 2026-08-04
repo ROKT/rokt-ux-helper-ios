@@ -184,6 +184,10 @@ public class RoktUXEvent {
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
         public let paymentProvider: PaymentProvider
+        /// Stable for this catalog item within the rendered offer, including close/reopen cycles.
+        public let paymentFlowId: String
+        /// Unique for this accepted presentation of the provider payment UI.
+        public let paymentAttemptId: String
         /// Backend-provided transaction data (billing / shipping address, supported
         /// payment methods, partner payment reference). `nil` if the offer did not
         /// include transaction data.
@@ -201,7 +205,9 @@ public class RoktUXEvent {
              totalPrice: Decimal?,
              unitPrice: Decimal?,
              paymentProvider: PaymentProvider,
-             transactionData: TransactionData?) {
+             transactionData: TransactionData?,
+             paymentFlowId: String,
+             paymentAttemptId: String) {
             self.layoutId = layoutId
             self.name = name
             self.cartItemId = cartItemId
@@ -215,6 +221,8 @@ public class RoktUXEvent {
             self.unitPrice = unitPrice
             self.paymentProvider = paymentProvider
             self.transactionData = transactionData
+            self.paymentFlowId = paymentFlowId
+            self.paymentAttemptId = paymentAttemptId
         }
     }
 

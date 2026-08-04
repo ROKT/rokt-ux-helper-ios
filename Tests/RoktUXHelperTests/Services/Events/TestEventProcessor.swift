@@ -349,6 +349,59 @@ final class TestEventProcessor: XCTestCase {
         XCTAssertEqual(receivedPayload?.filter { $0.eventType == .SignalUserInteraction }.count, 2)
     }
 
+    func testPaymentAttemptIdKeepsRepeatedInitiationsDistinct() {
+        let expectation = expectation(description: "payment attempts should remain distinct")
+        var receivedPayload: [RoktEventRequest]?
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            receivedPayload = self?.deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        let date = Date()
+
+        sut.handle(event: mockEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            date: date,
+            objectData: [kPaymentFlowId: "flow", kPaymentAttemptId: "attempt-1"]
+        ))
+        sut.handle(event: mockEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            date: date,
+            objectData: [kPaymentFlowId: "flow", kPaymentAttemptId: "attempt-2"]
+        ))
+
+        wait(for: [expectation], timeout: 1)
+
+        XCTAssertEqual(receivedPayload?.count, 2)
+        XCTAssertEqual(
+            Set(receivedPayload?.compactMap { $0.objectData?[kPaymentAttemptId] } ?? []),
+            Set(["attempt-1", "attempt-2"])
+        )
+    }
+
+    func testForwardPaymentStageKeepsSecondInitiationDistinct() {
+        let expectation = expectation(description: "forward-payment initiation should remain distinct")
+        var receivedPayload: [RoktEventRequest]?
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            receivedPayload = self?.deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        let correlation = [kPaymentFlowId: "flow", kPaymentAttemptId: "attempt"]
+
+        sut.handle(event: mockEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            date: Date(),
+            objectData: correlation
+        ))
+        sut.handle(event: mockEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            date: Date(),
+            objectData: correlation.merging([kPaymentStage: "ForwardPayment"]) { _, new in new }
+        ))
+
+        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(receivedPayload?.count, 2)
+    }
+
     func testDelayProcessorDeallocation() {
         let expectation = expectation(description: "wait")
         var receivedPayload: [RoktEventRequest]?
@@ -389,7 +442,8 @@ final class TestEventProcessor: XCTestCase {
         parentGuid: String = "parentGuid",
         pageInstanceGuid: String = "pageInstanceGuid",
         extraMetadata: [RoktEventNameValue] = [],
-        eventData: [String: String] = [:]
+        eventData: [String: String] = [:],
+        objectData: [String: String]? = nil
     ) -> RoktEventRequest {
         .init(
             sessionId: sessionId,
@@ -398,6 +452,7 @@ final class TestEventProcessor: XCTestCase {
             eventTime: date,
             extraMetadata: extraMetadata,
             eventData: eventData,
+            objectData: objectData,
             pageInstanceGuid: pageInstanceGuid,
             jwtToken: "token"
         )

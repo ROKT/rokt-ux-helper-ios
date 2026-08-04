@@ -269,6 +269,7 @@ public class RoktUX: UXEventsDelegate {
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the purchase succeeded or failed.
+       - failureReason: stable reason for a failed purchase; defaults to an unknown failure.
      */
     public func instantPurchaseFinalized(layoutId: String, catalogItemId: String, success: Bool) {
         if success {
@@ -286,21 +287,97 @@ public class RoktUX: UXEventsDelegate {
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the purchase succeeded or failed.
      */
-    public func devicePayFinalized(layoutId: String, catalogItemId: String, success: Bool) {
+    public func devicePayFinalized(
+        layoutId: String,
+        catalogItemId: String,
+        success: Bool,
+        failureReason: String? = nil,
+        paymentAttemptId: String? = nil
+    ) {
         if success {
-            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemDevicePaySuccess(
+                itemId: catalogItemId,
+                paymentAttemptId: paymentAttemptId
+            )
         } else {
-            eventServices[layoutId]?.cartItemDevicePayFailure(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemDevicePayFailure(
+                itemId: catalogItemId,
+                failureReason: failureReason,
+                paymentAttemptId: paymentAttemptId
+            )
         }
     }
 
     /**
      Call when the user cancels device pay (e.g. dismisses the Stripe payment sheet)
-     without completing the purchase. Returns the layout to the product detail state
-     without emitting a purchase-failure signal.
+     without completing the purchase. Returns the layout to the product detail state.
      */
-    public func devicePayRetry(layoutId: String, catalogItemId: String) {
-        eventServices[layoutId]?.cartItemDevicePayRetry(itemId: catalogItemId)
+    public func devicePayRetry(
+        layoutId: String,
+        catalogItemId: String,
+        paymentAttemptId: String? = nil
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayRetry(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
+        )
+    }
+
+    /**
+     Call when device pay cannot load, for example when an Afterpay popup cannot be opened.
+     */
+    public func devicePayLoadingFailed(
+        layoutId: String,
+        catalogItemId: String,
+        failureReason: String? = nil,
+        paymentAttemptId: String? = nil
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayLoadingFailure(
+            itemId: catalogItemId,
+            failureReason: failureReason,
+            paymentAttemptId: paymentAttemptId
+        )
+    }
+
+    /**
+     Call when a payment is declined but the customer is allowed to retry.
+     */
+    public func devicePayRetryableFailure(
+        layoutId: String,
+        catalogItemId: String,
+        paymentAttemptId: String? = nil
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayRetryableFailure(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
+        )
+    }
+
+    /// Call after the provider payment UI is visibly presented to the customer.
+    /// Do not call this for the helper-rendered confirmation UI; `devicePayShowConfirmation`
+    /// records that presentation automatically.
+    public func devicePayDetailsOpened(
+        layoutId: String,
+        catalogItemId: String,
+        paymentAttemptId: String? = nil
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayDetailsOpened(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
+        )
+    }
+
+    /// Call when the customer dismisses the provider payment UI without purchasing.
+    /// This emits both PaymentDetailsClosed and a DEVICE_PAY_CANCELLED terminal failure.
+    public func devicePayDetailsClosed(
+        layoutId: String,
+        catalogItemId: String,
+        paymentAttemptId: String? = nil
+    ) {
+        eventServices[layoutId]?.cartItemDevicePayDetailsClosed(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
+        )
     }
 
     /**
@@ -318,11 +395,13 @@ public class RoktUX: UXEventsDelegate {
     public func devicePayShowConfirmation(
         layoutId: String,
         catalogItemId: String,
-        catalogRuntimeData: [String: String]
+        catalogRuntimeData: [String: String],
+        paymentAttemptId: String? = nil
     ) {
         eventServices[layoutId]?.cartItemDevicePayPendingConfirmation(
             itemId: catalogItemId,
-            catalogRuntimeData: catalogRuntimeData
+            catalogRuntimeData: catalogRuntimeData,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -796,7 +875,9 @@ public class RoktUX: UXEventsDelegate {
         _ layoutId: String,
         catalogItem: CatalogItem,
         paymentProvider: PaymentProvider,
-        transactionData: TransactionData?
+        transactionData: TransactionData?,
+        paymentFlowId: String,
+        paymentAttemptId: String
     ) {
         onRoktEvent?(RoktUXEvent.CartItemDevicePay(
             layoutId: layoutId,
@@ -811,7 +892,9 @@ public class RoktUX: UXEventsDelegate {
             totalPrice: catalogItem.price,
             unitPrice: catalogItem.price,
             paymentProvider: paymentProvider,
-            transactionData: transactionData
+            transactionData: transactionData,
+            paymentFlowId: paymentFlowId,
+            paymentAttemptId: paymentAttemptId
         ))
     }
 

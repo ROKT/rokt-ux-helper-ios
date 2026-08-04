@@ -27,7 +27,9 @@ protocol UXEventsDelegate: AnyObject {
         _ layoutId: String,
         catalogItem: CatalogItem,
         paymentProvider: PaymentProvider,
-        transactionData: TransactionData?
+        transactionData: TransactionData?,
+        paymentFlowId: String,
+        paymentAttemptId: String
     )
     func onCartItemForwardPayment(
         _ layoutId: String,
