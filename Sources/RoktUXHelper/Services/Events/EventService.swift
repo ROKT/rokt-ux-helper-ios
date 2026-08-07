@@ -516,4 +516,12 @@ class EventDateFormatter {
     static func getDateString(_ date: Date) -> String {
         dateFormatter.string(from: date)
     }
+
+    /// Parses an event-time string back to epoch milliseconds for the
+    /// `v2/sessions/events` `timestamp` field. Falls back to the current time
+    /// when the string cannot be parsed.
+    static func getMillis(_ string: String) -> Int64 {
+        let date = dateFormatter.date(from: string) ?? Date()
+        return Int64(date.timeIntervalSince1970 * 1000)
+    }
 }
