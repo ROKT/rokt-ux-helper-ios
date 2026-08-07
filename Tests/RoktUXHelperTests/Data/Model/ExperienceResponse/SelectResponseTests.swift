@@ -41,11 +41,12 @@ final class SelectResponseTests: XCTestCase {
         let offer = try XCTUnwrap(slot.offer)
         XCTAssertEqual(offer.campaignId, "campaign-1")
         XCTAssertEqual(offer.catalogItems?.count, 1)
-        // Only `instance_guid` and `title` are part of the agreed contract; any
-        // campaign-specific fields in the payload are ignored.
+        // The consumed catalog fields are typed; unmodelled campaign-specific keys
+        // in the payload are ignored.
         let catalogItem = try XCTUnwrap(offer.catalogItems?.first)
         XCTAssertEqual(catalogItem.instanceGuid, "catalog-instance-1")
         XCTAssertEqual(catalogItem.title, "Catalog title")
+        XCTAssertEqual(catalogItem.price, 9.99)
 
         let creative = try XCTUnwrap(offer.creative)
         XCTAssertEqual(creative.referralCreativeId, "creative-1")
@@ -89,9 +90,8 @@ final class SelectResponseTests: XCTestCase {
     }
 
     func test_catalog_item_decodes_when_guaranteed_fields_are_absent() throws {
-        // Only `instance_guid` and `title` are modelled; both are optional, so
-        // decoding succeeds (with nil values) when they are absent and any other
-        // fields in the payload are ignored.
+        // Every catalog field is optional, so decoding succeeds (with nil values)
+        // when they are absent and any unmodelled fields in the payload are ignored.
         let json = """
         { "campaign_only_field": 7, "nested": { "k": "v" } }
         """.data(using: .utf8)!

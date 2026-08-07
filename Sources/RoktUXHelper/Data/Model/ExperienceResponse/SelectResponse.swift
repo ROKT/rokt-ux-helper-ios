@@ -1,21 +1,27 @@
 import Foundation
 import DcuiSchema
 
-/// Selection response for an offers request — the model the renderer consumes,
-/// alongside ``RoktUXExperienceResponse``. The layout-schema fields are
-/// parsed into the renderer's typed ``OuterLayoutSchemaNetworkModel`` /
-/// `LayoutSchemaModel` (the SDK-side wire model keeps the same fields as raw
-/// strings instead).
+/// Selection response for a `v2/sessions/offers` request — the single canonical,
+/// helper-owned response model the renderer consumes.
 ///
-/// It is response-side only and not yet wired into rendering.
+/// The layout-schema fields arrive on the wire as JSON **strings** and are parsed
+/// into the renderer's typed ``OuterLayoutSchemaNetworkModel`` / `LayoutSchemaModel`
+/// during decode (see ``SelectSchemaParsing``). ``getPageModel()`` maps this tree
+/// into the renderer's ``RoktUXPageModel`` / ``LayoutPlugin`` domain models.
+///
+/// Only the fields the renderer, events, catalog, payments and the Rokt SDK
+/// consume are typed; any other keys on the wire are ignored.
+///
+/// > Important: `public` only so the Rokt SDK can read `sessionToken` / `eventData`
+/// > off ``RoktUXParseResult/response``. Not a supported public integration type.
 @available(iOS 13, *)
-struct SelectResponse: Decodable {
-    let sessionId: String
-    let sessionToken: SessionToken
-    let pageInstanceGuid: String
+public struct SelectResponse: Decodable {
+    public let sessionId: String
+    public let sessionToken: SessionToken
+    public let pageInstanceGuid: String
     let pageContext: SelectPageContext?
     let plugins: [SelectPlugin]?
-    let eventData: [String: SelectEventDataEntry]?
+    public let eventData: [String: SelectEventDataEntry]?
 
     enum CodingKeys: String, CodingKey {
         case sessionId = "session_id"
@@ -26,7 +32,7 @@ struct SelectResponse: Decodable {
         case eventData = "event_data"
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         sessionId = try container.decode(String.self, forKey: .sessionId)
         sessionToken = try container.decode(SessionToken.self, forKey: .sessionToken)
@@ -40,9 +46,9 @@ struct SelectResponse: Decodable {
 
 /// The session token is treated as **opaque** — only the raw token string and its
 /// expiry are modelled. The JWT is deliberately NOT decoded here.
-struct SessionToken: Decodable {
-    let token: String
-    let expiresAt: Int64
+public struct SessionToken: Decodable {
+    public let token: String
+    public let expiresAt: Int64
 
     enum CodingKeys: String, CodingKey {
         case token
@@ -162,11 +168,15 @@ struct SelectOffer: Decodable {
     let campaignId: String?
     let creative: SelectCreative?
     let catalogItems: [SelectCatalogItem]?
+    let catalogItemGroup: SelectCatalogItemGroup?
+    let transactionData: SelectTransactionData?
 
     enum CodingKeys: String, CodingKey {
         case campaignId = "campaign_id"
         case creative
         case catalogItems = "catalog_items"
+        case catalogItemGroup = "catalog_item_group"
+        case transactionData = "transaction_data"
     }
 }
 
@@ -236,7 +246,7 @@ struct SelectResponseOption: Decodable {
     }
 }
 
-struct SelectImage: Decodable {
+struct SelectImage: Decodable, Equatable {
     let light: String?
     let dark: String?
     let alt: String?
@@ -252,8 +262,115 @@ struct SelectIcon: Decodable {
     let name: String?
 }
 
-struct SelectEventDataEntry: Decodable {
-    let token: String
-    /// Opaque per-event payloads.
-    let events: [String: SelectJSONValue]?
+/// A group of catalog items with selectable attributes (e.g. size / colour).
+/// Mirrors the backend `catalog_item_group`; maps to the renderer's ``CatalogItemGroup``.
+struct SelectCatalogItemGroup: Decodable {
+    let groupId: String?
+    let catalogItemIds: [String]?
+    let attributes: [SelectCatalogItemGroupAttribute]?
+    let metadata: [String: String]?
+
+    enum CodingKeys: String, CodingKey {
+        case groupId = "group_id"
+        case catalogItemIds = "catalog_item_ids"
+        case attributes
+        case metadata
+    }
+}
+
+struct SelectCatalogItemGroupAttribute: Decodable {
+    let attributeId: String?
+    let label: String?
+    let options: [SelectCatalogItemGroupOption]?
+    let metadata: [String: String]?
+
+    enum CodingKeys: String, CodingKey {
+        case attributeId = "attribute_id"
+        case label
+        case options
+        case metadata
+    }
+}
+
+struct SelectCatalogItemGroupOption: Decodable {
+    let label: String?
+    let catalogItemIds: [String]?
+    let metadata: [String: String]?
+
+    enum CodingKeys: String, CodingKey {
+        case label
+        case catalogItemIds = "catalog_item_ids"
+        case metadata
+    }
+}
+
+/// Partner-supplied transaction context on an offer (billing / shipping /
+/// supported payment methods). Mirrors the backend `transaction_data`; maps to
+/// the renderer's ``TransactionData``.
+struct SelectTransactionData: Decodable {
+    let shippingAddress: SelectAddress?
+    let billingAddress: SelectAddress?
+    let paymentType: String?
+    let supportedPaymentMethods: [SelectPaymentMethod]?
+    let isPartnerManagedPurchase: Bool?
+    let partnerPaymentReference: String?
+    let confirmationRef: String?
+    let metadata: [String: String]?
+
+    enum CodingKeys: String, CodingKey {
+        case shippingAddress = "shipping_address"
+        case billingAddress = "billing_address"
+        case paymentType = "payment_type"
+        case supportedPaymentMethods = "supported_payment_methods"
+        case isPartnerManagedPurchase = "is_partner_managed_purchase"
+        case partnerPaymentReference = "partner_payment_reference"
+        case confirmationRef = "confirmation_ref"
+        case metadata
+    }
+}
+
+struct SelectAddress: Decodable {
+    let name: String?
+    let address1: String?
+    let address2: String?
+    let city: String?
+    let state: String?
+    let stateCode: String?
+    let country: String?
+    let countryCode: String?
+    let zip: String?
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case address1
+        case address2
+        case city
+        case state
+        case stateCode = "state_code"
+        case country
+        case countryCode = "country_code"
+        case zip
+    }
+}
+
+struct SelectPaymentMethod: Decodable {
+    let type: String?
+}
+
+/// Token lookup for a trackable entity, echoed back on events. Exposed so the
+/// Rokt SDK can forward real-time events from ``RoktUXParseResult/response``.
+public struct SelectEventDataEntry: Decodable {
+    public let token: String
+    public let events: [String: SelectRealTimeEvent]?
+}
+
+/// A pre-serialized real-time event payload, keyed by signal type.
+public struct SelectRealTimeEvent: Decodable {
+    public let eventType: String?
+    public let payload: String?
+
+    enum CodingKeys: String, CodingKey {
+        case eventType = "event_type"
+        case payload
+    }
 }

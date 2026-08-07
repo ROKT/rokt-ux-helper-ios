@@ -7,24 +7,23 @@ final class RoktUXParseExperienceTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    /// Builds an SDK-shaped experience response embedding the given plugins JSON.
+    /// Builds a v2 selection-response (snake_case) embedding the given plugins JSON.
     private func makeExperienceResponse(
         sessionId: String = "test-session-id",
         pageId: String? = "test-page-id",
         pluginsJSON: String = "[]"
     ) -> String {
-        let page = pageId.map { #""page": {"pageId": "\#($0)"},"# } ?? ""
+        let pageIdField = pageId.map { #""page_id": "\#($0)","# } ?? ""
         return """
         {
-          "sessionId": "\(sessionId)",
-          \(page)
-          "placementContext": {
-            "roktTagId": "123",
-            "pageInstanceGuid": "test-page-instance-guid",
+          "session_id": "\(sessionId)",
+          "session_token": { "token": "session-token", "expires_at": 0 },
+          "page_instance_guid": "test-page-instance-guid",
+          "page_context": {
+            \(pageIdField)
+            "page_instance_guid": "test-page-instance-guid",
             "token": "context-token"
           },
-          "placements": [],
-          "token": "",
           "plugins": \(pluginsJSON)
         }
         """
@@ -54,6 +53,10 @@ final class RoktUXParseExperienceTests: XCTestCase {
         XCTAssertEqual(pageModel.pageInstanceGuid, "test-page-instance-guid")
         XCTAssertEqual(pageModel.layoutPlugins?.count, 1)
         XCTAssertGreaterThanOrEqual(result.parseEnd, result.parseStart)
+
+        // The decoded response is exposed for session-token / real-time-event handling.
+        XCTAssertEqual(result.response.sessionId, "test-session-id")
+        XCTAssertEqual(result.response.sessionToken.token, "session-token")
     }
 
     func test_parseExperience_noPlugins_returnsSessionIdWithoutPageModel() throws {

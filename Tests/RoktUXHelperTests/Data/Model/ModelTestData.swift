@@ -323,8 +323,8 @@ class ModelTestData: NSObject {
     enum PageModelData {
         static func withBNF() -> RoktUXPageModel {
             let data = toData(jsonFilename: "page_model")
-            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
-            return experienceResponse.getPageModel()!
+            let response = try! JSONDecoder().decode(SelectResponse.self, from: data)
+            return response.getPageModel(useDiagnosticEvents: false)!
         }
         static func getJsonString(jsonFilename: String) -> String {
             let data = toData(jsonFilename: jsonFilename)
@@ -341,8 +341,8 @@ class ModelTestData: NSObject {
     enum CatalogPageModelData {
         static func withBNF() -> RoktUXPageModel {
             let data = toData(jsonFilename: "add_to_cart_page_model")
-            let experienceResponse = try! JSONDecoder().decode(RoktUXS2SExperienceResponse.self, from: data)
-            return experienceResponse.getPageModel()!
+            let response = try! JSONDecoder().decode(SelectResponse.self, from: data)
+            return response.getPageModel(useDiagnosticEvents: false)!
         }
     }
 

@@ -70,7 +70,9 @@ class EventProcessor: EventProcessing {
 
     private func serialize(payload: RoktUXEventsPayload) -> [String: Any]? {
         do {
-            let data = try JSONEncoder().encode(payload)
+            // Serialise directly in the `v2/sessions/events` shape so the payload
+            // can be forwarded to the events API without further transformation.
+            let data = try JSONEncoder().encode(RoktSessionEventsBody(events: payload.events))
             guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 return nil
             }
