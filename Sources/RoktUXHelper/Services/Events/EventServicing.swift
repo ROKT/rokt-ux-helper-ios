@@ -25,9 +25,16 @@ protocol EventServicing: AnyObject {
         completion: @escaping (_ status: DevicePayStatus) -> Void
     )
     func cartItemDevicePaySuccess(itemId: String)
-    func cartItemDevicePayFailure(itemId: String)
+    func cartItemDevicePayFailure(itemId: String, failureReason: String?)
+    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?)
+    func cartItemDevicePayRetryableFailure(itemId: String)
     func cartItemDevicePayRetry(itemId: String)
-    func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String])
+    func cartItemDevicePayDetailsOpened(itemId: String)
+    func cartItemDevicePayDetailsClosed(itemId: String)
+    func cartItemDevicePayPendingConfirmation(
+        itemId: String,
+        catalogRuntimeData: [String: String]
+    )
     func cartItemForwardPayment(
         catalogItem: CatalogItem,
         transactionData: TransactionData?,
