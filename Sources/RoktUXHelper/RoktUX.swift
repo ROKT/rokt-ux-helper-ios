@@ -589,8 +589,13 @@ public class RoktUX: UXEventsDelegate {
                 if let layoutLoader {
 
                     let onSizeChange = { [weak layoutLoader] (size: CGFloat) in
-                        layoutLoader?.updateEmbeddedSize(size)
-                        onEmbeddedSizeChange(targetElement, size)
+                        // Round once here so the height applied to the embedded view's own
+                        // constraint and the height published to the host are always identical.
+                        // A host that constrains the view to the published height would otherwise
+                        // conflict with our constraint by a sub-point amount.
+                        let height = ceil(size)
+                        layoutLoader?.updateEmbeddedSize(height)
+                        onEmbeddedSizeChange(targetElement, height)
                     }
 
                     layoutLoader.load(onSizeChanged: onSizeChange,
