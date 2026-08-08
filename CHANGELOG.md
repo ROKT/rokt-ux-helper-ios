@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-06
+
+### Added
+
+- Include click destination URL metadata ([#334](https://github.com/ROKT/rokt-ux-helper-ios/pull/334))
+- Populate interactionType on user_interaction objectData ([#333](https://github.com/ROKT/rokt-ux-helper-ios/pull/333))
+
+### Fixed
+
+- Collapse HTML whitespace in parser ([#335](https://github.com/ROKT/rokt-ux-helper-ios/pull/335))
+
+### Changed
+
+- Bump actions/checkout from 6.0.3 to 7.0.1 ([#332](https://github.com/ROKT/rokt-ux-helper-ios/pull/332))
+- Bump github.com/pointfreeco/swift-snapshot-testing from 1.19.2 to 1.19.4 ([#336](https://github.com/ROKT/rokt-ux-helper-ios/pull/336))
+- Upgrade trunk ([#317](https://github.com/ROKT/rokt-ux-helper-ios/pull/317))
+
 ## [1.0.0] - 2026-07-16
 
 ### Fixed
@@ -399,7 +416,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...HEAD
+[1.0.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...1.0.0
 [0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
 [0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3
