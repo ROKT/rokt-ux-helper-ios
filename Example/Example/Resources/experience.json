@@ -1,224 +1,733 @@
 {
-  "session_id": "b20b0004-7cf8-493d-b0c2-b324ee580000",
-  "session_token": {
-    "token": "session-token",
-    "expires_at": 0
-  },
-  "page_instance_guid": "b20b0004-7cf9-4566-a708-9c90574690f9",
-  "page_context": {
-    "page_instance_guid": "b20b0004-7cf9-4566-a708-9c90574690f9",
-    "page_id": "6b1214f0-43e1-447d-b0bb-cf493d361411",
-    "language": "en",
-    "is_page_detected": true,
-    "page_variant_name": "iOSVaraint1",
-    "token": ""
-  },
-  "plugins": [
-    {
-      "plugin": {
-        "id": "3353172846080032866",
-        "name": "dcui",
-        "target_element_selector": "#target_element",
-        "config": {
-          "instance_guid": "8b97de56-1fc3-4647-a57f-ee885529c821",
-          "token": "",
-          "outer_layout_schema": "{\"layout\":{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"container\":{\"shadow\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#00000000\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D9D9D9\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":\"1\",\"borderRadius\":8},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"16 16 16 16\"},\"container\":{\"shadow\":null,\"overflow\":\"hidden\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"alignItems\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":16,\"fontStyle\":null,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"4 4 4 4\"},\"flexChild\":{\"weight\":1}}}]}}},\"type\":\"RichText\"}]},\"type\":\"Row\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":11},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":22}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\"%^STATE.IndicatorPosition^%\",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"numbered-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":10},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":10},\"height\":{\"type\":\"fixed\",\"value\":10}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"filled-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"border\":{\"borderRadius\":0},\"spacing\":{\"margin\":\"0 6 0 0\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":6}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"dashes\",\"condition\":\"is\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":11},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":22}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\"%^STATE.IndicatorPosition^%\",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"numbered-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":10},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":10},\"height\":{\"type\":\"fixed\",\"value\":10}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"filled-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"border\":{\"borderRadius\":0},\"spacing\":{\"margin\":\"0 6 0 0\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":6}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"dashes\",\"condition\":\"is\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"Thank you for your purchase:\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"Thank you for your purchase:\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"container\":{\"overflow\":\"hidden\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":null}}}]}},\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}},\"type\":\"OneByOneDistribution\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 10 4 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 10 4 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":11},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":22}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\"%^STATE.IndicatorPosition^%\",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"numbered-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":10},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":10},\"height\":{\"type\":\"fixed\",\"value\":10}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"filled-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"border\":{\"borderRadius\":0},\"spacing\":{\"margin\":\"0 6 0 0\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":6}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"dashes\",\"condition\":\"is\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":11},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":22}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\"%^STATE.IndicatorPosition^%\",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"numbered-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"text\":{\"fontSize\":11,\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null},\"border\":{\"borderRadius\":10},\"spacing\":{\"margin\":\"0 6 0 0\"},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":10},\"height\":{\"type\":\"fixed\",\"value\":10}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"filled-circles\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 2 6\",\"padding\":\"0 0 0 0\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"border\":{\"borderRadius\":0},\"spacing\":{\"margin\":\"0 6 0 0\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22},\"height\":{\"type\":\"fixed\",\"value\":6}},\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#D7D7D7\",\"dark\":null}}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"indicator\":\" \",\"startPosition\":2},\"type\":\"ProgressIndicator\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"filled-circles\",\"value\":\"dashes\",\"condition\":\"is\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D7D7D7\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"10 0 10 0\"},\"container\":{\"justifyContent\":\"flex-end\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"value\":\"Powered by <a target=\\\"_blank\\\" href=\\\"https://rokt.com\\\">Rokt</a> - <a target=\\\"_blank\\\" href=\\\"https://rokt.com/privacy-policy/\\\">Privacy Policy</a>\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":11,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"right\"},\"spacing\":{\"margin\":null,\"padding\":null}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#007db2\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}]},\"type\":\"Row\"}]},\"type\":\"Column\"},\"display\":\"EMBEDDED\",\"settings\":{\"closeOnComplete\":true},\"breakpoints\":{}}",
-          "slots": [
-            {
-              "instance_guid": "e17a5b55-6af3-457b-b931-80b0311d511d",
-              "token": "",
-              "layout_variant": {
-                "layout_variant_id": "3353172846080032865",
-                "module_name": "standard-marketing",
-                "layout_variant_schema": "{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}},{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"10 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"alignItems\":\"stretch\",\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"16 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}]},\"type\":\"ScrollableColumn\"}"
-              },
-              "offer": {
-                "campaign_id": "3357838645166342229",
-                "creative": {
-                  "referral_creative_id": "3357838791195164752",
-                  "instance_guid": "30441ef1-8223-4b5f-abac-dc92dae7cedb",
-                  "token": "",
-                  "copy": {
-                    "creative.title": "Congrats!",
-                    "creative.copy": "Successful test",
-                    "creative.tag": "Auto",
-                    "creative.success.title": "Success",
-                    "creative.success.copy": "We have sent a confirmation to test@rokt.com.",
-                    "creative.image.src": ""
-                  },
-                  "images": {
-                    "creativeImage": {
-                      "light": "",
-                      "dark": "",
-                      "alt": "",
-                      "title": ""
-                    }
-                  },
-                  "links": {},
-                  "icons": {},
-                  "response_options_map": {
-                    "positive": {
-                      "id": "3357840785583243266",
-                      "action": "Url",
-                      "instance_guid": "99ce00e8-8803-4112-9aa4-beed46deeaed",
-                      "signal_type": "SignalResponse",
-                      "short_label": "Yes please",
-                      "long_label": "Yes please",
-                      "short_success_label": "Email Sent",
-                      "is_positive": true,
-                      "url": "https://www.rokt.com",
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
-                    },
-                    "negative": {
-                      "id": "3357840785583243267",
-                      "action": "CaptureOnly",
-                      "instance_guid": "a7616afb-fd9b-4949-9926-2dc30d3ffb47",
-                      "signal_type": "SignalResponse",
-                      "short_label": "No thanks",
-                      "long_label": "No thanks",
-                      "is_positive": false,
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
-                    }
-                  }
+    "session_id": "00000000-0000-4000-8000-000000000001",
+    "session_token": {
+        "token": "dummy.jwt.token",
+        "expires_at": 1786034706169
+    },
+    "page_instance_guid": "00000000-0000-4000-8000-000000000002",
+    "page_context": {
+        "page_instance_guid": "00000000-0000-4000-8000-000000000002",
+        "page_id": "00000000-0000-4000-8000-000000000003",
+        "page_type": "Confirmation",
+        "is_page_detected": true,
+        "page_variant_name": "Testing",
+        "token": "dummy.jwt.token"
+    },
+    "plugins": [
+        {
+            "plugin": {
+                "id": "3578700651080056851",
+                "name": "s2s",
+                "url": "https://wsdk.rokt.com/plugins/torrent/index.html",
+                "target_element_selector": "RoktTest",
+                "target_element_position": "append",
+                "target_element_relation": "child",
+                "target_section": "None",
+                "config": {
+                    "slots": [
+                        {
+                            "instance_guid": "slot:00000000-0000-4000-8000-000000000004",
+                            "layout_variant": {
+                                "layout_variant_id": "3578700651080056852",
+                                "module_name": "s2s",
+                                "format_type": "Text",
+                                "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
+                            },
+                            "offer": {
+                                "campaign_id": "3433939246537244943",
+                                "account_id": "3048040266084948354",
+                                "max_total_items_qty_in_offer": 1,
+                                "creative": {
+                                    "referral_creative_id": "3505860184831885313",
+                                    "instance_guid": "ad:00000000-0000-4000-8000-000000000005",
+                                    "vertical_id": "811",
+                                    "response_options_map": {
+                                        "negative": {
+                                            "id": "3505863543495262209",
+                                            "action": "CaptureOnly",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:negative:3505863543495262209",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Decline",
+                                            "long_label": "Decline",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token"
+                                        },
+                                        "positive": {
+                                            "id": "3505863543495262208",
+                                            "action": "Url",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:positive:3505863543495262208",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Yes please",
+                                            "long_label": "Yes please",
+                                            "is_positive": true,
+                                            "url": "https://www.rokt.com?rtid=00000000000000000000000000000000000000000000000000000000000000ab",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token",
+                                            "rclid": "00000000000000000000000000000000000000000000000000000000000000ab"
+                                        }
+                                    },
+                                    "links": {
+                                        "privacyPolicy": {
+                                            "url": "https://server-api.rokt.com/LegalTerms/PrivacyPolicy/0",
+                                            "title": "Privacy Policy"
+                                        },
+                                        "termsAndConditions": {
+                                            "url": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Opaque 1.91:1 Image",
+                                            "title": "Opaque 1.91:1 Image"
+                                        },
+                                        "creativeImage.1to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "1:1 Image",
+                                            "title": "1:1 Image"
+                                        },
+                                        "creativeImage.1to1.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Opaque 1:1 Image",
+                                            "title": "Opaque 1:1 Image"
+                                        },
+                                        "creativeImage.hero": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Hero Image",
+                                            "title": "Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "1.91:1 Hero Image",
+                                            "title": "1.91:1 Hero Image"
+                                        },
+                                        "creativeImage.hero.1_91to1.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Opaque 1.91:1 Hero Image",
+                                            "title": "Opaque 1.91:1 Hero Image"
+                                        },
+                                        "creativeImage.hero.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Opaque Hero Image",
+                                            "title": "Opaque Hero Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "1:1 Logo Image",
+                                            "title": "1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Opaque 1:1 Logo Image",
+                                            "title": "Opaque 1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Opaque Logo Image",
+                                            "title": "Opaque Logo Image"
+                                        },
+                                        "creativeImage.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                            "alt": "Opaque Image",
+                                            "title": "Opaque Image"
+                                        },
+                                        "creativeImage.product": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Product Image",
+                                            "title": "Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "1.91:1 Product Image",
+                                            "title": "1.91:1 Product Image"
+                                        },
+                                        "creativeImage.product.1_91to1.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Opaque 1.91:1 Product Image",
+                                            "title": "Opaque 1.91:1 Product Image"
+                                        },
+                                        "creativeImage.product.opaque": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000007.jpeg",
+                                            "alt": "Opaque Product Image",
+                                            "title": "Opaque Product Image"
+                                        }
+                                    },
+                                    "token": "dummy.jwt.token",
+                                    "advertiser": {
+                                        "name": "Sample creatives",
+                                        "brand": "rokt.sample"
+                                    },
+                                    "copy": {
+                                        "creative.brandName": "rokt.sample",
+                                        "creative.copy": "Testing the image selection!",
+                                        "creative.disclaimer": "This is a test disclaimer",
+                                        "creative.image.src": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000006.png",
+                                        "creative.privacyPolicy.link": "https://server-api.rokt.com/LegalTerms/PrivacyPolicy/0",
+                                        "creative.privacyPolicy.message": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>",
+                                        "creative.privacyPolicy.title": "Privacy Policy",
+                                        "creative.tag": "Video",
+                                        "creative.termsAndConditions.link": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                        "creative.termsAndConditions.message": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.title": "This is a test creative!"
+                                    }
+                                }
+                            },
+                            "token": "dummy.jwt.token"
+                        },
+                        {
+                            "instance_guid": "slot:00000000-0000-4000-8000-000000000008",
+                            "layout_variant": {
+                                "layout_variant_id": "3578700651080056852",
+                                "module_name": "s2s",
+                                "format_type": "Text",
+                                "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
+                            },
+                            "offer": {
+                                "campaign_id": "3508864523054088192",
+                                "account_id": "2694701772023591526",
+                                "max_total_items_qty_in_offer": 1,
+                                "creative": {
+                                    "referral_creative_id": "3565285369527730176",
+                                    "instance_guid": "ad:00000000-0000-4000-8000-000000000009",
+                                    "vertical_id": "811",
+                                    "response_options_map": {
+                                        "negative": {
+                                            "id": "3565288298699161604",
+                                            "action": "CaptureOnly",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:negative:3565288298699161604",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Decline",
+                                            "long_label": "Decline",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token"
+                                        },
+                                        "positive": {
+                                            "id": "3565288298699161600",
+                                            "action": "Url",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:positive:3565288298699161600",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Claim now",
+                                            "long_label": "Claim now",
+                                            "is_positive": true,
+                                            "url": "https://example.com/offer",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token",
+                                            "rclid": "00000000000000000000000000000000000000000000000000000000000000ab"
+                                        }
+                                    },
+                                    "links": {
+                                        "termsAndConditions": {
+                                            "url": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                            "title": "Terms & Conditions"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000011.png",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000011.png",
+                                            "alt": "Transparent 1.91:1 Image",
+                                            "title": "Transparent 1.91:1 Image"
+                                        },
+                                        "creativeImage.1to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "1:1 Image",
+                                            "title": "1:1 Image"
+                                        },
+                                        "creativeImage.1to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Transparent 1:1 Image",
+                                            "title": "Transparent 1:1 Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000011.png",
+                                            "alt": "1.91:1 Logo Image",
+                                            "title": "1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000011.png",
+                                            "alt": "Transparent 1.91:1 Logo Image",
+                                            "title": "Transparent 1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "1:1 Logo Image",
+                                            "title": "1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Transparent 1:1 Logo Image",
+                                            "title": "Transparent 1:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Transparent Logo Image",
+                                            "title": "Transparent Logo Image"
+                                        },
+                                        "creativeImage.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                            "alt": "Transparent Image",
+                                            "title": "Transparent Image"
+                                        }
+                                    },
+                                    "token": "dummy.jwt.token",
+                                    "advertiser": {
+                                        "name": "Acme Streaming Services, LLC",
+                                        "brand": "Acme Stream"
+                                    },
+                                    "copy": {
+                                        "creative.brandName": "Acme Stream",
+                                        "creative.copy": "Save 61% per month on Acme Stream, Acme Play, both with ads.",
+                                        "creative.image.src": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000010.png",
+                                        "creative.tag": "Video",
+                                        "creative.termsAndConditions.link": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                        "creative.termsAndConditions.message": "<p>Offer for ad-supported Acme Stream, Acme Play Bundle plan only: $4.99/mo for 3 mos, then auto-renews at $12.99/mo or then-current reg. monthly price. Ends 12/31/26. U.S. residents, 18+ only. Offer valid for new and eligible returning subscribers; Acme Stream, ESPN, Acme Play, and bundle subscribers are not eligible. Cancel anytime, effective at the end of your billing period. Additional terms apply.</p>",
+                                        "creative.termsAndConditions.title": "Terms & Conditions",
+                                        "creative.title": "Get Acme Stream and Acme Play for $4.99/mo for 3 months!"
+                                    }
+                                }
+                            },
+                            "token": "dummy.jwt.token"
+                        },
+                        {
+                            "instance_guid": "slot:00000000-0000-4000-8000-000000000012",
+                            "layout_variant": {
+                                "layout_variant_id": "3578700651080056853",
+                                "module_name": "s2s",
+                                "format_type": "Benefits",
+                                "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
+                            },
+                            "offer": {
+                                "campaign_id": "3232796573634789835",
+                                "account_id": "3100361304281724392",
+                                "max_total_items_qty_in_offer": 1,
+                                "creative": {
+                                    "referral_creative_id": "3573471263663980544",
+                                    "instance_guid": "ad:00000000-0000-4000-8000-000000000013",
+                                    "vertical_id": "1404",
+                                    "response_options_map": {
+                                        "negative": {
+                                            "id": "3573472758305193986",
+                                            "action": "CaptureOnly",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:negative:3573472758305193986",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Decline",
+                                            "long_label": "Decline",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token"
+                                        },
+                                        "positive": {
+                                            "id": "3573472758305193985",
+                                            "action": "Url",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:positive:3573472758305193985",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Join Acme Auto",
+                                            "long_label": "Join Acme Auto",
+                                            "is_positive": true,
+                                            "url": "https://example.com/offer",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token",
+                                            "rclid": "00000000000000000000000000000000000000000000000000000000000000ab"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Transparent 1.91:1 Image",
+                                            "title": "Transparent 1.91:1 Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "1.91:1 Logo Image",
+                                            "title": "1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Transparent 1.91:1 Logo Image",
+                                            "title": "Transparent 1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Transparent Logo Image",
+                                            "title": "Transparent Logo Image"
+                                        },
+                                        "creativeImage.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                            "alt": "Transparent Image",
+                                            "title": "Transparent Image"
+                                        }
+                                    },
+                                    "icons": {
+                                        "benefits.1": {
+                                            "name": "PercentIcon"
+                                        },
+                                        "benefits.2": {
+                                            "name": "PlaneDepatureIcon"
+                                        },
+                                        "benefits.3": {
+                                            "name": "GiftIcon"
+                                        }
+                                    },
+                                    "token": "dummy.jwt.token",
+                                    "advertiser": {
+                                        "name": "Acme Rewards LLC",
+                                        "brand": "Acme Auto"
+                                    },
+                                    "copy": {
+                                        "benefits.1.description": "Join and save 50% on your Acme Auto membership.",
+                                        "benefits.1.icon": "PercentIcon",
+                                        "benefits.2.description": "Discounts on hotels, car rental, and other travel.",
+                                        "benefits.2.icon": "PlaneDepatureIcon",
+                                        "benefits.3.description": "Bring a second household member along, free.",
+                                        "benefits.3.icon": "GiftIcon",
+                                        "creative.brandName": "Acme Auto",
+                                        "creative.image.src": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000014.png",
+                                        "creative.tag": "Vehicle Repair and Maintenance",
+                                        "creative.title": "Three perks. One Acme Auto membership.",
+                                        "loyaltyconversion.condition": "sign up",
+                                        "loyaltyconversion.copy": "become a Acme Auto member"
+                                    }
+                                }
+                            },
+                            "token": "dummy.jwt.token"
+                        },
+                        {
+                            "instance_guid": "slot:00000000-0000-4000-8000-000000000015",
+                            "layout_variant": {
+                                "layout_variant_id": "3578700651080056852",
+                                "module_name": "s2s",
+                                "format_type": "Text",
+                                "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
+                            },
+                            "offer": {
+                                "campaign_id": "3519165035747934208",
+                                "account_id": "3420702250512150528",
+                                "max_total_items_qty_in_offer": 1,
+                                "creative": {
+                                    "referral_creative_id": "3573049484987924480",
+                                    "instance_guid": "ad:00000000-0000-4000-8000-000000000016",
+                                    "vertical_id": "2103",
+                                    "response_options_map": {
+                                        "negative": {
+                                            "id": "3573049974616883205",
+                                            "action": "CaptureOnly",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:negative:3573049974616883205",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Decline",
+                                            "long_label": "Decline",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token"
+                                        },
+                                        "positive": {
+                                            "id": "3573049974616883204",
+                                            "action": "Url",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:positive:3573049974616883204",
+                                            "signal_type": "SignalResponse",
+                                            "short_label": "Claim my free week",
+                                            "long_label": "Claim my free week",
+                                            "is_positive": true,
+                                            "url": "https://example.com/offer",
+                                            "url_behavior": "newTab",
+                                            "token": "dummy.jwt.token",
+                                            "rclid": "00000000000000000000000000000000000000000000000000000000000000ab"
+                                        }
+                                    },
+                                    "links": {
+                                        "termsAndConditions": {
+                                            "url": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                            "title": "Offer Details"
+                                        }
+                                    },
+                                    "images": {
+                                        "creativeImage": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Image",
+                                            "title": "Image"
+                                        },
+                                        "creativeImage.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "1.91:1 Image",
+                                            "title": "1.91:1 Image"
+                                        },
+                                        "creativeImage.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Transparent 1.91:1 Image",
+                                            "title": "Transparent 1.91:1 Image"
+                                        },
+                                        "creativeImage.logo": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Logo Image",
+                                            "title": "Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "1.91:1 Logo Image",
+                                            "title": "1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.1_91to1.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Transparent 1.91:1 Logo Image",
+                                            "title": "Transparent 1.91:1 Logo Image"
+                                        },
+                                        "creativeImage.logo.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Transparent Logo Image",
+                                            "title": "Transparent Logo Image"
+                                        },
+                                        "creativeImage.transparent": {
+                                            "light": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                            "alt": "Transparent Image",
+                                            "title": "Transparent Image"
+                                        }
+                                    },
+                                    "token": "dummy.jwt.token",
+                                    "advertiser": {
+                                        "name": "Acme Fitness",
+                                        "brand": "Acme Fitness"
+                                    },
+                                    "copy": {
+                                        "creative.brandName": "Acme Fitness",
+                                        "creative.copy": "Reset your routine this summer. Strengthen your body, clear your mind, and explore every class format free for 7 days.",
+                                        "creative.image.src": "https://apps.rokt.com/images/userfiles/00000000-0000-4000-8000-000000000017.png",
+                                        "creative.tag": "Fitness and Exercise",
+                                        "creative.termsAndConditions.link": "https://server-api.rokt.com/LegalTerms/TermsAndConditions/0",
+                                        "creative.termsAndConditions.message": "<p>Free Week Offer for new students who have visited any Acme Fitness Studio three or fewer times in the last 12 months and not activated a Free Week offer previously. Active, frozen, or suspended members are not eligible for this offer. Offer valid in all Acme Fitness studios. You can activate your Free Week Offer online. Once you take your first class in studio, you have 7 days to enjoy your Free Week. Must agree to the Acme Fitness Terms of Use at https://example.com/offer to participate. One-time use only. Non-transferable. Offer subject to change. Exclusions and restrictions apply. Incidental charges, including mat and towel rentals not included. No cash value.</p><p><br></p>",
+                                        "creative.termsAndConditions.title": "Offer Details",
+                                        "creative.title": "You've been gifted a free week of Acme Fitness!"
+                                    }
+                                }
+                            },
+                            "token": "dummy.jwt.token"
+                        }
+                    ],
+                    "instance_guid": "layout:00000000-0000-4000-8000-000000000002:3578700651080056851",
+                    "outer_layout_schema": "{\"breakpoints\":{\"tablet\":512.0,\"desktop\":640.0},\"layout\":{\"type\":\"Overlay\",\"node\":{\"allowBackdropToClose\":true,\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"maxWidth\":650.0,\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"alignSelf\":\"flex-start\"},\"spacing\":{\"margin\":\"10 10 10 10\"}}}],\"wrapper\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":\"#80000000\"}}}}]}},\"children\":[{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"24 16 16 8\"},\"text\":{\"textColor\":{\"light\":\"#2E3136\",\"dark\":\"#2E3136\"},\"fontSize\":24.0,\"fontFamily\":\"System\",\"fontWeight\":\"700\",\"horizontalTextAlign\":\"left\"}}}]}},\"value\":\"Order confirmed\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":14.0},\"height\":{\"type\":\"fixed\",\"value\":14.0}},\"spacing\":{\"margin\":\"0 16 0 0\"}}}]}},\"children\":[{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=\"}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16 10 10\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"OneByOneDistribution\",\"node\":{\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}}}]}}]}},{\"type\":\"ProgressIndicator\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22.0},\"height\":{\"type\":\"fixed\",\"value\":5.5}},\"spacing\":{\"margin\":\"0 4 0 0\"}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}]}},\"indicator\":\"‏‏‎ ‎\",\"accessibilityHidden\":true}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"flex-start\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 16 24 8\"},\"text\":{\"textColor\":{\"light\":\"#999999\",\"dark\":\"#999999\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"horizontalTextAlign\":\"left\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#266DCC\",\"dark\":\"#266DCC\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"<a href=\\\"https://example.invalid/privacy-policy\\\">Privacy Policy</a>\"}}]}}]}}]}},\"display\":\"FULLSCREEN\"}",
+                    "layout_schema_version": "2.8",
+                    "token": "dummy.jwt.token"
                 }
-              }
             },
-            {
-              "instance_guid": "17e61ca2-9074-433d-a818-d418336e57cd",
-              "token": "",
-              "layout_variant": {
-                "layout_variant_id": "3353172846080032865",
-                "module_name": "standard-marketing",
-                "layout_variant_schema": "{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}},{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"10 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"alignItems\":\"stretch\",\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"internally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"16 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}]},\"type\":\"ScrollableColumn\"}"
-              },
-              "offer": {
-                "campaign_id": "3306071803787346186",
-                "creative": {
-                  "referral_creative_id": "3306079070872011077",
-                  "instance_guid": "606a3f5b-e308-472e-843b-5699541322fb",
-                  "token": "",
-                  "copy": {
-                    "creative.title": "Click to learn more!",
-                    "creative.copy": "Click to learn more from our documentation.",
-                    "creative.termsAndConditions.message": "Not subject to change.",
-                    "creative.termsAndConditions.close.copy": "Close",
-                    "creative.termsAndConditions.title": "Terms & Conditions",
-                    "creative.tag": "Software",
-                    "creative.image.src": "",
-                    "creative.termsAndConditions.link": ""
-                  },
-                  "images": {
-                    "creativeImage": {
-                      "light": "",
-                      "dark": "",
-                      "alt": "",
-                      "title": ""
-                    }
-                  },
-                  "links": {
-                    "termsAndConditions": {
-                      "url": "https://www.rokt.com/",
-                      "title": "Terms & Conditions"
-                    }
-                  },
-                  "icons": {},
-                  "response_options_map": {
-                    "positive": {
-                      "id": "3306079070872011078",
-                      "action": "Url",
-                      "instance_guid": "098058c4-5ec2-45ab-bc71-2e047d57d27c",
-                      "signal_type": "SignalResponse",
-                      "short_label": "Yes please",
-                      "long_label": "Yes please",
-                      "is_positive": true,
-                      "url": "https://docs.rokt.com/",
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
+            "targeting_data": {
+                "link": "https://example.com/transparency",
+                "copy": "Why was this ad presented?\nIn order to provide the most relevant offers to you during your purchase on this website, we partner with Rokt to connect you with select advertisers. The following parameters may be used to do so: transactional information entered upon purchase (i.e. name, zip code, order value, etc.), a secure unique identifier (i.e. hashed email address), cookies or tracking technology, and your interactions with previous offers of this type.\nYou are always in control of how your information is used on this website. You may turn off cookies via your browser settings, or exercise your data subject rights (including restriction, deletion and general opt outs) by visiting Rokt's privacy policy at https://www.rokt.com/privacy-policy/.",
+                "advertisers": [
+                    {
+                        "name": "Sample creatives",
+                        "brand": "rokt.sample"
                     },
-                    "negative": {
-                      "id": "3306079070872011079",
-                      "action": "CaptureOnly",
-                      "instance_guid": "72372180-00cd-451e-acfd-ec145a6d0a70",
-                      "signal_type": "SignalResponse",
-                      "short_label": "No thanks",
-                      "long_label": "No thanks",
-                      "is_positive": false,
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "instance_guid": "c9f06a10-6b52-49af-9618-fb2d4fc4e83f",
-              "token": "",
-              "layout_variant": {
-                "layout_variant_id": "3353172846080032865",
-                "module_name": "standard-marketing",
-                "layout_variant_schema": "{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}},{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"center\",\"condition\":\"is\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"700\",\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"10 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.title|^% %^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"fit-height\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}},{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"maxWidth\":120,\"maxHeight\":60}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is-above\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"center\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^%<br/>%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.copy|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"BasicText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"alignItems\":\"stretch\",\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"externally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"minWidth\":190,\"minHeight\":32},\"flexChild\":{\"weight\":1},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"externally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"8 0 0 0\",\"padding\":\"0 0 0 0\"},\"container\":{\"gap\":8,\"justifyContent\":\"flex-start\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"externally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"negative\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}},\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minWidth\":190,\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"pressed\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.shortLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"}},\"pressed\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"openLinks\":\"externally\",\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"positive-first\",\"value\":\"positive-first\",\"condition\":\"is-not\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":true,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#999999\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textTransform\":null,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"16 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}]},\"type\":\"ScrollableColumn\"}"
-              },
-              "offer": {
-                "campaign_id": "3206770042489471288",
-                "creative": {
-                  "referral_creative_id": "3206770227173130552",
-                  "instance_guid": "7232874b-544f-4413-95f5-31a434abe298",
-                  "token": "",
-                  "copy": {
-                    "creative.title": "Test Creative",
-                    "creative.copy": "Test Creative..!",
-                    "creative.tag": "",
-                    "creative.image.src": ""
-                  },
-                  "images": {
-                    "creativeImage": {
-                      "light": "",
-                      "dark": "",
-                      "alt": "",
-                      "title": ""
-                    }
-                  },
-                  "links": {},
-                  "icons": {},
-                  "response_options_map": {
-                    "positive": {
-                      "id": "3206775488508002637",
-                      "action": "Url",
-                      "instance_guid": "99763353-b269-4cf3-86ec-6c9b84d54edf",
-                      "signal_type": "SignalResponse",
-                      "short_label": "Yes please",
-                      "long_label": "Yes please",
-                      "is_positive": true,
-                      "url": "https://www.rokt.com/",
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
+                    {
+                        "name": "Acme Streaming Services, LLC",
+                        "brand": "Acme Stream"
                     },
-                    "negative": {
-                      "id": "3206775488508002638",
-                      "action": "CaptureOnly",
-                      "instance_guid": "9bcbeaa1-b94e-4a09-b57c-99b8e048992d",
-                      "signal_type": "SignalResponse",
-                      "short_label": "No thanks",
-                      "long_label": "No thanks",
-                      "is_positive": false,
-                      "ignore_branch": false,
-                      "urlBehavior": "newTab",
-                      "token": ""
+                    {
+                        "name": "Acme Rewards LLC",
+                        "brand": "Acme Auto"
+                    },
+                    {
+                        "name": "Acme Fitness",
+                        "brand": "Acme Fitness"
                     }
-                  }
-                }
-              }
+                ]
             }
-          ]
         }
-      }
+    ],
+    "event_data": {
+        "00000000-0000-4000-8000-000000000001": {
+            "token": "dummy.jwt.token"
+        },
+        "00000000-0000-4000-8000-000000000002": {
+            "token": "dummy.jwt.token"
+        },
+        "ad:00000000-0000-4000-8000-000000000005": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "CampaignImpressionV2",
+                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDA3LThlZTctNmMyZGJiOGVkZWFmMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM0MzM5MzkyNDY1MzcyNDQ5NDNCAzMwNEoTMzA0ODA0MDI2NjA4NDk0ODM1NFITMzUwNTg2MDE4NDgzMTg4NTMxM1okMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTAyNTE4ODY3Nzg3MzgyNzg0"
+                }
+            }
+        },
+        "ad:00000000-0000-4000-8000-000000000009": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "CampaignImpressionV2",
+                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDBjLTg4YTQtY2M5NGViODc5ZjNiMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MDg4NjQ1MjMwNTQwODgxOTJCAzMwNEoTMjY5NDcwMTc3MjAyMzU5MTUyNlITMzU2NTI4NTM2OTUyNzczMDE3NlokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTUyNjg3ODczOTYwOTAyNjU2"
+                }
+            }
+        },
+        "ad:00000000-0000-4000-8000-000000000013": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "CampaignImpressionV2",
+                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDEyLTg0MmMtODhlNTA4ZmJmMTAwMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzMyMzI3OTY1NzM2MzQ3ODk4MzVCAzMwNEoTMzEwMDM2MTMwNDI4MTcyNDM5MlITMzU3MzQ3MTI2MzY2Mzk4MDU0NFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzMzQ5MzUwNjAwMDg3NTAzMjg3"
+                }
+            }
+        },
+        "ad:00000000-0000-4000-8000-000000000016": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "CampaignImpressionV2",
+                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDE2LWIzYTUtMmVlYzA1NTVmY2E0MiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MTkxNjUwMzU3NDc5MzQyMDhCAzMwNEoTMzQyMDcwMjI1MDUxMjE1MDUyOFITMzU3MzA0OTQ4NDk4NzkyNDQ4MFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTUzMTAxNzc5OTY0OTE5ODA4"
+                }
+            }
+        },
+        "layout:00000000-0000-4000-8000-000000000002:3578700651080056851": {
+            "token": "dummy.jwt.token"
+        },
+        "responseoption:00000000-0000-4000-8000-000000000005:negative:3505863543495262209": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "NegativeResponseV2",
+                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQwNy04ZWU3LTZjMmRiYjhlZGVhZjIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNDMzOTM5MjQ2NTM3MjQ0OTQzQgMzMDRKEzMwNDgwNDAyNjYwODQ5NDgzNTRSEzM1MDU4NjAxODQ4MzE4ODUzMTNaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000005:positive:3505863543495262208": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "ReferralV2",
+                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDA3LThlZTctNmMyZGJiOGVkZWFmMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM0MzM5MzkyNDY1MzcyNDQ5NDNCAzMwNEoTMzA0ODA0MDI2NjA4NDk0ODM1NFITMzUwNTg2MDE4NDgzMTg4NTMxM1okMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000009:negative:3565288298699161604": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "NegativeResponseV2",
+                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQwYy04OGE0LWNjOTRlYjg3OWYzYjIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNTA4ODY0NTIzMDU0MDg4MTkyQgMzMDRKEzI2OTQ3MDE3NzIwMjM1OTE1MjZSEzM1NjUyODUzNjk1Mjc3MzAxNzZaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000009:positive:3565288298699161600": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "ReferralV2",
+                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDBjLTg4YTQtY2M5NGViODc5ZjNiMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MDg4NjQ1MjMwNTQwODgxOTJCAzMwNEoTMjY5NDcwMTc3MjAyMzU5MTUyNlITMzU2NTI4NTM2OTUyNzczMDE3NlokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000013:negative:3573472758305193986": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "NegativeResponseV2",
+                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQxMi04NDJjLTg4ZTUwOGZiZjEwMDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzMjMyNzk2NTczNjM0Nzg5ODM1QgMzMDRKEzMxMDAzNjEzMDQyODE3MjQzOTJSEzM1NzM0NzEyNjM2NjM5ODA1NDRaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000013:positive:3573472758305193985": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "ReferralV2",
+                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDEyLTg0MmMtODhlNTA4ZmJmMTAwMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzMyMzI3OTY1NzM2MzQ3ODk4MzVCAzMwNEoTMzEwMDM2MTMwNDI4MTcyNDM5MlITMzU3MzQ3MTI2MzY2Mzk4MDU0NFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000016:negative:3573049974616883205": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "NegativeResponseV2",
+                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQxNi1iM2E1LTJlZWMwNTU1ZmNhNDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNTE5MTY1MDM1NzQ3OTM0MjA4QgMzMDRKEzM0MjA3MDIyNTA1MTIxNTA1MjhSEzM1NzMwNDk0ODQ5ODc5MjQ0ODBaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
+                }
+            }
+        },
+        "responseoption:00000000-0000-4000-8000-000000000016:positive:3573049974616883204": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalResponse": {
+                    "event_type": "ReferralV2",
+                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDE2LWIzYTUtMmVlYzA1NTVmY2E0MiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MTkxNjUwMzU3NDc5MzQyMDhCAzMwNEoTMzQyMDcwMjI1MDUxMjE1MDUyOFITMzU3MzA0OTQ4NDk4NzkyNDQ4MFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
+                }
+            }
+        },
+        "slot:00000000-0000-4000-8000-000000000004": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "PlacementImpressionV2",
+                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwMC1hYjYzLTk4ZmIyMTVmMzVmMDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
+                }
+            }
+        },
+        "slot:00000000-0000-4000-8000-000000000008": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "PlacementImpressionV2",
+                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwYS05MzdhLWI0YTdlMjFmNzFhODIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
+                }
+            }
+        },
+        "slot:00000000-0000-4000-8000-000000000012": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "PlacementImpressionV2",
+                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwZS04MjY5LWMxZGUwNWU3YTEwZDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
+                }
+            }
+        },
+        "slot:00000000-0000-4000-8000-000000000015": {
+            "token": "dummy.jwt.token",
+            "events": {
+                "SignalImpression": {
+                    "event_type": "PlacementImpressionV2",
+                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQxNC04NzFiLTgzNjczZjMwZWZmZDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
+                }
+            }
+        }
     }
-  ]
 }
