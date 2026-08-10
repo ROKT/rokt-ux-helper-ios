@@ -86,7 +86,7 @@ private extension RoktUXEventType {
         case .SignalInitialize: return ("signal_initialize", [:])
         case .SignalLoadStart: return ("load_start", [:])
         case .SignalLoadComplete: return ("load_complete", [:])
-        case .SignalActivation: return ("user_interaction", ["interactionType": "activation"])
+        case .SignalActivation: return ("user_interaction", ["interaction_type": "activation"])
         case .SignalUserInteraction: return ("user_interaction", [:])
         case .SignalSdkDiagnostic: return ("sdk_diagnostic", [:])
         case .SignalCartItemInstantPurchase: return ("cart_item_instant_purchase", [:])
