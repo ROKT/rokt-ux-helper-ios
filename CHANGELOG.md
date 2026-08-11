@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-11
+
+### Breaking Changes
+
+- Make SelectResponse the canonical experience response ([#338](https://github.com/ROKT/rokt-ux-helper-ios/pull/338))
+
 ## [1.0.1] - 2026-08-10
 
 ### Added
@@ -417,7 +423,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...2.0.0
 [1.0.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...1.0.0
 [0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
