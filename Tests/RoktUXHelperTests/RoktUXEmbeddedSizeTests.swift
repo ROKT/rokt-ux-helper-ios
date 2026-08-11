@@ -7,26 +7,25 @@ final class RoktUXEmbeddedSizeTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    /// Builds an SDK-shaped experience response embedding the given plugins JSON.
+    /// Builds a v2 selection response embedding the given plugins JSON.
     private func makeExperienceResponse(pluginsJSON: String) -> String {
         """
         {
-          "sessionId": "test-session-id",
-          "page": {"pageId": "test-page-id"},
-          "placementContext": {
-            "roktTagId": "123",
-            "pageInstanceGuid": "test-page-instance-guid",
+          "session_id": "test-session-id",
+          "session_token": { "token": "session-token", "expires_at": 0 },
+          "page_instance_guid": "test-page-instance-guid",
+          "page_context": {
+            "page_id": "test-page-id",
+            "page_instance_guid": "test-page-instance-guid",
             "token": "context-token"
           },
-          "placements": [],
-          "token": "",
           "plugins": \(pluginsJSON)
         }
         """
     }
 
     /// Extracts the plugins array (with a complete layout schema) from the
-    /// embedded one-by-one fixture so the SDK-shaped response renders.
+    /// embedded one-by-one fixture so the selection response renders.
     private func pluginsFromEmbeddedFixture() throws -> String {
         let data = ModelTestData.toData(jsonFilename: "embedded_onebyone")
         let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])

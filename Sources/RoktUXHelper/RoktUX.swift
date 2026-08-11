@@ -174,15 +174,17 @@ public class RoktUX: UXEventsDelegate {
     public static func parseExperience(_ experienceResponse: String) -> RoktUXParseResult? {
         let parseStart = Date()
         guard let response = try? RoktDecoder()
-            .decode(RoktUXExperienceResponse.self, experienceResponse)
+            .decode(SelectResponse.self, experienceResponse)
         else {
             return nil
         }
-        let pageModel = response.getPageModel()
+        // SDK integration semantics: diagnostic events enabled.
+        let pageModel = response.getPageModel(useDiagnosticEvents: true)
         let parseEnd = Date()
         return RoktUXParseResult(
             sessionId: response.sessionId,
-            pageId: pageModel?.pageId ?? response.page?.pageId,
+            pageId: pageModel?.pageId ?? response.pageContext?.pageId,
+            response: response,
             pageModel: pageModel,
             parseStart: parseStart,
             parseEnd: parseEnd
@@ -363,19 +365,14 @@ public class RoktUX: UXEventsDelegate {
                                    startDate: Date,
                                    experienceResponse: String,
                                    processor: EventProcessing) throws -> RoktUXPageModel {
-        var layoutPage: RoktUXPageModel
-        switch integrationType {
-        case .sdk:
-            layoutPage = try RoktDecoder()
-                .decode(RoktUXExperienceResponse.self, experienceResponse)
-                .getPageModel()
-                .unwrap(orThrow: RoktUXError.experienceResponseMapping)
-        default:
-            layoutPage = try RoktDecoder()
-                .decode(RoktUXS2SExperienceResponse.self, experienceResponse)
-                .getPageModel()
-                .unwrap(orThrow: RoktUXError.experienceResponseMapping)
-        }
+        // Both integrations decode the one canonical SelectResponse. The historical
+        // SDK-vs-S2S event-processing difference is preserved: the v2 response carries
+        // no `options`, so diagnostic events are enabled for the SDK path only (matching
+        // the previous SDK experience-response behaviour); S2S leaves them off.
+        let layoutPage = try RoktDecoder()
+            .decode(SelectResponse.self, experienceResponse)
+            .getPageModel(useDiagnosticEvents: integrationType == .sdk)
+            .unwrap(orThrow: RoktUXError.experienceResponseMapping)
 
         sendPageIntialEvents(
             pageModel: layoutPage,
