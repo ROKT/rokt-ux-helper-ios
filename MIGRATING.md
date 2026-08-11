@@ -33,13 +33,13 @@ if let failure = event as? RoktUXEvent.LayoutFailure {
 }
 ```
 
-| Reason | Meaning |
-|--------|---------|
-| `.noOffers` | Response decoded but contained no renderable offers/layouts |
-| `.invalidResponse` | Response could not be decoded or mapped |
-| `.invalidSchema` | Layout schema validation/transform failed |
-| `.missingEmbeddedTarget` | No `LayoutLoader` for the embedded placement target |
-| `.presentationFailed` | Overlay/bottom sheet could not be presented |
+| Reason                   | Meaning                                                     |
+| ------------------------ | ----------------------------------------------------------- |
+| `.noOffers`              | Response decoded but contained no renderable offers/layouts |
+| `.invalidResponse`       | Response could not be decoded or mapped                     |
+| `.invalidSchema`         | Layout schema validation/transform failed                   |
+| `.missingEmbeddedTarget` | No `LayoutLoader` for the embedded placement target         |
+| `.presentationFailed`    | Overlay/bottom sheet could not be presented                 |
 
 Console logging (when enabled via `RoktUX.setLogLevel` / `RoktUXConfig`) now appends
 `| sessionId=<id>` once the session is known, and uses distinct messages for `.noOffers`
