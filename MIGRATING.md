@@ -2,6 +2,49 @@
 
 This document provides guidance on migrating to newer versions of `rokt-ux-helper-ios`.
 
+## Migrating to the LayoutFailure reason API
+
+`RoktUXEvent.LayoutFailure` now includes `sessionId` and a `reason` so partners can tell
+**no offer returned** apart from **rendering / integration failures**.
+
+Existing checks for `event is RoktUXEvent.LayoutFailure` continue to work. Switch on
+`reason` when you need the split:
+
+```swift
+if let failure = event as? RoktUXEvent.LayoutFailure {
+    switch failure.reason {
+    case .noOffers:
+        // Offers request succeeded but nothing to show — not an integration bug.
+        // Share failure.sessionId with your account manager.
+        break
+    case .invalidResponse:
+        // Experience response could not be decoded or mapped.
+        break
+    case .invalidSchema:
+        // Layout schema failed validation/transform.
+        break
+    case .missingEmbeddedTarget:
+        // Host app did not provide a LayoutLoader for the embedded selector.
+        break
+    case .presentationFailed:
+        // Overlay/bottom sheet could not find a suitable view controller to present from.
+        break
+    }
+}
+```
+
+| Reason | Meaning |
+|--------|---------|
+| `.noOffers` | Response decoded but contained no renderable offers/layouts |
+| `.invalidResponse` | Response could not be decoded or mapped |
+| `.invalidSchema` | Layout schema validation/transform failed |
+| `.missingEmbeddedTarget` | No `LayoutLoader` for the embedded placement target |
+| `.presentationFailed` | Overlay/bottom sheet could not be presented |
+
+Console logging (when enabled via `RoktUX.setLogLevel` / `RoktUXConfig`) now appends
+`| sessionId=<id>` once the session is known, and uses distinct messages for `.noOffers`
+versus rendering failures.
+
 ## Migrating to 2.0.0
 
 Version **2.0.0** makes `SelectResponse` the single canonical response model. The raw
