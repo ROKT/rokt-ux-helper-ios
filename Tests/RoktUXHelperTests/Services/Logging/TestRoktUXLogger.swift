@@ -6,12 +6,10 @@ class RoktUXLoggerTests: XCTestCase {
     override func setUp() {
         super.setUp()
         RoktUXLogger.shared.logLevel = .none
-        RoktUXLogger.shared.sessionId = nil
     }
 
     override func tearDown() {
         RoktUXLogger.shared.logLevel = .none
-        RoktUXLogger.shared.sessionId = nil
         super.tearDown()
     }
 
@@ -21,27 +19,15 @@ class RoktUXLoggerTests: XCTestCase {
         XCTAssertEqual(logger.logLevel, .none)
     }
 
-    func testSessionIdCanBeSetAndCleared() {
-        let logger = RoktUXLogger()
-        XCTAssertNil(logger.sessionId)
-
-        logger.sessionId = "session-abc"
-        XCTAssertEqual(logger.sessionId, "session-abc")
-
-        logger.sessionId = nil
-        XCTAssertNil(logger.sessionId)
-    }
-
     func testLogMethodsDoNotCrashWithSessionId() {
         let logger = RoktUXLogger.shared
         logger.logLevel = .verbose
-        logger.sessionId = "session-for-log"
 
-        logger.verbose("verbose test message")
-        logger.debug("debug test message")
-        logger.info("info test message")
-        logger.warning("warning test message")
-        logger.error("error test message")
+        logger.verbose("verbose test message", sessionId: "session-for-log")
+        logger.debug("debug test message", sessionId: "session-for-log")
+        logger.info("info test message", sessionId: "session-for-log")
+        logger.warning("warning test message", sessionId: "session-for-log")
+        logger.error("error test message", sessionId: "session-for-log")
     }
 
     func testLogLevelCanBeSet() {

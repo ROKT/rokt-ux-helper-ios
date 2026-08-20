@@ -9,11 +9,6 @@ final class RoktUXTests: XCTestCase {
 
     private let layoutId = "layout-id"
 
-    override func tearDown() {
-        RoktUXLogger.shared.sessionId = nil
-        super.tearDown()
-    }
-
     private func makeCatalogItem(
         price: Decimal = 57.5,
         originalPrice: Decimal = 130.0
@@ -121,11 +116,11 @@ final class RoktUXTests: XCTestCase {
     // MARK: - onPlacementFailure
 
     func test_onPlacementFailure_emitsLayoutFailureWithInvalidSchemaReason() {
-        RoktUXLogger.shared.sessionId = "placement-failure-session"
         var captured: RoktUXEvent.LayoutFailure?
         let sut = makeSUT { event in
             captured = event as? RoktUXEvent.LayoutFailure
         }
+        sut.sessionId = "placement-failure-session"
 
         sut.onPlacementFailure(layoutId)
 

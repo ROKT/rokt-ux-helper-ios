@@ -112,7 +112,7 @@ final class RoktUXParseExperienceTests: XCTestCase {
         )
 
         wait(for: [failureExpectation], timeout: 5)
-        XCTAssertEqual(RoktUXLogger.shared.sessionId, sessionId)
+        XCTAssertEqual(sut.sessionId, sessionId)
     }
 
     func test_loadLayout_invalidJSON_emitsInvalidResponseFailure() {
@@ -157,7 +157,7 @@ final class RoktUXParseExperienceTests: XCTestCase {
         )
 
         wait(for: [failureExpectation], timeout: 5)
-        XCTAssertEqual(RoktUXLogger.shared.sessionId, sessionId)
+        XCTAssertEqual(sut.sessionId, sessionId)
     }
 
     func test_loadLayout_s2s_invalidJSON_emitsInvalidResponseFailure() {
@@ -205,7 +205,7 @@ final class RoktUXParseExperienceTests: XCTestCase {
         )
 
         wait(for: [failureExpectation], timeout: 5)
-        XCTAssertEqual(RoktUXLogger.shared.sessionId, sessionId)
+        XCTAssertEqual(sut.sessionId, sessionId)
     }
 
     func test_loadLayout_missingEmbeddedLoader_emitsMissingEmbeddedTarget() throws {

@@ -18,6 +18,10 @@ public class RoktUX: UXEventsDelegate {
 
     internal var onRoktEvent: ((RoktUXEvent) -> Void)?
     private var eventServices: [String: EventService] = [:]
+    /// Session identifier for the current `loadLayout` on this instance.
+    /// Scoped here (not on the shared logger) so concurrent `RoktUX` instances
+    /// do not overwrite each other's correlation id.
+    var sessionId: String?
 
     public init() {}
 
@@ -44,8 +48,8 @@ public class RoktUX: UXEventsDelegate {
         if let configLogLevel = config?.logLevel, configLogLevel != .none {
             RoktUXLogger.shared.logLevel = configLogLevel
         }
-        RoktUXLogger.shared.sessionId = nil
-        RoktUXLogger.shared.verbose("loadLayout called with S2S integration type")
+        sessionId = nil
+        RoktUXLogger.shared.verbose("loadLayout called with S2S integration type", sessionId: sessionId)
         let integrationType: HelperIntegrationType = .s2s
         let processor = EventProcessor(integrationType: integrationType, onRoktPlatformEvent: onRoktPlatformEvent)
         do {
@@ -55,7 +59,10 @@ public class RoktUX: UXEventsDelegate {
                                                    processor: processor)
 
             if let layoutPlugins = layoutPage.layoutPlugins, !layoutPlugins.isEmpty {
-                RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
+                RoktUXLogger.shared.info(
+                    "Processing \(layoutPlugins.count) layout plugin(s)",
+                    sessionId: sessionId
+                )
                 for layoutPlugin in layoutPlugins {
                     let layoutLoader = layoutLoaders?.first { $0.key == layoutPlugin.targetElementSelector }?
                         .value
@@ -124,8 +131,8 @@ public class RoktUX: UXEventsDelegate {
         if let configLogLevel = config?.logLevel, configLogLevel != .none {
             RoktUXLogger.shared.logLevel = configLogLevel
         }
-        RoktUXLogger.shared.sessionId = nil
-        RoktUXLogger.shared.verbose("loadLayout called with SDK integration type")
+        sessionId = nil
+        RoktUXLogger.shared.verbose("loadLayout called with SDK integration type", sessionId: sessionId)
         let integrationType: HelperIntegrationType = .sdk
         let processor = EventProcessor(integrationType: integrationType,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
@@ -236,8 +243,8 @@ public class RoktUX: UXEventsDelegate {
         if let configLogLevel = config?.logLevel, configLogLevel != .none {
             RoktUXLogger.shared.logLevel = configLogLevel
         }
-        RoktUXLogger.shared.sessionId = pageModel.sessionId
-        RoktUXLogger.shared.verbose("loadLayout called with pre-parsed page model")
+        sessionId = pageModel.sessionId
+        RoktUXLogger.shared.verbose("loadLayout called with pre-parsed page model", sessionId: sessionId)
         let processor = EventProcessor(integrationType: .sdk,
                                        onRoktPlatformEvent: onRoktPlatformEvent)
 
@@ -352,7 +359,8 @@ public class RoktUX: UXEventsDelegate {
     ) {
         guard let eventService = eventServices[layoutId] else {
             RoktUXLogger.shared.warning(
-                "forwardPaymentFinalized called for unknown layoutId \(layoutId); ignoring"
+                "forwardPaymentFinalized called for unknown layoutId \(layoutId); ignoring",
+                sessionId: sessionId
             )
             return
         }
@@ -376,7 +384,7 @@ public class RoktUX: UXEventsDelegate {
         // the previous SDK experience-response behaviour); S2S leaves them off.
         let response = try RoktDecoder()
             .decode(SelectResponse.self, experienceResponse)
-        RoktUXLogger.shared.sessionId = response.sessionId
+        sessionId = response.sessionId
         guard let layoutPage = response.getPageModel(useDiagnosticEvents: integrationType == .sdk) else {
             throw RoktUXError.loadLayoutEmpty(sessionId: response.sessionId)
         }
@@ -408,7 +416,10 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing
     ) {
         if let layoutPlugins = page.layoutPlugins, !layoutPlugins.isEmpty {
-            RoktUXLogger.shared.info("Processing \(layoutPlugins.count) layout plugin(s)")
+            RoktUXLogger.shared.info(
+                "Processing \(layoutPlugins.count) layout plugin(s)",
+                sessionId: sessionId
+            )
             for layoutPlugin in layoutPlugins {
                 let layoutLoader = defaultLayoutLoader ?? layoutLoaders?
                     .first { $0.key == layoutPlugin.targetElementSelector }?
@@ -566,7 +577,8 @@ public class RoktUX: UXEventsDelegate {
                                          callStack: kColorInvalid + color)
             RoktUXLogger.shared.error(
                 "Layout rendering failed: invalid color in schema (\(color)). "
-                    + "This is a layout configuration issue, not a missing offer."
+                    + "This is a layout configuration issue, not a missing offer.",
+                sessionId: page.sessionId
             )
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId,
                                                     sessionId: page.sessionId,
@@ -577,7 +589,8 @@ public class RoktUX: UXEventsDelegate {
                                          callStack: kLayoutInvalid)
             RoktUXLogger.shared.error(
                 "Layout rendering failed: invalid layout schema. "
-                    + "This is a layout configuration issue, not a missing offer."
+                    + "This is a layout configuration issue, not a missing offer.",
+                sessionId: page.sessionId
             )
             onRoktUXEvent(RoktUXEvent.LayoutFailure(layoutId: layoutPlugin.pluginId,
                                                     sessionId: page.sessionId,
@@ -632,13 +645,13 @@ public class RoktUX: UXEventsDelegate {
                                                     + targetElement + kLocationDoesNotExist)
                     RoktUXLogger.shared.error(
                         "Layout rendering failed: no LayoutLoader for embedded target '\(targetElement)'. "
-                            + "Check that the host app registers a placeholder for this selector."
+                            + "Check that the host app registers a placeholder for this selector.",
+                        sessionId: (eventService as? EventService)?.sessionId ?? self.sessionId
                     )
                     onUnload()
                     self.onRoktEvent?(RoktUXEvent.LayoutFailure(
                         layoutId: layoutPlugin.pluginId,
-                        sessionId: (eventService as? EventService)?.sessionId
-                            ?? RoktUXLogger.shared.sessionId,
+                        sessionId: (eventService as? EventService)?.sessionId ?? self.sessionId,
                         reason: .missingEmbeddedTarget
                     ))
                 }
@@ -681,13 +694,14 @@ public class RoktUX: UXEventsDelegate {
             } else {
                 RoktUXLogger.shared.error(
                     "Layout rendering failed: overlay was not presented because no suitable top view "
-                        + "controller was found. Enable RoktUX logging (.warning or lower) for resolver details."
+                        + "controller was found. Enable RoktUX logging (.warning or lower) for resolver details.",
+                    sessionId: eventService?.sessionId ?? self.sessionId
                 )
                 onUnload()
                 self.onRoktEvent?(
                     RoktUXEvent.LayoutFailure(
                         layoutId: eventService?.pluginId,
-                        sessionId: eventService?.sessionId ?? RoktUXLogger.shared.sessionId,
+                        sessionId: eventService?.sessionId ?? self.sessionId,
                         reason: .presentationFailed
                     )
                 )
@@ -800,7 +814,7 @@ public class RoktUX: UXEventsDelegate {
         onRoktEvent?(
             RoktUXEvent.LayoutFailure(
                 layoutId: layoutId,
-                sessionId: RoktUXLogger.shared.sessionId,
+                sessionId: eventServices[layoutId]?.sessionId ?? sessionId,
                 reason: .invalidSchema
             )
         )
@@ -811,14 +825,16 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing,
         onRoktUXEvent: (RoktUXEvent) -> Void
     ) {
-        RoktUXLogger.shared.sessionId = sessionId
+        self.sessionId = sessionId
         sendDiagnostics(sessionId: sessionId,
                         code: kAPIExecuteErrorCode,
                         callStack: kEmptyResponse,
+                        severity: .info,
                         processor: processor)
         RoktUXLogger.shared.verbose(
             "The offers request succeeded but no offer was returned. "
-                + "Please let your account manager know your session ID."
+                + "Please let your account manager know your session ID.",
+            sessionId: sessionId
         )
         onRoktUXEvent(
             RoktUXEvent.LayoutFailure(
@@ -834,18 +850,19 @@ public class RoktUX: UXEventsDelegate {
         processor: EventProcessing,
         onRoktUXEvent: (RoktUXEvent) -> Void
     ) {
-        sendDiagnostics(sessionId: RoktUXLogger.shared.sessionId,
+        sendDiagnostics(sessionId: sessionId,
                         code: kValidationErrorCode,
                         callStack: error.localizedDescription,
                         processor: processor)
         RoktUXLogger.shared.error(
             "Failed to parse experience response. The response could not be decoded or mapped.",
-            error: error
+            error: error,
+            sessionId: sessionId
         )
         onRoktUXEvent(
             RoktUXEvent.LayoutFailure(
                 layoutId: nil,
-                sessionId: RoktUXLogger.shared.sessionId,
+                sessionId: sessionId,
                 reason: .invalidResponse
             )
         )

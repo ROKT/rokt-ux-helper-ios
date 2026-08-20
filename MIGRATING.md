@@ -41,9 +41,9 @@ if let failure = event as? RoktUXEvent.LayoutFailure {
 | `.missingEmbeddedTarget` | No `LayoutLoader` for the embedded placement target         |
 | `.presentationFailed`    | Overlay/bottom sheet could not be presented                 |
 
-Console logging (when enabled via `RoktUX.setLogLevel` / `RoktUXConfig`) now appends
-`| sessionId=<id>` once the session is known, and uses distinct messages for `.noOffers`
-versus rendering failures.
+Console logging (when enabled via `RoktUX.setLogLevel` / `RoktUXConfig`) appends
+`| sessionId=<id>` on log lines that have a session in the current `RoktUX` instance,
+and uses distinct messages for `.noOffers` versus rendering failures.
 
 ## Migrating to 2.0.0
 
