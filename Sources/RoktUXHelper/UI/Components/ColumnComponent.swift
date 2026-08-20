@@ -39,6 +39,25 @@ struct ColumnComponent: View {
     @State private var availableHeight: CGFloat?
 
     let parentOverride: ComponentParentOverride?
+    let appliesVerticalSizeConstraints: Bool
+
+    init(
+        config: ComponentConfig,
+        model: ColumnViewModel,
+        parentWidth: Binding<CGFloat?>,
+        parentHeight: Binding<CGFloat?>,
+        styleState: Binding<StyleState>,
+        parentOverride: ComponentParentOverride?,
+        appliesVerticalSizeConstraints: Bool = true
+    ) {
+        self.config = config
+        self.model = model
+        self._parentWidth = parentWidth
+        self._parentHeight = parentHeight
+        self._styleState = styleState
+        self.parentOverride = parentOverride
+        self.appliesVerticalSizeConstraints = appliesVerticalSizeConstraints
+    }
 
     var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -87,6 +106,7 @@ struct ColumnComponent: View {
                 defaultWidth: .wrapContent,
                 isContainer: true,
                 containerType: .column,
+                appliesVerticalSizeConstraints: appliesVerticalSizeConstraints,
                 frameChangeIndex: $frameChangeIndex,
                 imageLoader: model.imageLoader
             )

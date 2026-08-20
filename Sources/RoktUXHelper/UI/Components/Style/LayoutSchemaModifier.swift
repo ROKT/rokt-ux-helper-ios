@@ -31,6 +31,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
     let containerType: ComponentParentType
     let applyAlignSelf: Bool
     let applyMargin: Bool
+    let appliesVerticalSizeConstraints: Bool
     @Binding var frameChangeIndex: Int
     let clipsToBounds: Bool
     let imageLoader: RoktUXImageLoader?
@@ -50,7 +51,8 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
                    verticalAxisAlignment: verticalAlignmentProperty.getAlignment(),
                    alignSelf: flex?.alignSelf,
                    parentOverride: parentOverride,
-                   margin: getMargin())
+                   margin: getMargin(),
+                   appliesVerticalSizeConstraints: appliesVerticalSizeConstraints)
             .background(backgroundStyle: background, imageLoader: imageLoader)
             .clipToBounds(clipsToBounds, borderRadius: border?.borderRadius)
             .border(
@@ -118,6 +120,7 @@ internal extension View {
         containerType: ComponentParentType = .column,
         applyAlignSelf: Bool = true,
         applyMargin: Bool = true,
+        appliesVerticalSizeConstraints: Bool = true,
         frameChangeIndex: Binding<Int> = .constant(0),
         clipsToBounds: Bool = false,
         imageLoader: RoktUXImageLoader?
@@ -144,6 +147,7 @@ internal extension View {
             containerType: containerType,
             applyAlignSelf: applyAlignSelf,
             applyMargin: applyMargin,
+            appliesVerticalSizeConstraints: appliesVerticalSizeConstraints,
             frameChangeIndex: frameChangeIndex,
             clipsToBounds: clipsToBounds,
             imageLoader: imageLoader

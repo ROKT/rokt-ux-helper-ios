@@ -137,6 +137,10 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_scrollable_column_with_max_height")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
+        static func scrollableColumnWithTallContent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_with_tall_content")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
     }
     
     enum ZStackData {

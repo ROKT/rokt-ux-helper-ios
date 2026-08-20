@@ -208,7 +208,7 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### ScrollableColumn
 
 - [x] Standard rendering -- Column with pink background inside a ScrollView (`testSnapshot`)
-- [ ] Max height constraint variant
+- [x] Max height constrained tall content -- bottom viewport shows the final colored sections (`testSnapshot_tallScrollableContentAtBottom`)
 - [ ] Scroll indicator visibility
 
 #### ScrollableRow

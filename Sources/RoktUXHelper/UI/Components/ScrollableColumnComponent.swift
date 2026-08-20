@@ -65,8 +65,8 @@ struct ScrollableColumnComponent: View {
                                   horizontalAlignment: horizontalAlignment.getAlignment())
     }
 
-    var dimensionMaxHeight: CGFloat? {
-        let heightModifier = HeightModifier(
+    private var heightModifier: HeightModifier {
+        HeightModifier(
             heightProperty: dimensionStyle?.height,
             minimum: dimensionStyle?.minHeight,
             maximum: dimensionStyle?.maxHeight,
@@ -74,7 +74,31 @@ struct ScrollableColumnComponent: View {
             defaultHeight: .wrapContent,
             parentHeight: parentHeight
         )
+    }
+
+    var dimensionMinHeight: CGFloat? {
+        heightModifier.frameMinHeight
+    }
+
+    var dimensionMaxHeight: CGFloat? {
         return heightModifier.frameMaxHeight
+    }
+
+    var dimensionFixedHeight: CGFloat? {
+        heightModifier.fixedHeight
+    }
+
+    var dimensionPercentageHeight: CGFloat? {
+        let margin = style?.spacing?.margin.map {
+            FrameAlignmentProperty.getFrameAlignment($0)
+        }
+        let percentageHeight = PercentageHeightModifier(
+            height: parentHeight,
+            percentage: dimensionStyle?.height,
+            verticalAxisAlignment: verticalAlignment.getAlignment(),
+            margin: margin
+        )
+        return percentageHeight.frameHeight
     }
 
     var body: some View {
@@ -84,27 +108,34 @@ struct ScrollableColumnComponent: View {
                             parentWidth: $parentWidth,
                             parentHeight: $parentHeight,
                             styleState: $styleState,
-                            parentOverride: parentOverride)
+                            parentOverride: parentOverride,
+                            appliesVerticalSizeConstraints: false)
             .readSize(weightProperties: weightProperties) { newSizeWithMax, newAlignment in
-                // Prioritize dimension maxHeight over weight maxHeight
-                if let dimensionMax = dimensionMaxHeight {
+                // Dimension sizing belongs to the ScrollView viewport. Its content must
+                // remain unconstrained so it can define the scrollable range.
+                if let fixedHeight = dimensionFixedHeight {
+                    contentMaxHeight = nil
+                    contentHeight = fixedHeight
+                } else if let percentageHeight = dimensionPercentageHeight {
+                    contentMaxHeight = nil
+                    contentHeight = percentageHeight
+                } else if let dimensionMax = dimensionMaxHeight {
                     contentMaxHeight = dimensionMax
+                    contentHeight = nil
                 } else if let weightMaxHeight = newSizeWithMax.maxHeight {
                     contentMaxHeight = weightMaxHeight
+                    contentHeight = nil
                 } else {
                     contentMaxHeight = nil
-                }
-
-                if contentMaxHeight == nil {
                     contentHeight = newSizeWithMax.size.height
-                } else {
-                    contentHeight = nil
                 }
 
                 contentAlignment = newAlignment
             }
         }
-        .frame(maxHeight: contentMaxHeight, alignment: contentAlignment)
         .frame(height: contentHeight, alignment: contentAlignment)
+        .frame(minHeight: dimensionMinHeight,
+               maxHeight: contentMaxHeight,
+               alignment: contentAlignment)
     }
 }

@@ -15,7 +15,8 @@ internal extension View {
         verticalAxisAlignment: Alignment,
         alignSelf: FlexAlignment?,
         parentOverride: ComponentParentOverride?,
-        margin: FrameAlignmentProperty?
+        margin: FrameAlignmentProperty?,
+        appliesVerticalSizeConstraints: Bool = true
     ) -> some View {
         var minWidth: CGFloat?
         var maxWidth: CGFloat?
@@ -58,39 +59,41 @@ internal extension View {
             alignment.horizontal = percentageWidth.alignmentAsHorizontalType
         }
 
-        // update with height values
-        let height = HeightModifier(heightProperty: dimension?.height,
-                                    minimum: dimension?.minHeight,
-                                    maximum: dimension?.maxHeight,
-                                    alignment: verticalAxisAlignment,
-                                    defaultHeight: defaultHeight,
-                                    parentHeight: parentHeight)
-        if height.heightProperty != nil,
-           height.isFixedHeight,
-           let fixedHeight = height.fixedHeight {
-            minHeight = fixedHeight
-            maxHeight = fixedHeight
-            alignment.vertical = height.alignmentAsVerticalType
-        } else {
-            if let frameMinHeight = height.frameMinHeight {
-                minHeight = frameMinHeight
+        if appliesVerticalSizeConstraints {
+            // update with height values
+            let height = HeightModifier(heightProperty: dimension?.height,
+                                        minimum: dimension?.minHeight,
+                                        maximum: dimension?.maxHeight,
+                                        alignment: verticalAxisAlignment,
+                                        defaultHeight: defaultHeight,
+                                        parentHeight: parentHeight)
+            if height.heightProperty != nil,
+               height.isFixedHeight,
+               let fixedHeight = height.fixedHeight {
+                minHeight = fixedHeight
+                maxHeight = fixedHeight
                 alignment.vertical = height.alignmentAsVerticalType
+            } else {
+                if let frameMinHeight = height.frameMinHeight {
+                    minHeight = frameMinHeight
+                    alignment.vertical = height.alignmentAsVerticalType
+                }
+                if let frameMaxHeight = height.frameMaxHeight {
+                    maxHeight = frameMaxHeight
+                    alignment.vertical = height.alignmentAsVerticalType
+                }
             }
-            if let frameMaxHeight = height.frameMaxHeight {
-                maxHeight = frameMaxHeight
-                alignment.vertical = height.alignmentAsVerticalType
-            }
-        }
 
-        // update with percentage height
-        let percentageHeight = PercentageHeightModifier(height: parentHeight,
-                                                        percentage: dimension?.height,
-                                                        verticalAxisAlignment: verticalAxisAlignment,
-                                                        margin: margin)
-        if let frameHeight = percentageHeight.frameHeight {
-            minHeight = frameHeight
-            maxHeight = frameHeight
-            alignment.vertical = percentageHeight.alignmentAsVerticalType
+            // update with percentage height
+            let percentageHeight = PercentageHeightModifier(height: parentHeight,
+                                                            percentage: dimension?.height,
+                                                            verticalAxisAlignment: verticalAxisAlignment,
+                                                            margin: margin)
+            if let frameHeight = percentageHeight.frameHeight {
+                minHeight = frameHeight
+                maxHeight = frameHeight
+                alignment.vertical = percentageHeight.alignmentAsVerticalType
+            }
         }
 
         // update with weight
@@ -104,7 +107,7 @@ internal extension View {
             maxWidth = frameMaxWidth
             alignment.horizontal = weight.alignment.asHorizontalType ?? WeightModifier.Constant.defaultHorizontalAlignment
         }
-        if let frameMaxHeight = weight.frameMaxHeight {
+        if appliesVerticalSizeConstraints, let frameMaxHeight = weight.frameMaxHeight {
             maxHeight = frameMaxHeight
             alignment.vertical = weight.alignment.asVerticalType ?? WeightModifier.Constant.defaultVerticalAlignment
         }
@@ -120,7 +123,7 @@ internal extension View {
             alignment.horizontal = alignSelfStretch.wrapperAlignment?.asHorizontalType ??
             AlignSelfStretchModifier.Constant.defaultHorizontalAlignment
         }
-        if let frameMaxHeight = alignSelfStretch.frameMaxHeight {
+        if appliesVerticalSizeConstraints, let frameMaxHeight = alignSelfStretch.frameMaxHeight {
             maxHeight = frameMaxHeight
             alignment.vertical = alignSelfStretch.wrapperAlignment?.asVerticalType ??
             AlignSelfStretchModifier.Constant.defaultVerticalAlignment
