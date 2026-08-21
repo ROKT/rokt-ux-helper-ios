@@ -39,6 +39,7 @@ struct ColumnComponent: View {
     @State private var availableHeight: CGFloat?
 
     let parentOverride: ComponentParentOverride?
+    var isScrollable: Bool = false
 
     var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -66,6 +67,30 @@ struct ColumnComponent: View {
 
     var accessibilityBehavior: AccessibilityChildBehavior {
         model.accessibilityGrouped ? .combine : .contain
+    }
+
+    private var heightModifier: HeightModifier {
+        HeightModifier(heightProperty: dimensionStyle?.height,
+                       minimum: dimensionStyle?.minHeight,
+                       maximum: dimensionStyle?.maxHeight,
+                       alignment: verticalAlignment.getAlignment(),
+                       defaultHeight: .wrapContent,
+                       parentHeight: parentHeight)
+    }
+
+    // A `ScrollView` is greedy along its scroll axis. When no style constrains this
+    // column's height, pin the viewport to its content so a scrollable column wraps
+    // exactly like a non-scrollable one.
+    private var scrollViewWrapsContent: Bool {
+        let stretchesVertically = config.parent == .row
+            && (flexStyle?.alignSelf == .stretch || parentOverride?.stretchChildren == true)
+
+        return heightModifier.fixedHeight == nil
+            && heightModifier.frameMinHeight == nil
+            && heightModifier.frameMaxHeight == nil
+            && !heightModifier.isPercentageHeight
+            && flexStyle?.weight == nil
+            && !stretchesVertically
     }
 
     var body: some View {
@@ -103,7 +128,20 @@ struct ColumnComponent: View {
             .accessibilityElement(children: accessibilityBehavior)
     }
 
+    @ViewBuilder
     private func build() -> some View {
+        // Vertical sizing, decoration and margin are applied by `applyLayoutModifier`
+        // outside this `ScrollView`, so they belong to the viewport while the stack
+        // inside stays unbounded and defines the scrollable range.
+        if isScrollable {
+            ScrollView(.vertical) { stack() }
+                .fixedSize(horizontal: false, vertical: scrollViewWrapsContent)
+        } else {
+            stack()
+        }
+    }
+
+    private func stack() -> some View {
         // `alignment` = children edge alignment in the horizontal direction
         return VStack(alignment: columnPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                       spacing: CGFloat(containerStyle?.gap ?? 0)) {

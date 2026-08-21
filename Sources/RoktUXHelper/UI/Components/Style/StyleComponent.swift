@@ -101,11 +101,13 @@ internal extension View {
         let weight = WeightModifier(props: weightProperties)
 
         if let frameMaxWidth = weight.frameMaxWidth {
-            maxWidth = frameMaxWidth
+            // Growing to fill the parent must not lift an explicit upper bound.
+            maxWidth = min(maxWidth ?? .infinity, frameMaxWidth)
             alignment.horizontal = weight.alignment.asHorizontalType ?? WeightModifier.Constant.defaultHorizontalAlignment
         }
         if let frameMaxHeight = weight.frameMaxHeight {
-            maxHeight = frameMaxHeight
+            // Growing to fill the parent must not lift an explicit upper bound.
+            maxHeight = min(maxHeight ?? .infinity, frameMaxHeight)
             alignment.vertical = weight.alignment.asVerticalType ?? WeightModifier.Constant.defaultVerticalAlignment
         }
 

@@ -115,6 +115,22 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_scrollable_row_with_max_width")
             return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
+        static func scrollableRowWithWideContent() -> RowModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_row_with_wide_content")
+            return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableRowWithMinWidth() -> RowModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_row_with_min_width")
+            return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableRowWithPercentageChildren() -> RowModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_row_with_percentage_children")
+            return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableRowWrapsContent() -> RowModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_row_wraps_content")
+            return try! JSONDecoder().decode(RowModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
     }
     enum ColumnData {
         static func columnWithBasicText() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
@@ -135,6 +151,22 @@ class ModelTestData: NSObject {
         }
         static func scrollableColumnWithMaxHeight() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_scrollable_column_with_max_height")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableColumnWithTallContent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_with_tall_content")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableColumnWithMinHeight() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_with_min_height")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableColumnWithPercentageChildren() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_with_percentage_children")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func scrollableColumnWrapsContent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_scrollable_column_wraps_content")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
     }
