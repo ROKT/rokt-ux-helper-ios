@@ -19,6 +19,17 @@ class RoktUXLoggerTests: XCTestCase {
         XCTAssertEqual(logger.logLevel, .none)
     }
 
+    func testLogMethodsDoNotCrashWithSessionId() {
+        let logger = RoktUXLogger.shared
+        logger.logLevel = .verbose
+
+        logger.verbose("verbose test message", sessionId: "session-for-log")
+        logger.debug("debug test message", sessionId: "session-for-log")
+        logger.info("info test message", sessionId: "session-for-log")
+        logger.warning("warning test message", sessionId: "session-for-log")
+        logger.error("error test message", sessionId: "session-for-log")
+    }
+
     func testLogLevelCanBeSet() {
         let logger = RoktUXLogger.shared
         logger.logLevel = .debug

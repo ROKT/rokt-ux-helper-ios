@@ -112,4 +112,21 @@ final class RoktUXTests: XCTestCase {
         XCTAssertNotEqual(event?.unitPrice, Decimal(130.0))
         XCTAssertNotEqual(event?.totalPrice, Decimal(130.0))
     }
+
+    // MARK: - onPlacementFailure
+
+    func test_onPlacementFailure_emitsLayoutFailureWithInvalidSchemaReason() {
+        var captured: RoktUXEvent.LayoutFailure?
+        let sut = makeSUT { event in
+            captured = event as? RoktUXEvent.LayoutFailure
+        }
+        sut.sessionId = "placement-failure-session"
+
+        sut.onPlacementFailure(layoutId)
+
+        let failure = try? XCTUnwrap(captured)
+        XCTAssertEqual(failure?.layoutId, layoutId)
+        XCTAssertEqual(failure?.sessionId, "placement-failure-session")
+        XCTAssertEqual(failure?.reason, .invalidSchema)
+    }
 }
