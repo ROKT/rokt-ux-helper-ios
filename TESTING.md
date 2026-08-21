@@ -38,6 +38,17 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesCatalogRuntimePlaceholders.1.png
   TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesShippingAddressFromTransactionData.1.png
   TestScrollableColumn/testSnapshot.1.png
+  TestScrollableColumn/testSnapshot_minHeightExpandsViewport.1.png
+  TestScrollableColumn/testSnapshot_percentageChildrenFillViewport.1.png
+  TestScrollableColumn/testSnapshot_shortContentKeepsMainAxisAlignment.1.png
+  TestScrollableColumn/testSnapshot_tallScrollableContentAtBottom.1.png
+  TestScrollableColumn/testSnapshot_tallScrollableContentAtTop.1.png
+  TestScrollableRow/testSnapshot.1.png
+  TestScrollableRow/testSnapshot_minWidthExpandsViewport.1.png
+  TestScrollableRow/testSnapshot_narrowContentKeepsMainAxisAlignment.1.png
+  TestScrollableRow/testSnapshot_percentageChildrenFillViewport.1.png
+  TestScrollableRow/testSnapshot_wideScrollableContentAtEnd.1.png
+  TestScrollableRow/testSnapshot_wideScrollableContentAtStart.1.png
   TestToggleButtonComponent/testSnapshot.1.png
   TestZStackComponent/testSnapshot.1.png
 ```
@@ -208,12 +219,21 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### ScrollableColumn
 
 - [x] Standard rendering -- Column with pink background inside a ScrollView (`testSnapshot`)
-- [ ] Max height constraint variant
+- [x] Max height constrained tall content -- viewport clipped at the max height with a stationary border (`testSnapshot_tallScrollableContentAtTop`)
+- [x] Max height constrained tall content -- bottom viewport shows the final colored sections (`testSnapshot_tallScrollableContentAtBottom`)
+- [x] Min height -- viewport background fills the minimum even though the content is shorter (`testSnapshot_minHeightExpandsViewport`)
+- [x] Percentage-height children -- two 50% children fill a fixed-height viewport (`testSnapshot_percentageChildrenFillViewport`)
+- [x] Main-axis alignment -- `justifyContent: center` centres short content in a taller viewport (`testSnapshot_shortContentKeepsMainAxisAlignment`)
 - [ ] Scroll indicator visibility
 
 #### ScrollableRow
 
-- [ ] Standard rendering
+- [x] Standard rendering -- Row with pink background inside a ScrollView (`testSnapshot`)
+- [x] Wide content -- viewport clipped at the parent width with a stationary border (`testSnapshot_wideScrollableContentAtStart`)
+- [x] Wide content -- trailing viewport shows the final colored sections (`testSnapshot_wideScrollableContentAtEnd`)
+- [x] Min width -- viewport background fills the minimum even though the content is narrower (`testSnapshot_minWidthExpandsViewport`)
+- [x] Percentage-width children -- two 50% children fill a fixed-width viewport (`testSnapshot_percentageChildrenFillViewport`)
+- [x] Main-axis alignment -- `justifyContent: center` centres narrow content in a wider viewport (`testSnapshot_narrowContentKeepsMainAxisAlignment`)
 - [ ] Scroll indicator visibility
 
 #### Overlay

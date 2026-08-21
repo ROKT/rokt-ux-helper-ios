@@ -144,7 +144,9 @@ struct WidthModifier {
             }
         } else {
             if defaultWidth == .fitWidth {
-                return parentWidth
+                // `maxWidth` is the authored maximum when there is one, and the parent
+                // width otherwise -- filling the parent must not ignore an explicit cap.
+                return maxWidth
             } else {
                 if minWidth != nil || maxWidth != nil {
                     return maxWidth
