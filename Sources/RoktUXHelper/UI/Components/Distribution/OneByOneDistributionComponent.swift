@@ -119,6 +119,7 @@ struct OneByOneDistributionComponent: View {
                                          argument: accessibilityAnnouncement)
                 }
                 .onChange(of: currentOffer) { newValue in
+                    model.publishVisibleOfferIndexes(firstIndex: newValue)
                     model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     transitionIn()
                     model.sendImpressionEvents(currentOffer: newValue)
@@ -156,6 +157,7 @@ struct OneByOneDistributionComponent: View {
             customStateMap: $customStateMap,
             totalItems: model.children?.count ?? 0
         )
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     func goToNextOffer(_: Any? = nil) {
@@ -234,11 +236,13 @@ struct OneByOneDistributionComponent: View {
     private func incrementCurrentOffer() {
         customStateMap = RoktUXCustomStateMap()
         currentOffer += 1
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     private func decrementCurrentOffer() {
         customStateMap = RoktUXCustomStateMap()
         currentOffer -= 1
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

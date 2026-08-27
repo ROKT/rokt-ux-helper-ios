@@ -40,29 +40,40 @@ final class CatalogProductResponseViewModel {
     }
 
     private var isCurrentOffer: Bool {
-        guard let progress = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> else { return true }
-        return progress.wrappedValue == context.offerIndex
+        progression.isVisible(offerIndex: context.offerIndex)
     }
 }
 
 @available(iOS 15, *)
 private final class CatalogProductProgression {
     private weak var layoutState: (any LayoutStateRepresenting)?
-    private var currentOfferIndex: Int?
+    private var visibleOfferIndexes: [Int]?
     private var pendingOfferIndex: Int?
     private var subscription: AnyCancellable?
     private(set) var generation = 0
 
     private init(layoutState: (any LayoutStateRepresenting)?) {
         self.layoutState = layoutState
-        self.currentOfferIndex = (layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue
+        self.visibleOfferIndexes = Self.offerIndexes(in: layoutState?.items ?? [:])
         subscription = layoutState?.itemsPublisher.sink { [weak self] items in
-            guard let self, let progress = items[LayoutState.currentProgressKey] as? Binding<Int>,
-                  self.currentOfferIndex != progress.wrappedValue else { return }
-            self.currentOfferIndex = progress.wrappedValue
+            guard let self, let indexes = Self.offerIndexes(in: items), self.visibleOfferIndexes != indexes else { return }
+            self.visibleOfferIndexes = indexes
             self.pendingOfferIndex = nil
             self.generation += 1
         }
+    }
+
+    func isVisible(offerIndex: Int) -> Bool {
+        Self.offerIndexes(in: layoutState?.items ?? [:])?.contains(offerIndex) ?? true
+    }
+
+    private static func offerIndexes(in items: [String: Any]) -> [Int]? {
+        if let indexes = items[LayoutState.visibleOfferIndexesKey] as? [Int] { return indexes }
+        let viewableItems = (items[LayoutState.viewableItemsKey] as? Binding<Int>)?.wrappedValue
+            ?? items[LayoutState.viewableItemsKey] as? Int ?? 1
+        guard viewableItems == 1,
+              let progress = items[LayoutState.currentProgressKey] as? Binding<Int> else { return nil }
+        return [progress.wrappedValue]
     }
 
     static func shared(in layoutState: (any LayoutStateRepresenting)?) -> CatalogProductProgression {

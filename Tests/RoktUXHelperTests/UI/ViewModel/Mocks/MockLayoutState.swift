@@ -63,7 +63,7 @@ class MockLayoutState: LayoutStateRepresenting {
     }
 
     func publishStateChange() {
-        // No-op for mock
+        itemsPublisher.send(items)
     }
 
     func setGlobalCustomState(key: String, value: Int) {

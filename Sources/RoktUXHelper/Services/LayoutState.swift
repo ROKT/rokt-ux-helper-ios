@@ -8,6 +8,7 @@ class LayoutState: LayoutStateRepresenting {
 
     static let breakPointsSharedKey = "breakPoints" // BreakPoint
     static let currentProgressKey = "currentProgress" // Binding<Int>
+    static let visibleOfferIndexesKey = "visibleOfferIndexes" // [Int], independent of page/group progress
     static let totalItemsKey = "totalItems" // Int
     static let layoutType = "layoutCode" // PlacementLayoutCode
     static let viewableItemsKey = "viewableItems" // Binding<Int>
