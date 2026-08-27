@@ -17,7 +17,7 @@ import Foundation
 enum OrphanedPlaceholderResolver {
 
     private static let bnfRegex: NSRegularExpression? = {
-        try? NSRegularExpression(pattern: "(?<=\\%\\^)[a-zA-Z0-9 .|_$\\-]*(?=\\^\\%)")
+        try? NSRegularExpression(pattern: BNFPlaceholder.deferredExpression)
     }()
 
     /// - Returns: the validated text with optional orphans replaced by their `|` defaults,
