@@ -36,7 +36,7 @@ enum CatalogRuntimePlaceholderResolver {
             // Skip placeholders that don't reference DATA.catalogRuntime.* in any alternative.
             guard chain.contains(prefix) else { continue }
 
-            let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData)
+            guard let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData) else { return "" }
             // Replace at the regex-derived position (expanded to include `%^` and `^%`).
             // A global string search would re-target the first identical token if the same
             // placeholder appears multiple times; reverse iteration keeps positional ranges
@@ -51,24 +51,30 @@ enum CatalogRuntimePlaceholderResolver {
     /// Walks the `|`-separated alternatives. For each `DATA.catalogRuntime.<key>` alternative,
     /// returns the runtime value if present. If no runtime alternative resolves and there is
     /// a trailing default literal, returns it. Otherwise returns the chain re-wrapped in
-    /// delimiters so the placeholder remains visible (preferable to silently emptying it).
+    /// delimiters so valid deferred bindings can resolve later. Invalid operations without a
+    /// usable alternative or default return nil, preserving mandatory-placeholder empty-line behavior.
     private static func resolveChain(
         _ chain: String,
         prefix: String,
         runtimeData: [String: String]?
-    ) -> String {
+    ) -> String? {
         let parts = chain.split(separator: BNFSeparator.alternative.rawValue.first!,
                                 omittingEmptySubsequences: false)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
         var fallback: String?
+        var invalidOperation = false
         for part in parts {
             if part.hasPrefix(prefix) {
                 let parsed = PropertyChainDataParser().parse(propertyChain: part)
-                if let binding = parsed.parseableChains.first,
-                   let value = runtimeData?[binding.key], !value.isEmpty,
-                   let transformed = try? binding.applyingTextOperations(to: value) {
-                    return transformed
+                guard let binding = parsed.parseableChains.first else { continue }
+                do {
+                    // Validate even before the runtime value arrives; malformed syntax cannot become valid later.
+                    let value = runtimeData?[binding.key] ?? ""
+                    let transformed = try binding.applyingTextOperations(to: value)
+                    if !value.isEmpty { return transformed }
+                } catch {
+                    invalidOperation = true
                 }
             } else if !part.isEmpty || fallback == nil {
                 // Treat trailing literal (no namespace) as the default. An empty trailing
@@ -76,6 +82,8 @@ enum CatalogRuntimePlaceholderResolver {
                 fallback = part
             }
         }
-        return fallback ?? (BNFSeparator.startDelimiter.rawValue + chain + BNFSeparator.endDelimiter.rawValue)
+        if let fallback { return fallback }
+        guard !invalidOperation else { return nil }
+        return BNFSeparator.startDelimiter.rawValue + chain + BNFSeparator.endDelimiter.rawValue
     }
 }

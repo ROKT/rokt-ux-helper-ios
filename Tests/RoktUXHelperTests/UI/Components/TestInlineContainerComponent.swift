@@ -68,6 +68,80 @@ final class TestInlineContainerComponent: XCTestCase {
         XCTAssertEqual(view.actionRun(at: CGPoint(x: rect.midX, y: rect.midY - 20))?.id, run.id)
     }
 
+    func testHoverTracksWrappedUnicodeActionsWithoutActivatingOrClaimingCopy() throws {
+        let events = InlineEventService()
+        let model = InlineContainerViewModel(children: [
+            .text(text("👩🏽‍🚀 e\u{301} 🇺🇸 ordinary copy ")),
+            .link(link(events), label: [text("Open a localized destination")]),
+            .toggle(toggle(events: events), label: [text("Change content")])
+        ])
+        let view = render(model, width: 130)
+        XCTAssertTrue(view.gestureRecognizers?.contains(where: { $0 is UIHoverGestureRecognizer }) == true)
+        var changes: [(UUID, StyleState)] = []
+        view.onInteractionStateChange = { changes.append(($0, $1)) }
+        let copy = try XCTUnwrap(view.rects(for: view.runs[0].range).first)
+        hover(view, at: CGPoint(x: copy.midX, y: copy.midY), state: .began)
+        XCTAssertTrue(changes.isEmpty)
+        let linkRects = view.rects(for: view.runs[1].range)
+        XCTAssertGreaterThan(linkRects.count, 1)
+        for rect in linkRects {
+            hover(view, at: CGPoint(x: rect.midX, y: rect.midY))
+        }
+        XCTAssertEqual(changes.map { $0.0 }, [view.runs[1].id])
+        XCTAssertEqual(changes.map { $0.1 }, [.hovered])
+        let toggleRect = try XCTUnwrap(view.rects(for: view.runs[2].range).first)
+        hover(view, at: CGPoint(x: toggleRect.midX, y: toggleRect.midY))
+        hover(view, at: CGPoint(x: copy.midX, y: copy.midY))
+        XCTAssertEqual(changes.map { $0.0 }, [view.runs[1].id, view.runs[1].id, view.runs[2].id, view.runs[2].id])
+        XCTAssertEqual(changes.map { $0.1 }, [.hovered, .default, .hovered, .default])
+        XCTAssertFalse(events.openURLCalled)
+        XCTAssertEqual(events.interactionCount, 0)
+    }
+
+    func testHoverResetsOnExitCancellationFailureAndDisable() throws {
+        let model = InlineContainerViewModel(children: [.toggle(toggle(), label: [text("Change")])])
+        let view = render(model, width: 250)
+        let run = view.runs[0]
+        let rect = try XCTUnwrap(view.rects(for: run.range).first)
+        let point = CGPoint(x: rect.midX, y: rect.midY)
+        var changes: [StyleState] = []
+        view.onInteractionStateChange = { _, state in changes.append(state) }
+        for terminal: UIGestureRecognizer.State in [.ended, .cancelled, .failed] {
+            hover(view, at: point, state: .began)
+            hover(view, at: point, state: terminal)
+        }
+        XCTAssertEqual(changes, [.hovered, .default, .hovered, .default, .hovered, .default])
+        changes.removeAll()
+        hover(view, at: point, state: .began)
+        view.actionsEnabled = false
+        hover(view, at: point)
+        XCTAssertEqual(changes, [.hovered, .disabled])
+        XCTAssertFalse(view.activateRun(id: run.id))
+        view.actionsEnabled = true
+        hover(view, at: point)
+        XCTAssertEqual(changes, [.hovered, .disabled, .hovered])
+    }
+
+    func testHoverUsesTheExistingTextStyleStateBinding() throws {
+        let normal = try JSONDecoder().decode(BasicTextStyle.self,
+                                              from: Data(##"{"text":{"textColor":{"light":"#000000"}}}"##.utf8))
+        let hovered = try JSONDecoder().decode(BasicTextStyle.self,
+                                               from: Data(##"{"text":{"textColor":{"light":"#ff0000"}}}"##.utf8))
+        let label = BasicTextViewModel(value: "Change", defaultStyle: [normal], pressedStyle: nil,
+                                       hoveredStyle: [hovered], disabledStyle: nil, layoutState: nil, diagnosticService: nil)
+        let model = InlineContainerViewModel(children: [.toggle(toggle(), label: [label])])
+        let view = render(model, width: 250)
+        view.onInteractionStateChange = { id, state in model.setStyleState(state, childID: id) }
+        let rect = try XCTUnwrap(view.rects(for: view.runs[0].range).first)
+        hover(view, at: CGPoint(x: rect.midX, y: rect.midY), state: .began)
+        XCTAssertEqual(label.styleState, .hovered)
+        let content = model.textContent(position: nil, colorScheme: .light, contentSize: .large, layoutDirection: .leftToRight)
+        XCTAssertEqual(content.text.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor,
+                       UIColor(hexString: "#ff0000"))
+        hover(view, at: .zero, state: .ended)
+        XCTAssertEqual(label.styleState, .default)
+    }
+
     func testVoiceOverReadsCopyThenDistinctLinkAndButtonWithoutFullTextDuplication() throws {
         let events = InlineEventService()
         let model = InlineContainerViewModel(children: [
@@ -434,6 +508,13 @@ final class TestInlineContainerComponent: XCTestCase {
         return view
     }
 
+    private func hover(_ view: InlineTextView, at point: CGPoint, state: UIGestureRecognizer.State = .changed) {
+        let recognizer = InlineHoverRecognizer()
+        recognizer.phase = state
+        recognizer.point = point
+        _ = view.perform(NSSelectorFromString("handleHover:"), with: recognizer)
+    }
+
     private func update(_ view: InlineTextView, model: InlineContainerViewModel, width: CGFloat,
                         position: Int? = nil, direction: LayoutDirection = .leftToRight,
                         colorScheme: ColorScheme = .light, contentSize: UIContentSizeCategory = .large) {
@@ -468,4 +549,14 @@ private final class InlineEventService: MockEventService {
         interactionCount += 1
         super.sendUserInteraction(action: action, context: context)
     }
+}
+
+private final class InlineHoverRecognizer: UIHoverGestureRecognizer {
+    var phase: UIGestureRecognizer.State = .possible
+    var point: CGPoint = .zero
+    override var state: UIGestureRecognizer.State {
+        get { phase }
+        set { phase = newValue }
+    }
+    override func location(in view: UIView?) -> CGPoint { point }
 }

@@ -168,8 +168,8 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     }
 
     @objc private func handleHover(_ recognizer: UIHoverGestureRecognizer) {
-        let next = recognizer.state == .ended || recognizer.state == .cancelled
-            ? nil : actionRun(at: recognizer.location(in: self))?.id
+        let next = recognizer.state == .began || recognizer.state == .changed
+            ? actionRun(at: recognizer.location(in: self))?.id : nil
         guard next != hoveredRunID else { return }
         if let previous = hoveredRunID, previous != pressedRunID {
             onInteractionStateChange?(previous, actionsEnabled ? .default : .disabled)
