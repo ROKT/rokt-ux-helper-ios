@@ -79,7 +79,9 @@ private extension SelectOffer {
             creative: creative.toCreativeModel(),
             catalogItems: catalogItems?.map { $0.toCatalogItem() },
             catalogItemGroup: catalogItemGroup?.toCatalogItemGroup(),
-            transactionData: transactionData?.toTransactionData()
+            transactionData: transactionData?.toTransactionData(),
+            accountId: accountId,
+            catalogItemResponseAction: catalogItemResponseAction
         )
     }
 }
@@ -130,7 +132,9 @@ private extension SelectResponseOption {
             shortSuccessLabel: shortSuccessLabel,
             isPositive: isPositive,
             url: url,
-            responseJWTToken: token ?? ""
+            responseJWTToken: token ?? "",
+            urlBehavior: urlBehavior,
+            ignoreBranch: ignoreBranch
         )
     }
 }
@@ -181,7 +185,12 @@ private extension SelectCatalogItem {
             copy: copy,
             inventoryStatus: inventoryStatus,
             linkedProductId: linkedProductId,
-            token: token ?? ""
+            token: token ?? "",
+            responseOptionsMap: responseOptionsMap?.mapValues { $0.toRoktUXResponseOption() },
+            productCartAttribute1: productCartAttribute1,
+            productCartAttribute2: productCartAttribute2,
+            productSku: productSku,
+            catalogId: catalogId
         )
     }
 }
