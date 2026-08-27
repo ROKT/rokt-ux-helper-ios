@@ -15,6 +15,8 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
     case SignalGatedResponse
     /// Triggered when the user engages with the offer.
     case SignalResponse
+    /// Triggered when the user follows a catalog product's destination.
+    case SignalProductItemResponse
     /// Triggered when the layout is dismissed by the user.
     case SignalDismissal
     /// Triggered when there is an error on RoktUXHelper.
@@ -38,6 +40,7 @@ public enum RoktUXEventType: String, Codable, CaseIterable {
 }
 
 enum UserInteraction: String, Codable, CaseIterable {
+    case Scroll
     case ValidationTriggerFailed
     case OfferProgression
     case DropDownItemSelected
@@ -50,6 +53,7 @@ enum UserInteraction: String, Codable, CaseIterable {
 }
 
 enum UserInteractionContext: String, Codable, CaseIterable {
+    case CatalogCarousel
     case CustomStateValidationTriggerButton
     case CatalogDropDown
     case CatalogImageGallery

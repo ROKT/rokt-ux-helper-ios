@@ -16,6 +16,7 @@ class LayoutState: LayoutStateRepresenting {
     static let globalCustomStateMapKey = "globalCustomStateMap" // Global CustomStateMap
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
+    static let catalogProductProgressionKey = "catalogProductProgression"
     static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [Int: Int] (attributeIndex -> optionIndex)
     // Holds runtime catalog values pushed by the host SDK after API calls
     // (e.g. {subtotal, tax, shipping, total} after `/cart/initialize-purchase`)
