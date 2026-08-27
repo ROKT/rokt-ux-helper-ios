@@ -272,7 +272,7 @@ final class TestInlineContainerComponent: XCTestCase {
 
     private func inlineView(in view: UIView) -> InlineTextView? {
         if let text = view as? InlineTextView { return text }
-        return view.subviews.lazy.compactMap { inlineView(in: $0) }.first
+        return view.subviews.lazy.compactMap { self.inlineView(in: $0) }.first
     }
 
     func testActionPaddingBorderAndOpacityUseNativeRangesWithoutChangingAccessibleText() throws {
@@ -401,7 +401,11 @@ final class TestInlineContainerComponent: XCTestCase {
         strategy.snapshot = { controller in
             .init { callback in
                 snapshot(controller).run { image in
-                    XCTAssertNoThrow(try self.exportSnapshot(image, testName: testName, file: file), file: file, line: line)
+                    do {
+                        try self.exportSnapshot(image, testName: testName, file: file)
+                    } catch {
+                        XCTFail("Could not export snapshot: \(error)", file: file, line: line)
+                    }
                     callback(image)
                 }
             }
