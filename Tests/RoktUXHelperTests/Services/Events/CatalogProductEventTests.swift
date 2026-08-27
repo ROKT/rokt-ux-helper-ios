@@ -4,6 +4,58 @@ import XCTest
 
 @available(iOS 15, *)
 final class CatalogProductEventTests: XCTestCase {
+    func testTransformedProductButtonRetainsURLActionUntilClose() throws {
+        let slots = try CatalogProductFixture.slots()
+        let context = try XCTUnwrap(CatalogItemContext(slots: slots, offerIndex: 1, itemIndex: 1))
+        let delegate = CatalogProductURLDelegate()
+        var events: [RoktEventRequest] = []
+        let service = get_mock_event_processor(uxEventDelegate: delegate) { events.append($0) }
+        let state = LayoutState()
+        state.items[LayoutState.currentProgressKey] = Binding.constant(1)
+        var progressions = 0
+        state.actionCollection[.nextOffer] = { _ in progressions += 1 }
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots),
+                                            layoutState: state, eventService: service)
+        let button = try transformer.getCatalogResponseButtonModel(style: nil, children: [],
+                                                                   context: .inner(.catalogItem(context)))
+        button.cartItemInstantPurchase(position: 1)
+        XCTAssertEqual(events.map(\.eventType), [.SignalProductItemResponse])
+        XCTAssertEqual(events[0].parentGuid, context.responseOption(for: nil)?.instanceGuid)
+        XCTAssertEqual(events[0].jwtToken, context.responseOption(for: nil)?.responseJWTToken)
+        XCTAssertEqual(delegate.closures.count, 1)
+        XCTAssertEqual(progressions, 0)
+        delegate.closures[0]()
+        XCTAssertEqual(progressions, 1)
+        XCTAssertFalse(delegate.roktEvents.contains(.CartItemInstantPurchase))
+        XCTAssertFalse(delegate.roktEvents.contains(.CartItemForwardPayment))
+    }
+
+    func testCarouselMountAndUserScrollReachTheEventService() throws {
+        let slots = try CatalogProductFixture.slots()
+        let service = MockEventService()
+        let state = LayoutState()
+        let model = CatalogCarouselCollectionViewModel(slots: slots, offerIndex: 1, viewableItems: [1],
+                                                       peekThroughSize: [], layoutState: state,
+                                                       callbacks: .init(eventService: service)) { _ in .empty }
+        let geometry = model.geometry(viewportWidth: 100, breakpointIndex: 0)
+        model.mounted()
+        model.mounted()
+        XCTAssertEqual(service.catalogImpressions.map(\.itemIndex), [0, 1])
+        XCTAssertTrue(service.catalogScrolls.isEmpty)
+        model.beginInteraction(offset: 0, geometry: geometry)
+        model.scrolled(offset: 59, geometry: geometry)
+        XCTAssertTrue(service.catalogScrolls.isEmpty)
+        model.scrolled(offset: 60, geometry: geometry)
+        model.scrolled(offset: 100, geometry: geometry)
+        model.scrolled(offset: 0, geometry: geometry)
+        model.scrolled(offset: 100, geometry: geometry)
+        XCTAssertEqual(service.catalogScrolls.count, 1)
+        XCTAssertEqual(service.catalogScrolls[0].0.itemIndex, 1)
+        XCTAssertEqual(service.catalogScrolls[0].1, 1)
+        XCTAssertEqual(service.catalogScrolls[0].0.offerIndex, 1)
+        XCTAssertFalse(service.cartItemInstantPurchaseCalled)
+    }
+
     func testResponsesUseSelectedOptionIdentityAndToken() throws {
         let delegate = MockUXHelper()
         var events: [RoktEventRequest] = []
@@ -280,7 +332,7 @@ private enum CatalogProductActionFixture {
     }
 }
 
-private final class CatalogProductURLDelegate: MockUXHelper {
+final class CatalogProductURLDelegate: MockUXHelper {
     var closures: [() -> Void] = []
     var errors: [() -> Void] = []
 

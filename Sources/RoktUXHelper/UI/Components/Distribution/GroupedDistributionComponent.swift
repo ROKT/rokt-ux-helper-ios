@@ -153,6 +153,7 @@ struct GroupedDistributionComponent: View {
                 .accessibilityFocused($shouldFocusAccessibility)
                 .accessibilityLabel(accessibilityAnnouncement)
                 .onChange(of: currentLeadingOffer) { newValue in
+                    model.publishVisibleOfferIndexes(firstIndex: newValue, count: viewableItems)
                     model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     model.sendViewableImpressionEvents(viewableItems: viewableItems,
                                                        currentLeadingOffer: newValue)
@@ -218,6 +219,7 @@ struct GroupedDistributionComponent: View {
             viewableItems: $viewableItems,
             customStateMap: $customStateMap
         )
+        model.publishVisibleOfferIndexes(firstIndex: currentGroup * viewableItems, count: viewableItems)
     }
 
     func goToNextGroup(_: Any? = nil) {
@@ -348,6 +350,7 @@ struct GroupedDistributionComponent: View {
                 newPageIndex += 1
             }
         }
+        model.publishVisibleOfferIndexes(firstIndex: currentGroup * viewableItems, count: viewableItems)
     }
 
     func setRecalculatedCurrentGroup() {
@@ -359,10 +362,12 @@ struct GroupedDistributionComponent: View {
     private func incrementCurrentGroup() {
         currentGroup += 1
         currentLeadingOffer = currentGroup * viewableItems
+        model.publishVisibleOfferIndexes(firstIndex: currentLeadingOffer, count: viewableItems)
     }
 
     private func decrementCurrentGroup() {
         currentGroup -= 1
         currentLeadingOffer = currentGroup * viewableItems
+        model.publishVisibleOfferIndexes(firstIndex: currentLeadingOffer, count: viewableItems)
     }
 }
