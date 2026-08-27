@@ -144,6 +144,8 @@ final class TestInlineContainerComponent: XCTestCase {
         let normalFont = try XCTUnwrap(normal.text.attribute(.font, at: index, effectiveRange: nil) as? UIFont)
         let largeFont = try XCTUnwrap(large.text.attribute(.font, at: index, effectiveRange: nil) as? UIFont)
         XCTAssertGreaterThan(largeFont.pointSize, normalFont.pointSize)
+        XCTAssertEqual(largeFont.pointSize, Float(18).getAsScaledFontSize(contentSize: .accessibilityExtraExtraExtraLarge),
+                       accuracy: 0.01)
         XCTAssertTrue(normalFont.fontDescriptor.symbolicTraits.contains(.traitItalic))
         XCTAssertEqual(normal.text.attribute(.underlineStyle, at: index, effectiveRange: nil) as? Int, 1)
         XCTAssertEqual(normal.text.attribute(.kern, at: index, effectiveRange: nil) as? CGFloat, 2)
