@@ -99,6 +99,6 @@ final class CatalogCarouselCollectionComponentTests: XCTestCase {
 
     private func carouselController(in parent: UIViewController) -> CatalogCarouselViewController? {
         if let carousel = parent as? CatalogCarouselViewController { return carousel }
-        return parent.children.lazy.compactMap { carouselController(in: $0) }.first
+        return parent.children.lazy.compactMap { self.carouselController(in: $0) }.first
     }
 }

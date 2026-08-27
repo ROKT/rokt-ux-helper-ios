@@ -57,7 +57,7 @@ final class CatalogCarouselViewController: UIViewController, UIScrollViewDelegat
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.decelerationRate = .fast
         scrollView.semanticContentAttribute = .forceLeftToRight
-        scrollView.accessibilityScrollHandler = { [weak self] in self?.accessibilityScroll($0) ?? false }
+        scrollView.accessibilityScrollHandler = { [weak self] in self?.performAccessibilityScroll($0) ?? false }
         view.addSubview(scrollView)
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -172,7 +172,7 @@ final class CatalogCarouselViewController: UIViewController, UIScrollViewDelegat
         isRightToLeft ? geometry.maximumOffset - logicalOffset : logicalOffset
     }
 
-    private func accessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
+    private func performAccessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
         guard let geometry, scrollView.isScrollEnabled else { return false }
         let forward: Bool
         switch direction {
