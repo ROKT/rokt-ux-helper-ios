@@ -27,6 +27,61 @@ final class CatalogProductDistributionTests: XCTestCase {
         try verifyMultipleVisibleOffers(.grouped)
     }
 
+    func test_oneByOneRestoresStaleIndexesToLastOfferAndAllowsProductResponses() throws {
+        for index in [4, Int.max] {
+            try verifyRestoredOneByOneIndex(index, expected: 3)
+        }
+    }
+
+    func test_oneByOneRestoresNegativeIndexesToFirstOfferAndAllowsProductResponses() throws {
+        for index in [-1, Int.min] {
+            try verifyRestoredOneByOneIndex(index, expected: 0)
+        }
+    }
+
+    func test_oneByOnePreservesValidRestoredIndexes() throws {
+        for index in [0, 2, 3] {
+            try verifyRestoredOneByOneIndex(index, expected: index)
+        }
+    }
+
+    func test_oneByOneRestoresSingleOfferAtZero() throws {
+        try verifyRestoredOneByOneIndex(Int.max, expected: 0, offerCount: 1)
+    }
+
+    func test_oneByOneClampsUpdatesThroughItsProgressBinding() throws {
+        let scene = try makeScene(.oneByOne, visibleCount: 1)
+        defer { scene.tearDown() }
+        let progress = try XCTUnwrap(scene.state.items[LayoutState.currentProgressKey] as? Binding<Int>)
+        for (index, expected) in [(Int.max, 3), (Int.min, 0), (0, 0), (2, 2)] {
+            try waitForVisible([expected], in: scene.state) { progress.wrappedValue = index }
+            XCTAssertEqual(progress.wrappedValue, expected)
+            let response = try responseModel(in: scene, offerIndex: expected)
+            let previousCount = scene.delegate.closures.count
+            response.handleResponse()
+            XCTAssertEqual(scene.delegate.closures.count, previousCount + 1)
+        }
+    }
+
+    private func verifyRestoredOneByOneIndex(_ index: Int, expected: Int, offerCount: Int = 4) throws {
+        let scene = try makeScene(.oneByOne, visibleCount: 1, initialOfferIndex: index,
+                                  expectedVisibleIndexes: [expected], offerCount: offerCount)
+        defer { scene.tearDown() }
+        let progress = try XCTUnwrap(scene.state.items[LayoutState.currentProgressKey] as? Binding<Int>)
+        XCTAssertEqual(progress.wrappedValue, expected)
+        let response = try responseModel(in: scene, offerIndex: expected)
+        response.handleResponse()
+        XCTAssertEqual(scene.delegate.closures.count, 1, "The visible offer must allow product responses after restoring state")
+        let completion = try XCTUnwrap(scene.delegate.closures.first)
+        if expected + 1 < offerCount {
+            try waitForVisible([expected + 1], in: scene.state, perform: completion)
+            XCTAssertEqual(progress.wrappedValue, expected + 1)
+        } else {
+            try assertRemainsVisible([expected], in: scene.state, perform: completion)
+            XCTAssertEqual(progress.wrappedValue, expected)
+        }
+    }
+
     private func verifyNavigationLifecycle(_ distribution: Distribution) throws {
         let scene = try makeScene(distribution, visibleCount: 1)
         defer { scene.tearDown() }
@@ -34,20 +89,20 @@ final class CatalogProductDistributionTests: XCTestCase {
         response.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 1)
 
-        waitForVisible([1], in: scene.state) { scene.state.actionCollection[.progressControlNext](nil) }
-        waitForVisible([0], in: scene.state) { scene.state.actionCollection[.progressControlPrevious](nil) }
+        try waitForVisible([1], in: scene.state) { scene.state.actionCollection[.progressControlNext](nil) }
+        try waitForVisible([0], in: scene.state) { scene.state.actionCollection[.progressControlPrevious](nil) }
         let staleCompletion = try XCTUnwrap(scene.delegate.closures[safe: 0])
-        assertRemainsVisible([0], in: scene.state, perform: staleCompletion)
+        try assertRemainsVisible([0], in: scene.state, perform: staleCompletion)
 
         response.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 2)
         let firstCompletion = try XCTUnwrap(scene.delegate.closures[safe: 1])
-        waitForVisible([1], in: scene.state, perform: firstCompletion)
-        waitForVisible([0], in: scene.state) { scene.state.actionCollection[.progressControlPrevious](nil) }
+        try waitForVisible([1], in: scene.state, perform: firstCompletion)
+        try waitForVisible([0], in: scene.state) { scene.state.actionCollection[.progressControlPrevious](nil) }
         response.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 3)
         let repeatedCompletion = try XCTUnwrap(scene.delegate.closures[safe: 2])
-        waitForVisible([1], in: scene.state, perform: repeatedCompletion)
+        try waitForVisible([1], in: scene.state, perform: repeatedCompletion)
         XCTAssertFalse(scene.delegate.roktEvents.contains(.CartItemInstantPurchase))
         XCTAssertFalse(scene.delegate.roktEvents.contains(.CartItemForwardPayment))
     }
@@ -59,14 +114,14 @@ final class CatalogProductDistributionTests: XCTestCase {
         secondOffer.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 1)
         let secondCompletion = try XCTUnwrap(scene.delegate.closures[safe: 0])
-        assertRemainsVisible([0, 1], in: scene.state, perform: secondCompletion)
+        try assertRemainsVisible([0, 1], in: scene.state, perform: secondCompletion)
 
-        waitForVisible([2, 3], in: scene.state) { scene.state.actionCollection[.progressControlNext](nil) }
+        try waitForVisible([2, 3], in: scene.state) { scene.state.actionCollection[.progressControlNext](nil) }
         let fourthOffer = try responseModel(in: scene, offerIndex: 3)
         fourthOffer.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 2)
         let fourthCompletion = try XCTUnwrap(scene.delegate.closures[safe: 1])
-        assertRemainsVisible([2, 3], in: scene.state, perform: fourthCompletion)
+        try assertRemainsVisible([2, 3], in: scene.state, perform: fourthCompletion)
 
         secondOffer.handleResponse()
         XCTAssertEqual(scene.delegate.closures.count, 2, "An offer outside the visible group cannot respond")
@@ -78,13 +133,14 @@ final class CatalogProductDistributionTests: XCTestCase {
         return CatalogProductResponseViewModel(context: context, eventService: scene.service, layoutState: scene.state)
     }
 
-    private func makeScene(_ distribution: Distribution, visibleCount: UInt8) throws -> Scene {
+    private func makeScene(_ distribution: Distribution, visibleCount: UInt8, initialOfferIndex: Int? = nil,
+                           expectedVisibleIndexes: [Int]? = nil, offerCount: Int = 4) throws -> Scene {
         let productSlot = try CatalogProductFixture.slots()[1]
-        let slots = (0..<4).map { index in
+        let slots = (0..<offerCount).map { index in
             SlotModel(instanceGuid: "example-slot-\(index)", offer: productSlot.offer,
                       layoutVariant: productSlot.layoutVariant, jwtToken: productSlot.jwtToken)
         }
-        let state = LayoutState()
+        let state = LayoutState(initialPluginViewState: .init(pluginId: "example-plugin", offerIndex: initialOfferIndex))
         state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false)
         let delegate = CatalogProductURLDelegate()
         let service = get_mock_event_processor(uxEventDelegate: delegate)
@@ -110,33 +166,47 @@ final class CatalogProductDistributionTests: XCTestCase {
         window.rootViewController = host
         window.isHidden = false
         host.view.layoutIfNeeded()
-        wait(for: [mounted], timeout: 3)
-        waitForVisible(Array(0..<Int(visibleCount)), in: state) { screen.width = 301 }
-        return Scene(slots: slots, state: state, service: service, delegate: delegate, window: window)
+        let scene = Scene(slots: slots, state: state, service: service, delegate: delegate, window: window)
+        do {
+            let mountResult = XCTWaiter.wait(for: [mounted], timeout: 3)
+            XCTAssertEqual(mountResult, .completed)
+            guard mountResult == .completed else { throw WaitError.timedOut }
+            try waitForVisible(expectedVisibleIndexes ?? Array(0..<Int(visibleCount)), in: state) { screen.width = 301 }
+            return scene
+        } catch {
+            scene.tearDown()
+            throw error
+        }
     }
 
-    private func waitForVisible(_ indexes: [Int], in state: LayoutState, perform action: () -> Void) {
+    private func waitForVisible(_ indexes: [Int], in state: LayoutState, perform action: () -> Void) throws {
         let published = expectation(description: "Distribution publishes visible offers \(indexes)")
         let subscription = state.itemsPublisher
             .compactMap { $0[LayoutState.visibleOfferIndexesKey] as? [Int] }
             .filter { $0 == indexes }.first().sink { _ in published.fulfill() }
         action()
-        wait(for: [published], timeout: 3)
+        let result = XCTWaiter.wait(for: [published], timeout: 3)
         subscription.cancel()
+        XCTAssertEqual(result, .completed)
+        guard result == .completed else { throw WaitError.timedOut }
         XCTAssertEqual(state.items[LayoutState.visibleOfferIndexesKey] as? [Int], indexes)
     }
 
-    private func assertRemainsVisible(_ indexes: [Int], in state: LayoutState, perform action: () -> Void) {
+    private func assertRemainsVisible(_ indexes: [Int], in state: LayoutState, perform action: () -> Void) throws {
         let changed = expectation(description: "The visible offers must not change")
         changed.isInverted = true
         let subscription = state.itemsPublisher
             .compactMap { $0[LayoutState.visibleOfferIndexesKey] as? [Int] }
             .filter { $0 != indexes }.sink { _ in changed.fulfill() }
         action()
-        wait(for: [changed], timeout: 0.1)
+        let result = XCTWaiter.wait(for: [changed], timeout: 0.1)
         subscription.cancel()
+        XCTAssertEqual(result, .completed)
+        guard result == .completed else { throw WaitError.unexpectedProgression }
         XCTAssertEqual(state.items[LayoutState.visibleOfferIndexesKey] as? [Int], indexes)
     }
+
+    private enum WaitError: Error { case timedOut, unexpectedProgression }
 
     @MainActor
     private struct Scene {
