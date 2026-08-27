@@ -60,11 +60,16 @@ final class InlineTextLayoutManager: NSLayoutManager, NSLayoutManagerDelegate {
         borderColor.setStroke()
         borderColor.setFill()
         let widths = style.borderWidth
-        if widths.isMultiDimension(), !style.dashed {
+        if widths.isMultiDimension() {
+            if style.dashed {
+                drawDashedSides(widths, in: rect, context: context)
+                return
+            }
             context.fill(CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: max(0, widths.top)))
             context.fill(CGRect(x: rect.minX, y: rect.maxY - widths.bottom, width: rect.width, height: max(0, widths.bottom)))
             context.fill(CGRect(x: rect.minX, y: rect.minY, width: max(0, widths.left), height: rect.height))
             context.fill(CGRect(x: rect.maxX - widths.right, y: rect.minY, width: max(0, widths.right), height: rect.height))
+            return
         }
         let width = min(max(0, widths.defaultWidth()), min(rect.width, rect.height))
         let stroke = UIBezierPath(roundedRect: rect.insetBy(dx: width/2, dy: width/2),
@@ -72,5 +77,24 @@ final class InlineTextLayoutManager: NSLayoutManager, NSLayoutManagerDelegate {
         stroke.lineWidth = width
         if style.dashed { stroke.setLineDash([10], count: 1, phase: 0) }
         if width > 0 { stroke.stroke() }
+    }
+
+    private func drawDashedSides(_ widths: FrameAlignmentProperty, in rect: CGRect, context: CGContext) {
+        let sides: [(width: CGFloat, points: [CGPoint])] = [
+            (widths.top, [CGPoint(x: rect.minX, y: rect.minY + widths.top/2),
+                          CGPoint(x: rect.maxX, y: rect.minY + widths.top/2)]),
+            (widths.right, [CGPoint(x: rect.maxX - widths.right/2, y: rect.minY),
+                            CGPoint(x: rect.maxX - widths.right/2, y: rect.maxY)]),
+            (widths.bottom, [CGPoint(x: rect.maxX, y: rect.maxY - widths.bottom/2),
+                             CGPoint(x: rect.minX, y: rect.maxY - widths.bottom/2)]),
+            (widths.left, [CGPoint(x: rect.minX + widths.left/2, y: rect.maxY),
+                           CGPoint(x: rect.minX + widths.left/2, y: rect.minY)])
+        ]
+        context.setLineDash(phase: 0, lengths: [10])
+        for (width, points) in sides where width > 0 {
+            context.setLineWidth(width)
+            context.addLines(between: points)
+            context.strokePath()
+        }
     }
 }

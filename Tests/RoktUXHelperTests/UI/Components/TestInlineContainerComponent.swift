@@ -1,5 +1,6 @@
 import Combine
 import DcuiSchema
+import SnapshotTesting
 import SwiftUI
 import XCTest
 @testable import RoktUXHelper
@@ -153,6 +154,33 @@ final class TestInlineContainerComponent: XCTestCase {
                        UIColor(hexString: "#ffffff"))
     }
 
+    func testNaturalLineMetricsFitMixedFontsAndLargeDynamicType() throws {
+        let copyStyle = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":14}}"#.utf8))
+        let actionStyle = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":24}}"#.utf8))
+        let model = InlineContainerViewModel(children: [
+            .text(text("Description ", style: copyStyle)),
+            .toggle(toggle(), label: [text("Change", style: actionStyle)])
+        ])
+        let normal = render(model, width: 350)
+        let copyGlyph = normal.layoutManager.glyphIndexForCharacter(at: normal.runs[0].range.location)
+        let actionGlyph = normal.layoutManager.glyphIndexForCharacter(at: normal.runs[1].range.location)
+        XCTAssertEqual(normal.layoutManager.location(forGlyphAt: copyGlyph).y,
+                       normal.layoutManager.location(forGlyphAt: actionGlyph).y, accuracy: 0.5)
+
+        let large = render(model, width: 150, contentSize: .accessibilityExtraExtraExtraLarge)
+        XCTAssertGreaterThan(large.bounds.height, normal.bounds.height)
+        let glyphs = large.layoutManager.glyphRange(for: large.textContainer)
+        large.layoutManager.enumerateLineFragments(forGlyphRange: glyphs) { rect, _, _, range, _ in
+            let characters = large.layoutManager.characterRange(forGlyphRange: range, actualGlyphRange: nil)
+            large.textStorage.enumerateAttribute(.font, in: characters) { value, _, _ in
+                guard let font = value as? UIFont else { return }
+                XCTAssertGreaterThanOrEqual(rect.height, font.lineHeight - 1)
+            }
+        }
+        XCTAssertGreaterThanOrEqual(large.bounds.height,
+                                    large.layoutManager.usedRect(for: large.textContainer).maxY)
+    }
+
     func testRightToLeftContentRetainsLogicalAccessibilityOrderAndActionRanges() throws {
         let model = InlineContainerViewModel(children: [
             .text(text("وصف قصير ")),
@@ -289,17 +317,122 @@ final class TestInlineContainerComponent: XCTestCase {
         }
     }
 
+    func testDashedBordersRenderEachNonzeroSideAndLeaveGaps() throws {
+        for widths in ["2 0 0 0", "0 2 0 0", "0 0 2 0", "0 0 0 2"] {
+            let dashed = try decorationPixels(borderWidth: widths, borderStyle: "dashed")
+            let solid = try decorationPixels(borderWidth: widths, borderStyle: "solid")
+            XCTAssertGreaterThan(dashed.filter { $0 != 0 }.count, 0, widths)
+            XCTAssertLessThan(dashed.filter { $0 != 0 }.count, solid.filter { $0 != 0 }.count, widths)
+        }
+        let absent = try decorationPixels(borderWidth: "0", borderStyle: "dashed")
+        XCTAssertTrue(absent.allSatisfy { $0 == 0 })
+    }
+
+    func testSnapshot_narrowWrappingTextAndAction() throws {
+        let copyStyle = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":17}}"#.utf8))
+        let actionStyle = try JSONDecoder().decode(BasicTextStyle.self,
+                                                   from: Data(##"{"text":{"fontSize":17,"fontWeight":"700","textColor":{"light":"#154caa"},"textDecoration":"underline"}}"##
+                                                   .utf8))
+        let styles = try JSONDecoder().decode([BasicStateStylingBlock<InlineSpanStyle>].self,
+                                              from: Data(##"[{"default":{"spacing":{"padding":"2 3","margin":"0 2"},"backgroundColor":{"light":"#f1f5fa"},"border":{"borderColor":{"light":"#154caa"},"borderWidth":"2 0 0 0","borderStyle":"dashed"}}}]"##
+                                              .utf8))
+        let model = InlineContainerViewModel(children: [
+            .text(text("A concise description with enough detail to wrap naturally beside the action. ", style: copyStyle)),
+            .toggle(toggle(), label: [text("Show more information", style: actionStyle)], styles: styles)
+        ])
+        let view = render(model, width: 180)
+        XCTAssertGreaterThan(view.rects(for: view.runs[0].range).count, 1)
+        XCTAssertGreaterThan(view.rects(for: view.runs[1].range).count, 1)
+        assertInlineSnapshot(view)
+    }
+
+    func testSnapshot_expandedRightToLeftInDarkMode() throws {
+        let style = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":18}}"#.utf8))
+        let actionStyle = try JSONDecoder().decode(BasicTextStyle.self,
+                                                   from: Data(##"{"text":{"fontSize":18,"fontWeight":"700","textColor":{"light":"#154caa","dark":"#99c2ff"},"textDecoration":"underline"}}"##
+                                                   .utf8))
+        let copy = text("وصف قصير ", style: style)
+        let model = InlineContainerViewModel(children: [
+            .text(copy), .toggle(toggle(), label: [text("عرض أقل", style: actionStyle)])
+        ])
+        let view = render(model, width: 230, direction: .rightToLeft, colorScheme: .dark)
+        let collapsedHeight = view.bounds.height
+        copy
+            .updateDataBinding(
+                dataBinding: .value(
+                    "وصف المنتج الكامل يقدم معلومات إضافية واضحة عن المزايا والتفاصيل. يمكن قراءة النص الكامل هنا قبل اختيار المتابعة، مع بقاء الإجراء في نهاية النص. "
+                )
+            )
+        update(view, model: model, width: 230, direction: .rightToLeft, colorScheme: .dark)
+        XCTAssertGreaterThan(view.bounds.height, collapsedHeight)
+        assertInlineSnapshot(view, colorScheme: .dark)
+    }
+
+    private func decorationPixels(borderWidth: String, borderStyle: String) throws -> Data {
+        let styles = try JSONDecoder().decode([BasicStateStylingBlock<InlineSpanStyle>].self,
+                                              from: Data("""
+                                              [{"default":{"border":{"borderColor":{"light":"#0000ff"},
+                                              "borderWidth":"\(borderWidth)","borderStyle":"\(borderStyle)"}}}]
+                                              """.utf8))
+        let model = InlineContainerViewModel(children: [.toggle(toggle(), label: [text("Change content")], styles: styles)])
+        let view = render(model, width: 240)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        format.preferredRange = .standard
+        let image = UIGraphicsImageRenderer(bounds: view.bounds, format: format).image { _ in
+            view.layoutManager.drawBackground(forGlyphRange: view.layoutManager.glyphRange(for: view.textContainer),
+                                              at: CGPoint(x: view.textContainerInset.left, y: view.textContainerInset.top))
+        }
+        return try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
+    }
+
+    private func assertInlineSnapshot(_ view: InlineTextView, colorScheme: ColorScheme = .light,
+                                      file: StaticString = #filePath, testName: String = #function, line: UInt = #line) {
+        let controller = UIViewController()
+        controller.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
+        controller.view.backgroundColor = colorScheme == .dark ? .black : .white
+        view.frame.origin = CGPoint(x: 16, y: 80)
+        controller.view.addSubview(view)
+        var strategy = Snapshotting<UIViewController, UIImage>.image(
+            on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision
+        )
+        let snapshot = strategy.snapshot
+        strategy.snapshot = { controller in
+            .init { callback in
+                snapshot(controller).run { image in
+                    XCTAssertNoThrow(try self.exportSnapshot(image, testName: testName, file: file), file: file, line: line)
+                    callback(image)
+                }
+            }
+        }
+        assertSnapshot(of: controller, as: strategy, named: "inline", file: file, testName: testName, line: line)
+    }
+
+    private func exportSnapshot(_ image: UIImage, testName: String, file: StaticString) throws {
+        // Missing references normally stay beside the tests; also expose the first rendering to CI's existing artifact upload.
+        guard let path = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] else { return }
+        let suite = URL(fileURLWithPath: "\(file)").deletingPathExtension().lastPathComponent
+        let directory = URL(fileURLWithPath: path).appendingPathComponent(suite)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let name = testName.replacingOccurrences(of: "()", with: "")
+        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).inline.png"))
+    }
+
     private func render(_ model: InlineContainerViewModel, width: CGFloat,
-                        position: Int? = nil, direction: LayoutDirection = .leftToRight) -> InlineTextView {
+                        position: Int? = nil, direction: LayoutDirection = .leftToRight,
+                        colorScheme: ColorScheme = .light, contentSize: UIContentSizeCategory = .large) -> InlineTextView {
         let view = InlineTextView()
-        update(view, model: model, width: width, position: position, direction: direction)
+        update(view, model: model, width: width, position: position, direction: direction,
+               colorScheme: colorScheme, contentSize: contentSize)
         return view
     }
 
     private func update(_ view: InlineTextView, model: InlineContainerViewModel, width: CGFloat,
-                        position: Int? = nil, direction: LayoutDirection = .leftToRight) {
+                        position: Int? = nil, direction: LayoutDirection = .leftToRight,
+                        colorScheme: ColorScheme = .light, contentSize: UIContentSizeCategory = .large) {
         view.frame = CGRect(x: 0, y: 0, width: width, height: 1)
-        view.setContent(model.textContent(position: position, colorScheme: .light, contentSize: .large,
+        view.setContent(model.textContent(position: position, colorScheme: colorScheme, contentSize: contentSize,
                                           layoutDirection: direction), accessibilityLabel: model.accessibilityLabel)
         view.frame.size.height = view.measuredHeight(for: width)
         view.layoutIfNeeded()
