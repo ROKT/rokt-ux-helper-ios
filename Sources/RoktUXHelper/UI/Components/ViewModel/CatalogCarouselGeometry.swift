@@ -31,6 +31,13 @@ struct CatalogCarouselGeometry: Equatable {
     var contentWidth: CGFloat { CGFloat(itemCount) * itemWidth + CGFloat(max(0, itemCount - 1)) * gap }
     var maximumOffset: CGFloat { max(0, contentWidth - viewportWidth) }
 
+    var snapOffsets: [CGFloat] {
+        let grouped = Swift.stride(from: 0, to: itemCount, by: viewableItems).map { offset(for: $0) }
+        return (grouped + [maximumOffset]).reduce(into: []) { offsets, offset in
+            if offsets.last != offset { offsets.append(offset) }
+        }
+    }
+
     static func isHorizontalDrag(velocity: CGPoint) -> Bool {
         velocity.x.isFinite && velocity.y.isFinite && abs(velocity.x) > abs(velocity.y)
     }
@@ -50,7 +57,14 @@ struct CatalogCarouselGeometry: Equatable {
     }
 
     func snappedOffset(proposedOffset: CGFloat) -> CGFloat {
-        offset(for: leadingIndex(at: proposedOffset))
+        let proposed = clampedOffset(proposedOffset)
+        return snapOffsets.min { abs($0 - proposed) < abs($1 - proposed) } ?? 0
+    }
+
+    func adjacentOffset(from offset: CGFloat, forward: Bool) -> CGFloat {
+        let current = clampedOffset(offset)
+        if forward { return snapOffsets.first { $0 > current + 0.5 } ?? current }
+        return snapOffsets.last { $0 < current - 0.5 } ?? current
     }
 
     func visibleIndexes(at offset: CGFloat, threshold: CGFloat = 0.6) -> [Int] {

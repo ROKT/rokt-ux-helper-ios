@@ -29,7 +29,8 @@ final class CatalogCarouselGeometryTests: XCTestCase {
         XCTAssertEqual(geometry.offset(for: 1), 115)
         XCTAssertEqual(geometry.offset(for: 4), 375)
         XCTAssertEqual(geometry.leadingIndex(at: 375), 3)
-        XCTAssertEqual(geometry.snappedOffset(proposedOffset: 120), 115)
+        XCTAssertEqual(geometry.snappedOffset(proposedOffset: 120), 0)
+        XCTAssertEqual(geometry.snappedOffset(proposedOffset: 150), 260)
     }
 
     func test_noPeekOnlyReservesGapsBetweenVisibleItems() {
@@ -49,6 +50,35 @@ final class CatalogCarouselGeometryTests: XCTestCase {
         XCTAssertEqual(geometry.visibleIndexes(at: 59.99), [])
         XCTAssertEqual(geometry.visibleIndexes(at: 60), [1])
         XCTAssertEqual(geometry.visibleIndexes(at: 100), [1])
+    }
+
+    func test_twoVisibleItemsSnapInGroupsAndKeepTheTrimmedFinalPosition() {
+        let geometry = CatalogCarouselGeometry(viewportWidth: 340, itemCount: 5, viewableItems: 2, gap: 10, peek: 20)
+        XCTAssertEqual(geometry.snapOffsets, [0, 260, 375])
+        XCTAssertEqual(geometry.snappedOffset(proposedOffset: 355), 375)
+        XCTAssertEqual(geometry.adjacentOffset(from: 375, forward: false), 260)
+        XCTAssertEqual(geometry.adjacentOffset(from: 260, forward: false), 0)
+        XCTAssertEqual(geometry.adjacentOffset(from: 260, forward: true), 375)
+        XCTAssertEqual(geometry.adjacentOffset(from: 375, forward: true), 375)
+    }
+
+    func test_threeVisibleItemsUseThreeCardGroupsWithPeeking() {
+        let geometry = CatalogCarouselGeometry(viewportWidth: 360, itemCount: 8, viewableItems: 3, gap: 10, peek: 15)
+        XCTAssertEqual(geometry.snapOffsets.count, 3)
+        XCTAssertEqual(geometry.snapOffsets[0], 0)
+        XCTAssertEqual(geometry.snapOffsets[1], 295, accuracy: 0.001)
+        XCTAssertEqual(geometry.snapOffsets[2], geometry.maximumOffset)
+        XCTAssertEqual(geometry.snappedOffset(proposedOffset: 280), 295, accuracy: 0.001)
+        XCTAssertEqual(geometry.adjacentOffset(from: geometry.maximumOffset, forward: false), 295, accuracy: 0.001)
+    }
+
+    func test_singleVisibleItemRetainsSingleCardSnaps() {
+        let single = CatalogCarouselGeometry(viewportWidth: 100, itemCount: 1, viewableItems: 1, gap: 0, peek: 20)
+        XCTAssertEqual(single.snapOffsets, [0])
+        XCTAssertEqual(single.adjacentOffset(from: 0, forward: true), 0)
+        let many = CatalogCarouselGeometry(viewportWidth: 100, itemCount: 4, viewableItems: 1, gap: 0, peek: 0)
+        XCTAssertEqual(many.snapOffsets, [0, 100, 200, 300])
+        XCTAssertEqual(many.snappedOffset(proposedOffset: 175), 200)
     }
 
     func test_oversizedSettingsCannotProduceNegativeCardWidths() {

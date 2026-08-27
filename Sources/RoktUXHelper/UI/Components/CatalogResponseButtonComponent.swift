@@ -4,6 +4,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct CatalogResponseButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @SwiftUI.Environment(\.isEnabled) private var isEnabled
 
     let config: ComponentConfig
     let model: CatalogResponseButtonViewModel
@@ -35,8 +36,12 @@ struct CatalogResponseButtonComponent: View {
 
     @GestureState private var isPressingDown: Bool = false
 
+    private var isProductInteractionDisabled: Bool {
+        model.catalogItemContext != nil && (!isEnabled || isDisabled || styleState == .disabled)
+    }
+
     var style: CatalogResponseButtonStyles? {
-        switch styleState {
+        switch isProductInteractionDisabled ? .disabled : styleState {
         case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
         case .pressed:
@@ -93,7 +98,18 @@ struct CatalogResponseButtonComponent: View {
     }
 
     var body: some View {
-        if model.isRenderable { content }
+        if model.isRenderable {
+            if model.catalogItemContext != nil {
+                content
+                    .disabled(isProductInteractionDisabled)
+                    .allowsHitTesting(!isProductInteractionDisabled)
+                    .accessibilityAction { handleButtonTapped() }
+                    .onAppear(perform: updateStyleState)
+                    .onChange(of: isEnabled) { _ in updateStyleState() }
+            } else {
+                content
+            }
+        }
     }
 
     private var content: some View {
@@ -221,11 +237,11 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        model.cartItemInstantPurchase(position: config.position)
+        model.cartItemInstantPurchase(position: config.position, isEnabled: !isProductInteractionDisabled)
     }
 
     private func updateStyleState() {
-        if isDisabled {
+        if isDisabled || (model.catalogItemContext != nil && !isEnabled) {
             styleState = .disabled
         } else {
             if isPressed {

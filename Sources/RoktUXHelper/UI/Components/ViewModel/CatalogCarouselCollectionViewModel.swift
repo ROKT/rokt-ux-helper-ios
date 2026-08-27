@@ -92,7 +92,8 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
             measuredWidth = geometry.itemWidth
             itemHeights.removeAll()
         }
-        scrollTracker.layoutChanged(visibleIndexes: geometry.visibleIndexes(at: geometry.offset(for: currentItemIndex)))
+        let offset = geometry.snappedOffset(proposedOffset: geometry.offset(for: currentItemIndex))
+        scrollTracker.layoutChanged(visibleIndexes: geometry.visibleIndexes(at: offset))
     }
 
     func scrolled(offset: CGFloat, geometry: CatalogCarouselGeometry) {

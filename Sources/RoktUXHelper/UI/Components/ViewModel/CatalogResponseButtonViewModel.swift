@@ -61,9 +61,9 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         }
     }
 
-    func cartItemInstantPurchase(position: Int?) {
+    func cartItemInstantPurchase(position: Int?, isEnabled: Bool = true) {
         if let catalogItemContext {
-            guard isRenderable else { return }
+            guard isEnabled, isRenderable else { return }
             productResponse?(catalogItemContext, responseKey)
             return
         }
