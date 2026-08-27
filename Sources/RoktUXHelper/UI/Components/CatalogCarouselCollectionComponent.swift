@@ -3,6 +3,7 @@ import DcuiSchema
 
 @available(iOS 15, *)
 struct CatalogCarouselCollectionComponent: View {
+    @SwiftUI.Environment(\.isEnabled) private var isEnabled
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @ObservedObject var model: CatalogCarouselCollectionViewModel
     let config: ComponentConfig
@@ -26,13 +27,16 @@ struct CatalogCarouselCollectionComponent: View {
     private var breakpointIndex: Int { model.layoutState?.getGlobalBreakpointIndex(globalScreenSize.width) ?? 0 }
     private var style: BaseStyles? { model.defaultStyle?[safe: model.updateBreakpointIndex(for: globalScreenSize.width)] }
     private var background: BackgroundStylingProperties? { style?.background ?? parentOverride?.parentBackgroundStyle }
+    private var isInteractionEnabled: Bool { isEnabled && styleState != .disabled }
 
     var body: some View {
         if !model.cards.isEmpty {
             GeometryReader { proxy in
                 let geometry = model.geometry(viewportWidth: proxy.size.width, breakpointIndex: breakpointIndex)
-                CatalogCarouselScrollHost(model: model, geometry: geometry, isEnabled: styleState != .disabled,
-                                          content: cards(geometry: geometry).environmentObject(globalScreenSize))
+                CatalogCarouselScrollHost(model: model, geometry: geometry, isEnabled: isInteractionEnabled,
+                                          content: cards(geometry: geometry)
+                                            .environmentObject(globalScreenSize)
+                                            .disabled(!isInteractionEnabled))
                     .id(model.id)
             }
             .frame(height: model.contentHeight ?? 1)

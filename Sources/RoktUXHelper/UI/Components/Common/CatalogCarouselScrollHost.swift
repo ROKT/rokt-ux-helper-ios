@@ -13,10 +13,12 @@ struct CatalogCarouselScrollHost<Content: View>: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ controller: CatalogCarouselViewController, context: Context) {
-        controller.update(content: AnyView(content.environment(\.self, context.environment)),
+        var environment = context.environment
+        environment.isEnabled = environment.isEnabled && isEnabled
+        controller.update(content: AnyView(content.environment(\.self, environment)),
                           geometry: geometry,
                           isRightToLeft: context.environment.layoutDirection == .rightToLeft,
-                          isEnabled: isEnabled)
+                          isEnabled: environment.isEnabled)
     }
 
     static func dismantleUIViewController(_ controller: CatalogCarouselViewController, coordinator: Void) {
@@ -93,6 +95,7 @@ final class CatalogCarouselViewController: UIViewController, UIScrollViewDelegat
         }
         hostingController?.rootView = content
         widthConstraint?.constant = max(geometry.viewportWidth, geometry.contentWidth)
+        scrollView.isUserInteractionEnabled = isEnabled
         scrollView.isScrollEnabled = isEnabled && geometry.maximumOffset > 0
         if !isEnabled { model.endInteraction() }
         view.setNeedsLayout()
@@ -103,7 +106,7 @@ final class CatalogCarouselViewController: UIViewController, UIScrollViewDelegat
         guard needsAlignment, let geometry, !isTornDown else { return }
         needsAlignment = false
         isAligning = true
-        let offset = geometry.offset(for: model.currentItemIndex)
+        let offset = geometry.snappedOffset(proposedOffset: geometry.offset(for: model.currentItemIndex))
         scrollView.setContentOffset(CGPoint(x: physicalOffset(offset, geometry: geometry), y: 0), animated: false)
         isAligning = false
         DispatchQueue.main.async { [weak self] in
@@ -179,8 +182,7 @@ final class CatalogCarouselViewController: UIViewController, UIScrollViewDelegat
         case .previous: forward = false
         default: return false
         }
-        let index = model.currentItemIndex + (forward ? geometry.viewableItems : -geometry.viewableItems)
-        let target = geometry.offset(for: index)
+        let target = geometry.adjacentOffset(from: logicalOffset(geometry: geometry), forward: forward)
         guard abs(target - logicalOffset(geometry: geometry)) > 0.5 else { return false }
         model.beginInteraction(offset: logicalOffset(geometry: geometry), geometry: geometry)
         let animated = !UIAccessibility.isReduceMotionEnabled

@@ -6,6 +6,36 @@ import Combine
 @available(iOS 15, *)
 @MainActor
 final class CatalogCarouselCollectionComponentTests: XCTestCase {
+    func test_collectionCombinesInheritedAndStyleDisabledStates() throws {
+        for (inheritedEnabled, styleState) in [(false, StyleState.default), (true, .disabled), (true, .default)] {
+            let mounted = expectation(description: "Catalog collection is mounted")
+            let model = CatalogCarouselTestFixture.model(slots: try CatalogCarouselTestFixture.slots(count: 2),
+                                                         callbacks: .init(onMount: { _ in mounted.fulfill() }))
+            let screen = GlobalScreenSize()
+            screen.width = 300
+            let root = LayoutSchemaComponent(config: ComponentConfig(parent: .column, position: 1),
+                                             layout: .catalogCarouselCollection(model),
+                                             parentWidth: .constant(300), parentHeight: .constant(nil),
+                                             styleState: .constant(styleState))
+                .frame(width: 300)
+                .environmentObject(screen)
+                .disabled(!inheritedEnabled)
+            let host = UIHostingController(rootView: root)
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 300, height: 500))
+            window.rootViewController = host
+            window.isHidden = false
+            defer {
+                window.isHidden = true
+                window.rootViewController = nil
+            }
+            host.view.layoutIfNeeded()
+            wait(for: [mounted], timeout: 3)
+            let controller = try XCTUnwrap(carouselController(in: host))
+            XCTAssertEqual(controller.scrollView.isUserInteractionEnabled, inheritedEnabled && styleState != .disabled)
+            XCTAssertEqual(controller.scrollView.isScrollEnabled, inheritedEnabled && styleState != .disabled)
+        }
+    }
+
     func test_componentDispatchMeasuresChangingContentAndViewportWidth() throws {
         let state = LayoutState()
         let slots = try CatalogCarouselTestFixture.slots(count: 2)
@@ -65,5 +95,10 @@ final class CatalogCarouselCollectionComponentTests: XCTestCase {
         XCTAssertLessThan(try XCTUnwrap(model.contentHeight), expandedHeight)
         XCTAssertNil(state.items[LayoutState.activeCatalogItemKey])
         XCTAssertNil(state.items[LayoutState.currentProgressKey])
+    }
+
+    private func carouselController(in parent: UIViewController) -> CatalogCarouselViewController? {
+        if let carousel = parent as? CatalogCarouselViewController { return carousel }
+        return parent.children.lazy.compactMap { carouselController(in: $0) }.first
     }
 }

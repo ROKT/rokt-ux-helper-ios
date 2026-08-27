@@ -98,6 +98,30 @@ final class CatalogCarouselBindingTests: XCTestCase {
         XCTAssertNil(image.image)
     }
 
+    func test_disabledProductCardDoesNotRespondPurchaseOrDismiss() throws {
+        let slots = try CatalogProductFixture.slots()
+        let card = try XCTUnwrap(CatalogItemContext(slots: slots, offerIndex: 1, itemIndex: 0))
+        let state = LayoutState()
+        let events = MockEventService()
+        var closed = false
+        state.actionCollection[.close] = { _ in closed = true }
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin(slots: slots),
+                                            layoutState: state, eventService: events)
+        let button = try transformer.getCatalogResponseButtonModel(style: nil, children: [],
+                                                                   context: .inner(.catalogItem(card)), responseKey: "buy-now")
+        var responseCount = 0
+        button.productResponse = { _, _ in responseCount += 1 }
+        button.cartItemInstantPurchase(position: 1, isEnabled: false)
+        XCTAssertEqual(responseCount, 0)
+        XCTAssertFalse(events.cartItemInstantPurchaseCalled)
+        XCTAssertFalse(events.cartItemForwardPaymentCalled)
+        XCTAssertFalse(events.dismissalEventCalled)
+        XCTAssertFalse(closed)
+        button.cartItemInstantPurchase(position: 1, isEnabled: true)
+        button.cartItemInstantPurchase(position: 1, isEnabled: false)
+        XCTAssertEqual(responseCount, 1)
+    }
+
     private static let template = #"""
     {"type":"Column","node":{"children":[
       {"type":"BasicText","node":{"value":"%^DATA.creativeCopy.title^%: %^DATA.catalogItem.title^%"}},
