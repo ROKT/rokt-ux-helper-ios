@@ -21,7 +21,7 @@ final class TestEventProcessor: XCTestCase {
             XCTAssertEqual(body.channel.type, "s2s")
             // single_session pins the batch to the synchronous events path (one session per batch).
             XCTAssertTrue(body.singleSession)
-            XCTAssertEqual(body.events.count, 16)
+            XCTAssertEqual(body.events.count, allEventTypes.count)
 
             allEventTypes.forEach { eventType in
                 // Each event carries a unique eventData value, so locate it by that.
@@ -70,7 +70,7 @@ final class TestEventProcessor: XCTestCase {
             }
 
             // S2S filters SignalLoadStart / SignalLoadComplete.
-            XCTAssertEqual(body.events.count, 14)
+            XCTAssertEqual(body.events.count, allEventTypes.count - 2)
             expectation.fulfill()
         }
         allEventTypes.forEach {
@@ -303,6 +303,31 @@ final class TestEventProcessor: XCTestCase {
         XCTAssertEqual(received?.first?.eventType, "user_interaction")
     }
 
+    func testProductResponsesBypassDeduplicationButKeepTheirIdentityAndToken() {
+        let expectation = expectation(description: "repeated product clicks")
+        var received: [SessionBody.Event]?
+        let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
+            received = self?.deserialize(payload)?.events
+            expectation.fulfill()
+        }
+        let date = Date()
+        let first = mockEvent(eventType: .SignalProductItemResponse, date: date,
+                              parentGuid: "response:example/product", eventData: ["catalogItemId": "item:example/product"])
+        let second = mockEvent(eventType: .SignalProductItemResponse, date: date,
+                               parentGuid: "response:example/product", eventData: ["catalogItemId": "item:example/product"])
+        sut.handle(event: first)
+        sut.handle(event: second)
+        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(received?.count, 2)
+        XCTAssertEqual(Set(received?.map(\.instanceId) ?? []).count, 2)
+        for event in received ?? [] {
+            XCTAssertEqual(event.eventType, "product_item_response")
+            XCTAssertEqual(event.data["parent_id"], "response:example/product")
+            XCTAssertEqual(event.data["token"], "token")
+            XCTAssertEqual(event.data["catalogItemId"], "item:example/product")
+        }
+    }
+
     // MARK: - Helpers
 
     /// Decodes the `v2/sessions/events` body emitted by the processor.
@@ -340,6 +365,7 @@ final class TestEventProcessor: XCTestCase {
         case .SignalImpression: return "impression"
         case .SignalViewed: return "viewed"
         case .SignalResponse: return "signal_response"
+        case .SignalProductItemResponse: return "product_item_response"
         case .SignalGatedResponse: return "signal_gated_response"
         case .SignalDismissal: return "dismissal"
         case .SignalInitialize: return "signal_initialize"

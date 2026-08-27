@@ -28,6 +28,9 @@ class MockEventService: EventDiagnosticServicing {
     var signalViewedEventCalled = false
     var signalResponseEventCalled = false
     var gatedSignalResponseEventCalled = false
+    var productResponses: [CatalogProductResponse] = []
+    var catalogImpressions: [CatalogItemContext] = []
+    var catalogScrolls: [(CatalogItemContext, Int)] = []
     var lastSignalResponseDestinationURL: String?
     var lastGatedSignalResponseDestinationURL: String?
     var dismissalEventCalled = false
@@ -99,6 +102,18 @@ class MockEventService: EventDiagnosticServicing {
 
     func sendDismissalEvent() {
         dismissalEventCalled = true
+    }
+
+    func sendCatalogProductResponse(_ response: CatalogProductResponse) {
+        productResponses.append(response)
+    }
+
+    func sendCatalogItemImpression(context: CatalogItemContext) {
+        catalogImpressions.append(context)
+    }
+
+    func sendCatalogCarouselScroll(context: CatalogItemContext, lastCardIndex: Int) {
+        catalogScrolls.append((context, lastCardIndex))
     }
 
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void) {
@@ -222,6 +237,9 @@ class MockEventService: EventDiagnosticServicing {
         signalViewedEventCalled = false
         signalResponseEventCalled = false
         gatedSignalResponseEventCalled = false
+        productResponses = []
+        catalogImpressions = []
+        catalogScrolls = []
         lastSignalResponseDestinationURL = nil
         lastGatedSignalResponseDestinationURL = nil
         dismissalEventCalled = false
