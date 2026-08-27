@@ -25,7 +25,7 @@ final class CatalogCarouselSnapshotTests: XCTestCase {
     }
 
     private func snapshot(itemCount: Int, width: CGFloat, viewableItems: UInt8 = 1,
-                          file: StaticString = #filePath, testName: String = #function) throws {
+                          file: StaticString = #filePath, testName: String = #function, line: UInt = #line) throws {
         let items: [[String: Any]] = (0..<itemCount).map { index in
             ["catalog_item_id": "example-item-\(index)",
              "title": index == 1 ? "Example product with a longer title" : "Example product \(index + 1)",
@@ -80,10 +80,29 @@ final class CatalogCarouselSnapshotTests: XCTestCase {
         host.view.layoutIfNeeded()
         if itemCount == 0 { measured.fulfill() }
         wait(for: [measured], timeout: 5)
-        assertSnapshot(of: host,
-                       as: .image(on: snapshotDevice, precision: snapshotPrecision,
-                                  perceptualPrecision: snapshotPerceptualPrecision),
-                       file: file, testName: testName)
+        var strategy = Snapshotting<UIViewController, UIImage>.image(
+            on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision
+        )
+        let render = strategy.snapshot
+        strategy.snapshot = { controller in
+            .init { callback in
+                render(controller).run { image in
+                    XCTAssertNoThrow(try self.exportSnapshot(image, testName: testName, file: file), file: file, line: line)
+                    callback(image)
+                }
+            }
+        }
+        assertSnapshot(of: host, as: strategy, named: "carousel", file: file, testName: testName, line: line)
+    }
+
+    private func exportSnapshot(_ image: UIImage, testName: String, file: StaticString) throws {
+        // Missing references stay beside the tests; also expose the first rendering to CI's existing artifact upload.
+        guard let path = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] else { return }
+        let suite = URL(fileURLWithPath: "\(file)").deletingPathExtension().lastPathComponent
+        let directory = URL(fileURLWithPath: path).appendingPathComponent(suite)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let name = testName.replacingOccurrences(of: "()", with: "")
+        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).carousel.png"))
     }
 
     private static let cardTemplate = #"""
