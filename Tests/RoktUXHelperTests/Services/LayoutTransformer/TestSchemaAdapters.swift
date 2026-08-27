@@ -3,6 +3,60 @@ import XCTest
 @testable import RoktUXHelper
 
 final class TestSchemaAdapters: XCTestCase {
+    func testCatalogActionsRejectNonzeroGapInEverySupportedState() throws {
+        for type in ["StaticLink", "ToggleButtonStateTrigger", "CatalogResponseButton"] {
+            for state in ["default", "pressed", "hovered", "disabled"] {
+                for gap in [-2, 4] {
+                    var block: [String: Any] = ["default": [:]]
+                    block[state] = ["container": ["gap": gap]]
+                    let schema = try decode(CatalogCarouselCollectionTemplateNodeChildren.self,
+                                            catalogAction(type, block: block))
+                    XCTAssertThrowsError(try schema.commonLayout())
+                }
+            }
+        }
+    }
+
+    func testCatalogActionsAllowAbsentAndZeroGapInEverySupportedState() throws {
+        for type in ["StaticLink", "ToggleButtonStateTrigger", "CatalogResponseButton"] {
+            for state in ["default", "pressed", "hovered", "disabled"] {
+                for container: [String: Any] in [[:], ["gap": 0]] {
+                    var block: [String: Any] = ["default": [:]]
+                    block[state] = ["container": container]
+                    let schema = try decode(CatalogCarouselCollectionTemplateNodeChildren.self,
+                                            catalogAction(type, block: block))
+                    XCTAssertNoThrow(try schema.commonLayout())
+                }
+            }
+        }
+    }
+
+    func testCatalogRowsRejectEveryNondefaultStateAtEachTemplateLevel() throws {
+        for state in ["pressed", "hovered", "disabled", "focussed"] {
+            let object: [String: Any] = ["type": "Row", "node": ["children": [text()], "styles": ["elements": ["own": [
+                ["default": [:], state: ["container": ["opacity": 0.5]]]
+            ]]]]]
+            let root = try decode(CatalogCarouselCollectionTemplateNode.self, object)
+            let child = try decode(CatalogCarouselCollectionTemplateNodeChildren.self, object)
+            let label = try decode(CatalogCarouselCollectionNonInteractableChildren.self, object)
+            XCTAssertThrowsError(try root.commonLayout())
+            XCTAssertThrowsError(try child.commonLayout())
+            XCTAssertThrowsError(try label.commonLayout())
+        }
+    }
+
+    func testCatalogRowDefaultsAndConditionalStylesRemainSupported() throws {
+        let schema = try decode(CatalogCarouselCollectionTemplateNode.self, ["type": "Row", "node": [
+            "children": [text()], "styles": ["elements": ["own": [["default": ["container": ["gap": 4]]]]],
+                                             "conditionalTransitions": ["predicates": [customState()], "duration": 100,
+                                                                        "value": ["own": ["container": ["opacity": 0.5]]]]]
+        ]])
+        guard case .row(let model) = try schema.commonLayout() else { return XCTFail("Expected row") }
+        XCTAssertEqual(model.styles?.elements?.own.first?.default.container?.gap, 4)
+        XCTAssertEqual(model.styles?.conditionalTransitions?.value.own?.container?.opacity, 0.5)
+        XCTAssertEqual(model.styles?.conditionalTransitions?.duration, 100)
+    }
+
     func testUnboundInlineConditionsRejectDataOnEitherSideButAllowLocalState() throws {
         let conditions: [[String: Any]] = [
             ["type": "CreativeCopy", "predicate": ["condition": "exists", "value": "title"]],
@@ -273,6 +327,13 @@ final class TestSchemaAdapters: XCTestCase {
 
     private func decode<T: Decodable>(_ type: T.Type, _ object: [String: Any]) throws -> T {
         try JSONDecoder().decode(type, from: JSONSerialization.data(withJSONObject: object))
+    }
+
+    private func catalogAction(_ type: String, block: [String: Any]) -> [String: Any] {
+        var node: [String: Any] = ["children": [text()], "styles": ["elements": ["own": [block]]]]
+        if type == "StaticLink" { node["src"] = "https://example.com"; node["open"] = "externally" }
+        if type == "ToggleButtonStateTrigger" { node["customStateKey"] = "details" }
+        return ["type": type, "node": node]
     }
 
     private func styles(_ value: [String: Any]) -> [String: Any] {

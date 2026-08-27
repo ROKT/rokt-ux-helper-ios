@@ -181,9 +181,10 @@ enum SchemaNodeAdapter {
     }
 
     static func row<C: CatalogCardSchemaNode>(_ model: RowModel<C, LayoutVariantWhenPredicate>) throws -> LayoutSchemaModel {
-        .row(RowModel(styles: try cardStyle(model.styles, blocks: model.styles?.elements?.own, node: "Row",
-                                            allowsTransition: true),
-                      children: try model.children.map { try $0.commonLayout() }))
+        try rejectNondefaultStates(model.styles?.elements?.own, node: "Row")
+        return .row(RowModel(styles: try cardStyle(model.styles, blocks: model.styles?.elements?.own, node: "Row",
+                                                   allowsTransition: true),
+                             children: try model.children.map { try $0.commonLayout() }))
     }
 
     static func column<C: CatalogCardSchemaNode>(_ model: ColumnModel<C, LayoutVariantWhenPredicate>) throws
@@ -217,8 +218,8 @@ enum SchemaNodeAdapter {
     }
 
     static func richText(_ model: RichTextModel<LayoutVariantWhenPredicate>) throws -> LayoutSchemaModel {
-        try rejectRichTextStates(model.styles?.elements?.own, element: "own")
-        try rejectRichTextStates(model.styles?.elements?.link, element: "link")
+        try rejectNondefaultStates(model.styles?.elements?.own, node: "RichText.own")
+        try rejectNondefaultStates(model.styles?.elements?.link, node: "RichText.link")
         for block in model.styles?.elements?.link ?? [] {
             _ = try StyleTransformer.updatedStyle(block.default, newStyle: nil)
         }
@@ -226,10 +227,10 @@ enum SchemaNodeAdapter {
                                        openLinks: model.openLinks, value: model.value))
     }
 
-    private static func rejectRichTextStates<T>(_ blocks: [BasicStateStylingBlock<T>]?, element: String) throws {
+    private static func rejectNondefaultStates<T>(_ blocks: [BasicStateStylingBlock<T>]?, node: String) throws {
         if blocks?
             .contains(where: { $0.pressed != nil || $0.hovered != nil || $0.disabled != nil || $0.focussed != nil }) == true {
-            throw LayoutTransformerError.unsupportedFeature("catalogCard.RichText.\(element) nondefault state")
+            throw LayoutTransformerError.unsupportedFeature("catalogCard.\(node) nondefault state")
         }
     }
 

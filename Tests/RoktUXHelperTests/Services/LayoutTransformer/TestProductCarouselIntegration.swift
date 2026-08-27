@@ -283,6 +283,49 @@ final class TestProductCarouselIntegration: XCTestCase {
             XCTAssertNoThrow(try transformer.transform(distribution, context: .outer(slots.map(\.offer))))
         }
     }
+
+    func testLegacyActionsKeepGapAndRowStateStylesOutsideCatalogCards() throws {
+        let item = try XCTUnwrap(CatalogProductFixture.slots()[1].offer?.catalogItems?.first)
+        let events = SchemaIntegrationEventService()
+        events.useDiagnosticEvents = true
+        let transformer = ProductCarouselIntegrationFixture.transformer(slots: [], events: events)
+        let row: [String: Any] = ["type": "Row", "node": ["children": [], "styles": ["elements": ["own": [[
+            "default": ["container": ["gap": 2]], "pressed": ["container": ["gap": 3]],
+            "hovered": ["container": ["gap": 4]], "disabled": ["container": ["gap": 5]],
+            "focussed": ["container": ["gap": 6]]
+        ]]]]]]
+        for type in ["StaticLink", "ToggleButtonStateTrigger", "CatalogResponseButton"] {
+            var node: [String: Any] = ["children": [row], "styles": ["elements": ["own": [[
+                "default": ["container": ["gap": 4]]
+            ]]]]]
+            if type == "StaticLink" { node["src"] = "https://example.com"; node["open"] = "externally" }
+            if type == "ToggleButtonStateTrigger" { node["customStateKey"] = "details" }
+            let schema = try JSONDecoder().decode(LayoutSchemaModel.self,
+                                                  from: JSONSerialization.data(withJSONObject: ["type": type, "node": node]))
+            let layout = try transformer.transform(schema, context: .inner(.addToCart(item)))
+            let children: [LayoutSchemaViewModel]?
+            switch layout {
+            case .staticLink(let model):
+                XCTAssertEqual(model.defaultStyle?.first?.container?.gap, 4)
+                children = model.children
+            case .toggleButton(let model):
+                XCTAssertEqual(model.defaultStyle?.first?.container?.gap, 4)
+                children = model.children
+            case .catalogResponseButton(let model):
+                XCTAssertEqual(model.defaultStyle?.first?.container?.gap, 4)
+                children = model.children
+            default: return XCTFail("Expected existing action")
+            }
+            guard case .row(let model) = children?.first else { return XCTFail("Expected existing row") }
+            let styles = try XCTUnwrap(model.stylingProperties?.first)
+            XCTAssertEqual(styles.default.container?.gap, 2)
+            XCTAssertEqual(styles.pressed?.container?.gap, 3)
+            XCTAssertEqual(styles.hovered?.container?.gap, 4)
+            XCTAssertEqual(styles.disabled?.container?.gap, 5)
+            XCTAssertEqual(styles.focussed?.container?.gap, 6)
+        }
+        XCTAssertTrue(events.diagnostics.isEmpty)
+    }
 }
 
 enum ProductCarouselIntegrationFixture {
