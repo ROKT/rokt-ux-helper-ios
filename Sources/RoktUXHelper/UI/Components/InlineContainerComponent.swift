@@ -6,6 +6,7 @@ struct InlineContainerComponent: View {
     @ObservedObject var model: InlineContainerViewModel
     @Binding var parentWidth: CGFloat?
     @Binding var parentHeight: CGFloat?
+    @Binding var styleState: StyleState
     let parentOverride: ComponentParentOverride?
     @EnvironmentObject private var globalScreenSize: GlobalScreenSize
     @Environment(\.colorScheme) private var colorScheme
@@ -13,11 +14,25 @@ struct InlineContainerComponent: View {
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.isEnabled) private var isEnabled
     @State private var contentHeight: CGFloat = 0
+    @State private var hovered = false
+
+    init(config: ComponentConfig, model: InlineContainerViewModel,
+         parentWidth: Binding<CGFloat?>, parentHeight: Binding<CGFloat?>,
+         parentOverride: ComponentParentOverride?, styleState: Binding<StyleState> = .constant(.default)) {
+        self.config = config
+        self.model = model
+        self._parentWidth = parentWidth
+        self._parentHeight = parentHeight
+        self.parentOverride = parentOverride
+        self._styleState = styleState
+    }
 
     private var style: BaseStyles? {
-        guard let styles = model.defaultStyle, !styles.isEmpty else { return nil }
-        return styles[model.updateBreakpointIndex(for: globalScreenSize.width)]
+        let state: StyleState = isEnabled ? (hovered && styleState == .default ? .hovered : styleState) : .disabled
+        return model.style(state: state, position: config.position, width: globalScreenSize.width, colorScheme: colorScheme)
     }
+
+    private var actionsEnabled: Bool { isEnabled && styleState != .disabled }
 
     private var textAlignment: NSTextAlignment {
         switch style?.container?.justifyContent {
@@ -36,7 +51,7 @@ struct InlineContainerComponent: View {
                                                                alignment: textAlignment),
                                     accessibilityLabel: model.accessibilityLabel,
                                     width: geometry.size.width,
-                                    isEnabled: isEnabled,
+                                    isEnabled: actionsEnabled,
                                     height: $contentHeight,
                                     onInteractionStateChange: model.setStyleState)
         }
@@ -62,10 +77,15 @@ struct InlineContainerComponent: View {
         .onAppear { updateTextStyles() }
         .onChange(of: globalScreenSize.width) { _ in updateTextStyles() }
         .onChange(of: isEnabled) { _ in updateTextStyles() }
+        .onChange(of: styleState) { _ in updateTextStyles() }
+        .onHover { hovered = $0 }
+        .animation(.linear(duration: max(0, model.conditionalStyle?.animation.duration ?? 0)),
+                   value: model.conditionalStyle?.applies(position: config.position, width: globalScreenSize.width ?? 0,
+                                                          colorScheme: colorScheme) ?? false)
     }
 
     private func updateTextStyles() {
-        model.updateTextStyles(width: globalScreenSize.width, state: isEnabled ? .default : .disabled)
+        model.updateTextStyles(width: globalScreenSize.width, state: isEnabled ? styleState : .disabled)
     }
 }
 

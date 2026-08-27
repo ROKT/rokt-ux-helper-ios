@@ -18,6 +18,7 @@ enum LayoutSchemaViewModel: Hashable {
 
     case richText(RichTextViewModel)
     case basicText(BasicTextViewModel)
+    case inlineContainer(InlineContainerViewModel)
     case creativeResponse(CreativeResponseViewModel)
     case staticImage(StaticImageViewModel)
     case dataImage(DataImageViewModel)
@@ -46,6 +47,8 @@ extension LayoutSchemaViewModel {
             return lhsModel == rhsModel
         case (.basicText(let lhsModel), .basicText(let rhsModel)):
             return lhsModel == rhsModel
+        case (.inlineContainer(let lhs), .inlineContainer(let rhs)):
+            return lhs == rhs
         case (.catalogResponseButton(let lhs), .catalogResponseButton(let rhs)):
             return lhs == rhs
         case (.catalogStackedCollection(let lhs), .catalogStackedCollection(let rhs)):

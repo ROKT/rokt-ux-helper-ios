@@ -9,6 +9,7 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     private weak var eventService: EventDiagnosticServicing?
     private(set) var children: [LayoutSchemaViewModel]?
     let id: UUID = UUID()
+    let accessibilityLabel: String?
     let defaultStyle: [StaticLinkStyles]?
     let pressedStyle: [StaticLinkStyles]?
     let hoveredStyle: [StaticLinkStyles]?
@@ -26,9 +27,11 @@ class StaticLinkViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [StaticLinkStyles]?,
          disabledStyle: [StaticLinkStyles]?,
          layoutState: (any LayoutStateRepresenting)?,
-         eventService: EventDiagnosticServicing?) {
+         eventService: EventDiagnosticServicing?,
+         accessibilityLabel: String? = nil) {
         self.children = children
         self.src = src
+        self.accessibilityLabel = accessibilityLabel
         self.open = open
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle

@@ -2,6 +2,8 @@
 
 This example demonstrates two ways to integrate RoktUXHelper using `RoktLayoutView` (SwiftUI) and `RoktLayoutUIView` (UIKit) to render a view showcasing multiple offers.
 
+`Example/Resources/product-carousel-layout.json` is a layout variant reference for expandable descriptions and product cards. The description uses `When`, custom state, and `sliceText[Chars,78]`; product title, price, image, and response content bind to each card. It is also decoded and transformed by the helper integration tests. This reference is not loaded by the default example screens.
+
 ## Prerequisites
 
 - Ensure you have the latest version of Xcode installed.

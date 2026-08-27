@@ -52,6 +52,21 @@ extension BaseStyles {
 
 @available(iOS 13, *)
 extension BaseStyles {
+    init(_ style: BasicTextStyle) {
+        self.init(background: style.background, dimension: style.dimension, flexChild: style.flexChild,
+                  spacing: style.spacing, text: style.text)
+    }
+
+    init(_ style: StaticLinkStyles) {
+        self.init(background: style.background, border: style.border, container: style.container,
+                  dimension: style.dimension, flexChild: style.flexChild, spacing: style.spacing)
+    }
+
+    init(_ style: ToggleButtonStateTriggerStyle) {
+        self.init(background: style.background, border: style.border, container: style.container,
+                  dimension: style.dimension, flexChild: style.flexChild, spacing: style.spacing)
+    }
+
     init(_ style: StaticImageStyles) {
         self.init(
             background: style.background,

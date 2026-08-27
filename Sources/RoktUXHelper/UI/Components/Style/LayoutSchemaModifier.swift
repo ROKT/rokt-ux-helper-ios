@@ -70,6 +70,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
                 blurRadius: container?.shadow?.blurRadius,
                 isContainer: isContainer
             )
+            .opacity(Double(container?.opacity ?? 1))
             .offset(offset: getOffset())
             .ifLet(dimension?.rotateZ) { $0.rotate(rotateZ: $1) }
             // HAS TO BE APPLIED AFTER BACKGROUND BUT BEFORE MARGIN

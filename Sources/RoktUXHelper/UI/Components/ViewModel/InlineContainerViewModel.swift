@@ -2,7 +2,7 @@ import Combine
 import DcuiSchema
 import SwiftUI
 
-/// Native-only children keep interactive labels text-only, before schema integration.
+/// Native children keep interactive labels text-only throughout text layout.
 enum InlineContainerChild {
     case text(BasicTextViewModel)
     case link(StaticLinkViewModel, label: [BasicTextViewModel], accessibilityLabel: String? = nil,
@@ -45,7 +45,7 @@ enum InlineContainerChild {
             let index = model.updateBreakpointIndex(for: width)
             let style = Self.select(model, at: index, state: state)
             return InlineSpanStyle(spacing: style?.spacing, backgroundColor: style?.background?.backgroundColor,
-                                   border: style?.border)
+                                   border: style?.border, opacity: style?.container?.opacity)
         case .toggle(let model, _, _, let styles):
             if let styles {
                 let index = model.layoutState?.getGlobalBreakpointIndex(width) ?? 0
@@ -61,7 +61,7 @@ enum InlineContainerChild {
             }
             let style = values?[safe: index]
             return InlineSpanStyle(spacing: style?.spacing, backgroundColor: style?.background?.backgroundColor,
-                                   border: style?.border)
+                                   border: style?.border, opacity: style?.container?.opacity)
         }
     }
 
@@ -96,10 +96,13 @@ enum InlineContainerChild {
     }
 }
 
-final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive {
+final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive, Identifiable, Hashable {
+    let id = UUID()
     let children: [InlineContainerChild]
     let stylingProperties: [BasicStateStylingBlock<BaseStyles>]?
     let accessibilityLabel: String?
+    let conditionalStyle: ConditionalStyleBinding?
+    let childConditionalStyles: [UUID: ConditionalStyleBinding]
     weak var layoutState: (any LayoutStateRepresenting)?
     @LazyPublished private var width: CGFloat?
     private var subscriptions = Set<AnyCancellable>()
@@ -107,14 +110,21 @@ final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive {
     init(children: [InlineContainerChild],
          stylingProperties: [BasicStateStylingBlock<BaseStyles>]? = nil,
          accessibilityLabel: String? = nil,
-         layoutState: (any LayoutStateRepresenting)? = nil) {
+         layoutState: (any LayoutStateRepresenting)? = nil,
+         conditionalStyle: ConditionalStyleBinding? = nil,
+         childConditionalStyles: [UUID: ConditionalStyleBinding] = [:]) {
         self.children = children
         self.stylingProperties = stylingProperties
         self.accessibilityLabel = accessibilityLabel
         self.layoutState = layoutState
+        self.conditionalStyle = conditionalStyle
+        self.childConditionalStyles = childConditionalStyles
         for text in children.flatMap(\.texts) {
             text.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
                 .store(in: &subscriptions)
+        }
+        for conditional in Array(childConditionalStyles.values) + [conditionalStyle].compactMap({ $0 }) {
+            conditional.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &subscriptions)
         }
     }
 
@@ -132,23 +142,40 @@ final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive {
         children.first(where: { $0.id == childID })?.texts.forEach { $0.styleState = state }
     }
 
+    func style(state: StyleState, position: Int?, width: CGFloat?, colorScheme: ColorScheme) -> BaseStyles? {
+        let block = stylingProperties?[safe: updateBreakpointIndex(for: width)]
+        let selected: BaseStyles?
+        let childStates = children.flatMap(\.texts).map(\.styleState)
+        let activeState = state == .default
+            ? (childStates.contains(.pressed) ? .pressed : childStates.contains(.hovered) ? .hovered : .default) : state
+        switch activeState {
+        case .pressed: selected = block?.pressed ?? block?.default
+        case .hovered: selected = block?.hovered ?? block?.default
+        case .disabled: selected = block?.disabled ?? block?.default
+        default: selected = block?.default
+        }
+        return conditionalStyle?.resolve(selected, position: position, width: width ?? 0, colorScheme: colorScheme) ?? selected
+    }
+
     func textContent(position: Int?, colorScheme: ColorScheme,
                      contentSize: UIContentSizeCategory, layoutDirection: LayoutDirection,
                      alignment: NSTextAlignment = .natural) -> InlineTextContent {
         let builder = InlineSpanBuilder()
         var runs: [InlineTextRun] = []
         for child in children {
-            let resolved = child.texts.compactMap { model -> (BasicTextViewModel, String)? in
+            let resolved = child.texts.compactMap { model -> (value: String, style: BasicTextStyle?)? in
+                let style = textStyle(model, position: position, colorScheme: colorScheme)
                 let pages = Int(ceil(Double(model.totalOffer)/Double(max(1, model.viewableItems.wrappedValue))))
-                let value = TextComponentBNFHelper.replaceStates(model.boundValue,
-                                                                 currentOffer: "\(model.currentIndex.wrappedValue + 1)",
-                                                                 totalOffers: "\(pages)")
-                return value.isEmpty ? nil : (model, value)
+                let expanded = TextComponentBNFHelper.replaceStates(model.inlineResolvedValue,
+                                                                    currentOffer: "\(model.currentIndex.wrappedValue + 1)",
+                                                                    totalOffers: "\(pages)")
+                let value = BasicTextViewModel.transform(expanded, using: style?.text?.textTransform)
+                return value.isEmpty ? nil : (value, style)
             }
             guard !resolved.isEmpty else { continue }
-            let range = builder.append(style: child.spanStyle(width: width), colorScheme: colorScheme) {
-                for (model, value) in resolved {
-                    let style = model.currentStylingProperties
+            let range = builder.append(style: spanStyle(child, position: position, colorScheme: colorScheme),
+                                       colorScheme: colorScheme) {
+                for (value, style) in resolved {
                     _ = builder.append(style: InlineSpanStyle(spacing: style?.spacing,
                                                               backgroundColor: style?.background?.backgroundColor),
                                        colorScheme: colorScheme) {
@@ -159,7 +186,7 @@ final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive {
             }
             let explicitLabel = child.accessibilityLabel
                 .flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
-            let label = explicitLabel ?? resolved.map { $0.1 }.joined()
+            let label = explicitLabel ?? resolved.map(\.value).joined()
             runs.append(InlineTextRun(id: child.id, range: range, label: label, action: child.action(position: position)))
         }
         let text = builder.text
@@ -168,6 +195,34 @@ final class InlineContainerViewModel: ObservableObject, BaseStyleAdaptive {
         paragraph.alignment = alignment
         paragraph.lineBreakMode = .byWordWrapping
         text.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: text.length))
-        return InlineTextContent(text: text, runs: runs, decorations: builder.decorations)
+        let conditions = childConditionalStyles.sorted { $0.key.uuidString < $1.key.uuidString }.map(\.value)
+        return InlineTextContent(text: text, runs: runs, decorations: builder.decorations,
+                                 transitionStates: conditions.map {
+                                      $0.applies(position: position, width: width ?? 0, colorScheme: colorScheme)
+                                  }, transitionDuration: conditions.map { $0.animation.duration }.max() ?? 0)
+    }
+
+    private func textStyle(_ model: BasicTextViewModel, position: Int?, colorScheme: ColorScheme) -> BasicTextStyle? {
+        let style = model.currentStylingProperties
+        guard let conditional = childConditionalStyles[model.id] else { return style }
+        let base = BaseStyles(background: style?.background, dimension: style?.dimension,
+                              flexChild: style?.flexChild, spacing: style?.spacing, text: style?.text)
+        guard let merged = conditional.resolve(base, position: position, width: width ?? 0, colorScheme: colorScheme)
+            else { return style }
+        return BasicTextStyle(dimension: merged.dimension, flexChild: merged.flexChild, spacing: merged.spacing,
+                              background: merged.background, text: merged.text)
+    }
+
+    private func spanStyle(_ child: InlineContainerChild, position: Int?, colorScheme: ColorScheme) -> InlineSpanStyle {
+        let style = child.spanStyle(width: width)
+        if case .text = child { return style }
+        guard let conditional = childConditionalStyles[child.id],
+              conditional.applies(position: position, width: width ?? 0, colorScheme: colorScheme) else { return style }
+        let diff = conditional.animation.style
+        return InlineSpanStyle(spacing: StyleTransformer.updatedSpacing(style.spacing, newStyle: diff.spacing),
+                               backgroundColor: try? StyleTransformer.updatedColor(style.backgroundColor,
+                                                                                   newStyle: diff.background?.backgroundColor),
+                               border: try? StyleTransformer.updatedBorder(style.border, newStyle: diff.border),
+                               opacity: diff.container?.opacity ?? style.opacity)
     }
 }

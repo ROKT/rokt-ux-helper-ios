@@ -149,6 +149,8 @@ struct ToggleButtonComponent: View {
                 self.isPressed = isPressed
                 updateStyleState()
             })
+            .accessibilityAddTraits(.isButton)
+            .ifLet(model.accessibilityLabel) { $0.accessibilityElement(children: .ignore).accessibilityLabel($1) }
     }
 
     func build() -> some View {

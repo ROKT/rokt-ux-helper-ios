@@ -162,6 +162,7 @@ struct GroupedDistributionComponent: View {
                                          argument: accessibilityAnnouncement)
                 }
                 .onChange(of: customStateMap) { _ in
+                    model.layoutState?.publishStateChange()
                     model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
                 }
                 .onChange(of: globalScreenSize.width) { newSize in

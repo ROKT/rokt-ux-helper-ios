@@ -503,7 +503,7 @@ private extension TestCatalogImageGalleryComponent {
                         shadow: nil,
                         overflow: nil,
                         gap: 4,
-                        blur: nil
+                        blur: nil, opacity: nil
                     ),
                     background: nil,
                     border: nil,
@@ -693,7 +693,7 @@ extension LayoutSchemaViewModel {
                         shadow: nil,
                         overflow: nil,
                         gap: 4,
-                        blur: nil
+                        blur: nil, opacity: nil
                     ),
                     background: nil,
                     border: nil,
@@ -809,7 +809,7 @@ extension LayoutSchemaViewModel {
                 default: CatalogImageGalleryIndicatorStyles(
                     container: ContainerStylingProperties(
                         justifyContent: .center, alignItems: .center,
-                        shadow: nil, overflow: nil, gap: 8, blur: nil
+                        shadow: nil, overflow: nil, gap: 8, blur: nil, opacity: nil
                     ),
                     background: BackgroundStylingProperties(
                         backgroundColor: ThemeColor(light: "#99000000", dark: "#99FFFFFF"), backgroundImage: nil

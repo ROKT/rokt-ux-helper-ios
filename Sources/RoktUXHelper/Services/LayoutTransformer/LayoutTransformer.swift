@@ -16,9 +16,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         case inner(Inner)
 
         enum Inner {
-            case positive(OfferModel)
-            case negative(OfferModel)
-            case generic(OfferModel?)
+            case positive(OfferModel, offerIndex: Int? = nil)
+            case negative(OfferModel, offerIndex: Int? = nil)
+            case generic(OfferModel?, offerIndex: Int? = nil)
             case addToCart(CatalogItem)
             case catalogItem(CatalogItemContext)
         }
@@ -26,6 +26,14 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         var catalogItemContext: CatalogItemContext? {
             if case .inner(.catalogItem(let context)) = self { return context }
             return nil
+        }
+
+        var offerIndex: Int? {
+            switch self {
+            case .inner(.generic(_, let index)), .inner(.positive(_, let index)), .inner(.negative(_, let index)):
+                return index
+            default: return catalogItemContext?.offerIndex
+            }
         }
     }
 
@@ -88,6 +96,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             return try transform(layout, context: context)
         } else if let layout = layout as? AccessibilityGroupedLayoutChildren {
             return try transform(layout, context: context)
+        } else if let layout = layout as? any CatalogCardSchemaNode {
+            return try withSchemaValidation { try transform(layout.commonLayout(), context: context) }
         } else {
             return .empty
         }
@@ -158,7 +168,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                         children: try transformChildren(whenModel.children, context: context),
                         predicates: whenModel.predicates,
                         transition: whenModel.transition,
-                        catalogItemContext: context.catalogItemContext
+                        catalogItemContext: context.catalogItemContext,
+                        predicateOfferIndex: context.offerIndex
                     )
                 )
         case .staticLink(let staticLinkModel):
@@ -167,14 +178,15 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                         src: staticLinkModel.src,
                         open: staticLinkModel.open,
                         styles: staticLinkModel.styles,
-                        children: transformChildren(staticLinkModel.children, context: context)
+                        children: transformNonInteractiveChildren(staticLinkModel.children, context: context),
+                        accessibilityLabel: resolveAccessibilityLabel(staticLinkModel.a11yLabel, context: context)
                     )
                 )
         case .closeButton(let closeButtonModel):
                 .closeButton(
                     try getCloseButton(
                         styles: closeButtonModel.styles,
-                        children: transformChildren(closeButtonModel.children, context: context),
+                        children: transformNonInteractiveChildren(closeButtonModel.children, context: context),
                         dismissalMethod: closeButtonModel.dismissalMethod
                     )
                 )
@@ -187,8 +199,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     try getProgressControl(
                         styles: progressControlModel.styles,
                         direction: progressControlModel.direction,
-                        children: transformChildren(progressControlModel.children,
-                                                    context: context)
+                        children: transformNonInteractiveChildren(progressControlModel.children,
+                                                                  context: context)
                     )
                 )
         case .accessibilityGrouped(let accessibilityGroupedModel):
@@ -217,8 +229,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     try getToggleButton(
                         customStateKey: buttonModel.customStateKey,
                         styles: buttonModel.styles,
-                        children: transformChildren(buttonModel.children,
-                                                    context: context)
+                        children: transformNonInteractiveChildren(buttonModel.children,
+                                                                  context: context),
+                        accessibilityLabel: resolveAccessibilityLabel(buttonModel.a11yLabel, context: context)
                     )
                 )
         case .dataImageCarousel(let dataImageCarouselModel):
@@ -236,16 +249,17 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                 .catalogResponseButton(
                     try getCatalogResponseButtonModel(
                         style: model.styles,
-                        children: transformChildren(model.children, context: context),
+                        children: transformNonInteractiveChildren(model.children, context: context),
                         context: context,
-                        responseKey: model.responseKey
+                        responseKey: model.responseKey,
+                        accessibilityLabel: model.a11yLabel
                     )
                 )
         case .catalogDevicePayButton(let devicePayModel):
                 .catalogDevicePayButton(
                     try getCatalogDevicePayButton(
                         model: devicePayModel,
-                        children: transformChildren(devicePayModel.children, context: context),
+                        children: transformNonInteractiveChildren(devicePayModel.children, context: context),
                         context: context
                     )
                 )
@@ -266,6 +280,10 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                 .catalogCombinedCollection(
                     try getCatalogCombinedCollection(model: model, context: context)
                 )
+        case .inlineContainer(let model):
+            try withSchemaValidation { .inlineContainer(try getInlineContainer(model, context: context)) }
+        case .catalogCarouselCollection(let model):
+            try withSchemaValidation { .catalogCarouselCollection(try getCatalogCarousel(model, context: context)) }
         }
     }
 
@@ -302,9 +320,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
     // attach inner layout into outer layout and transform to UI Model
     func getOneByOne(oneByOneModel: OneByOneDistributionModel<WhenPredicate>, context: Context) throws -> OneByOneViewModel {
-        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
-            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
-            return try transform(innerLayout, context: .inner(.generic($0.offer)))
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
+            guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(oneByOneModel.styles?.elements?.own)
         return OneByOneViewModel(children: children,
@@ -316,9 +334,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     }
 
     func getCarousel(carouselModel: CarouselDistributionModel<WhenPredicate>, context: Context) throws -> CarouselViewModel {
-        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
-            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
-            return try transform(innerLayout, context: .inner(.generic($0.offer)))
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
+            guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(carouselModel.styles?.elements?.own)
         return CarouselViewModel(children: children,
@@ -334,9 +352,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         groupedModel: GroupedDistributionModel<WhenPredicate>,
         context: Context
     ) throws -> GroupedDistributionViewModel {
-        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.compactMap {
-            guard let innerLayout = $0.layoutVariant?.layoutVariantSchema else { return nil }
-            return try transform(innerLayout, context: .inner(.generic($0.offer)))
+        let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
+            guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
+            return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
         }
         let updateStyles = try StyleTransformer.updatedStyles(groupedModel.styles?.elements?.own)
         return GroupedDistributionViewModel(children: children,
@@ -362,7 +380,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                        open: LinkOpenTarget,
                        styles: LayoutStyle<StaticLinkElements,
                                            ConditionalStyleTransition<StaticLinkTransitions, WhenPredicate>>?,
-                       children: [LayoutSchemaViewModel]?) throws -> StaticLinkViewModel {
+                       children: [LayoutSchemaViewModel]?,
+                       accessibilityLabel: String? = nil) throws -> StaticLinkViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return StaticLinkViewModel(children: children,
                                    src: src,
@@ -372,7 +391,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                    hoveredStyle: updateStyles.compactMap {$0.hovered},
                                    disabledStyle: updateStyles.compactMap {$0.disabled},
                                    layoutState: layoutState,
-                                   eventService: eventService)
+                                   eventService: eventService,
+                                   accessibilityLabel: accessibilityLabel)
     }
 
     func getCloseButton(styles: LayoutStyle<CloseButtonElements,
@@ -452,9 +472,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     disabledStyle: imageDisabledStyle.isEmpty ? nil : imageDisabledStyle,
                     layoutState: layoutState
                 ) }
-        case .inner(.generic(let offer?)),
-                .inner(.negative(let offer)),
-                .inner(.positive(let offer)):
+        case .inner(.generic(let offer?, _)),
+                .inner(.negative(let offer, _)),
+                .inner(.positive(let offer, _)):
             if let catalogItem = offer.catalogItems?.first {
                 images = catalogItem.images
                     .sorted { $0.key < $1.key }
@@ -493,7 +513,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         model: CatalogCombinedCollectionModel<CatalogCombinedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
         context: Context
     ) throws -> CatalogCombinedCollectionViewModel {
-        guard case let .inner(.generic(.some(offer))) = context else {
+        guard case let .inner(.generic(.some(offer), _)) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }
 
@@ -599,9 +619,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     func getDataImage(_ imageModel: DataImageModel<WhenPredicate>, context: Context) throws -> DataImageViewModel {
         var creativeImage: CreativeImage?
         switch context {
-        case .inner(.generic(.some(let offer))),
-                .inner(.negative(let offer)),
-                .inner(.positive(let offer)):
+        case .inner(.generic(.some(let offer), _)),
+                .inner(.negative(let offer, _)),
+                .inner(.positive(let offer, _)):
             creativeImage = findImage(for: imageModel.imageKey, in: offer.creative.images)
         case let .inner(.addToCart(catalogItem)):
             creativeImage = findImage(for: imageModel.imageKey, in: catalogItem.images)
@@ -815,16 +835,17 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
     func getCreativeResponse(model: CreativeResponseModel<LayoutSchemaModel, WhenPredicate>,
                              context: Context) throws -> LayoutSchemaViewModel {
-        guard case let .inner(.generic(offer)) = context, let offer else {
+        try validateNonInteractiveChildren(model.children)
+        guard case let .inner(.generic(offer, _)) = context, let offer else {
             throw LayoutTransformerError.InvalidMapping()
         }
         var updatedContext: Context
         if model.responseKey == BNFNamespace.CreativeResponseKey.positive.rawValue,
            offer.creative.responseOptionsMap?.positive != nil {
-            updatedContext = .inner(.positive(offer))
+            updatedContext = .inner(.positive(offer, offerIndex: context.offerIndex))
         } else if model.responseKey == BNFNamespace.CreativeResponseKey.negative.rawValue,
                   offer.creative.responseOptionsMap?.negative != nil {
-            updatedContext = .inner(.negative(offer))
+            updatedContext = .inner(.negative(offer, offerIndex: context.offerIndex))
         } else {
             return .empty
         }
@@ -874,7 +895,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         context: Context,
         accessibilityGrouped: Bool = false
     ) throws -> CatalogStackedCollectionViewModel {
-        guard case let .inner(.generic(.some(offer))) = context else {
+        guard case let .inner(.generic(.some(offer), _)) = context else {
             throw LayoutTransformerError.InvalidMapping()
         }
 
@@ -917,7 +938,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         >?,
         children: [LayoutSchemaViewModel]?,
         context: Context,
-        responseKey: String? = nil
+        responseKey: String? = nil,
+        accessibilityLabel: String? = nil
     ) throws -> CatalogResponseButtonViewModel {
         let catalogItem: CatalogItem
         switch context {
@@ -939,7 +961,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             disabledStyle: updateStyles.compactMap { $0.disabled },
             transactionData: transactionData,
             catalogItemContext: context.catalogItemContext,
-            responseKey: responseKey
+            responseKey: responseKey,
+            accessibilityLabel: try resolveAccessibilityLabel(accessibilityLabel, context: context)
         )
         if let context = context.catalogItemContext {
             let response = CatalogProductResponseViewModel(context: context, responseKey: responseKey,
@@ -986,21 +1009,24 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     func getWhenNode(children: [LayoutSchemaViewModel]?,
                      predicates: [WhenPredicate],
                      transition: WhenTransition?,
-                     catalogItemContext: CatalogItemContext? = nil) -> WhenViewModel {
+                     catalogItemContext: CatalogItemContext? = nil,
+                     predicateOfferIndex: Int? = nil) -> WhenViewModel {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
                              offers: layoutPlugin.slots.map(\.offer),
                              globalBreakPoints: layoutPlugin.breakpoints,
                              layoutState: layoutState,
-                             catalogItemContext: catalogItemContext)
+                             catalogItemContext: catalogItemContext,
+                             predicateOfferIndex: predicateOfferIndex)
     }
 
     func getToggleButton(customStateKey: String,
                          styles: LayoutStyle<ToggleButtonStateTriggerElements,
                                              ConditionalStyleTransition<ToggleButtonStateTriggerTransitions, WhenPredicate>>?,
                          children: [LayoutSchemaViewModel]?,
-                         eventService: EventDiagnosticServicing? = nil) throws -> ToggleButtonViewModel {
+                         eventService: EventDiagnosticServicing? = nil,
+                         accessibilityLabel: String? = nil) throws -> ToggleButtonViewModel {
         let updateStyles = try StyleTransformer.updatedStyles(styles?.elements?.own)
         return ToggleButtonViewModel(children: children,
                                      customStateKey: customStateKey,
@@ -1009,16 +1035,17 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                      hoveredStyle: updateStyles.compactMap {$0.hovered},
                                      disabledStyle: updateStyles.compactMap {$0.disabled},
                                      eventService: eventService ?? self.eventService,
-                                     layoutState: layoutState)
+                                     layoutState: layoutState,
+                                     accessibilityLabel: accessibilityLabel)
     }
 
     func getDataImageCarousel(_ dataImageCarouselModel: DataImageCarouselModel<WhenPredicate>,
                               context: Context) throws -> DataImageCarouselViewModel {
         var carouselImages: [CreativeImage]?
         switch context {
-        case .inner(.generic(let offer?)),
-                .inner(.negative(let offer)),
-                .inner(.positive(let offer)):
+        case .inner(.generic(let offer?, _)),
+                .inner(.negative(let offer, _)),
+                .inner(.positive(let offer, _)):
             let imageKeys = dataImageCarouselModel.imageKey.split(separator: "|").map {
                 $0.trimmingCharacters(in: .whitespacesAndNewlines)
             }
@@ -1109,11 +1136,11 @@ private extension LayoutTransformer.Context {
                 .outer
         case .inner(let inner):
             switch inner {
-            case .positive(let offerModel):
+            case .positive(let offerModel, _):
                     .positiveResponse(offerModel)
-            case .negative(let offerModel):
+            case .negative(let offerModel, _):
                     .negativeResponse(offerModel)
-            case .generic(let offerModel):
+            case .generic(let offerModel, _):
                     .generic(offerModel)
             case .catalogItem(let context):
                     .generic(context.offer)
@@ -1183,7 +1210,8 @@ private extension ContainerStylingProperties {
         shadow: Shadow? = nil,
         overflow: Overflow? = nil,
         gap: Float? = nil,
-        blur: Float? = nil
+        blur: Float? = nil,
+        opacity: Float? = nil
     ) -> ContainerStylingProperties {
         ContainerStylingProperties(
             justifyContent: justifyContent,
@@ -1191,7 +1219,8 @@ private extension ContainerStylingProperties {
             shadow: shadow,
             overflow: overflow,
             gap: gap,
-            blur: blur
+            blur: blur,
+            opacity: opacity
         )
     }
 }

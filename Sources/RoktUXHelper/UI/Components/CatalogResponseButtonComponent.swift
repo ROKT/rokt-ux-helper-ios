@@ -188,6 +188,7 @@ struct CatalogResponseButtonComponent: View {
     func build() -> some View {
         createContainer()
             .accessibilityAddTraits(.isButton)
+            .ifLet(model.accessibilityLabel) { $0.accessibilityElement(children: .ignore).accessibilityLabel($1) }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)

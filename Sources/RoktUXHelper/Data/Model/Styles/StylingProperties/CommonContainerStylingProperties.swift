@@ -7,8 +7,11 @@ protocol CommonContainerStylingProperties {
     var shadow: Shadow? { get }
     var overflow: Overflow? { get }
     var blur: Float? { get }
+    var opacity: Float? { get }
 }
 
 extension ContainerStylingProperties: CommonContainerStylingProperties {}
 
-extension ZStackContainerStylingProperties: CommonContainerStylingProperties {}
+extension ZStackContainerStylingProperties: CommonContainerStylingProperties {
+    var opacity: Float? { nil }
+}

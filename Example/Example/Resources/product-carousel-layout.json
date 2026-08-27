@@ -1,0 +1,456 @@
+{
+    "type": "Column",
+    "node": {
+        "children": [
+            {
+                "type": "When",
+                "node": {
+                    "predicates": [
+                        {
+                            "type": "Placeholder",
+                            "predicate": {
+                                "type": "TextLength",
+                                "content": {
+                                    "condition": "is-below",
+                                    "input": "%^DATA.creativeCopy.creative.copy^%",
+                                    "value": "78"
+                                }
+                            }
+                        }
+                    ],
+                    "children": [
+                        {
+                            "type": "BasicText",
+                            "node": {
+                                "value": "%^DATA.creativeCopy.creative.copy^%",
+                                "styles": {
+                                    "elements": {
+                                        "own": [
+                                            {
+                                                "default": {
+                                                    "text": {
+                                                        "fontSize": 16,
+                                                        "textColor": {
+                                                            "light": "#222222",
+                                                            "dark": "#eeeeee"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "When",
+                "node": {
+                    "predicates": [
+                        {
+                            "type": "Placeholder",
+                            "predicate": {
+                                "type": "TextLength",
+                                "content": {
+                                    "condition": "is-above",
+                                    "input": "%^DATA.creativeCopy.creative.copy^%",
+                                    "value": "77"
+                                }
+                            }
+                        },
+                        {
+                            "type": "CustomState",
+                            "predicate": {
+                                "key": "detailsExpanded",
+                                "condition": "is",
+                                "value": 0
+                            }
+                        }
+                    ],
+                    "children": [
+                        {
+                            "type": "InlineContainer",
+                            "node": {
+                                "a11yLabel": "Offer description",
+                                "children": [
+                                    {
+                                        "type": "BasicText",
+                                        "node": {
+                                            "value": "%^DATA.creativeCopy.creative.copy:sliceText[Chars,78]^%... ",
+                                            "styles": {
+                                                "elements": {
+                                                    "own": [
+                                                        {
+                                                            "default": {
+                                                                "text": {
+                                                                    "fontSize": 16,
+                                                                    "textColor": {
+                                                                        "light": "#222222",
+                                                                        "dark": "#eeeeee"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ToggleButtonStateTrigger",
+                                        "node": {
+                                            "customStateKey": "detailsExpanded",
+                                            "a11yLabel": "See More",
+                                            "children": [
+                                                {
+                                                    "type": "BasicText",
+                                                    "node": {
+                                                        "value": "See More",
+                                                        "styles": {
+                                                            "elements": {
+                                                                "own": [
+                                                                    {
+                                                                        "default": {
+                                                                            "text": {
+                                                                                "fontSize": 16,
+                                                                                "textColor": {
+                                                                                    "light": "#222222",
+                                                                                    "dark": "#eeeeee"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ],
+                                            "styles": {
+                                                "elements": {
+                                                    "own": [
+                                                        {
+                                                            "default": {
+                                                                "spacing": {
+                                                                    "padding": "2 4"
+                                                                },
+                                                                "container": {
+                                                                    "opacity": 1
+                                                                }
+                                                            },
+                                                            "pressed": {
+                                                                "container": {
+                                                                    "opacity": 0.6
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "When",
+                "node": {
+                    "predicates": [
+                        {
+                            "type": "Placeholder",
+                            "predicate": {
+                                "type": "TextLength",
+                                "content": {
+                                    "condition": "is-above",
+                                    "input": "%^DATA.creativeCopy.creative.copy^%",
+                                    "value": "77"
+                                }
+                            }
+                        },
+                        {
+                            "type": "CustomState",
+                            "predicate": {
+                                "key": "detailsExpanded",
+                                "condition": "is",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "children": [
+                        {
+                            "type": "InlineContainer",
+                            "node": {
+                                "a11yLabel": "Offer description",
+                                "children": [
+                                    {
+                                        "type": "BasicText",
+                                        "node": {
+                                            "value": "%^DATA.creativeCopy.creative.copy^% ",
+                                            "styles": {
+                                                "elements": {
+                                                    "own": [
+                                                        {
+                                                            "default": {
+                                                                "text": {
+                                                                    "fontSize": 16,
+                                                                    "textColor": {
+                                                                        "light": "#222222",
+                                                                        "dark": "#eeeeee"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ToggleButtonStateTrigger",
+                                        "node": {
+                                            "customStateKey": "detailsExpanded",
+                                            "a11yLabel": "See Less",
+                                            "children": [
+                                                {
+                                                    "type": "BasicText",
+                                                    "node": {
+                                                        "value": "See Less",
+                                                        "styles": {
+                                                            "elements": {
+                                                                "own": [
+                                                                    {
+                                                                        "default": {
+                                                                            "text": {
+                                                                                "fontSize": 16,
+                                                                                "textColor": {
+                                                                                    "light": "#222222",
+                                                                                    "dark": "#eeeeee"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ],
+                                            "styles": {
+                                                "elements": {
+                                                    "own": [
+                                                        {
+                                                            "default": {
+                                                                "spacing": {
+                                                                    "padding": "2 4"
+                                                                },
+                                                                "container": {
+                                                                    "opacity": 1
+                                                                }
+                                                            },
+                                                            "pressed": {
+                                                                "container": {
+                                                                    "opacity": 0.6
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "CatalogCarouselCollection",
+                "node": {
+                    "viewableItems": [
+                        1,
+                        2
+                    ],
+                    "peekThroughSize": [
+                        {
+                            "type": "fixed",
+                            "value": 16
+                        },
+                        {
+                            "type": "percentage",
+                            "value": 5
+                        }
+                    ],
+                    "styles": {
+                        "elements": {
+                            "own": [
+                                {
+                                    "default": {
+                                        "container": {
+                                            "gap": 12,
+                                            "opacity": 1
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "template": {
+                        "type": "Column",
+                        "node": {
+                            "children": [
+                                {
+                                    "type": "DataImage",
+                                    "node": {
+                                        "imageKey": "catalogItemImage0",
+                                        "styles": {
+                                            "elements": {
+                                                "own": [
+                                                    {
+                                                        "default": {
+                                                            "dimension": {
+                                                                "height": {
+                                                                    "type": "fixed",
+                                                                    "value": 120
+                                                                }
+                                                            },
+                                                            "image": {
+                                                                "scale": "fit"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "When",
+                                    "node": {
+                                        "predicates": [
+                                            {
+                                                "type": "Placeholder",
+                                                "predicate": {
+                                                    "type": "TextValue",
+                                                    "content": {
+                                                        "condition": "is",
+                                                        "input": "%^DATA.catalogItem.productCartAttribute1^%",
+                                                        "value": "title"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "children": [
+                                            {
+                                                "type": "BasicText",
+                                                "node": {
+                                                    "value": "%^DATA.catalogItem.title^%",
+                                                    "styles": {
+                                                        "elements": {
+                                                            "own": [
+                                                                {
+                                                                    "default": {
+                                                                        "text": {
+                                                                            "fontSize": 16,
+                                                                            "textColor": {
+                                                                                "light": "#222222",
+                                                                                "dark": "#eeeeee"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "When",
+                                    "node": {
+                                        "predicates": [
+                                            {
+                                                "type": "Placeholder",
+                                                "predicate": {
+                                                    "type": "TextValue",
+                                                    "content": {
+                                                        "condition": "is",
+                                                        "input": "%^DATA.catalogItem.productCartAttribute2^%",
+                                                        "value": "price"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "children": [
+                                            {
+                                                "type": "BasicText",
+                                                "node": {
+                                                    "value": "%^DATA.catalogItem.priceFormatted^%",
+                                                    "styles": {
+                                                        "elements": {
+                                                            "own": [
+                                                                {
+                                                                    "default": {
+                                                                        "text": {
+                                                                            "fontSize": 16,
+                                                                            "textColor": {
+                                                                                "light": "#222222",
+                                                                                "dark": "#eeeeee"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "CatalogResponseButton",
+                                    "node": {
+                                        "a11yLabel": "%^DATA.catalogItem.title|^%",
+                                        "children": [
+                                            {
+                                                "type": "BasicText",
+                                                "node": {
+                                                    "value": "View product",
+                                                    "styles": {
+                                                        "elements": {
+                                                            "own": [
+                                                                {
+                                                                    "default": {
+                                                                        "text": {
+                                                                            "fontSize": 16,
+                                                                            "textColor": {
+                                                                                "light": "#222222",
+                                                                                "dark": "#eeeeee"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

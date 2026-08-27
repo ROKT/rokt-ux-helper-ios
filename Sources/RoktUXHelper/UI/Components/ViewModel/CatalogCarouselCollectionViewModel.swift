@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import DcuiSchema
+import SwiftUI
 
 struct CatalogCarouselCallbacks {
     var onMount: (([CatalogItemContext]) -> Void)?
@@ -26,6 +27,7 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
     let defaultStyle: [BaseStyles]?
     let viewableItems: [UInt8]
     let peekThroughSize: [PeekThroughSize]
+    let conditionalStyle: ConditionalStyleBinding?
     weak var layoutState: (any LayoutStateRepresenting)?
 
     @Published private(set) var currentItemIndex = 0
@@ -36,6 +38,7 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
     private var scrollTracker = CatalogCarouselScrollTracker()
     private var measuredWidth: CGFloat?
     private var itemHeights: [Int: CGFloat] = [:]
+    private var styleSubscription: AnyCancellable?
 
     var imageLoader: RoktUXImageLoader? { layoutState?.imageLoader }
 
@@ -46,6 +49,7 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
          defaultStyle: [BaseStyles]? = nil,
          layoutState: any LayoutStateRepresenting,
          callbacks: CatalogCarouselCallbacks = .init(),
+         conditionalStyle: ConditionalStyleBinding? = nil,
          buildCard: (CatalogItemContext) throws -> LayoutSchemaViewModel) rethrows {
         let count = slots[safe: offerIndex]?.offer?.catalogItems?.count ?? 0
         self.cards = try (0..<count).compactMap { index in
@@ -57,9 +61,16 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
         self.defaultStyle = defaultStyle
         self.layoutState = layoutState
         self.callbacks = callbacks
+        self.conditionalStyle = conditionalStyle
+        styleSubscription = conditionalStyle?.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
 
-    func geometry(viewportWidth: CGFloat, breakpointIndex: Int) -> CatalogCarouselGeometry {
+    func style(width: CGFloat?, position: Int?, colorScheme: ColorScheme) -> BaseStyles? {
+        let base = defaultStyle?[safe: updateBreakpointIndex(for: width)]
+        return conditionalStyle?.resolve(base, position: position, width: width ?? 0, colorScheme: colorScheme) ?? base
+    }
+
+    func geometry(viewportWidth: CGFloat, breakpointIndex: Int, style override: BaseStyles? = nil) -> CatalogCarouselGeometry {
         let visible = viewableItems[safe: max(0, min(breakpointIndex, viewableItems.count - 1))] ?? 1
         let peekSize = peekThroughSize[safe: max(0, min(breakpointIndex, peekThroughSize.count - 1))]
         let peek: CGFloat
@@ -68,7 +79,7 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
         case .percentage(let value): peek = viewportWidth * CGFloat(value)/100
         case nil: peek = 0
         }
-        let style = defaultStyle?[safe: max(0, min(breakpointIndex, (defaultStyle?.count ?? 0) - 1))]
+        let style = override ?? defaultStyle?[safe: max(0, min(breakpointIndex, (defaultStyle?.count ?? 0) - 1))]
         return CatalogCarouselGeometry(viewportWidth: viewportWidth, itemCount: cards.count,
                                        viewableItems: Int(visible), gap: CGFloat(style?.container?.gap ?? 0), peek: peek)
     }
