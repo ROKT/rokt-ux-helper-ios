@@ -64,7 +64,7 @@ final class CatalogItemContextTests: XCTestCase {
             XCTAssertEqual(resolver
                 .resolveString(placeholder: "%^DATA.catalogItem.images.catalogItemImage0.light^%", context: context),
                            card.catalogItem.images["catalogItemImage0"]?.light)
-            XCTAssertEqual(resolver.resolveString(placeholder: "%^DATA.creative.copy.title^%", context: context), "Product offer")
+            XCTAssertEqual(resolver.resolveString(placeholder: "%^DATA.creativeCopy.title^%", context: context), "Product offer")
             XCTAssertEqual(resolver.resolveInt(placeholder: "%^STATE.IndicatorPosition^%", context: context), 1)
             XCTAssertEqual(resolver.resolveInt(placeholder: "%^STATE.TotalOffers^%", context: context), 2)
         }

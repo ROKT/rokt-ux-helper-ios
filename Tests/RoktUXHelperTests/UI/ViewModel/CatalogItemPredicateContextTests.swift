@@ -12,7 +12,7 @@ final class CatalogItemPredicateContextTests: XCTestCase {
         state.items[LayoutState.activeCatalogItemKey] = second.catalogItem
         let predicates: [WhenPredicate] = [
             .placeholder(.textValue(.init(condition: .is, input: "%^DATA.catalogItem.productCartAttribute1^%", value: "title"))),
-            .placeholder(.textValue(.init(condition: .is, input: "%^DATA.creative.copy.title^%", value: "Product offer"))),
+            .placeholder(.textValue(.init(condition: .is, input: "%^DATA.creativeCopy.title^%", value: "Product offer"))),
             .creativeCopy(.init(condition: .exists, value: "firstCardOnly")),
             .creativeCopy(.init(condition: .exists, value: "parentOnly")),
             .creativeCopy(.init(condition: .notExists, value: "otherOfferOnly"))
