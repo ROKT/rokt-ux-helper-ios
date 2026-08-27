@@ -45,7 +45,12 @@ struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where San
                             hasValidCharactersAndNamespace(binding: binding)
             }
 
-            isValid = isValid && hasValidCharactersAndNamespace(binding: binding)
+            if index == bindings.count - 1, index > 0, parser.namespaceIn(placeholder: binding) == nil {
+                // Literal fallbacks are not operator expressions and may contain localized punctuation.
+                isValid = isValid && !sanitiser.sanitiseDelimiters(data: binding).isEmpty
+            } else {
+                isValid = isValid && hasValidCharactersAndNamespace(binding: binding)
+            }
         }
 
         return isValid
@@ -57,6 +62,9 @@ struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where San
             sanitisedBinding = sanitiser.sanitiseNamespace(data: sanitisedBinding, namespace: namespace)
         }
 
+        let parts = sanitisedBinding.components(separatedBy: ":")
+        guard parts.dropFirst().allSatisfy({ BNFTextOperation($0) != .invalid }) else { return false }
+        sanitisedBinding = parts[0]
         let wordsInBinding = sanitisedBinding.components(separatedBy: BNFSeparator.namespace.rawValue)
 
         return wordsInBinding.allSatisfy(hasOnlyAlphaNumericOrSpace(binding:))

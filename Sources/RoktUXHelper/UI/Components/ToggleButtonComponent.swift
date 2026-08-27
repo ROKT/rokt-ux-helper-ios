@@ -203,16 +203,7 @@ struct ToggleButtonComponent: View {
     }
 
     private func handleToggle() {
-        model.layoutState?.actionCollection[.toggleCustomState](
-            CustomStateIdentifiable(
-                position: config.position,
-                key: model.customStateKey
-            )
-        )
-        model.eventService?.sendUserInteraction(
-            action: .ToggleButtonStateTriggerClick,
-            context: .ToggleButtonStateTrigger
-        )
+        model.handleToggle(position: config.position)
     }
 
     private func updateStyleState() {

@@ -22,11 +22,15 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
         responseKey: String?,
         from data: CatalogItem?
     ) throws -> DataBinding<U> {
+        let placeholder = parser.parse(propertyChain: propertyChain)
         guard dataValidator.isValid(data: propertyChain) else {
+            if placeholder.hasTextOperations {
+                throw BNFPlaceholderError.invalidTextOperation
+            }
             return .value(propertyChain as! U)
         }
 
-        let placeholder = parser.parse(propertyChain: propertyChain)
+        guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
         let resolution = try resolveValue(from: placeholder, data: data)
         let mappedData: Any? = resolution.value ?? placeholder.defaultValue
 
@@ -53,6 +57,12 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
                     throw BNFPlaceholderError.mandatoryKeyEmpty
                 }
                 if let resolvedValue {
+                    if !keyAndNamespace.textOperations.isEmpty {
+                        guard let text = stringValue(from: resolvedValue) else {
+                            throw BNFPlaceholderError.invalidTextOperation
+                        }
+                        return (try keyAndNamespace.applyingTextOperations(to: text), false)
+                    }
                     return (resolvedValue, false)
                 }
             case .state:

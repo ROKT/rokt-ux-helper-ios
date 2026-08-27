@@ -50,7 +50,7 @@ class TextComponentBNFHelper {
     ) -> [String: String] {
         var placeHoldersToResolvedValues: [String: String] = [:]
 
-        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let bnfRegexPattern = BNFPlaceholder.expression
         let range = NSRange(originalString.startIndex..<originalString.endIndex, in: originalString)
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
@@ -78,10 +78,12 @@ class TextComponentBNFHelper {
         totalOffersString: String
     ) -> String {
         let validator = PlaceholderValidator()
-        guard validator.isValid(data: propertyChain) else { return propertyChain }
-
         let parser = PropertyChainDataParser()
         let parsedChain = parser.parse(propertyChain: propertyChain)
+        guard validator.isValid(data: propertyChain) else {
+            return parsedChain.hasTextOperations
+                ? (parsedChain.defaultValue ?? "") : propertyChain
+        }
 
         for keyAndNamespace in parsedChain.parseableChains {
             guard case .state = keyAndNamespace.namespace,
@@ -91,9 +93,9 @@ class TextComponentBNFHelper {
             }
 
             if DataBindingStateKeys.isTotalOffers(keyAndNamespace.key) {
-                return totalOffersString
+                return (try? keyAndNamespace.applyingTextOperations(to: totalOffersString)) ?? ""
             } else if DataBindingStateKeys.isIndicatorPosition(keyAndNamespace.key) {
-                return currentOfferString
+                return (try? keyAndNamespace.applyingTextOperations(to: currentOfferString)) ?? ""
             }
         }
 

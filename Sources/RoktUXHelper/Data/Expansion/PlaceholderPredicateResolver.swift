@@ -92,21 +92,21 @@ final class PlaceholderPredicateResolver {
                                                                             propertyChain: keyAndNamespace.withNamespace,
                                                                             responseKey: nil,
                                                                             from: offer)
-                return unwrapBinding(result)
+                return try keyAndNamespace.applyingTextOperations(to: unwrapBinding(result))
             case .dataCatalogItem:
                 if let catalogItem = context.activeCatalogItem {
                     let result = try catalogExtractor.extractDataRepresentedBy(String.self,
                                                                                propertyChain: keyAndNamespace.withNamespace,
                                                                                responseKey: nil,
                                                                                from: catalogItem)
-                    return unwrapBinding(result)
+                    return try keyAndNamespace.applyingTextOperations(to: unwrapBinding(result))
                 }
             case .state:
                 if keyAndNamespace.key == DataBindingStateKeys.indicatorPosition {
-                    return String(context.currentOfferIndex)
+                    return try keyAndNamespace.applyingTextOperations(to: String(context.currentOfferIndex))
                 }
                 if keyAndNamespace.key == DataBindingStateKeys.totalOffers {
-                    return String(context.offers.count)
+                    return try keyAndNamespace.applyingTextOperations(to: String(context.offers.count))
                 }
             case .dataTransactionData, .dataCatalogRuntime:
                 // Predicates targeting transactionData / DATA.catalogRuntime.* aren't supported
@@ -119,7 +119,7 @@ final class PlaceholderPredicateResolver {
         return parsedPlaceholder.defaultValue
     }
 
-    private func unwrapBinding(_ binding: DataBinding<String>) -> Any {
+    private func unwrapBinding(_ binding: DataBinding<String>) -> String {
         switch binding {
         case .value(let value), .state(let value):
             return value

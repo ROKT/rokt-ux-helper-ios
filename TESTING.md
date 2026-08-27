@@ -261,3 +261,13 @@ rendering drift across simulator runtimes.
 - [ ] Progress bar rendering at various states
 
 > **Contributing:** When you add a new snapshot test, check the box above and note the test method name. When you identify a new scenario worth covering, add an unchecked item.
+
+## Native Inline Text
+
+`TestInlineContainerComponent` exercises the internal text renderer without adding a schema dependency or advertising a new schema version. It covers shared text/action lines, narrow wrapping, Unicode action ranges, Dynamic Type, dark mode, right-to-left content, accessible link/button labels, disabled actions, custom-state dispatch, and SwiftUI host height changes. The height coordinator test checks that identical measurements do not keep updating SwiftUI state.
+
+Inline range styles cover typography, solid background colors, nonnegative padding/margins, solid or dashed borders, and opacity. Parent container styles use the existing layout modifier. Background images, blur, and shadows on individual inline ranges are not represented by `InlineSpanStyle`; a future schema adapter must handle or explicitly reject these effects rather than discard them. No new wire node is accepted by this implementation alone.
+
+`BNFTextOperationTests` and `TextSlicingTests` cover `:sliceText[Chars,N]`, including 77/78/79-character boundaries, joined emoji and combining marks, invalid arguments, and fallback alternatives. `N` is a nonnegative whole number within Swift's `Int` range. Slicing uses the same `String` character semantics as the length predicate. Operations apply to the selected key alternative; literal fallbacks remain unchanged.
+
+Run these tests on an iOS simulator using the package's normal `xcodebuild` workflow. Native layout assertions do not replace visual checks: inspect inline wrapping and decoration on iOS 15 and a current OS, exercise VoiceOver and nested scrolling, and verify the example host before enabling schema integration. No inline snapshot reference images are recorded yet.

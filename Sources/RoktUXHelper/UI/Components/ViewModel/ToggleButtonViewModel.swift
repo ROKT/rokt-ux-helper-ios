@@ -33,4 +33,13 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
         self.eventService = eventService
         self.layoutState = layoutState
     }
+
+    func handleToggle(position: Int?) {
+        layoutState?.actionCollection[.toggleCustomState](
+            CustomStateIdentifiable(position: position, key: customStateKey)
+        )
+        eventService?.sendUserInteraction(action: .ToggleButtonStateTriggerClick,
+                                          context: .ToggleButtonStateTrigger)
+    }
+
 }

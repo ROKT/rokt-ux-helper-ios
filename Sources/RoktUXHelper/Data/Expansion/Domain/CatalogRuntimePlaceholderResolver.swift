@@ -15,7 +15,7 @@ import Foundation
 enum CatalogRuntimePlaceholderResolver {
 
     private static let bnfRegex: NSRegularExpression? = {
-        try? NSRegularExpression(pattern: "(?<=\\%\\^)[a-zA-Z0-9 .|_$\\-]*(?=\\^\\%)")
+        try? NSRegularExpression(pattern: BNFPlaceholder.deferredExpression)
     }()
 
     static func resolve(text: String, catalogRuntimeData: [String: String]?) -> String {
@@ -64,9 +64,11 @@ enum CatalogRuntimePlaceholderResolver {
         var fallback: String?
         for part in parts {
             if part.hasPrefix(prefix) {
-                let key = String(part.dropFirst(prefix.count))
-                if let value = runtimeData?[key], !value.isEmpty {
-                    return value
+                let parsed = PropertyChainDataParser().parse(propertyChain: part)
+                if let binding = parsed.parseableChains.first,
+                   let value = runtimeData?[binding.key], !value.isEmpty,
+                   let transformed = try? binding.applyingTextOperations(to: value) {
+                    return transformed
                 }
             } else if !part.isEmpty || fallback == nil {
                 // Treat trailing literal (no namespace) as the default. An empty trailing

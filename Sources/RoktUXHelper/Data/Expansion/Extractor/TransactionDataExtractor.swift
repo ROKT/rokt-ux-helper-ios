@@ -22,11 +22,15 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
         responseKey: String?,
         from data: TransactionData?
     ) throws -> DataBinding<U> {
+        let placeholder = parser.parse(propertyChain: propertyChain)
         guard dataValidator.isValid(data: propertyChain) else {
+            if placeholder.hasTextOperations {
+                throw BNFPlaceholderError.invalidTextOperation
+            }
             return .value(propertyChain as! U)
         }
 
-        let placeholder = parser.parse(propertyChain: propertyChain)
+        guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
         let resolved = try resolveValue(from: placeholder, data: data)
         let mappedData: Any? = resolved ?? placeholder.defaultValue
 
@@ -51,6 +55,12 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
                     throw BNFPlaceholderError.mandatoryKeyEmpty
                 }
                 if let resolved {
+                    if !keyAndNamespace.textOperations.isEmpty {
+                        guard let text = stringValue(from: resolved) else {
+                            throw BNFPlaceholderError.invalidTextOperation
+                        }
+                        return try keyAndNamespace.applyingTextOperations(to: text)
+                    }
                     return resolved
                 }
             case .dataCatalogItem,

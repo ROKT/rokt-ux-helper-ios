@@ -25,9 +25,15 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
         responseKey: String?,
         from data: OfferModel?
     ) throws -> DataBinding<U> {
-        guard dataValidator.isValid(data: propertyChain) else { return .value(propertyChain as! U) }
-
         let placeholder = parser.parse(propertyChain: propertyChain)
+        guard dataValidator.isValid(data: propertyChain) else {
+            if placeholder.hasTextOperations {
+                throw BNFPlaceholderError.invalidTextOperation
+            }
+            return .value(propertyChain as! U)
+        }
+
+        guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
 
         let processedData = try processChains(placeholder.parseableChains, responseKey: responseKey, data: data)
 
@@ -44,9 +50,10 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
     private func processChains(_ chains: [BNFKeyAndNamespace], responseKey: String?, data: OfferModel?) throws -> ProcessedData {
         for chain in chains {
             let result = try processChain(chain, responseKey: responseKey, data: data)
-            if result != .empty {
-                return result
+            if let value = result.mappedValue, !result.isStateType {
+                return ProcessedData(mappedValue: try chain.applyingTextOperations(to: value))
             }
+            if result != .empty { return result }
         }
         return .empty
     }
