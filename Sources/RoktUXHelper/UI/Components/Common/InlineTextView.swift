@@ -25,12 +25,17 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     var actionsEnabled = true {
         didSet {
             guard oldValue != actionsEnabled else { return }
-            if !actionsEnabled { setPressedRun(nil) }
+            if !actionsEnabled {
+                setPressedRun(nil)
+                if let hoveredRunID { onInteractionStateChange?(hoveredRunID, .disabled) }
+                hoveredRunID = nil
+            }
             updateAccessibility()
         }
     }
     private var elements: [UUID: InlineAccessibilityElement] = [:]
     private var pressedRunID: UUID?
+    private var hoveredRunID: UUID?
     private var previousWidth: CGFloat = 0
     private let minimumTargetSize: CGFloat = 44
 
@@ -54,6 +59,7 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         tap.delegate = self
         addGestureRecognizer(tap)
+        addGestureRecognizer(UIHoverGestureRecognizer(target: self, action: #selector(handleHover(_:))))
     }
 
     required init?(coder: NSCoder) { return nil }
@@ -144,6 +150,17 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
         activateRun(id: run.id)
     }
 
+    @objc private func handleHover(_ recognizer: UIHoverGestureRecognizer) {
+        let next = recognizer.state == .began || recognizer.state == .changed
+            ? actionRun(at: recognizer.location(in: self))?.id : nil
+        guard next != hoveredRunID else { return }
+        if let previous = hoveredRunID, previous != pressedRunID {
+            onInteractionStateChange?(previous, actionsEnabled ? .default : .disabled)
+        }
+        hoveredRunID = next
+        if let next, next != pressedRunID { onInteractionStateChange?(next, .hovered) }
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         setPressedRun(touches.first.flatMap { actionRun(at: $0.location(in: self))?.id })
@@ -161,7 +178,10 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
 
     private func setPressedRun(_ id: UUID?) {
         guard id != pressedRunID else { return }
-        if let previous = pressedRunID { onInteractionStateChange?(previous, actionsEnabled ? .default : .disabled) }
+        if let previous = pressedRunID {
+            let nextState: StyleState = previous == hoveredRunID ? .hovered : .default
+            onInteractionStateChange?(previous, actionsEnabled ? nextState : .disabled)
+        }
         pressedRunID = id
         if let id { onInteractionStateChange?(id, .pressed) }
     }

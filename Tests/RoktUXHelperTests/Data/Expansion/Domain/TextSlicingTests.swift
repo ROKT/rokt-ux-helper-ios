@@ -40,6 +40,25 @@ final class TextSlicingTests: XCTestCase {
         }
     }
 
+    func testMalformedRuntimeOperationDoesNotReappearAfterFinalizationOrRuntimeUpdates() {
+        let state = MockLayoutState()
+        let template = "Before %^DATA.catalogRuntime.copy:sliceText[Chars,-1]^% after"
+        let basic = BasicTextViewModel(value: template, defaultStyle: nil, pressedStyle: nil, hoveredStyle: nil,
+                                       disabledStyle: nil, layoutState: state, diagnosticService: nil)
+        let rich = RichTextViewModel(value: template, defaultStyle: nil, openLinks: nil,
+                                     layoutState: state, eventService: nil)
+        basic.updateDataBinding(dataBinding: .value(template))
+        rich.updateDataBinding(dataBinding: .value(template))
+        basic.finalizePlaceholders()
+        rich.finalizePlaceholders()
+        XCTAssertEqual(basic.boundValue, "")
+        XCTAssertEqual(rich.boundValue, "")
+        state.items[LayoutState.catalogRuntimeDataKey] = ["copy": "Runtime copy"]
+        state.itemsPublisher.send(state.items)
+        XCTAssertEqual(basic.boundValue, "")
+        XCTAssertEqual(rich.boundValue, "")
+    }
+
     func testSliceAndExistingLengthPredicateAgreeOnUnicode() throws {
         let value = String(repeating: "a", count: 77) + "👩🏽‍🚀" + "z"
         let data = offer(copy: value)

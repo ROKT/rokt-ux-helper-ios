@@ -1,7 +1,7 @@
 import DcuiSchema
 import SwiftUI
 
-/// Uses the same typography and adaptive colors as BasicTextComponent.
+/// Shares BasicText's font and color helpers; inline typography excludes line-level controls.
 enum InlineTextAttributes {
     static func make(_ value: String, style: BasicTextStyle?, colorScheme: ColorScheme,
                      contentSize: UIContentSizeCategory) -> NSAttributedString {
