@@ -11,7 +11,7 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
     func map(consumer: LayoutSchemaViewModel, context: CatalogItem) {
         switch consumer {
         case .richText(let textModel):
-            let originalText = textModel.value ?? ""
+            let originalText = textModel.currentTemplateText
 
             let transformedText = resolveDataExpansion(
                 originalText,
@@ -20,7 +20,7 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
         case .basicText(let textModel):
-            let originalText = textModel.value ?? ""
+            let originalText = textModel.currentTemplateText
 
             let transformedText = resolveDataExpansion(
                 originalText,

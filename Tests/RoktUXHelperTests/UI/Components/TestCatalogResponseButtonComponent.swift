@@ -18,7 +18,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
             .view(CatalogResponseButtonComponent.self)
             .actualView()
             .inspect()
-            .hStack()
+            .find(ViewType.HStack.self)
         
         // test custom modifier class
         let paddingModifier = try catalogResponseButton.modifier(PaddingModifier.self)
