@@ -6,24 +6,26 @@ import SwiftUI
 @MainActor
 final class CatalogCarouselScrollHostTests: XCTestCase {
     func test_hostRetainsItsChildControllerAndTearsDownDelegatesAndContent() throws {
-        let model = CatalogCarouselTestFixture.model(slots: try CatalogCarouselTestFixture.slots(count: 3))
-        var controller: CatalogCarouselViewController? = CatalogCarouselViewController(model: model)
-        weak var weakController = controller
-        let geometry = model.geometry(viewportWidth: 300, breakpointIndex: 0)
-        controller?.update(content: AnyView(Text("Example products")), geometry: geometry,
-                           isRightToLeft: false, isEnabled: true)
-        weak var weakHost = controller?.hostingController
-        XCTAssertNotNil(weakHost)
-        XCTAssertTrue(controller?.hostingController?.parent === controller)
-        XCTAssertEqual(controller?.children.count, 1)
-        XCTAssertTrue(controller?.scrollView.delegate === controller)
-        controller?.tearDown()
-        XCTAssertNil(controller?.scrollView.delegate)
-        XCTAssertNil(controller?.scrollView.accessibilityScrollHandler)
-        XCTAssertNil(controller?.hostingController)
-        XCTAssertEqual(controller?.children.count, 0)
-        XCTAssertNil(weakHost)
-        controller = nil
+        weak var weakController: CatalogCarouselViewController?
+        try autoreleasepool {
+            let model = CatalogCarouselTestFixture.model(slots: try CatalogCarouselTestFixture.slots(count: 3))
+            let controller = CatalogCarouselViewController(model: model)
+            weakController = controller
+            let geometry = model.geometry(viewportWidth: 300, breakpointIndex: 0)
+            controller.update(content: AnyView(Text("Example products")), geometry: geometry,
+                              isRightToLeft: false, isEnabled: true)
+            weak var weakHost = controller.hostingController
+            XCTAssertNotNil(weakHost)
+            XCTAssertTrue(controller.hostingController?.parent === controller)
+            XCTAssertEqual(controller.children.count, 1)
+            XCTAssertTrue(controller.scrollView.delegate === controller)
+            controller.tearDown()
+            XCTAssertNil(controller.scrollView.delegate)
+            XCTAssertNil(controller.scrollView.accessibilityScrollHandler)
+            XCTAssertNil(controller.hostingController)
+            XCTAssertEqual(controller.children.count, 0)
+            XCTAssertNil(weakHost)
+        }
         XCTAssertNil(weakController)
     }
 
