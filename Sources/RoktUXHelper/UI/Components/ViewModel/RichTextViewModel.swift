@@ -5,6 +5,7 @@ import DcuiSchema
 class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAdaptive {
     // `value` is used by our BNF transformer to update `dataBinding`
     private(set) var value: String?
+    let catalogItemContext: CatalogItemContext?
     private(set) var dataBinding: DataBinding = .value("")
     // Post-mapper text retained as the template for reactive `%^DATA.catalogRuntime.<key>^%`
     // resolution. See `BasicTextViewModel` for the same pattern.
@@ -31,7 +32,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
 
     var viewableItems: Binding<Int>
     var currentIndex: Binding<Int>
-    lazy var totalOffer: Int = layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
+    lazy var totalOffer: Int = catalogItemContext?.offers.count ?? layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     private var cancellable: AnyCancellable?
 
     var totalPages: Int {
@@ -60,9 +61,11 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         openLinks: LinkOpenTarget?,
         stateDataExpansionClosure: ((String?) -> String?)? = nil,
         layoutState: (any LayoutStateRepresenting)?,
-        eventService: EventDiagnosticServicing?
+        eventService: EventDiagnosticServicing?,
+        catalogItemContext: CatalogItemContext? = nil
     ) {
         self.value = value
+        self.catalogItemContext = catalogItemContext
         self.boundValue = value ?? ""
 
         self.defaultStyle = defaultStyle
@@ -72,12 +75,14 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.layoutState = layoutState
         self.eventService = eventService
         self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
-        self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        self.currentIndex = catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
+            ?? layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         updateBoundValueWithStyling()
         cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
             guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
-            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+            self.currentIndex = self.catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
+                ?? newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
             self.reapplyCatalogRuntimeResolution()
         }
     }

@@ -93,6 +93,10 @@ struct CatalogResponseButtonComponent: View {
     }
 
     var body: some View {
+        if model.isRenderable { content }
+    }
+
+    private var content: some View {
         build()
             .onHover { isHovered in
                 self.isHovered = isHovered
