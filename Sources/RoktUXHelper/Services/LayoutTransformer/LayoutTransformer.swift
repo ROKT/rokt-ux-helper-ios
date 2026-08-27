@@ -928,7 +928,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
         let transactionData = transactionData(for: context)
         let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
-        return CatalogResponseButtonViewModel(
+        let model = CatalogResponseButtonViewModel(
             catalogItem: catalogItem,
             children: children,
             layoutState: layoutState,
@@ -941,6 +941,12 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             catalogItemContext: context.catalogItemContext,
             responseKey: responseKey
         )
+        if let context = context.catalogItemContext {
+            let response = CatalogProductResponseViewModel(context: context, responseKey: responseKey,
+                                                           eventService: eventService, layoutState: layoutState)
+            model.productResponse = { _, _ in response.handleResponse() }
+        }
+        return model
     }
 
     func getProgressIndicatorUIModel(
