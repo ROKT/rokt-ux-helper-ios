@@ -29,7 +29,8 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
             let component = CatalogResponseButtonComponent(config: .init(parent: .column, position: 1), model: model,
                                                            parentWidth: .constant(240), parentHeight: .constant(nil),
                                                            parentOverride: nil).environmentObject(screen)
-            let child = try component.inspect().find(BasicTextComponent.self).actualView()
+            let button = try component.inspect().view(CatalogResponseButtonComponent.self).actualView()
+            let child = try button.inspect().find(BasicTextComponent.self).actualView()
             XCTAssertEqual(child.model.boundValue, "View product")
             XCTAssertFalse(child.expandsToContainerOnSelfAlign)
         }
