@@ -1,10 +1,39 @@
 import XCTest
 import SwiftUI
 import ViewInspector
+import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 15.0, *)
 final class TestCatalogResponseButtonComponent: XCTestCase {
+
+    @MainActor
+    func test_productResponseWithoutStylesRendersItsChildWithoutExpandingHeight() throws {
+        let slots = try CatalogProductFixture.slots()
+        let context = try XCTUnwrap(CatalogItemContext(slots: slots, offerIndex: 1, itemIndex: 0))
+        for styles in ["null", #"{"elements":{"own":[]}}"#] {
+            let schema = try JSONDecoder().decode(LayoutSchemaModel.self, from: Data("""
+            {"type":"CatalogResponseButton","node":{"styles":\(styles),"children":[
+              {"type":"BasicText","node":{"value":"View product"}}
+            ]}}
+            """.utf8))
+            let state = LayoutState()
+            let transformer = ProductCarouselIntegrationFixture.transformer(slots: slots, state: state)
+            let layout = try transformer.transform(schema, context: .inner(.catalogItem(context)))
+            guard case .catalogResponseButton(let model) = layout else {
+                return XCTFail("Expected a catalog response button")
+            }
+            XCTAssertEqual(model.defaultStyle?.count, 0)
+            let screen = GlobalScreenSize()
+            screen.width = 240
+            let component = CatalogResponseButtonComponent(config: .init(parent: .column, position: 1), model: model,
+                                                           parentWidth: .constant(240), parentHeight: .constant(nil),
+                                                           parentOverride: nil).environmentObject(screen)
+            let child = try component.inspect().find(BasicTextComponent.self).actualView()
+            XCTAssertEqual(child.model.boundValue, "View product")
+            XCTAssertFalse(child.expandsToContainerOnSelfAlign)
+        }
+    }
 
     func test_creative_response() throws {
 

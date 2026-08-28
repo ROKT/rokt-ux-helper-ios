@@ -29,6 +29,8 @@ final class TestInlineSchemaLifecycle: XCTestCase {
         XCTAssertTrue(view.activateRun(id: action.id))
         wait(for: [changed], timeout: 3)
         subscription.cancel()
+        waitForInline(in: scene) { $0.text.hasPrefix("COPY ") }
+        XCTAssertTrue(try XCTUnwrap(scene.firstInline()).text.hasPrefix("COPY "))
         XCTAssertEqual(state.globalCustomStateValue(for: "details"), 1)
         XCTAssertEqual(captured.last?.customStateMap?[CustomStateIdentifiable(position: nil, key: "details")], 1)
         XCTAssertEqual(model.style(state: .default, position: nil, width: 200, colorScheme: .light)?.container?.opacity, 0.5)
@@ -38,6 +40,8 @@ final class TestInlineSchemaLifecycle: XCTestCase {
         XCTAssertEqual(content.transitionDuration, 0.1)
         XCTAssertEqual(content.runs.last?.label, "Change details")
         XCTAssertTrue(view.activateRun(id: action.id))
+        waitForInline(in: scene) { $0.text.hasPrefix("Copy ") }
+        XCTAssertTrue(try XCTUnwrap(scene.firstInline()).text.hasPrefix("Copy "))
         XCTAssertEqual(state.globalCustomStateValue(for: "details"), 0)
         XCTAssertEqual(captured.last?.customStateMap?[CustomStateIdentifiable(position: nil, key: "details")], 0)
         XCTAssertEqual(events.interactionCount, 2)
