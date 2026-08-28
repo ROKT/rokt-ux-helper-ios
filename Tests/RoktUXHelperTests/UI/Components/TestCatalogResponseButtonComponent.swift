@@ -13,7 +13,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
         let context = try XCTUnwrap(CatalogItemContext(slots: slots, offerIndex: 1, itemIndex: 0))
         for styles in ["null", #"{"elements":{"own":[]}}"#] {
             let schema = try JSONDecoder().decode(LayoutSchemaModel.self, from: Data("""
-            {"type":"CatalogResponseButton","node":{"styles":\(styles),"children":[
+            {"type":"CatalogResponseButton","node":{"responseKey":"buy-now","styles":\(styles),"children":[
               {"type":"BasicText","node":{"value":"View product"}}
             ]}}
             """.utf8))
@@ -23,6 +23,7 @@ final class TestCatalogResponseButtonComponent: XCTestCase {
             guard case .catalogResponseButton(let model) = layout else {
                 return XCTFail("Expected a catalog response button")
             }
+            XCTAssertTrue(model.isRenderable)
             XCTAssertEqual(model.defaultStyle?.count, 0)
             let screen = GlobalScreenSize()
             screen.width = 240
