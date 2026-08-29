@@ -50,9 +50,9 @@ xcodebuild -project Example/Example.xcodeproj -scheme Example \
 ### Command traps
 
 1. **`swift build` and `swift test` cannot work here.** `Sources/` imports `UIKit` unguarded and SPM
-   builds for the host platform, so you get
-   `RoktIntegrationInfoDetails.swift:2:8: error: no such module 'UIKit'`. Everything goes through
-   `xcodebuild` with an iOS Simulator destination.
+   builds for the host platform, so both fail immediately with
+   `error: no such module 'UIKit'`. Everything goes through `xcodebuild` with an iOS Simulator
+   destination.
 2. **Keep `set -o pipefail` in front of any `xcodebuild … | xcbeautify`** or the pipeline's status is
    the formatter's and a failed build reports success. CI does this in
    `.github/composite_actions/run_xcodebuild_tests/action.yml`; copy that shape.
