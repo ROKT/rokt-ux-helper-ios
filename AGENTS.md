@@ -12,21 +12,14 @@ for the layout. Human docs: [README.md](./README.md) (architecture, schema bumps
 
 ## Confidentiality — this is a public repository
 
-Everything committed here is permanent and world-readable: code, comments, commit messages, branch
-names, PR titles and descriptions (titles also become public release-note entries), and test names.
-Never include:
+This repository is public, and everything committed to it is permanent and world-readable: code, comments, commit messages, branch names, PR titles/descriptions (PR titles also become public release-note entries), and test names. Never include internal-only information:
 
-- Partner, client, customer, or advertiser names or identifiers, or any detail that could identify
-  one — account/tenant/campaign IDs, deal terms, integration specifics. Keep examples anonymized.
+- Partner, client, customer, or advertiser names or identifiers — or any detail that could identify one (account/tenant/campaign IDs, deal terms, integration specifics). Keep examples generic and anonymized.
 - Internal service/system names, internal contract/class names, or their field layouts.
-- Backend or infrastructure detail: serializer libraries and versions, server-side
-  validation/deserialization behavior, datastore/infra specifics, or how a payload is checked
-  server-side.
+- Backend or infrastructure implementation details: serializer libraries and versions, server-side validation/deserialization behavior, datastore/infra specifics, or anything describing how a payload is checked server-side.
 - Links to private repos, internal tickets/PRs, or internal dashboards.
 
-Describe client-side behavior only, in partner-facing terms. When a change is driven by a server
-contract, say so generically ("to match the server contract") without naming internal types,
-versions, or server behavior. Keep internal rationale in non-public channels.
+Describe client-side behavior only — what the SDK sends and receives and why, in partner-facing terms. When a change is driven by a server contract, refer to it generically (e.g. "to match the server contract") without naming internal types, versions, or server behavior. Keep internal rationale in non-public channels.
 
 <!-- END COMMON SECTION -->
 
@@ -41,7 +34,7 @@ set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper 
   -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' \
   -derivedDataPath DerivedData test
 
-trunk check --all && trunk fmt --all          # the lint gate; see trap 6
+trunk check --all && trunk fmt --all          # the lint gate; see trap 5
 
 xcodebuild -project Example/Example.xcodeproj -scheme Example \
   -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' build
@@ -64,26 +57,32 @@ xcodebuild -project Example/Example.xcodeproj -scheme Example \
 4. **`isRecording` is deprecated in the pinned `swift-snapshot-testing`.** Delete the stale PNG and
    re-run, or wrap the assertion in `withSnapshotTesting(record: .all) { … }`. Never commit a
    record-mode override; it disables regression detection for that test.
-5. **A CLI re-record needs the `TEST_RUNNER_` prefix on the variable:**
-   `TEST_RUNNER_SNAPSHOT_TESTING_RECORD=all xcodebuild … test`. The test bundle runs inside the
-   simulator, so a bare `SNAPSHOT_TESTING_RECORD` never reaches it — that prefix is why the CI action
-   passes `TEST_RUNNER_SNAPSHOT_ARTIFACTS` to collect failure diffs.
-6. **`trunk` is the lint gate and it checks the whole repository.**
+5. **`trunk` is the lint gate and it checks the whole repository.**
    `.github/workflows/pull-request.yml` runs trunk-action with `check-mode: all`, so a pre-existing
-   violation in a file you never touched fails your PR. Three scoping surprises: SwiftFormat's
+   violation in a file you never touched turns your PR red. Three scoping surprises: SwiftFormat's
    config is `.trunk/configs/.swiftformat`, so calling `swiftformat` directly applies different
-   rules; `.swiftlint.yml` excludes `Tests`, so
-   SwiftLint never sees test code; and Markdown is formatted by prettier, because
-   `.trunk/configs/.markdownlint.yaml` turns markdownlint's formatting rules off.
-7. **No workflow builds `Example/`** — nothing under `.github/` references it, so breaking the
+   rules; `.swiftlint.yml` excludes `Tests`, so SwiftLint never sees test code; and Markdown is
+   formatted by prettier, because `.trunk/configs/.markdownlint.yaml` turns markdownlint's
+   formatting rules off.
+6. **No workflow builds `Example/`** — nothing under `.github/` references it, so breaking the
    example app is invisible to CI. Build it yourself if you changed public API or rendering.
-8. **The size report cannot fail your PR.** Both measurement steps in
-   `.github/workflows/ci-size-report.yml` are `continue-on-error` and degrade to `N/A`, and the job
-   is not in `pr-notify`'s `needs`. Read its comment as information, not as a gate.
+7. **A red Size Report means broken tooling, never "too big".** Nothing in
+   `.github/workflows/ci-size-report.yml` fails on the delta — exceeding its threshold only changes
+   the wording of the comment — and both measurement steps are `continue-on-error`, so a failed
+   measurement degrades to `N/A`. But the steps after them (delta, report, PR comment, artifact
+   upload) are not shielded, so the job can still go red on infrastructure alone. It is absent from
+   `pr-notify`'s `needs`.
 
 ## Pull requests
 
-- Base branch is `main`.
+- Base branch is `main` for ordinary work. A patch on a supported release line bases on, and merges
+  back into, its `maintenance/X.Y.x` branch instead — see [RELEASING.md](./RELEASING.md); CI runs on
+  pushes to both.
+- **What actually gates the merge is the `Protect default` ruleset, which a checkout cannot see**
+  (repo Settings → Rules): one approval, CODEOWNERS review, every review thread resolved, squash
+  only. It lists **no required status checks**, so a red check blocks nobody mechanically — and it
+  dismisses existing approvals on every push, so a fixup commit after an approval costs you that
+  approval.
 - Conventional-commit PR titles, with `!` **after** the scope for a breaking change:
   `feat(offers)!: …`, not `feat!(offers): …`. Both spellings are in the history, so do not copy a
   neighboring commit blindly.
