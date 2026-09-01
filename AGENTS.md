@@ -1,10 +1,14 @@
 # Agent Guide
 
-Instructions for AI coding agents (Claude Code, Codex, etc.) working in this repository. Human contributors should still read [README.md](./README.md), [TESTING.md](./TESTING.md), and [RELEASING.md](./RELEASING.md).
+Instructions for AI coding agents (Claude Code, Codex, etc.) working in this repository. It carries
+only what you cannot get from the repository itself: read `Package.swift`, `.swiftlint.yml`,
+`.trunk/trunk.yaml`, and `.github/workflows/` for versions, dependencies, and lint rules, and `ls`
+for the layout. Human docs: [README.md](./README.md) (architecture, schema bumps),
+[TESTING.md](./TESTING.md) (snapshot workflow, CI toolchain pins), [RELEASING.md](./RELEASING.md),
+[MIGRATING.md](./MIGRATING.md).
 
-## Project overview
-
-`RoktUXHelper` is a Swift package that renders Rokt experiences inside partner iOS apps (SwiftUI + UIKit). It is distributed via SPM and CocoaPods. The library targets **iOS 15.0+**. See [README.md](./README.md) for the architecture diagram and a description of the core components (`RoktUX`, `LayoutTransformer`, `CreativeSyntaxMapper`, `LayoutSchemaViewModel`, `LayoutState`).
+<!-- COMMON SECTION - kept in sync by hand with ROKT/rokt-ux-helper-android's AGENTS.md.
+     Change it in both repositories or in neither. -->
 
 ## Confidentiality — this is a public repository
 
@@ -17,57 +21,87 @@ This repository is public, and everything committed to it is permanent and world
 
 Describe client-side behavior only — what the SDK sends and receives and why, in partner-facing terms. When a change is driven by a server contract, refer to it generically (e.g. "to match the server contract") without naming internal types, versions, or server behavior. Keep internal rationale in non-public channels.
 
-## Repository layout
+<!-- END COMMON SECTION -->
 
-- `Sources/RoktUXHelper/` — library source.
-- `Tests/RoktUXHelperTests/` — unit and snapshot tests. Snapshot references live alongside the tests in `__Snapshots__/`.
-- `Example/` — example host app demonstrating SwiftUI and UIKit integration.
-- `.github/workflows/` — CI (pull request checks) and release automation.
-- `tools/` — local tooling and scripts.
+## Commands
 
-## Working on a feature branch
+In Xcode: `open Package.swift`, then `⌘U`. From the CLI, substituting the CI simulator model and
+runtime for `<model>`/`<runtime>` (see trap 3):
 
-1. **Branch naming and commits** — use conventional commit style for both branch names and PR titles (e.g. `feat(richtext): support <p> tag`, `fix(catalog-device-pay): prevent duplicate taps`). The release-draft workflow parses PR titles to generate the changelog, so accurate type/scope matters.
-2. **Tests** — open `Package.swift` in Xcode and run `⌘U`, or from the CLI:
+```bash
+# tests; append -only-testing:RoktUXHelperTests/TestRowComponent to scope to one suite
+set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
+  -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' \
+  -derivedDataPath DerivedData test
 
-   ```bash
-   set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
-     -destination 'platform=iOS Simulator,name=iPhone 17' \
-     -derivedDataPath DerivedData test | xcbeautify
-   ```
+trunk check --all && trunk fmt --all          # the lint gate; see trap 5
 
-   Do **not** use `swift test` — the library imports `UIKit`, which is unavailable in the host SPM build and the command will fail. To scope to a single suite, append `-only-testing:RoktUXHelperTests/TestRowComponent`. Add tests for new behaviour.
+xcodebuild -project Example/Example.xcodeproj -scheme Example \
+  -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' build
+```
 
-3. **Snapshot tests** — visual regressions are caught by `swift-snapshot-testing`; reference PNGs live next to each test in `__Snapshots__/`. To intentionally update a snapshot, either delete the offending PNG and re-run the test (it re-records on first run), or set `isRecording = true` in the test's `setUp()`, re-run, then **remove the flag before committing** (never commit `isRecording = true`). On CI failure, download the `snapshot-failures` artifact for actual-vs-expected diffs. See [TESTING.md](./TESTING.md) for the full workflow and coverage matrix.
-4. **Schema bumps** — if you change the `DcuiSchema` dependency, also bump `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` so `SchemaVersionConsistencyTests` passes. README has the full steps.
-5. **Public API changes** — update [MIGRATING.md](./MIGRATING.md) when you rename or remove public symbols.
-6. **PR template** — fill in the sections in `.github/pull_request_template.md` (background, what changed, screenshots if UI, checklist).
+### Command traps
 
-## CHANGELOG.md is auto-generated — do not edit it
+1. **`swift build` and `swift test` cannot work here.** `Sources/` imports `UIKit` unguarded and SPM
+   builds for the host platform, so both fail immediately with
+   `error: no such module 'UIKit'`. Everything goes through `xcodebuild` with an iOS Simulator
+   destination.
+2. **Keep `set -o pipefail` in front of any `xcodebuild … | xcbeautify`** or the pipeline's status is
+   the formatter's and a failed build reports success. CI does this in
+   `.github/composite_actions/run_xcodebuild_tests/action.yml`; copy that shape.
+3. **Put the OS in `-destination`, not just the model.** Snapshot PNGs are valid only for the Xcode +
+   iOS runtime pair CI uses, and CI reads that pair from repository Actions variables
+   (`CI_XCODE_VERSION`, `CI_SIMULATOR_MODEL`, `CI_SIMULATOR_OS`) that a checkout cannot see —
+   TESTING.md records their current values. A `name=`-only destination resolves against whatever
+   runtimes you happen to have installed, and every snapshot test then "fails" with nothing broken.
+4. **`isRecording` is deprecated in the pinned `swift-snapshot-testing`.** Delete the stale PNG and
+   re-run, or wrap the assertion in `withSnapshotTesting(record: .all) { … }`. Never commit a
+   record-mode override; it disables regression detection for that test.
+5. **`trunk` is the lint gate and it checks the whole repository.**
+   `.github/workflows/pull-request.yml` runs trunk-action with `check-mode: all`, so a pre-existing
+   violation in a file you never touched turns your PR red. Three scoping surprises: SwiftFormat's
+   config is `.trunk/configs/.swiftformat`, so calling `swiftformat` directly applies different
+   rules; `.swiftlint.yml` excludes `Tests`, so SwiftLint never sees test code; and Markdown is
+   formatted by prettier, because `.trunk/configs/.markdownlint.yaml` turns markdownlint's
+   formatting rules off.
+6. **No workflow builds `Example/`** — nothing under `.github/` references it, so breaking the
+   example app is invisible to CI. Build it yourself if you changed public API or rendering.
+7. **A red Size Report means broken tooling, never "too big".** Nothing in
+   `.github/workflows/ci-size-report.yml` fails on the delta — exceeding its threshold only changes
+   the wording of the comment — and both measurement steps are `continue-on-error`, so a failed
+   measurement degrades to `N/A`. But the steps after them (delta, report, PR comment, artifact
+   upload) are not shielded, so the job can still go red on infrastructure alone. It is absent from
+   `pr-notify`'s `needs`.
 
-`CHANGELOG.md` is produced automatically by the [`Release – Draft`](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/release-draft.yml) GitHub Actions workflow, which calls `ROKT/rokt-workflows/actions/generate-changelog` and builds entries from the git history (conventional commit PR titles).
+## Pull requests
 
-**Do not modify `CHANGELOG.md` on feature branches.** Any manual edits will be overwritten when the next release PR is drafted. If you want your change to appear in the release notes:
+- Base branch is `main` for ordinary work. A patch on a supported release line bases on, and merges
+  back into, its `maintenance/X.Y.x` branch instead — see [RELEASING.md](./RELEASING.md); CI runs on
+  pushes to both.
+- **What actually gates the merge is the `Protect default` ruleset, which a checkout cannot see**
+  (repo Settings → Rules): one approval, CODEOWNERS review, every review thread resolved, squash
+  only. It lists **no required status checks**, so a red check blocks nobody mechanically — and it
+  dismisses existing approvals on every push, so a fixup commit after an approval costs you that
+  approval.
+- Conventional-commit PR titles, with `!` **after** the scope for a breaking change:
+  `feat(offers)!: …`, not `feat!(offers): …`. Both spellings are in the history, so do not copy a
+  neighboring commit blindly.
+- **Nothing in CI validates the title**, and the changelog is generated from it, so a malformed title
+  silently produces a malformed public release note. Branch names use the same convention by habit;
+  no gate enforces that either.
+- `SchemaVersionConsistencyTests` guards `Constants.layoutSchemaVersion` in
+  `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` against the `dcui-swift-schema`
+  pin in `Package.swift` — move both together (README has the steps). Nothing guards
+  `RoktUXHelper.podspec`'s deployment target against `Package.swift`'s `platforms`; `pod lib lint`
+  only checks the podspec against itself.
+- Update [MIGRATING.md](./MIGRATING.md) when you rename or remove a public symbol.
 
-- Write a clear, conventional commit-style **PR title** (e.g. `feat(richtext): support <ul>, <ol>, <li>`).
-- That title becomes the changelog entry at release time — no further action needed.
+## Files the release workflow owns — do not hand-edit
 
-See [RELEASING.md](./RELEASING.md) for the full release flow.
+`CHANGELOG.md`, `VERSION`, and `RoktUXHelper.podspec`'s `s.version` are written by the
+`Release – Draft` workflow, which runs by manual dispatch from `main` or `maintenance/*` only. Edits
+on a feature branch are overwritten when the next release PR is drafted; the way into the changelog
+is the PR title. See [RELEASING.md](./RELEASING.md).
 
-## Files you generally should not touch
-
-- `CHANGELOG.md` — auto-generated (see above).
-- `VERSION` — bumped by the `Release – Draft` workflow.
-- `RoktUXHelper.podspec` version field — also bumped by the release workflow.
-- `Package.resolved` — only changes when dependency versions change.
-- `Tests/.../__Snapshots__/*.png` — only regenerate intentionally; see [TESTING.md](./TESTING.md).
-
-## Verification before opening a PR
-
-- Build and run the unit + snapshot tests locally.
-- If you changed UI rendering, inspect snapshot diffs (delete the relevant `__Snapshots__/*.png`, re-run to re-record, eyeball the output, commit the new PNGs).
-- Confirm the example app in `Example/` still builds against your changes.
-
-## Releases
-
-Releases are driven entirely by the `Release – Draft` → merge → `Release – Publish` workflow chain. Agents should not create release commits, edit `CHANGELOG.md`, or bump `VERSION` directly. See [RELEASING.md](./RELEASING.md).
+Reference PNGs under `Tests/**/__Snapshots__/` are committed on purpose. Regenerate them only when
+you intended the visual change, and look at each one before committing.
