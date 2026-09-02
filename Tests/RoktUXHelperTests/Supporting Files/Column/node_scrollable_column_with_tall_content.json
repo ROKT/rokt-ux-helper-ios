@@ -1,0 +1,271 @@
+{
+  "styles": {
+    "elements": {
+      "own": [
+        {
+          "default": {
+            "dimension": {
+              "maxHeight": 200
+            },
+            "spacing": {
+              "padding": "8 8 8 8"
+            },
+            "container": {
+              "gap": 8,
+              "alignItems": "stretch"
+            },
+            "background": {
+              "backgroundColor": {
+                "light": "#1D2939"
+              }
+            },
+            "border": {
+              "borderRadius": 12,
+              "borderColor": {
+                "light": "#12B76A"
+              },
+              "borderWidth": "4",
+              "borderStyle": "solid"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Red section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#D92D20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Orange section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#F79009"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Yellow section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#1D2939"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#FEC84B"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Green section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#12B76A"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Blue section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#2E90FA"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Purple section",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fit",
+                      "value": "fit-width"
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#7A5AF8"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
