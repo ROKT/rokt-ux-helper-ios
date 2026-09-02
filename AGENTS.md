@@ -34,7 +34,7 @@ set -o pipefail && xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper 
   -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' \
   -derivedDataPath DerivedData test
 
-trunk check --all && trunk fmt --all          # the lint gate; see trap 5
+trunk check --all && trunk fmt --all          # repo-wide; CI is diff-scoped, see trap 5
 
 xcodebuild -project Example/Example.xcodeproj -scheme Example \
   -destination 'platform=iOS Simulator,name=<model>,OS=<runtime>' build
@@ -57,9 +57,12 @@ xcodebuild -project Example/Example.xcodeproj -scheme Example \
 4. **`isRecording` is deprecated in the pinned `swift-snapshot-testing`.** Delete the stale PNG and
    re-run, or wrap the assertion in `withSnapshotTesting(record: .all) { … }`. Never commit a
    record-mode override; it disables regression detection for that test.
-5. **`trunk` is the lint gate and it checks the whole repository.**
-   `.github/workflows/pull-request.yml` runs trunk-action with `check-mode: all`, so a pre-existing
-   violation in a file you never touched turns your PR red. Three scoping surprises: SwiftFormat's
+5. **`trunk` is the lint gate, and on a PR it only sees your diff.**
+   `.github/workflows/pull-request.yml` leaves trunk-action's check mode unset, so the action
+   autodetects it per event: a PR is checked against its base sha, a push against the previous tip,
+   and only a manual `workflow_dispatch` run scans the whole repository. A pre-existing violation
+   in a file you never touched will not turn your PR red, so nothing here tells you the repo is
+   clean — run `trunk check --all` yourself for that. Three scoping surprises: SwiftFormat's
    config is `.trunk/configs/.swiftformat`, so calling `swiftformat` directly applies different
    rules; `.swiftlint.yml` excludes `Tests`, so SwiftLint never sees test code; and Markdown is
    formatted by prettier, because `.trunk/configs/.markdownlint.yaml` turns markdownlint's
