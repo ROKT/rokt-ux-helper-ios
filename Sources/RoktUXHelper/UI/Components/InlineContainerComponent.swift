@@ -77,9 +77,11 @@ struct InlineTextRepresentable: UIViewRepresentable {
     @Binding var height: CGFloat
     let onInteractionStateChange: (StyleState, UUID) -> Void
 
-    func makeUIView(context: Context) -> InlineTextView { InlineTextView() }
+    func makeUIView(context: Context) -> InlineTextContainerView { InlineTextContainerView() }
 
-    func updateUIView(_ view: InlineTextView, context: Context) {
+    func updateUIView(_ container: InlineTextContainerView, context: Context) {
+        let view = container.textView
+        container.accessibilityLabel = accessibilityLabel
         view.onInteractionStateChange = { id, state in onInteractionStateChange(state, id) }
         view.actionsEnabled = isEnabled
         view.setContent(content, accessibilityLabel: accessibilityLabel)

@@ -142,7 +142,7 @@ final class TestInlineContainerComponent: XCTestCase {
         XCTAssertEqual(label.styleState, .default)
     }
 
-    func testVoiceOverReadsCopyThenDistinctLinkAndButtonWithoutFullTextDuplication() throws {
+    func testAccessibilityExposesCopyThenDistinctLinkAndButtonWithoutFullTextDuplication() throws {
         let events = InlineEventService()
         let model = InlineContainerViewModel(children: [
             .text(text("Read the details. ")),
@@ -161,6 +161,67 @@ final class TestInlineContainerComponent: XCTestCase {
         XCTAssertEqual(events.interactionCount, 0)
         XCTAssertTrue(elements[2].accessibilityActivate())
         XCTAssertEqual(events.interactionCount, 1)
+    }
+
+    func testContainerOwnsOrderedAccessibilityElementsAndClearsEmptyContent() throws {
+        let events = InlineEventService()
+        let model = InlineContainerViewModel(children: [
+            .text(text("Read details. ")),
+            .link(link(events), label: [text("Terms")]),
+            .toggle(toggle(events: events), label: [text("Change")])
+        ])
+        let container = InlineTextContainerView()
+        let view = container.textView
+        update(view, model: model, width: 240)
+        container.frame = CGRect(x: 20, y: 30, width: 240, height: view.bounds.height)
+        container.layoutIfNeeded()
+        XCTAssertFalse(container.isAccessibilityElement)
+        XCTAssertTrue(view.accessibilityElementsHidden)
+        let elements = try XCTUnwrap(container.accessibilityElements as? [UIAccessibilityElement])
+        XCTAssertEqual(elements.map(\.accessibilityLabel), ["Read details. ", "Terms", "Change"])
+        XCTAssertEqual(elements.map(\.accessibilityTraits), [.staticText, .link, .button])
+        for (element, run) in zip(elements, view.runs) {
+            XCTAssertTrue(element.accessibilityContainer === container)
+            let frame = view.rects(for: run.range).reduce(CGRect.null) { $0.union($1) }
+            XCTAssertEqual(element.accessibilityFrameInContainerSpace, view.convert(frame, to: container))
+        }
+        view.actionsEnabled = false
+        XCTAssertTrue(elements[2].accessibilityTraits.contains(.notEnabled))
+        XCTAssertFalse(elements[2].accessibilityActivate())
+        view.actionsEnabled = true
+        XCTAssertTrue(elements[2] === container.accessibilityElements?.last as? UIAccessibilityElement)
+        XCTAssertTrue(elements[2].accessibilityActivate())
+        XCTAssertEqual(events.interactionCount, 1)
+        update(view, model: InlineContainerViewModel(children: []), width: 240)
+        XCTAssertEqual(container.accessibilityElements?.count, 0)
+        XCTAssertFalse(elements[2].accessibilityActivate())
+    }
+
+    func testWrappedActionActivationPointUsesAnActualLabelFragment() throws {
+        let model = InlineContainerViewModel(children: [
+            .text(text("Read the details. ")),
+            .toggle(toggle(), label: [text("See more")])
+        ])
+        let container = InlineTextContainerView()
+        let view = container.textView
+        update(view, model: model, width: 400)
+        let wideAction = try XCTUnwrap(view.rects(for: view.runs[1].range).first)
+        let width = wideAction.midX
+        update(view, model: model, width: width)
+        container.frame = CGRect(x: 20, y: 60, width: width, height: view.bounds.height)
+        container.layoutIfNeeded()
+        let run = view.runs[1]
+        let fragments = view.rects(for: run.range)
+        XCTAssertEqual(fragments.count, 2)
+        let element = try XCTUnwrap(container.accessibilityElements?.last as? UIAccessibilityElement)
+        let union = fragments.reduce(CGRect.null) { $0.union($1) }
+        XCTAssertNil(view.actionRun(at: CGPoint(x: union.midX, y: union.midY)))
+        let firstFragment = try XCTUnwrap(fragments.first)
+        let labelPoint = CGPoint(x: firstFragment.midX, y: firstFragment.midY)
+        XCTAssertEqual(view.actionRun(at: labelPoint)?.id, run.id)
+        let screenFrame = UIAccessibility.convertToScreenCoordinates(firstFragment, in: view)
+        XCTAssertEqual(element.accessibilityActivationPoint.x, screenFrame.midX, accuracy: 0.5)
+        XCTAssertEqual(element.accessibilityActivationPoint.y, screenFrame.midY, accuracy: 0.5)
     }
 
     func testDisabledActionsCannotActivateFromTouchOrAccessibility() throws {
