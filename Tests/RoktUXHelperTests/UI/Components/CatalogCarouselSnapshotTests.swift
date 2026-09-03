@@ -32,6 +32,8 @@ final class CatalogCarouselSnapshotTests: XCTestCase {
              "price_formatted": "$\(12 + index * 3).00",
              "response_options_map": ["positive": [
                  "id": "example-response-\(index)", "is_positive": true, "action": "Url",
+                 "instance_guid": "example-response-instance-\(index)",
+                 "signal_type": "SignalProductItemResponse", "token": "example-response-token-\(index)",
                  "url": "https://example.com/product-\(index)"
              ]]]
         }
