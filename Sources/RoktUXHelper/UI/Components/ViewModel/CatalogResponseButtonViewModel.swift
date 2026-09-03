@@ -27,7 +27,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let transactionData: TransactionData?
 
     var isRenderable: Bool {
-        catalogItemContext.map { $0.responseOption(for: responseKey) != nil } ?? true
+        catalogItemContext.map { CatalogProductResponse(context: $0, responseKey: responseKey) != nil } ?? true
     }
 
     var isPartnerManagedPurchase: Bool {

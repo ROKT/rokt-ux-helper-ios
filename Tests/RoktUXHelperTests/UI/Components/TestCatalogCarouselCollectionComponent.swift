@@ -33,6 +33,16 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
         try snapshotProductLayout()
     }
 
+    /// Dark-mode offer copy, product labels, and response labels retain their authored contrast.
+    func testSnapshot_productLayoutInDarkMode() throws {
+        try snapshotProductLayout(colorScheme: .dark)
+    }
+
+    /// A product without a response keeps its image and labels, but does not render a response button.
+    func testSnapshot_productLayoutWithMissingResponse() throws {
+        try snapshotProductLayout(missingFirstResponse: true)
+    }
+
     /// Activating the native inline action expands the description and moves the carousel below the new text height.
     func testSnapshot_productLayoutAfterExpandingDescription() throws {
         try snapshotProductLayout(expandDescription: true)
@@ -56,6 +66,8 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
              "price_formatted": "$\(12 + index * 3).00",
              "response_options_map": ["positive": [
                  "id": "example-response-\(index)", "is_positive": true, "action": "Url",
+                 "instance_guid": "example-response-instance-\(index)",
+                 "signal_type": "SignalProductItemResponse", "token": "example-response-token-\(index)",
                  "url": "https://example.com/product-\(index)"
              ]]]
         }
@@ -71,6 +83,9 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
                                                            peekThroughSize: [.fixed(16)], defaultStyle: [style],
                                                            layoutState: state) { context in
             try transformer.transform(template, context: .inner(.catalogItem(context)))
+        }
+        for card in model.cards {
+            XCTAssertNotNil(CatalogProductResponse(context: card.context), file: file, line: line)
         }
         let screen = GlobalScreenSize()
         screen.width = width
@@ -110,13 +125,14 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
     private func snapshotProductLayout(expandDescription: Bool = false, scrollToLastCard: Bool = false,
                                        contentSize: ContentSizeCategory = .large,
                                        direction: LayoutDirection = .leftToRight,
+                                       colorScheme: ColorScheme = .light, missingFirstResponse: Bool = false,
                                        file: StaticString = #filePath, testName: String = #function,
                                        line: UInt = #line) throws {
         let width: CGFloat = 350
         let copy = direction == .rightToLeft
             ? "تصفح مجموعة من المنتجات المختارة واكتشف التفاصيل الكاملة قبل اختيار المنتج المناسب لك. تتوفر خيارات متعددة مع صور وأسعار واضحة للمقارنة."
             : "Explore a selection of everyday essentials, with clear product details and prices to help you choose. Read the full description before viewing a product."
-        let slots = try productSlots(copy: copy, direction: direction)
+        let slots = try productSlots(copy: copy, direction: direction, missingFirstResponse: missingFirstResponse)
         let transformer = ProductCarouselIntegrationFixture.transformer(slots: slots)
         let layout = try transformer.transform(ProductCarouselIntegrationFixture.distributions[0],
                                                context: .outer(slots.map(\.offer)))
@@ -125,12 +141,12 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
               case .catalogCarouselCollection(let carousel) = column.children?[3] else {
             return XCTFail("Expected the typed product layout inside its distribution", file: file, line: line)
         }
-        for card in carousel.cards {
+        for (index, card) in carousel.cards.enumerated() {
             guard case .column(let product) = card.layout,
                   case .catalogResponseButton(let response) = product.children?[3] else {
                 return XCTFail("Expected a product response button", file: file, line: line)
             }
-            XCTAssertTrue(response.isRenderable, file: file, line: line)
+            XCTAssertEqual(response.isRenderable, !missingFirstResponse || index != 0, file: file, line: line)
         }
         let screen = GlobalScreenSize()
         screen.width = width
@@ -141,15 +157,16 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
             .padding(16)
             .frame(width: width, alignment: .topLeading)
             .frame(maxHeight: .infinity, alignment: .topLeading)
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color.black : Color.white)
             .environmentObject(screen)
-            .environment(\.colorScheme, .light)
+            .environment(\.colorScheme, colorScheme)
             .environment(\.sizeCategory, contentSize)
             .environment(\.layoutDirection, direction)
         let measured = expectation(description: "Typed product cards have a stable height")
         let measurement = carousel.$contentHeight.compactMap { $0 }.filter { $0 > 120 }
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main).first().sink { _ in measured.fulfill() }
         let host = UIHostingController(rootView: root)
+        host.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: width, height: 844))
         window.rootViewController = host
         window.isHidden = false
@@ -172,7 +189,7 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
             let scroll = try XCTUnwrap(firstView(CatalogCarouselScrollView.self, in: window), file: file, line: line)
             let breakpoint = carousel.layoutState?.getGlobalBreakpointIndex(width) ?? 0
             let geometry = carousel.geometry(viewportWidth: scroll.bounds.width, breakpointIndex: breakpoint,
-                                             style: carousel.style(width: width, position: 0, colorScheme: .light))
+                                             style: carousel.style(width: width, position: 0, colorScheme: colorScheme))
             XCTAssertGreaterThan(geometry.maximumOffset, 0, file: file, line: line)
             XCTAssertEqual(scroll.contentSize.width - scroll.bounds.width, geometry.maximumOffset,
                            accuracy: 0.5, file: file, line: line)
@@ -191,7 +208,7 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
         assertCarouselSnapshot(host, file: file, testName: testName, line: line)
     }
 
-    private func productSlots(copy: String, direction: LayoutDirection) throws -> [SlotModel] {
+    private func productSlots(copy: String, direction: LayoutDirection, missingFirstResponse: Bool) throws -> [SlotModel] {
         let titles = direction == .rightToLeft
             ? ["حقيبة يومية", "زجاجة قابلة لإعادة الاستخدام", "دفتر ملاحظات"]
             : ["Everyday bag", "Reusable bottle with an easy-carry handle", "Pocket notebook"]
@@ -201,16 +218,19 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
                 context.fill(CGRect(x: 0, y: 0, width: 80, height: 80))
             }
             let imageURI = "data:image/png;base64," + (try XCTUnwrap(image.pngData())).base64EncodedString()
-            return ["catalog_item_id": "example-item-\(index)", "title": title,
-                    "price_formatted": "$\(12 + index * 6).00",
-                    "product_cart_attribute1": "title", "product_cart_attribute2": "price",
-                    "images": ["catalogItemImage0": ["light": imageURI, "alt": title]],
-                    "token": "example-item-token-\(index)",
-                    "response_options_map": ["positive": [
-                        "id": "example-response-\(index)", "is_positive": true, "action": "Url",
-                        "signal_type": "SignalProductItemResponse", "token": "example-response-token-\(index)",
-                        "url": "https://example.com/product-\(index)"
-                    ]]]
+            var item: [String: Any] = ["catalog_item_id": "example-item-\(index)", "title": title,
+                                       "price_formatted": "$\(12 + index * 6).00",
+                                       "product_cart_attribute1": "title", "product_cart_attribute2": "price",
+                                       "images": ["catalogItemImage0": ["light": imageURI, "dark": imageURI, "alt": title]],
+                                       "token": "example-item-token-\(index)",
+                                       "response_options_map": ["positive": [
+                                           "id": "example-response-\(index)", "is_positive": true, "action": "Url",
+                                           "instance_guid": "example-response-instance-\(index)",
+                                           "signal_type": "SignalProductItemResponse", "token": "example-response-token-\(index)",
+                                           "url": "https://example.com/product-\(index)"
+                                       ]]]
+            if missingFirstResponse && index == 0 { item.removeValue(forKey: "response_options_map") }
+            return item
         }
         let offer = try CatalogProductFixture.offer([
             "creative": ["copy": ["creative.copy": copy]], "catalog_items": items
@@ -253,7 +273,7 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
                 }
             }
         }
-        assertSnapshot(of: host, as: strategy, named: "carousel", file: file, testName: testName, line: line)
+        assertSnapshot(of: host, as: strategy, file: file, testName: testName, line: line)
     }
 
     private func exportSnapshot(_ image: UIImage, testName: String, file: StaticString) throws {
@@ -263,7 +283,7 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
         let directory = URL(fileURLWithPath: path).appendingPathComponent(suite)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let name = testName.replacingOccurrences(of: "()", with: "")
-        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).carousel.png"))
+        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).1.png"))
     }
 
     private static let cardTemplate = #"""

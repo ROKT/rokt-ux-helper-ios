@@ -85,7 +85,6 @@ struct CatalogCarouselCollectionComponent: View {
                         model.recordHeight(size.height, itemIndex: card.context.itemIndex, itemWidth: geometry.itemWidth)
                     }
                     .accessibilityElement(children: .contain)
-                    .accessibilityLabel(String(format: kPageAnnouncement, card.context.itemIndex + 1, model.cards.count))
             }
         }
         .frame(width: max(geometry.viewportWidth, geometry.contentWidth), alignment: .topLeading)

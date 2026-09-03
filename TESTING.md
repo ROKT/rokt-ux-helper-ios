@@ -25,19 +25,24 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestBasicTextComponent/testSnapshot.1.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_zeroProducts.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_oneProduct.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_manyProducts.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_smallWidth.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithCollapsedDescription.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutAfterExpandingDescription.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.carousel.png
-  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_zeroProducts.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_oneProduct.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_manyProducts.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_smallWidth.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithCollapsedDescription.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutInDarkMode.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithMissingResponse.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutAfterExpandingDescription.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.1.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
-  TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.inline.png
-  TestInlineContainerComponent/testSnapshot_expandedRightToLeftInDarkMode.inline.png
+  TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.1.png
+  TestInlineContainerComponent/testSnapshot_expandedRightToLeftInDarkMode.1.png
+  TestInlineContainerComponent/testSnapshot_disabledAction.1.png
+  TestInlineContainerComponent/testSnapshot_hoveredAction.1.png
+  TestInlineContainerComponent/testSnapshot_pressedAction.1.png
   TestRichTextComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
   TestRichTextComponent/testSnapshot_nilTextStyle.1.png
@@ -263,9 +268,10 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 - [x] Typed product layout after activating See More (`testSnapshot_productLayoutAfterExpandingDescription`)
 - [x] Typed product layout scrolled to its last product (`testSnapshot_productLayoutScrolledToLastCard`)
 - [x] Accessible text with right-to-left offer and product copy (`testSnapshot_productLayoutWithAccessibleTextRightToLeft`)
-- [ ] Dark mode product layout
+- [x] Dark mode offer copy, product labels, and response labels (`testSnapshot_productLayoutInDarkMode`)
+- [x] Product with no response retains its image and labels but omits its button (`testSnapshot_productLayoutWithMissingResponse`)
 
-The four typed-layout cases reuse `ProductCarouselIntegrationFixture` and render through `OneByOneDistribution`, including the inline description and catalog cards. They use valid generic product responses and synchronous data-URI images. Expansion activates the rendered inline action, and the scrolled case moves the real carousel scroll view. These cases are component integration coverage; they do not replace running the assembled template in the SDK example app.
+The typed-layout cases reuse `ProductCarouselIntegrationFixture` and render through `OneByOneDistribution`, including the inline description and catalog cards. They use generic product responses and synchronous data-URI images. The missing-response case removes only the first product's response map and checks that the other products still have renderable responses. It exercises an absent button, not disabled styling for a valid response. Expansion activates the rendered inline action, and the scrolled case moves the real carousel scroll view. These cases are component integration coverage; they do not replace running the assembled template in the SDK example app.
 
 The accessible RTL case scales the inline description; product labels retain their authored size. Its action labels are English. This does not establish full-template Dynamic Type, translated-label, or VoiceOver acceptance.
 
@@ -273,11 +279,12 @@ The accessible RTL case scales the inline description; product labels retain the
 
 - [x] Narrow copy/action wrapping with action padding and border (`testSnapshot_narrowWrappingTextAndAction`)
 - [x] Expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`)
-- [ ] Disabled and pressed action appearance
-- [ ] Pointer-hover appearance
+- [x] Disabled action appearance and blocked activation (`testSnapshot_disabledAction`)
+- [x] Pressed action text, background, and border appearance (`testSnapshot_pressedAction`)
+- [x] Pointer-hover action text, background, and border appearance (`testSnapshot_hoveredAction`)
 - [ ] Standalone inline layout at accessible text sizes
 
-The typed product layout cases above also exercise inline copy within its surrounding layout. Dynamic Type, interaction states, and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
+The typed product layout cases above also exercise inline copy within its surrounding layout. The hover snapshot uses the existing test recognizer to select hover styling; the disabled snapshot then disables that action. The pressed snapshot selects the existing model style state directly. These snapshots cover appearance, not real pointer or touch delivery. Dynamic Type and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
 
 #### Placeholder Resolution (Runtime + Transaction Data)
 
@@ -300,12 +307,12 @@ rendering drift across simulator runtimes.
 
 ## Native Inline Text
 
-`TestInlineContainerComponent` builds the text renderer directly from native view models. It covers shared text/action lines, narrow wrapping, Unicode action ranges, natural mixed-font baselines, Dynamic Type, dark mode, right-to-left content, accessible link/button labels, pointer hover, disabled actions, custom-state dispatch, and SwiftUI host height changes. The height coordinator test checks that identical measurements do not keep updating SwiftUI state. The package now pins and advertises `2.9.0-alpha1`; `TestSchemaAdapters`, `TestProductCarouselIntegration`, and `TestInlineSchemaLifecycle` cover the typed inline and catalog carousel adapters, transformation, state binding, and hosted lifecycle behavior.
+`TestInlineContainerComponent` builds the text renderer directly from native view models. It covers shared text/action lines, narrow wrapping, Unicode action ranges, natural mixed-font baselines, Dynamic Type, dark mode, right-to-left content, accessible link/button labels, pointer hover, disabled actions, custom-state dispatch, and SwiftUI host height changes. Container tests verify ordered accessibility elements without duplicated text, stale-action removal, and wrapped-action activation points within actual text fragments. These native assertions do not replace app-level touch automation or manual VoiceOver testing. The height coordinator test checks that identical measurements do not keep updating SwiftUI state. The package now pins and advertises `2.9.0-alpha1`; `TestSchemaAdapters`, `TestProductCarouselIntegration`, and `TestInlineSchemaLifecycle` cover the typed inline and catalog carousel adapters, transformation, state binding, and hosted lifecycle behavior.
 
 Inline range styles cover font/color/baseline/decoration typography, solid background colors, nonnegative padding/margins, solid or dashed borders (including unequal side widths), and opacity. Line height, line limits, and per-span paragraph alignment are not part of the inline text style contract. Parent container styles use the existing layout modifier. The typed adapters explicitly reject unsupported effects, including background images, nonzero blur, and shadows on individual inline ranges. Adapter tests check these rejections in interaction states, conditional transitions, and hidden branches.
 
 `BNFTextOperationTests` and `TextSlicingTests` cover `:sliceText[Chars,N]`, including 77/78/79-character boundaries, joined emoji and combining marks, invalid arguments, and fallback alternatives. `N` is a nonnegative whole number within Swift's `Int` range. Slicing uses the same `String` character semantics as the length predicate. Operations apply to the selected key alternative; literal fallbacks remain unchanged.
 
-The real native view has snapshot tests for narrow copy/action wrapping (`testSnapshot_narrowWrappingTextAndAction`) and expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`). Both use the shared device and precision settings. Their references were rendered in simulator CI and visually reviewed. The snapshot helper also exports the rendered image to `SNAPSHOT_ARTIFACTS` when set, so CI can expose a first rendering even when a missing reference is recorded beside the tests. Missing references still fail the tests and must be visually reviewed before committing their PNGs.
+The real native view has snapshot tests for narrow copy/action wrapping (`testSnapshot_narrowWrappingTextAndAction`) and expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`). These and the disabled, hovered, and pressed action snapshots use the shared device and precision settings. The original wrapping and right-to-left references were rendered in simulator CI and visually reviewed. New references follow the same record, inspect, and rerun workflow above. The snapshot helper also exports the rendered image to `SNAPSHOT_ARTIFACTS` when set, so CI can expose a first rendering even when a missing reference is recorded beside the tests. Missing references still fail the tests and must be visually reviewed before committing their PNGs.
 
 Run these tests on an iOS simulator using the package's normal `xcodebuild` workflow. Native layout assertions do not replace visual checks: inline wrapping and decoration on iOS 15 and a current OS, VoiceOver, nested scrolling, and example host verification remain release gates.

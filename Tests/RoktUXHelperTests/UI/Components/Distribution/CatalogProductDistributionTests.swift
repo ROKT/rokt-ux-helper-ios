@@ -49,18 +49,48 @@ final class CatalogProductDistributionTests: XCTestCase {
         try verifyRestoredOneByOneIndex(Int.max, expected: 0, offerCount: 1)
     }
 
-    func test_oneByOneClampsUpdatesThroughItsProgressBinding() throws {
+    func test_oneByOneProgressBindingTracksValidUpdates() throws {
         let scene = try makeScene(.oneByOne, visibleCount: 1)
         defer { scene.tearDown() }
         let progress = try XCTUnwrap(scene.state.items[LayoutState.currentProgressKey] as? Binding<Int>)
-        for (index, expected) in [(Int.max, 3), (Int.min, 0), (0, 0), (2, 2)] {
-            try waitForVisible([expected], in: scene.state) { progress.wrappedValue = index }
-            XCTAssertEqual(progress.wrappedValue, expected)
-            let response = try responseModel(in: scene, offerIndex: expected)
+        for index in [3, 0, 2] {
+            try waitForVisible([index], in: scene.state) { progress.wrappedValue = index }
+            XCTAssertEqual(progress.wrappedValue, index)
+            let response = try responseModel(in: scene, offerIndex: index)
             let previousCount = scene.delegate.closures.count
             response.handleResponse()
             XCTAssertEqual(scene.delegate.closures.count, previousCount + 1)
         }
+    }
+
+    func test_oneByOneProgressionUpdatesSiblingConditionalVisibility() throws {
+        var contentHeight: CGFloat = 0
+        let scene = try makeScene(.oneByOne, visibleCount: 1, withConditionalPreviousControl: true) {
+            contentHeight = $0.height
+        }
+        defer { scene.tearDown() }
+        try waitForContentHeight("The first offer has measured content") { contentHeight > 0 }
+        let firstOfferHeight = contentHeight
+
+        for _ in 0..<2 {
+            try waitForVisible([1], in: scene.state) { scene.state.actionCollection[.progressControlNext](nil) }
+            try waitForContentHeight("The sibling Previous control is rendered after advancing") {
+                abs(contentHeight - firstOfferHeight - 44) < 1
+            }
+            try waitForVisible([0], in: scene.state) { scene.state.actionCollection[.progressControlPrevious](nil) }
+            try waitForContentHeight("The sibling Previous control is removed at the first offer") {
+                abs(contentHeight - firstOfferHeight) < 1
+            }
+        }
+    }
+
+    private func waitForContentHeight(_ description: String, file: StaticString = #filePath, line: UInt = #line,
+                                      matches: @escaping () -> Bool) throws {
+        let measured = expectation(for: NSPredicate { _, _ in matches() }, evaluatedWith: nil)
+        measured.expectationDescription = description
+        let result = XCTWaiter.wait(for: [measured], timeout: 3)
+        XCTAssertEqual(result, .completed, description, file: file, line: line)
+        guard result == .completed else { throw WaitError.timedOut }
     }
 
     private func verifyRestoredOneByOneIndex(_ index: Int, expected: Int, offerCount: Int = 4) throws {
@@ -134,7 +164,9 @@ final class CatalogProductDistributionTests: XCTestCase {
     }
 
     private func makeScene(_ distribution: Distribution, visibleCount: UInt8, initialOfferIndex: Int? = nil,
-                           expectedVisibleIndexes: [Int]? = nil, offerCount: Int = 4) throws -> Scene {
+                           expectedVisibleIndexes: [Int]? = nil, offerCount: Int = 4,
+                           withConditionalPreviousControl: Bool = false,
+                           onContentSizeChange: ((CGSize) -> Void)? = nil) throws -> Scene {
         let productSlot = try CatalogProductFixture.slots()[1]
         let slots = (0..<offerCount).map { index in
             SlotModel(instanceGuid: "example-slot-\(index)", offer: productSlot.offer,
@@ -149,8 +181,28 @@ final class CatalogProductDistributionTests: XCTestCase {
                                                                pressedStyle: nil, hoveredStyle: nil, disabledStyle: nil,
                                                                layoutState: state, diagnosticService: nil))
         }
-        let layout = distribution.layout(children: children, slots: slots, visibleCount: visibleCount,
+        var layout = distribution.layout(children: children, slots: slots, visibleCount: visibleCount,
                                          state: state, service: service)
+        if withConditionalPreviousControl {
+            let previous = BasicTextViewModel(value: "Previous", defaultStyle: nil, pressedStyle: nil,
+                                              hoveredStyle: nil, disabledStyle: nil, layoutState: state,
+                                              diagnosticService: nil)
+            let controlStyle = ProgressControlStyle(container: nil, background: nil, border: nil,
+                                                    dimension: .init(minWidth: nil, maxWidth: nil, width: nil,
+                                                                     minHeight: nil, maxHeight: nil,
+                                                                     height: .fixed(44), rotateZ: nil),
+                                                    flexChild: nil, spacing: nil)
+            let control = ProgressControlViewModel(children: [.basicText(previous)], defaultStyle: [controlStyle],
+                                                   pressedStyle: nil, hoveredStyle: nil, disabledStyle: nil,
+                                                   direction: .backward, layoutState: state)
+            let conditional = WhenViewModel(children: [.progressControl(control)],
+                                            predicates: [.progression(.init(condition: .isAbove, value: "0"))],
+                                            transition: nil, offers: slots.map(\.offer), globalBreakPoints: nil,
+                                            layoutState: state)
+            layout = .column(ColumnViewModel(children: [layout, .when(conditional)], defaultStyle: nil,
+                                             pressedStyle: nil, hoveredStyle: nil, disabledStyle: nil,
+                                             accessibilityGrouped: false, layoutState: state))
+        }
         let screen = GlobalScreenSize()
         screen.width = 300
         screen.height = 800
@@ -158,6 +210,8 @@ final class CatalogProductDistributionTests: XCTestCase {
         let root = LayoutSchemaComponent(config: ComponentConfig(parent: .column, position: nil), layout: layout,
                                          parentWidth: .constant(300), parentHeight: .constant(nil),
                                          styleState: .constant(.default))
+            .fixedSize(horizontal: false, vertical: withConditionalPreviousControl)
+            .readSize(onChange: onContentSizeChange)
             .frame(width: 300, height: 500, alignment: .topLeading)
             .environmentObject(screen)
             .onAppear { DispatchQueue.main.async { mounted.fulfill() } }

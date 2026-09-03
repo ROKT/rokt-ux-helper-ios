@@ -163,7 +163,7 @@ struct OneByOneDistributionComponent: View {
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
         model.setupBindings(
-            currentProgess: Binding(get: { currentOffer }, set: { currentOffer = $0 }),
+            currentProgess: $storedCurrentOffer,
             customStateMap: $customStateMap,
             totalItems: model.children?.count ?? 0
         )

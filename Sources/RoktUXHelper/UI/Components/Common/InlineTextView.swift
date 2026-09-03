@@ -24,6 +24,12 @@ struct InlineTextContent {
 final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     private(set) var runs: [InlineTextRun] = []
     var onInteractionStateChange: ((UUID, StyleState) -> Void)?
+    weak var accessibilityContainerView: UIView? {
+        didSet {
+            elements.removeAll()
+            updateAccessibility()
+        }
+    }
     var actionsEnabled = true {
         didSet {
             guard oldValue != actionsEnabled else { return }
@@ -227,23 +233,41 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     }
 
     private func updateAccessibility() {
+        let container = accessibilityContainerView ?? self
         var current: [UUID: InlineAccessibilityElement] = [:]
         accessibilityElements = runs.map { run in
-            let element = elements[run.id] ?? InlineAccessibilityElement(accessibilityContainer: self)
+            let element = elements[run.id] ?? InlineAccessibilityElement(accessibilityContainer: container)
+            element.accessibilityContainer = container
             element.accessibilityLabel = run.label
             element.accessibilityTraits = run.action?.traits ?? .staticText
             if run.action != nil, !actionsEnabled { element.accessibilityTraits.insert(.notEnabled) }
             element.activation = run.action.map { _ in { [weak self] in self?.activateRun(id: run.id) ?? false } }
-            let frame = rects(for: run.range).reduce(CGRect.null) { $0.union($1) }
-            element.accessibilityFrameInContainerSpace = frame.isNull ? .zero : frame
+            let fragments = rects(for: run.range)
+            let frame = fragments.reduce(CGRect.null) { $0.union($1) }
+            element.accessibilityFrameInContainerSpace = frame.isNull ? .zero : convert(frame, to: container)
+            element.activationFrameInContainerSpace = run.action == nil ? nil : fragments.first.map { convert($0, to: container) }
             current[run.id] = element
             return element
         }
+        accessibilityContainerView?.accessibilityElements = accessibilityElements
         elements = current
     }
 }
 
 private final class InlineAccessibilityElement: UIAccessibilityElement {
     var activation: (() -> Bool)?
+    var activationFrameInContainerSpace: CGRect?
+
+    override var accessibilityActivationPoint: CGPoint {
+        get {
+            guard let frame = activationFrameInContainerSpace,
+                  let container = accessibilityContainer as? UIView else { return super.accessibilityActivationPoint }
+            // A wrapped label's bounding-box center can land in adjacent copy. Convert on access so scrolling stays correct.
+            let screenFrame = UIAccessibility.convertToScreenCoordinates(frame, in: container)
+            return CGPoint(x: screenFrame.midX, y: screenFrame.midY)
+        }
+        set { super.accessibilityActivationPoint = newValue }
+    }
+
     override func accessibilityActivate() -> Bool { activation?() ?? false }
 }
