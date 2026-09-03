@@ -29,6 +29,10 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestCatalogCarouselCollectionComponent/testSnapshot_oneProduct.carousel.png
   TestCatalogCarouselCollectionComponent/testSnapshot_manyProducts.carousel.png
   TestCatalogCarouselCollectionComponent/testSnapshot_smallWidth.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithCollapsedDescription.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutAfterExpandingDescription.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.carousel.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
@@ -255,13 +259,15 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 - [x] Single product -- full-width card (`testSnapshot_oneProduct`)
 - [x] Multiple products -- grouped width, gap, and peek (`testSnapshot_manyProducts`)
 - [x] Narrow host -- wrapping product title (`testSnapshot_smallWidth`)
-- [ ] Typed product layout with collapsed description, data-URI images, selected title/price fields, and response buttons (`testSnapshot_productLayoutWithCollapsedDescription`; awaiting native reference recording and review)
-- [ ] Typed product layout after activating See More (`testSnapshot_productLayoutAfterExpandingDescription`; awaiting native reference recording and review)
-- [ ] Typed product layout scrolled to its last product (`testSnapshot_productLayoutScrolledToLastCard`; awaiting native reference recording and review)
-- [ ] Accessible text with right-to-left offer and product copy (`testSnapshot_productLayoutWithAccessibleTextRightToLeft`; awaiting native reference recording and review)
+- [x] Typed product layout with collapsed description, data-URI images, selected title/price fields, and response buttons (`testSnapshot_productLayoutWithCollapsedDescription`)
+- [x] Typed product layout after activating See More (`testSnapshot_productLayoutAfterExpandingDescription`)
+- [x] Typed product layout scrolled to its last product (`testSnapshot_productLayoutScrolledToLastCard`)
+- [x] Accessible text with right-to-left offer and product copy (`testSnapshot_productLayoutWithAccessibleTextRightToLeft`)
 - [ ] Dark mode product layout
 
 The four typed-layout cases reuse `ProductCarouselIntegrationFixture` and render through `OneByOneDistribution`, including the inline description and catalog cards. They use valid generic product responses and synchronous data-URI images. Expansion activates the rendered inline action, and the scrolled case moves the real carousel scroll view. These cases are component integration coverage; they do not replace running the assembled template in the SDK example app.
+
+The accessible RTL case scales the inline description; product labels retain their authored size. Its action labels are English. This does not establish full-template Dynamic Type, translated-label, or VoiceOver acceptance.
 
 #### InlineContainer
 
