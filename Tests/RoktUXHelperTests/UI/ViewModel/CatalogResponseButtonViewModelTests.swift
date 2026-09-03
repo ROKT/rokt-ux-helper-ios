@@ -24,6 +24,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             transactionData: makeTransactionData(isPartnerManagedPurchase: true)
         )
 
+        XCTAssertTrue(sut.isRenderable)
         sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventService.cartItemInstantPurchaseCalled)
@@ -66,6 +67,7 @@ final class CatalogResponseButtonViewModelTests: XCTestCase {
             transactionData: transactionData
         )
 
+        XCTAssertTrue(sut.isRenderable)
         sut.cartItemInstantPurchase(position: nil)
 
         XCTAssertTrue(eventService.cartItemForwardPaymentCalled)

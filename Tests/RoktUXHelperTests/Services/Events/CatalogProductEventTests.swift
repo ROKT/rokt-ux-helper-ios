@@ -1,5 +1,6 @@
 import SwiftUI
 import XCTest
+import ViewInspector
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
@@ -18,6 +19,7 @@ final class CatalogProductEventTests: XCTestCase {
                                             layoutState: state, eventService: service)
         let button = try transformer.getCatalogResponseButtonModel(style: nil, children: [],
                                                                    context: .inner(.catalogItem(context)))
+        XCTAssertTrue(button.isRenderable)
         button.cartItemInstantPurchase(position: 1)
         XCTAssertEqual(events.map(\.eventType), [.SignalProductItemResponse])
         XCTAssertEqual(events[0].parentGuid, context.responseOption(for: nil)?.instanceGuid)
@@ -129,7 +131,9 @@ final class CatalogProductEventTests: XCTestCase {
 
     func testWrongModulesActionsAndIncompleteResponseOptionsAreRejected() throws {
         for module in [nil, "add-to-cart", "instant-purchase"] as [String?] {
-            XCTAssertNil(CatalogProductResponse(context: try CatalogProductActionFixture.context(moduleName: module)))
+            let context = try CatalogProductActionFixture.context(moduleName: module)
+            XCTAssertNil(CatalogProductResponse(context: context))
+            try assertProductButtonIsHidden(context: context)
         }
         for (key, value) in [
             ("action", "CaptureOnly" as Any), ("action", "ExternalPaymentTrigger"), ("action", "unknown"),
@@ -138,9 +142,11 @@ final class CatalogProductEventTests: XCTestCase {
         ] {
             let context = try CatalogProductActionFixture.context(updateOption: { $0[key] = value })
             XCTAssertNil(CatalogProductResponse(context: context), key)
+            try assertProductButtonIsHidden(context: context)
         }
         let context = try CatalogProductActionFixture.context(updateOffer: { $0["catalogItemResponseAction"] = "CaptureOnly" })
         XCTAssertNil(CatalogProductResponse(context: context))
+        try assertProductButtonIsHidden(context: context)
     }
 
     func testURLBehaviorUsesExistingNativeOpenTypes() throws {
@@ -159,6 +165,7 @@ final class CatalogProductEventTests: XCTestCase {
     func testMalformedAndUnsafeURLsDoNotEmitOrOpen() throws {
         for url in ["", " ", "/relative", "https://", "javascript:alert(1)", "data:text/html,test", "file:///tmp/example"] {
             let context = try CatalogProductActionFixture.context(updateOption: { $0["url"] = url })
+            try assertProductButtonIsHidden(context: context)
             let service = MockEventService()
             let state = MockLayoutState()
             var progressions = 0
@@ -171,6 +178,11 @@ final class CatalogProductEventTests: XCTestCase {
         }
         let context = try CatalogProductActionFixture.context(updateOption: { $0["url"] = "exampleapp://product/one" })
         XCTAssertNotNil(CatalogProductResponse(context: context))
+    }
+
+    func testProductButtonWithMissingURLIsHiddenWithoutFallingBackToPurchase() throws {
+        let context = try CatalogProductActionFixture.context(updateOption: { $0.removeValue(forKey: "url") })
+        try assertProductButtonIsHidden(context: context)
     }
 
     func testCustomSchemesNeverGoToTheInternalWebView() throws {
@@ -298,6 +310,36 @@ final class CatalogProductEventTests: XCTestCase {
         model.handleResponse()
         delegate.closures[1]()
         XCTAssertEqual(progressions, 1)
+    }
+
+    private func assertProductButtonIsHidden(context: CatalogItemContext,
+                                             file: StaticString = #filePath, line: UInt = #line) throws {
+        let service = MockEventService()
+        let state = LayoutState()
+        var responseInvoked = false
+        var closeInvoked = false
+        state.actionCollection[.close] = { _ in closeInvoked = true }
+        let button = CatalogResponseButtonViewModel(catalogItem: context.catalogItem, children: [],
+                                                    layoutState: state, eventService: service, defaultStyle: nil,
+                                                    pressedStyle: nil, hoveredStyle: nil, disabledStyle: nil,
+                                                    catalogItemContext: context)
+        button.productResponse = { _, _ in responseInvoked = true }
+
+        XCTAssertFalse(button.isRenderable, file: file, line: line)
+        button.cartItemInstantPurchase(position: context.offerIndex)
+        XCTAssertFalse(responseInvoked, file: file, line: line)
+        XCTAssertFalse(service.cartItemInstantPurchaseCalled, file: file, line: line)
+        XCTAssertFalse(service.cartItemForwardPaymentCalled, file: file, line: line)
+        XCTAssertFalse(service.dismissalEventCalled, file: file, line: line)
+        XCTAssertFalse(closeInvoked, file: file, line: line)
+
+        let screen = GlobalScreenSize()
+        screen.width = 300
+        let component = CatalogResponseButtonComponent(config: .init(parent: .column, position: context.offerIndex),
+                                                       model: button, parentWidth: .constant(300),
+                                                       parentHeight: .constant(nil), parentOverride: nil)
+            .environmentObject(screen)
+        XCTAssertThrowsError(try component.inspect().find(ViewType.HStack.self), file: file, line: line)
     }
 }
 
