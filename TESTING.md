@@ -25,9 +25,15 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestBasicTextComponent/testSnapshot.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_zeroProducts.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_oneProduct.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_manyProducts.carousel.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_smallWidth.carousel.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
+  TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.inline.png
+  TestInlineContainerComponent/testSnapshot_expandedRightToLeftInDarkMode.inline.png
   TestRichTextComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
   TestRichTextComponent/testSnapshot_nilTextStyle.1.png
@@ -242,6 +248,30 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
+
+#### CatalogCarouselCollection
+
+- [x] Empty catalog -- no reserved carousel space (`testSnapshot_zeroProducts`)
+- [x] Single product -- full-width card (`testSnapshot_oneProduct`)
+- [x] Multiple products -- grouped width, gap, and peek (`testSnapshot_manyProducts`)
+- [x] Narrow host -- wrapping product title (`testSnapshot_smallWidth`)
+- [ ] Typed product layout with collapsed description, data-URI images, selected title/price fields, and response buttons (`testSnapshot_productLayoutWithCollapsedDescription`; awaiting native reference recording and review)
+- [ ] Typed product layout after activating See More (`testSnapshot_productLayoutAfterExpandingDescription`; awaiting native reference recording and review)
+- [ ] Typed product layout scrolled to its last product (`testSnapshot_productLayoutScrolledToLastCard`; awaiting native reference recording and review)
+- [ ] Accessible text with right-to-left offer and product copy (`testSnapshot_productLayoutWithAccessibleTextRightToLeft`; awaiting native reference recording and review)
+- [ ] Dark mode product layout
+
+The four typed-layout cases reuse `ProductCarouselIntegrationFixture` and render through `OneByOneDistribution`, including the inline description and catalog cards. They use valid generic product responses and synchronous data-URI images. Expansion activates the rendered inline action, and the scrolled case moves the real carousel scroll view. These cases are component integration coverage; they do not replace running the assembled template in the SDK example app.
+
+#### InlineContainer
+
+- [x] Narrow copy/action wrapping with action padding and border (`testSnapshot_narrowWrappingTextAndAction`)
+- [x] Expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`)
+- [ ] Disabled and pressed action appearance
+- [ ] Pointer-hover appearance
+- [ ] Standalone inline layout at accessible text sizes
+
+The typed product layout cases above also exercise inline copy within its surrounding layout. Dynamic Type, interaction states, and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
 
 #### Placeholder Resolution (Runtime + Transaction Data)
 
