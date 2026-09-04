@@ -616,8 +616,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                   pressedStyle: updateStyles.compactMap {$0.pressed},
                                   hoveredStyle: updateStyles.compactMap {$0.hovered},
                                   disabledStyle: updateStyles.compactMap {$0.disabled},
-                                  layoutState: layoutState,
-                                  catalogItemContext: context.catalogItemContext)
+                                  layoutState: layoutState)
     }
 
     func getBasicText(_ basicTextModel: BasicTextModel<WhenPredicate>, context: Context) throws -> BasicTextViewModel {

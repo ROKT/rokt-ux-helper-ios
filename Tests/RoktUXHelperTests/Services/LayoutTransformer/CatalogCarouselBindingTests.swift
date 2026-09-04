@@ -18,6 +18,7 @@ final class CatalogCarouselBindingTests: XCTestCase {
             try transformer.transform(template, context: .inner(.catalogItem(context)))
         }
 
+        XCTAssertEqual(model.cards.count, 2)
         for card in model.cards {
             guard case .column(let column) = card.layout,
                   let children = column.children,
@@ -32,10 +33,11 @@ final class CatalogCarouselBindingTests: XCTestCase {
             let item = card.context.catalogItem
             XCTAssertEqual(text.boundValue, "Product offer: \(item.title)")
             XCTAssertEqual(richText.boundValue, "Product offer / \(item.title)")
-            XCTAssertEqual(image.image?.light, item.images["catalogItemImage0"]?.light)
+            let expectedImage = try XCTUnwrap(item.images["catalogItemImage0"])
+            let resolvedImage = try XCTUnwrap(image.image)
+            XCTAssertEqual(resolvedImage, expectedImage)
             XCTAssertEqual(text.catalogItemContext?.itemIndex, card.context.itemIndex)
             XCTAssertEqual(richText.catalogItemContext?.itemIndex, card.context.itemIndex)
-            XCTAssertEqual(image.catalogItemContext?.itemIndex, card.context.itemIndex)
             XCTAssertEqual(when.catalogItemContext?.itemIndex, card.context.itemIndex)
             XCTAssertEqual(row.catalogItemContext?.itemIndex, card.context.itemIndex)
             XCTAssertEqual(response.catalogItemContext?.catalogItem.token, item.token)
