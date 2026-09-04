@@ -10,13 +10,16 @@ protocol DataValidating {
 struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where Sanitiser.T == String {
     private let sanitiser: Sanitiser
     private let parser: PropertyChainDataParsing
+    private let validatesTextOperations: Bool
 
     init(
         sanitiser: Sanitiser = DataSanitiser(),
-        parser: PropertyChainDataParsing = PropertyChainDataParser()
+        parser: PropertyChainDataParsing = PropertyChainDataParser(),
+        validatesTextOperations: Bool = true
     ) {
         self.sanitiser = sanitiser
         self.parser = parser
+        self.validatesTextOperations = validatesTextOperations
     }
 
     func isValid(data: String) -> Bool {
@@ -45,7 +48,12 @@ struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where San
                             hasValidCharactersAndNamespace(binding: binding)
             }
 
-            isValid = isValid && hasValidCharactersAndNamespace(binding: binding)
+            if index == bindings.count - 1, index > 0, parser.namespaceIn(placeholder: binding) == nil {
+                // Literal fallbacks are not operator expressions and may contain localized punctuation.
+                isValid = isValid && !sanitiser.sanitiseDelimiters(data: binding).isEmpty
+            } else {
+                isValid = isValid && hasValidCharactersAndNamespace(binding: binding)
+            }
         }
 
         return isValid
@@ -57,6 +65,11 @@ struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where San
             sanitisedBinding = sanitiser.sanitiseNamespace(data: sanitisedBinding, namespace: namespace)
         }
 
+        let parts = sanitisedBinding.components(separatedBy: ":")
+        // Resolvers validate operations when they attempt an alternative, so an unused
+        // alternative cannot reject a value that has already resolved successfully.
+        guard !validatesTextOperations || parts.dropFirst().allSatisfy({ BNFTextOperation($0) != .invalid }) else { return false }
+        sanitisedBinding = parts[0]
         let wordsInBinding = sanitisedBinding.components(separatedBy: BNFSeparator.namespace.rawValue)
 
         return wordsInBinding.allSatisfy(hasOnlyAlphaNumericOrSpace(binding:))

@@ -15,7 +15,7 @@ import Foundation
 enum CatalogRuntimePlaceholderResolver {
 
     private static let bnfRegex: NSRegularExpression? = {
-        try? NSRegularExpression(pattern: "(?<=\\%\\^)[a-zA-Z0-9 .|_$\\-]*(?=\\^\\%)")
+        try? NSRegularExpression(pattern: BNFPlaceholder.deferredExpression)
     }()
 
     static func resolve(text: String, catalogRuntimeData: [String: String]?) -> String {
@@ -36,7 +36,7 @@ enum CatalogRuntimePlaceholderResolver {
             // Skip placeholders that don't reference DATA.catalogRuntime.* in any alternative.
             guard chain.contains(prefix) else { continue }
 
-            let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData)
+            guard let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData) else { return "" }
             // Replace at the regex-derived position (expanded to include `%^` and `^%`).
             // A global string search would re-target the first identical token if the same
             // placeholder appears multiple times; reverse iteration keeps positional ranges
@@ -51,29 +51,43 @@ enum CatalogRuntimePlaceholderResolver {
     /// Walks the `|`-separated alternatives. For each `DATA.catalogRuntime.<key>` alternative,
     /// returns the runtime value if present. If no runtime alternative resolves and there is
     /// a trailing default literal, returns it. Otherwise returns the chain re-wrapped in
-    /// delimiters so the placeholder remains visible (preferable to silently emptying it).
+    /// delimiters so valid deferred bindings can resolve later. Invalid operations without a
+    /// usable alternative or default return nil, preserving mandatory-placeholder empty-line behavior.
     private static func resolveChain(
         _ chain: String,
         prefix: String,
         runtimeData: [String: String]?
-    ) -> String {
+    ) -> String? {
         let parts = chain.split(separator: BNFSeparator.alternative.rawValue.first!,
                                 omittingEmptySubsequences: false)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
         var fallback: String?
-        for part in parts {
+        var invalidOperation = false
+        var hasForeignAlternative = false
+        let parser = PropertyChainDataParser()
+        for (index, part) in parts.enumerated() {
             if part.hasPrefix(prefix) {
-                let key = String(part.dropFirst(prefix.count))
-                if let value = runtimeData?[key], !value.isEmpty {
-                    return value
+                let parsed = parser.parse(propertyChain: part)
+                guard let binding = parsed.parseableChains.first else { continue }
+                do {
+                    // Validate even before the runtime value arrives; malformed syntax cannot become valid later.
+                    let value = runtimeData?[binding.key] ?? ""
+                    let transformed = try binding.applyingTextOperations(to: value)
+                    if !value.isEmpty { return transformed }
+                } catch {
+                    invalidOperation = true
                 }
-            } else if !part.isEmpty || fallback == nil {
-                // Treat trailing literal (no namespace) as the default. An empty trailing
-                // literal "" is also a valid default — preserved on first encounter.
+            } else if let namespace = parser.namespaceIn(placeholder: part), namespace != .dataCatalogRuntime {
+                hasForeignAlternative = true
+            } else if index == parts.count - 1, parser.namespaceIn(placeholder: part) == nil {
+                // Only a final literal without a namespace is a default, including an empty literal.
                 fallback = part
             }
         }
-        return fallback ?? (BNFSeparator.startDelimiter.rawValue + chain + BNFSeparator.endDelimiter.rawValue)
+        if let fallback { return fallback }
+        // A foreign candidate may still resolve in its namespace's later pass.
+        guard !invalidOperation || hasForeignAlternative else { return nil }
+        return BNFSeparator.startDelimiter.rawValue + chain + BNFSeparator.endDelimiter.rawValue
     }
 }

@@ -7,7 +7,7 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
     private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = PlaceholderValidator(),
+        dataValidator: Validator = PlaceholderValidator(validatesTextOperations: false),
         parser: PropertyChainDataParsing = PropertyChainDataParser(),
         dataReflector: any DataReflecting = DataReflector()
     ) {
@@ -22,12 +22,15 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
         responseKey: String?,
         from data: TransactionData?
     ) throws -> DataBinding<U> {
+        let placeholder = parser.parse(propertyChain: propertyChain)
         guard dataValidator.isValid(data: propertyChain) else {
+            if placeholder.hasTextOperations {
+                throw BNFPlaceholderError.invalidTextOperation
+            }
             return .value(propertyChain as! U)
         }
 
-        let placeholder = parser.parse(propertyChain: propertyChain)
-        let resolved = try resolveValue(from: placeholder, data: data)
+        let resolved = try resolveValue(from: placeholder, data: data, allowsTextOperations: type == String.self)
         let mappedData: Any? = resolved ?? placeholder.defaultValue
 
         guard let mappedData,
@@ -40,9 +43,16 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
 
     private func resolveValue(
         from placeholder: BNFPlaceholder,
-        data: TransactionData?
+        data: TransactionData?,
+        allowsTextOperations: Bool
     ) throws -> Any? {
+        var invalidOperation = false
         for keyAndNamespace in placeholder.parseableChains {
+            if keyAndNamespace.textOperations
+                .contains(.invalid) || (!keyAndNamespace.textOperations.isEmpty && !allowsTextOperations) {
+                invalidOperation = true
+                continue
+            }
             switch keyAndNamespace.namespace {
             case .dataTransactionData:
                 guard let data else { continue }
@@ -51,6 +61,13 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
                     throw BNFPlaceholderError.mandatoryKeyEmpty
                 }
                 if let resolved {
+                    if !keyAndNamespace.textOperations.isEmpty {
+                        guard let text = stringValue(from: resolved) else {
+                            invalidOperation = true
+                            continue
+                        }
+                        return try keyAndNamespace.applyingTextOperations(to: text)
+                    }
                     return resolved
                 }
             case .dataCatalogItem,
@@ -63,6 +80,9 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
                 // Foreign namespaces — handled by other mappers / reactive resolution.
                 throw LayoutTransformerError.InvalidSyntaxMapping()
             }
+        }
+        if invalidOperation && (placeholder.defaultValue == nil || !allowsTextOperations) {
+            throw BNFPlaceholderError.invalidTextOperation
         }
         return nil
     }

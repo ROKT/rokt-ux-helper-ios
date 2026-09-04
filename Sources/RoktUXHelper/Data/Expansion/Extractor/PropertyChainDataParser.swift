@@ -57,7 +57,9 @@ struct PropertyChainDataParser<Sanitiser: DataSanitising>: PropertyChainDataPars
 
             let chainWithoutNamespace = sanitiser.sanitiseNamespace(data: $0, namespace: namespace)
 
-            return BNFKeyAndNamespace(key: chainWithoutNamespace, namespace: namespace)
+            let parts = chainWithoutNamespace.components(separatedBy: ":")
+            return BNFKeyAndNamespace(key: parts[0], namespace: namespace,
+                                      textOperations: parts.dropFirst().map(BNFTextOperation.init))
         }
     }
 

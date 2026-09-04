@@ -3,6 +3,86 @@ import XCTest
 
 final class CatalogRuntimePlaceholderResolverTests: XCTestCase {
 
+    func test_missingRuntimeAlternativeDoesNotTurnAForeignNamespaceIntoLiteralCopy() {
+        for alternative in ["DATA.creativeCopy.copy", "DATA.catalogItem.title", "DATA.transactionData.metadata.summary",
+                            "STATE.totalOffers"] {
+            let text = "Before %^DATA.catalogRuntime.missing|\(alternative)^% after"
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: [:]), text)
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["missing": "found"]),
+                           "Before found after")
+        }
+    }
+
+    func test_missingRuntimeAndForeignAlternativesUseOnlyTheFinalLiteralDefault() {
+        for fallback in ["Details...", ""] {
+            let text = "Before %^DATA.catalogRuntime.missing|DATA.creativeCopy.copy|\(fallback)^% after"
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: [:]),
+                           "Before \(fallback) after")
+        }
+    }
+
+    func test_invalidRuntimeAlternativeDefersToTheStateResolver() {
+        let text = "Before %^DATA.catalogRuntime.title:unknown[]|STATE.TotalOffers^% after"
+        for data: [String: String]? in [nil, [:], ["title": "abcdef"]] {
+            let runtimeResolved = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: data)
+            XCTAssertEqual(runtimeResolved, text)
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(runtimeResolved, currentOffer: "2", totalOffers: "4"),
+                           "Before 4 after")
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(NSAttributedString(string: runtimeResolved),
+                                                                currentOffer: "2", totalOffers: "4").string,
+                           "Before 4 after")
+        }
+    }
+
+    func test_invalidMandatoryOperationEmptiesTheLineBeforeAndAfterRuntimeDataArrives() {
+        for operation in ["sliceText[Chars,-1]", "sliceText[Chars,NaN]", "sliceText[Chars,2", "unknown[]"] {
+            let text = "Before %^DATA.catalogRuntime.title:\(operation)^% after"
+            for data: [String: String]? in [nil, [:], ["title": ""], ["title": "abcdef"]] {
+                XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: data), "", operation)
+            }
+        }
+    }
+
+    func test_invalidOperationUsesItsLiteralOrEmptyDefault() {
+        for fallback in ["Détails…", ""] {
+            let text = "Before %^DATA.catalogRuntime.title:sliceText[Chars,-1]|\(fallback)^% after"
+            for data: [String: String]? in [nil, ["title": "abcdef"]] {
+                XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: data),
+                               "Before \(fallback) after")
+            }
+        }
+    }
+
+    func test_invalidRuntimeAlternativeCanFallThroughToAValidAlternative() {
+        let text = "%^DATA.catalogRuntime.first:sliceText[Chars,-1]|DATA.catalogRuntime.second:sliceText[Chars,2]|fallback^%"
+        XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text,
+                                                                 catalogRuntimeData: ["first": "abc", "second": "👩🏽‍🚀e\u{301}z"]),
+                       "👩🏽‍🚀e\u{301}")
+        XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["first": "abc"]),
+                       "fallback")
+    }
+
+    func test_validFirstAlternativeDoesNotEvaluateAnUnusedInvalidOperation() {
+        let text = "%^DATA.catalogRuntime.first:sliceText[Chars,2]|DATA.catalogRuntime.second:unknown[]^%"
+        XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text,
+                                                                 catalogRuntimeData: ["first": "abc", "second": "def"]), "ab")
+    }
+
+    func test_invalidMandatoryOperationStillEmptiesCopyContainingOtherResolvedTokens() {
+        let text = "👩🏽‍🚀 %^DATA.catalogRuntime.first^% / %^DATA.catalogRuntime.second:sliceText[Chars,-1]^% / %^DATA.catalogRuntime.first^%"
+        XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text,
+                                                                 catalogRuntimeData: ["first": "copy", "second": "value"]), "")
+    }
+
+    func test_validMandatoryRuntimeOperationRemainsDeferredUntilDataArrives() {
+        let text = "Before %^DATA.catalogRuntime.title:sliceText[Chars,2]^% after"
+        for data: [String: String]? in [nil, [:], ["title": ""]] {
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: data), text)
+        }
+        XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["title": "abcdef"]),
+                       "Before ab after")
+    }
+
     // MARK: - Single occurrence (baseline)
 
     func test_singleOccurrence_resolvesFromRuntimeData() {
