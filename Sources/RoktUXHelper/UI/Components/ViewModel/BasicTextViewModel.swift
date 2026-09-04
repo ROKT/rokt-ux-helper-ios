@@ -15,6 +15,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
 
     // `value` is used by our BNF transformer to update `dataBinding`
     private(set) var value: String?
+    let catalogItemContext: CatalogItemContext?
     private(set) var dataBinding: DataBinding<String> = .value("")
 
     // Post-mapper text retained as the template for reactive catalog-runtime resolution. Mappers
@@ -60,7 +61,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     var viewableItems: Binding<Int> = .constant(1)
 
     var totalOffer: Int {
-        layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
+        catalogItemContext?.offers.count ?? layoutState?.items[LayoutState.totalItemsKey] as? Int ?? 1
     }
 
     init(
@@ -71,9 +72,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         disabledStyle: [BasicTextStyle]?,
         stateDataExpansionClosure: ((String?) -> String?)? = nil,
         layoutState: (any LayoutStateRepresenting)?,
-        diagnosticService: DiagnosticServicing?
+        diagnosticService: DiagnosticServicing?,
+        catalogItemContext: CatalogItemContext? = nil
     ) {
         self.value = value
+        self.catalogItemContext = catalogItemContext
 
         self.boundValue = value ?? ""
 
@@ -86,13 +89,15 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.layoutState = layoutState
         self.diagnosticService = diagnosticService
         self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
-        self.currentIndex = layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+        self.currentIndex = catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
+            ?? layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
 
         cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
             guard let self else { return }
             self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
-            self.currentIndex = newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
+            self.currentIndex = self.catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
+                ?? newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
             // Re-resolve `%^DATA.catalogRuntime.<key>^%` against the latest catalog-runtime dict so the
             // confirmation screen picks up subtotal/tax/shipping/total values pushed at runtime.
             self.reapplyCatalogRuntimeResolution()

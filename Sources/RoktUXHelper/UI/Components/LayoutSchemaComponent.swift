@@ -181,6 +181,15 @@ struct LayoutSchemaComponent: View {
                 styleState: $styleState,
                 parentOverride: parentOverride
             )
+        case .catalogCarouselCollection(let model):
+            CatalogCarouselCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
         case .catalogCombinedCollection(let model):
             CatalogCombinedCollectionComponent(
                 config: config,

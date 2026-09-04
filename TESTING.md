@@ -26,6 +26,7 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestBasicTextComponent/testSnapshot.1.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
+  CatalogCarouselSnapshotTests/testSnapshot_mixedIntrinsicCardHeights.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot.1.png
@@ -262,6 +263,12 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
+
+#### CatalogCarouselCollection
+
+`CatalogCarouselStretchLayoutTests` mounts the real carousel and measures rendered card surfaces with different text lengths. It checks equal card heights, growth and shrinkage after text changes, narrow and wide host widths, and stable mount/scroll callbacks. These are native layout assertions with synthetic colors, not recorded image snapshots or product-button gesture coverage.
+
+- [x] Product cards with different intrinsic title heights share a row height (`testSnapshot_mixedIntrinsicCardHeights`). This checks the card surfaces, not aligned internal buttons or full-template styling.
 
 #### Placeholder Resolution (Runtime + Transaction Data)
 

@@ -8,6 +8,9 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
 
     let id: UUID = UUID()
     let catalogItem: CatalogItem?
+    let catalogItemContext: CatalogItemContext?
+    let responseKey: String?
+    var productResponse: ((CatalogItemContext, String?) -> Void)?
     var children: [LayoutSchemaViewModel]?
     weak var eventService: EventDiagnosticServicing?
     weak var layoutState: (any LayoutStateRepresenting)?
@@ -22,6 +25,10 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
 
     let transactionData: TransactionData?
 
+    var isRenderable: Bool {
+        catalogItemContext.map { $0.responseOption(for: responseKey) != nil } ?? true
+    }
+
     var isPartnerManagedPurchase: Bool {
         transactionData?.isPartnerManagedPurchase ?? true
     }
@@ -34,8 +41,12 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
          pressedStyle: [CatalogResponseButtonStyles]?,
          hoveredStyle: [CatalogResponseButtonStyles]?,
          disabledStyle: [CatalogResponseButtonStyles]?,
-         transactionData: TransactionData? = nil) {
-        self.catalogItem = catalogItem
+         transactionData: TransactionData? = nil,
+         catalogItemContext: CatalogItemContext? = nil,
+         responseKey: String? = nil) {
+        self.catalogItem = catalogItemContext?.catalogItem ?? catalogItem
+        self.catalogItemContext = catalogItemContext
+        self.responseKey = responseKey
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
@@ -43,10 +54,19 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
         self.disabledStyle = disabledStyle
         self.layoutState = layoutState
         self.eventService = eventService
-        self.transactionData = transactionData
+        if let catalogItemContext {
+            self.transactionData = catalogItemContext.offer.transactionData
+        } else {
+            self.transactionData = transactionData
+        }
     }
 
-    func cartItemInstantPurchase(position: Int?) {
+    func cartItemInstantPurchase(position: Int?, isEnabled: Bool = true) {
+        if let catalogItemContext {
+            guard isEnabled, isRenderable else { return }
+            productResponse?(catalogItemContext, responseKey)
+            return
+        }
         guard let catalogItem else {
             sendCloseEvent()
             closeLayout()

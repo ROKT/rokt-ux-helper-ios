@@ -20,6 +20,12 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             case negative(OfferModel)
             case generic(OfferModel?)
             case addToCart(CatalogItem)
+            case catalogItem(CatalogItemContext)
+        }
+
+        var catalogItemContext: CatalogItemContext? {
+            if case .inner(.catalogItem(let context)) = self { return context }
+            return nil
         }
     }
 
@@ -59,6 +65,11 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         (layoutState.items[LayoutState.fullOfferKey] as? OfferModel)?.transactionData
     }
 
+    private func transactionData(for context: Context) -> TransactionData? {
+        if let card = context.catalogItemContext { return card.offer.transactionData }
+        return activeTransactionData
+    }
+
     func transform() throws -> LayoutSchemaViewModel? {
         guard let layout = layoutPlugin.layout else { return nil}
 
@@ -88,7 +99,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                 .row(
                     try getRow(
                         rowModel.styles,
-                        children: transformChildren(rowModel.children, context: context)
+                        children: transformChildren(rowModel.children, context: context),
+                        catalogItemContext: context.catalogItemContext
                     )
                 )
         case .column(let columnModel):
@@ -145,7 +157,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     getWhenNode(
                         children: try transformChildren(whenModel.children, context: context),
                         predicates: whenModel.predicates,
-                        transition: whenModel.transition
+                        transition: whenModel.transition,
+                        catalogItemContext: context.catalogItemContext
                     )
                 )
         case .staticLink(let staticLinkModel):
@@ -195,7 +208,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                 .scrollableRow(
                     try getScrollableRow(
                         rowModel.styles,
-                        children: transformChildren(rowModel.children, context: context)
+                        children: transformChildren(rowModel.children, context: context),
+                        catalogItemContext: context.catalogItemContext
                     )
                 )
         case .toggleButtonStateTrigger(let buttonModel):
@@ -223,7 +237,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     try getCatalogResponseButtonModel(
                         style: model.styles,
                         children: transformChildren(model.children, context: context),
-                        context: context
+                        context: context,
+                        responseKey: model.responseKey
                     )
                 )
         case .catalogDevicePayButton(let devicePayModel):
@@ -260,7 +275,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     ) throws -> LayoutSchemaViewModel {
         switch layout {
         case .row(let rowModel):
-                .row(try getRow(rowModel.styles, children: transformChildren(rowModel.children, context: context)))
+                .row(try getRow(rowModel.styles, children: transformChildren(rowModel.children, context: context),
+                                catalogItemContext: context.catalogItemContext))
         case .column(let columnModel):
             .column(
                 try getColumn(
@@ -589,6 +605,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             creativeImage = findImage(for: imageModel.imageKey, in: offer.creative.images)
         case let .inner(.addToCart(catalogItem)):
             creativeImage = findImage(for: imageModel.imageKey, in: catalogItem.images)
+        case let .inner(.catalogItem(card)):
+            creativeImage = findImage(for: imageModel.imageKey, in: card.catalogItem.images)
         default:
             throw LayoutTransformerError.missingData
         }
@@ -609,13 +627,18 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                     hoveredStyle: updateStyles.compactMap {$0.hovered},
                                     disabledStyle: updateStyles.compactMap {$0.disabled},
                                     layoutState: layoutState,
-                                    diagnosticService: eventService)
+                                    diagnosticService: eventService,
+                                    catalogItemContext: context.catalogItemContext)
         if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .basicText(vm), context: bnfContext)
+        }
+        if let catalogItem = context.catalogItemContext?.catalogItem {
+            addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .basicText(vm), context: catalogItem)
         }
-        if case .inner = context, let transactionData = activeTransactionData {
+        let transactionData = transactionData(for: context)
+        if case .inner = context, let transactionData {
             transactionDataMapper.map(consumer: .basicText(vm), context: transactionData)
         }
         // Final pass after the whole mapper chain: substitute `|` defaults for any
@@ -632,14 +655,19 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                    linkStyle: updateLinkStyles.compactMap {$0.default},
                                    openLinks: richTextModel.openLinks,
                                    layoutState: layoutState,
-                                   eventService: eventService)
+                                   eventService: eventService,
+                                   catalogItemContext: context.catalogItemContext)
 
         if case .inner = context, let bnfContext = context.mapToCreativeContext {
             creativeMapper.map(consumer: .richText(vm), context: bnfContext)
+        }
+        if let catalogItem = context.catalogItemContext?.catalogItem {
+            addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
         } else if case let .inner(.addToCart(catalogItem)) = context {
             addToCartMapper.map(consumer: .richText(vm), context: catalogItem)
         }
-        if case .inner = context, let transactionData = activeTransactionData {
+        let transactionData = transactionData(for: context)
+        if case .inner = context, let transactionData {
             transactionDataMapper.map(consumer: .richText(vm), context: transactionData)
         }
         vm.finalizePlaceholders()
@@ -683,7 +711,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
     func getRow(_ styles: LayoutStyle<RowElements, ConditionalStyleTransition<RowTransitions, WhenPredicate>>?,
                 children: [LayoutSchemaViewModel]?,
-                accessibilityGrouped: Bool = false) throws -> RowViewModel {
+                accessibilityGrouped: Bool = false,
+                catalogItemContext: CatalogItemContext? = nil) throws -> RowViewModel {
         let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
         return RowViewModel(
@@ -697,14 +726,16 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             layoutState: layoutState,
             predicates: styles?.conditionalTransitions?.predicates,
             globalBreakPoints: layoutPlugin.breakpoints,
-            offers: layoutPlugin.slots.map(\.offer)
+            offers: layoutPlugin.slots.map(\.offer),
+            catalogItemContext: catalogItemContext
         )
     }
 
     func getScrollableRow(_ styles: LayoutStyle<ScrollableRowElements,
                                                 ConditionalStyleTransition<ScrollableRowTransitions, WhenPredicate>>?,
                           children: [LayoutSchemaViewModel]?,
-                          accessibilityGrouped: Bool = false) throws -> RowViewModel {
+                          accessibilityGrouped: Bool = false,
+                          catalogItemContext: CatalogItemContext? = nil) throws -> RowViewModel {
         let updatedStyles = try StyleTransformer.updatedStyles(styles?.elements?.own, transform: BaseStyles.init)
 
         return RowViewModel(
@@ -718,7 +749,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             layoutState: layoutState,
             predicates: styles?.conditionalTransitions?.predicates,
             globalBreakPoints: layoutPlugin.breakpoints,
-            offers: layoutPlugin.slots.map(\.offer)
+            offers: layoutPlugin.slots.map(\.offer),
+            catalogItemContext: catalogItemContext
         )
     }
 
@@ -745,7 +777,8 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         case .row(let rowModel):
             return .row(try getRow(rowModel.styles,
                                    children: transformChildren(rowModel.children, context: context),
-                                   accessibilityGrouped: true))
+                                   accessibilityGrouped: true,
+                                   catalogItemContext: context.catalogItemContext))
         case .zStack(let zStackModel):
             return .zStack(try getZStack(zStackModel.styles,
                                          children: transformChildren(zStackModel.children, context: context),
@@ -882,13 +915,17 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             ConditionalStyleTransition<CatalogResponseButtonTransitions, WhenPredicate>
         >?,
         children: [LayoutSchemaViewModel]?,
-        context: Context
+        context: Context,
+        responseKey: String? = nil
     ) throws -> CatalogResponseButtonViewModel {
-        guard case let .inner(.addToCart(catalogItem)) = context else {
-            throw LayoutTransformerError.InvalidMapping()
+        let catalogItem: CatalogItem
+        switch context {
+        case .inner(.addToCart(let item)): catalogItem = item
+        case .inner(.catalogItem(let card)): catalogItem = card.catalogItem
+        default: throw LayoutTransformerError.InvalidMapping()
         }
 
-        let transactionData = (layoutState.items[LayoutState.fullOfferKey] as? OfferModel)?.transactionData
+        let transactionData = transactionData(for: context)
         let updateStyles = try StyleTransformer.updatedStyles(style?.elements?.own)
         return CatalogResponseButtonViewModel(
             catalogItem: catalogItem,
@@ -899,7 +936,9 @@ where CreativeSyntaxMapper.Context == CreativeContext,
             pressedStyle: updateStyles.compactMap { $0.pressed },
             hoveredStyle: updateStyles.compactMap { $0.hovered },
             disabledStyle: updateStyles.compactMap { $0.disabled },
-            transactionData: transactionData
+            transactionData: transactionData,
+            catalogItemContext: context.catalogItemContext,
+            responseKey: responseKey
         )
     }
 
@@ -939,13 +978,15 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
     func getWhenNode(children: [LayoutSchemaViewModel]?,
                      predicates: [WhenPredicate],
-                     transition: WhenTransition?) -> WhenViewModel {
+                     transition: WhenTransition?,
+                     catalogItemContext: CatalogItemContext? = nil) -> WhenViewModel {
         return WhenViewModel(children: children,
                              predicates: predicates,
                              transition: transition,
                              offers: layoutPlugin.slots.map(\.offer),
                              globalBreakPoints: layoutPlugin.breakpoints,
-                             layoutState: layoutState)
+                             layoutState: layoutState,
+                             catalogItemContext: catalogItemContext)
     }
 
     func getToggleButton(customStateKey: String,
@@ -1067,6 +1108,8 @@ private extension LayoutTransformer.Context {
                     .negativeResponse(offerModel)
             case .generic(let offerModel):
                     .generic(offerModel)
+            case .catalogItem(let context):
+                    .generic(context.offer)
             case .addToCart:
                 nil
             }
