@@ -7,6 +7,74 @@ import DcuiSchema
 @available(iOS 15, *)
 @MainActor
 final class CatalogCarouselStretchLayoutTests: XCTestCase {
+    func test_intrinsicWidthCardsKeepTheirLeadingEdgeInBothLayoutDirections() throws {
+        for direction in [LayoutDirection.leftToRight, .rightToLeft] {
+            let bounds = try renderCardAlignment(direction: direction)
+            XCTAssertEqual(bounds[0].minX, direction == .leftToRight ? 0 : 280, accuracy: 1)
+            XCTAssertEqual(bounds[1].minX, direction == .leftToRight ? 160 : 120, accuracy: 1)
+        }
+    }
+
+    func test_fullWidthCardsPreserveAuthoredChildAlignmentInBothLayoutDirections() throws {
+        for direction in [LayoutDirection.leftToRight, .rightToLeft] {
+            for alignment in ["center", "flex-end"] {
+                let bounds = try renderCardAlignment(direction: direction, alignment: alignment)
+                let inset: CGFloat = alignment == "center" ? 60 : 120
+                XCTAssertEqual(bounds[0].minX, direction == .leftToRight ? inset : 280 - inset, accuracy: 1)
+                XCTAssertEqual(bounds[1].minX, direction == .leftToRight ? 160 + inset : 120 - inset, accuracy: 1)
+            }
+        }
+    }
+
+    private func renderCardAlignment(direction: LayoutDirection, alignment: String? = nil) throws -> [CGRect] {
+        let state = LayoutState()
+        let slots = try CatalogCarouselTestFixture.slots(count: 2)
+        let model = try CatalogCarouselCollectionViewModel(slots: slots, offerIndex: 1, viewableItems: [2],
+                                                           peekThroughSize: [], layoutState: state) { context in
+            let color = context.itemIndex == 0 ? "#FF0000" : "#0000FF"
+            let style = try JSONDecoder().decode(BasicTextStyle.self, from: Data("""
+            {"dimension":{"width":{"type":"fixed","value":40},"height":{"type":"fixed","value":80}},
+             "background":{"backgroundColor":{"light":"\(color)"}}}
+            """.utf8))
+            let text = BasicTextViewModel(value: " ", defaultStyle: [style], pressedStyle: nil, hoveredStyle: nil,
+                                          disabledStyle: nil, layoutState: state, diagnosticService: nil,
+                                          catalogItemContext: context)
+            let columnStyle = try alignment.map { alignment in
+                try JSONDecoder().decode(ColumnStyle.self, from: Data("""
+                {"dimension":{"width":{"type":"percentage","value":100}},
+                 "container":{"alignItems":"\(alignment)"}}
+                """.utf8))
+            }
+            return .column(ColumnViewModel(children: [.basicText(text)], defaultStyle: columnStyle.map { [$0] },
+                                           pressedStyle: nil, hoveredStyle: nil, disabledStyle: nil,
+                                           accessibilityGrouped: false, layoutState: state))
+        }
+        let screen = GlobalScreenSize()
+        screen.width = 320
+        screen.height = 300
+        let root = LayoutSchemaComponent(config: .init(parent: .column, position: 1),
+                                         layout: .catalogCarouselCollection(model), parentWidth: .constant(320),
+                                         parentHeight: .constant(nil), styleState: .constant(.default))
+            .frame(width: 320)
+            .frame(maxHeight: .infinity, alignment: .topLeading)
+            .background(Color.white)
+            .environment(\.colorScheme, .light)
+            .environment(\.layoutDirection, direction)
+            .environmentObject(screen)
+        let host = UIHostingController(rootView: root)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 300))
+        defer {
+            window.isHidden = true
+            window.rootViewController = nil
+        }
+        _ = try measure(model, satisfying: { $0 == 80 }) {
+            window.rootViewController = host
+            window.isHidden = false
+            host.view.layoutIfNeeded()
+        }
+        return try cardSurfaceBounds(in: host.view)
+    }
+
     func test_renderedCardsStretchAndShrinkAfterTextAndWidthChanges() throws {
         let state = LayoutState()
         let slots = try CatalogCarouselTestFixture.slots(count: 2)
@@ -118,6 +186,14 @@ final class CatalogCarouselStretchLayoutTests: XCTestCase {
 
     private func assertEqualCardHeights(in view: UIView, minimumHeight: CGFloat,
                                         file: StaticString = #filePath, line: UInt = #line) throws {
+        let bounds = try cardSurfaceBounds(in: view, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(bounds[0].height, minimumHeight, file: file, line: line)
+        XCTAssertEqual(bounds[0].height, bounds[1].height, accuracy: 1, file: file, line: line)
+        XCTAssertEqual(bounds[0].minY, bounds[1].minY, accuracy: 1, file: file, line: line)
+    }
+
+    private func cardSurfaceBounds(in view: UIView, file: StaticString = #filePath,
+                                   line: UInt = #line) throws -> [CGRect] {
         view.layoutIfNeeded()
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
@@ -126,21 +202,21 @@ final class CatalogCarouselStretchLayoutTests: XCTestCase {
             view.layer.render(in: context.cgContext)
         }
         let attachment = XCTAttachment(image: image)
-        attachment.name = "Card surfaces at width \(view.bounds.width), expected height \(minimumHeight + 2)"
+        attachment.name = "Card surfaces at width \(view.bounds.width)"
         attachment.lifetime = .keepAlways
         add(attachment)
         let cgImage = try XCTUnwrap(image.cgImage, file: file, line: line)
         let width = cgImage.width
         let height = cgImage.height
         var pixels = [UInt8](repeating: 0, count: width * height * 4)
-        let bounds = try pixels.withUnsafeMutableBytes { buffer -> [(Int, Int)?] in
+        let bounds = try pixels.withUnsafeMutableBytes { buffer -> [CGRect?] in
             let context = try XCTUnwrap(CGContext(data: buffer.baseAddress, width: width, height: height,
                                                   bitsPerComponent: 8, bytesPerRow: width * 4,
                                                   space: CGColorSpaceCreateDeviceRGB(),
                                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue |
                                                     CGBitmapInfo.byteOrder32Big.rawValue), file: file, line: line)
             context.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
-            var rows: [(Int, Int)?] = [nil, nil]
+            var bounds: [CGRect?] = [nil, nil]
             let bytes = buffer.bindMemory(to: UInt8.self)
             for y in 0..<height {
                 for x in 0..<width {
@@ -157,18 +233,15 @@ final class CatalogCarouselStretchLayoutTests: XCTestCase {
                         card = nil
                     }
                     if let card {
-                        rows[card] = (min(rows[card]?.0 ?? y, y), max(rows[card]?.1 ?? y, y))
+                        let pixel = CGRect(x: x, y: y, width: 1, height: 1)
+                        bounds[card] = bounds[card]?.union(pixel) ?? pixel
                     }
                 }
             }
-            return rows
+            return bounds
         }
-        let first = try XCTUnwrap(bounds[0], "First card surface must render", file: file, line: line)
-        let second = try XCTUnwrap(bounds[1], "Second card surface must render", file: file, line: line)
-        let firstHeight = CGFloat(first.1 - first.0 + 1)
-        let secondHeight = CGFloat(second.1 - second.0 + 1)
-        XCTAssertGreaterThanOrEqual(firstHeight, minimumHeight, file: file, line: line)
-        XCTAssertEqual(firstHeight, secondHeight, accuracy: 1, file: file, line: line)
-        XCTAssertEqual(CGFloat(first.0), CGFloat(second.0), accuracy: 1, file: file, line: line)
+        return try bounds.enumerated().map { index, bounds in
+            try XCTUnwrap(bounds, "Card \(index) surface must render", file: file, line: line)
+        }
     }
 }

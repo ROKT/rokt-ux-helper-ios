@@ -74,13 +74,15 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         self.stateDataExpansionClosure = stateDataExpansionClosure
         self.layoutState = layoutState
         self.eventService = eventService
-        self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.viewableItems = catalogItemContext == nil
+            ? layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1) : .constant(1)
         self.currentIndex = catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
             ?? layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         updateBoundValueWithStyling()
         cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
             guard let self else { return }
-            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.viewableItems = self.catalogItemContext == nil
+                ? newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1) : .constant(1)
             self.currentIndex = self.catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
                 ?? newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
             self.reapplyCatalogRuntimeResolution()

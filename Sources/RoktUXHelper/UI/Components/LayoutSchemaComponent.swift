@@ -48,6 +48,9 @@ struct LayoutSchemaComponent: View {
                                styleState: $styleState,
                                parentOverride: parentOverride,
                                expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign)
+        case .inlineContainer(let model):
+            InlineContainerComponent(config: config, model: model, parentWidth: $parentWidth, parentHeight: $parentHeight,
+                                     parentOverride: parentOverride, styleState: $styleState)
         case .column(let columnModel):
             ColumnComponent(config: config,
                             model: columnModel,

@@ -198,6 +198,7 @@ struct CatalogResponseButtonComponent: View {
     func build() -> some View {
         createContainer()
             .accessibilityAddTraits(.isButton)
+            .ifLet(model.accessibilityLabel) { $0.accessibilityElement(children: .ignore).accessibilityLabel($1) }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
@@ -236,7 +237,7 @@ struct CatalogResponseButtonComponent: View {
     //   since it will only take up its container's finite height
     // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
     private func shouldExpandToContainerOnSelfAlign() -> Bool {
-        guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
+        guard let heightType = model.defaultStyle?[safe: breakpointIndex]?.dimension?.height else { return false }
 
         switch heightType {
         case .fixed, .percentage:

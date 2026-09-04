@@ -4,6 +4,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct CatalogCarouselCollectionComponent: View {
     @SwiftUI.Environment(\.isEnabled) private var isEnabled
+    @SwiftUI.Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject var globalScreenSize: GlobalScreenSize
     @ObservedObject var model: CatalogCarouselCollectionViewModel
     let config: ComponentConfig
@@ -25,14 +26,15 @@ struct CatalogCarouselCollectionComponent: View {
     }
 
     private var breakpointIndex: Int { model.layoutState?.getGlobalBreakpointIndex(globalScreenSize.width) ?? 0 }
-    private var style: BaseStyles? { model.defaultStyle?[safe: model.updateBreakpointIndex(for: globalScreenSize.width)] }
+    private var style: BaseStyles? { model.style(width: globalScreenSize.width, position: config.position,
+                                                 colorScheme: colorScheme) }
     private var background: BackgroundStylingProperties? { style?.background ?? parentOverride?.parentBackgroundStyle }
     private var isInteractionEnabled: Bool { isEnabled && styleState != .disabled }
 
     var body: some View {
         if !model.cards.isEmpty {
             GeometryReader { proxy in
-                let geometry = model.geometry(viewportWidth: proxy.size.width, breakpointIndex: breakpointIndex)
+                let geometry = model.geometry(viewportWidth: proxy.size.width, breakpointIndex: breakpointIndex, style: style)
                 CatalogCarouselScrollHost(model: model, geometry: geometry, isEnabled: isInteractionEnabled,
                                           content: cards(geometry: geometry)
                                             .environmentObject(globalScreenSize)
@@ -59,6 +61,9 @@ struct CatalogCarouselCollectionComponent: View {
                                  frameChangeIndex: $frameChangeIndex,
                                  imageLoader: model.imageLoader)
             .onChange(of: globalScreenSize.width) { _ in frameChangeIndex += 1 }
+            .animation(.linear(duration: max(0, model.conditionalStyle?.animation.duration ?? 0)),
+                       value: model.conditionalStyle?.applies(position: config.position, width: globalScreenSize.width ?? 0,
+                                                              colorScheme: colorScheme) ?? false)
         }
     }
 
@@ -74,7 +79,7 @@ struct CatalogCarouselCollectionComponent: View {
                                                                               parentHorizontalAlignment: .leading,
                                                                               parentBackgroundStyle: background,
                                                                               stretchChildren: true))
-                    .frame(width: geometry.itemWidth)
+                    .frame(width: geometry.itemWidth, alignment: .topLeading)
                     .readSize { size in
                         model.recordHeight(size.height, itemIndex: card.context.itemIndex, itemWidth: geometry.itemWidth)
                     }

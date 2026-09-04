@@ -88,14 +88,16 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.stateDataExpansionClosure = stateDataExpansionClosure
         self.layoutState = layoutState
         self.diagnosticService = diagnosticService
-        self.viewableItems = layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+        self.viewableItems = catalogItemContext == nil
+            ? layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1) : .constant(1)
         self.currentIndex = catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
             ?? layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
         performStyleStateBinding()
 
         cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
             guard let self else { return }
-            self.viewableItems = newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1)
+            self.viewableItems = self.catalogItemContext == nil
+                ? newValue[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1) : .constant(1)
             self.currentIndex = self.catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
                 ?? newValue[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
             // Re-resolve `%^DATA.catalogRuntime.<key>^%` against the latest catalog-runtime dict so the
@@ -124,6 +126,11 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     /// reintroducing the raw placeholders for a later finalize pass to zero the line.
     var currentTemplateText: String {
         postMapperTemplate ?? value ?? ""
+    }
+
+    var inlineResolvedValue: String {
+        if case .value = dataBinding { return applyCatalogRuntimeResolution(to: currentTemplateText) }
+        return boundValue
     }
 
     private func runDataExpansion() {
@@ -198,16 +205,18 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     }
 
     private func updateBoundValueWithStyling() {
-        guard let transform = currentStylingProperties?.text?.textTransform else { return }
+        boundValue = Self.transform(boundValue, using: currentStylingProperties?.text?.textTransform)
+    }
 
+    static func transform(_ value: String, using transform: TextTransform?) -> String {
         switch transform {
         case .uppercase:
-            boundValue = boundValue.uppercased()
+            return value.uppercased()
         case .lowercase:
-            boundValue = boundValue.lowercased()
+            return value.lowercased()
         case .capitalize:
-            boundValue = boundValue.capitalized
-        default: break
+            return value.capitalized
+        default: return value
         }
     }
 

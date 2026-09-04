@@ -1,5 +1,6 @@
 import Foundation
 import DcuiSchema
+import SwiftUI
 
 @available(iOS 15, *)
 class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
@@ -91,10 +92,15 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         layoutState?.actionCollection[.nextOffer] = goToNextOffer
         layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
-        // Store the raw values instead of bindings
         layoutState?.items[LayoutState.totalItemsKey] = children?.count ?? 0
-        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
-        layoutState?.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.viewableItemsKey] = Binding(
+            get: { [weak self] in self?.viewableItems ?? 1 },
+            set: { [weak self] in self?.viewableItems = $0 }
+        )
+        layoutState?.items[LayoutState.customStateMap] = Binding<RoktUXCustomStateMap?>(
+            get: { [weak self] in self?.customStateMap },
+            set: { [weak self] in self?.customStateMap = $0 }
+        )
         publishVisibleOfferIndexes(firstIndex: currentLeadingOfferIndex, count: viewableItems)
     }
 

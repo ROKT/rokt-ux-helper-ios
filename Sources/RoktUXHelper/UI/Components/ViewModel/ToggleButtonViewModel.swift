@@ -6,6 +6,7 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     let id: UUID = UUID()
     var children: [LayoutSchemaViewModel]?
     let customStateKey: String
+    let accessibilityLabel: String?
     let defaultStyle: [ToggleButtonStateTriggerStyle]?
     let pressedStyle: [ToggleButtonStateTriggerStyle]?
     let hoveredStyle: [ToggleButtonStateTriggerStyle]?
@@ -23,9 +24,11 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
          hoveredStyle: [ToggleButtonStateTriggerStyle]?,
          disabledStyle: [ToggleButtonStateTriggerStyle]?,
          eventService: EventDiagnosticServicing? = nil,
-         layoutState: (any LayoutStateRepresenting)?) {
+         layoutState: (any LayoutStateRepresenting)?,
+         accessibilityLabel: String? = nil) {
         self.children = children
         self.customStateKey = customStateKey
+        self.accessibilityLabel = accessibilityLabel
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle
@@ -35,9 +38,15 @@ class ToggleButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive {
     }
 
     func handleToggle(position: Int?) {
-        layoutState?.actionCollection[.toggleCustomState](
-            CustomStateIdentifiable(position: position, key: customStateKey)
-        )
+        if position == nil {
+            let current = layoutState?.globalCustomStateValue(for: customStateKey) ?? 0
+            layoutState?.setGlobalCustomState(key: customStateKey, value: current == 1 ? 0 : 1)
+            layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
+        } else {
+            layoutState?.actionCollection[.toggleCustomState](
+                CustomStateIdentifiable(position: position, key: customStateKey)
+            )
+        }
         eventService?.sendUserInteraction(action: .ToggleButtonStateTriggerClick,
                                           context: .ToggleButtonStateTrigger)
     }

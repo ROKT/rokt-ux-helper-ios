@@ -14,6 +14,7 @@ protocol PredicateHandling {
     var globalBreakPoints: BreakPoint? { get }
     var offers: [OfferModel?] { get }
     var catalogItemContext: CatalogItemContext? { get }
+    var predicateOfferIndex: Int? { get }
     var width: CGFloat { get }
     var componentConfig: ComponentConfig? { get }
     var animate: Bool { get set }
@@ -29,6 +30,7 @@ extension PredicateHandling {
     var placeholderResolver: PlaceholderPredicateResolver { PlaceholderPredicateResolver() }
 
     var catalogItemContext: CatalogItemContext? { nil }
+    var predicateOfferIndex: Int? { nil }
 
     var currentProgress: Binding<Int> {
         layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
@@ -362,7 +364,7 @@ extension PredicateHandling {
         let breakPointsMatched = breakPointOrientationPredicatesMatched(width: uiState.width)
         let darkModeMatched = darkModePredicatesMatched(isDarkMode: uiState.isDarkMode)
         let staticBooleanMatched = staticBooleanPredicatesMatched()
-        let creativeCopyMatched = creativeCopyMatched(offerPosition: uiState.currentProgress)
+        let creativeCopyMatched = creativeCopyMatched(offerPosition: predicateOfferIndex ?? uiState.currentProgress)
         let staticStringMatched = staticStringPredicatesMatched()
         let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap,
                                                               globalCustomStateMap: uiState.globalCustomStateMap,
@@ -428,7 +430,7 @@ extension PredicateHandling {
             context = PlaceholderResolutionContext(catalogItemContext: catalogItemContext)
         } else {
             context = PlaceholderResolutionContext(offers: offers,
-                                                   currentOfferIndex: uiState.currentProgress,
+                                                   currentOfferIndex: predicateOfferIndex ?? uiState.currentProgress,
                                                    activeCatalogItem: activeCatalogItem)
         }
 

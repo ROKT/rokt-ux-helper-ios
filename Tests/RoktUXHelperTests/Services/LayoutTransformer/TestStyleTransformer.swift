@@ -4,6 +4,19 @@ import DcuiSchema
 
 @available(iOS 15, *)
 final class TestStyleTransformer: XCTestCase {
+    func test_newShadowIsPreservedWhenThereIsNoDefaultShadow() throws {
+        let shadow = Shadow(offsetX: 2, offsetY: 3, blurRadius: 4, spreadRadius: 0,
+                            color: ThemeColor(light: "#123456", dark: "#abcdef"))
+        let result = try XCTUnwrap(StyleTransformer.updatedShadow(nil, newStyle: shadow))
+        XCTAssertEqual(result.offsetX, 2)
+        XCTAssertEqual(result.offsetY, 3)
+        XCTAssertEqual(result.blurRadius, 4)
+        XCTAssertEqual(result.color.light, "#123456")
+        XCTAssertEqual(result.color.dark, "#abcdef")
+        let invalid = Shadow(offsetX: nil, offsetY: nil, blurRadius: nil, spreadRadius: nil,
+                             color: ThemeColor(light: "invalid", dark: nil))
+        XCTAssertThrowsError(try StyleTransformer.updatedShadow(nil, newStyle: invalid))
+    }
     
     func test_get_updated_style_styling_properties_model() throws {
         // Arrange
@@ -15,7 +28,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        spreadRadius: 0,
                                                                                                        color: ThemeColor(light: "#111111",
                                                                                                                          dark: nil)),
-                                                                                        overflow: .visible, gap: nil, blur: 0),
+                                                                                        overflow: .visible, gap: nil, blur: 0,
+                                                                                        opacity: nil),
                                                   background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "#111111",
                                                                                                        dark: nil),
@@ -57,7 +71,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                         spreadRadius: 0,
                                                                                                         color: ThemeColor(light: "#111111",
                                                                                                                           dark: nil)),
-                                                                                         overflow: .visible, gap: nil, blur: 0),
+                                                                                         overflow: .visible, gap: nil, blur: 0,
+                                                                                         opacity: nil),
                                                    background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "#111112",
                                                                                                        dark: nil),
@@ -542,7 +557,7 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        color: ThemeColor(light: "#333333",
                                                                                                                          dark: nil)),
                                                                                         overflow: .visible, gap: nil,
-                                                                                        blur: nil),
+                                                                                        blur: nil, opacity: nil),
                                                   background: BackgroundStylingProperties(backgroundColor:
                                                                                             ThemeColor(light: "", dark: nil),
                                                                                           backgroundImage: nil),
@@ -580,7 +595,8 @@ final class TestStyleTransformer: XCTestCase {
                                                                                                        spreadRadius: 0,
                                                                                                        color: ThemeColor(light: "color",
                                                                                                                          dark: nil)),
-                                                                                        overflow: .visible, gap: nil, blur: nil),
+                                                                                        overflow: .visible, gap: nil, blur: nil,
+                                                                                        opacity: nil),
                                                   background: nil,
                                                   dimension: DimensionStylingProperties(minWidth: 0,
                                                                                         maxWidth: 0,

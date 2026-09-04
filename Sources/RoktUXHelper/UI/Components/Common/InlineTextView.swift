@@ -16,6 +16,8 @@ struct InlineTextContent {
     let text: NSAttributedString
     let runs: [InlineTextRun]
     var decorations: [InlineTextDecoration] = []
+    var transitionStates: [Bool] = []
+    var transitionDuration: TimeInterval = 0
 }
 
 /// One TextKit layout keeps every span, including action labels, in the same text flow.
@@ -42,6 +44,7 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     private var elements: [UUID: InlineAccessibilityElement] = [:]
     private var pressedRunID: UUID?
     private var hoveredRunID: UUID?
+    private var previousTransitionStates: [Bool]?
     private var previousWidth: CGFloat = 0
     private let minimumTargetSize: CGFloat = 44
 
@@ -73,10 +76,24 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     func setContent(_ content: InlineTextContent, accessibilityLabel: String?) {
         runs = content.runs
         let textChanged = attributedText?.isEqual(to: content.text) != true
-        if textChanged { attributedText = content.text }
-        if let manager = layoutManager as? InlineTextLayoutManager, manager.decorations != content.decorations {
-            manager.decorations = content.decorations
-            setNeedsDisplay()
+        let manager = layoutManager as? InlineTextLayoutManager
+        let decorationsChanged = manager?.decorations != content.decorations
+        let changedTransition = previousTransitionStates.map { $0 != content.transitionStates } ?? false
+        previousTransitionStates = content.transitionStates
+        let update = {
+            if textChanged { self.attributedText = content.text }
+            if decorationsChanged {
+                manager?.decorations = content.decorations
+                self.setNeedsDisplay()
+            }
+        }
+        if changedTransition, textChanged || decorationsChanged, content.transitionDuration > 0,
+           !UIAccessibility.isReduceMotionEnabled {
+            UIView.transition(with: self, duration: content.transitionDuration,
+                              options: [.transitionCrossDissolve, .beginFromCurrentState, .allowAnimatedContent],
+                              animations: update)
+        } else {
+            update()
         }
         self.accessibilityLabel = accessibilityLabel
         let previousInsets = textContainerInset

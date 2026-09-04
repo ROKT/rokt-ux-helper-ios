@@ -490,6 +490,7 @@ final class TestInlineContainerComponent: XCTestCase {
         XCTAssertTrue(absent.allSatisfy { $0 == 0 })
     }
 
+    /// Copy and decorated action text wrap together without a separate button row.
     func testSnapshot_narrowWrappingTextAndAction() throws {
         let copyStyle = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":17}}"#.utf8))
         let actionStyle = try JSONDecoder().decode(BasicTextStyle.self,
@@ -508,6 +509,7 @@ final class TestInlineContainerComponent: XCTestCase {
         assertInlineSnapshot(view)
     }
 
+    /// Expanded right-to-left copy and its action retain their dark-mode contrast.
     func testSnapshot_expandedRightToLeftInDarkMode() throws {
         let style = try JSONDecoder().decode(BasicTextStyle.self, from: Data(#"{"text":{"fontSize":18}}"#.utf8))
         let actionStyle = try JSONDecoder().decode(BasicTextStyle.self,
@@ -528,6 +530,74 @@ final class TestInlineContainerComponent: XCTestCase {
         update(view, model: model, width: 230, direction: .rightToLeft, colorScheme: .dark)
         XCTAssertGreaterThan(view.bounds.height, collapsedHeight)
         assertInlineSnapshot(view, colorScheme: .dark)
+    }
+
+    /// Disabled action styling remains visible while touch and accessibility activation are blocked.
+    func testSnapshot_disabledAction() throws {
+        try snapshotActionAppearance(.disabled)
+    }
+
+    /// Pointer hover selects the action's text, background, and border styling without activating it.
+    func testSnapshot_hoveredAction() throws {
+        try snapshotActionAppearance(.hovered)
+    }
+
+    /// Selecting the pressed style renders its text, background, and border; this is not touch automation.
+    func testSnapshot_pressedAction() throws {
+        try snapshotActionAppearance(.pressed)
+    }
+
+    private func snapshotActionAppearance(_ state: StyleState, file: StaticString = #filePath,
+                                          testName: String = #function, line: UInt = #line) throws {
+        let textStyles = try JSONDecoder().decode(BasicStateStylingBlock<BasicTextStyle>.self, from: Data(##"""
+        {"default":{"text":{"fontSize":17,"fontWeight":"700","textColor":{"light":"#154caa"}}},
+         "hovered":{"text":{"fontSize":17,"fontWeight":"700","textColor":{"light":"#ffffff"}}},
+         "pressed":{"text":{"fontSize":17,"fontWeight":"700","textColor":{"light":"#ffffff"}}},
+         "disabled":{"text":{"fontSize":17,"fontWeight":"700","textColor":{"light":"#5c5c5c"}}}}
+        """##.utf8))
+        let styles = try JSONDecoder().decode([BasicStateStylingBlock<InlineSpanStyle>].self, from: Data(##"""
+        [{"default":{"spacing":{"padding":"2 4"},"backgroundColor":{"light":"#f1f5fa"},
+           "border":{"borderColor":{"light":"#154caa"},"borderWidth":"1","borderRadius":4}},
+          "hovered":{"spacing":{"padding":"2 4"},"backgroundColor":{"light":"#154caa"},
+           "border":{"borderColor":{"light":"#154caa"},"borderWidth":"1","borderRadius":4}},
+          "pressed":{"spacing":{"padding":"2 4"},"backgroundColor":{"light":"#0b285b"},
+           "border":{"borderColor":{"light":"#0b285b"},"borderWidth":"1","borderRadius":4}},
+          "disabled":{"spacing":{"padding":"2 4"},"backgroundColor":{"light":"#eeeeee"},"opacity":0.5,
+           "border":{"borderColor":{"light":"#888888"},"borderWidth":"1","borderRadius":4}}}]
+        """##.utf8))
+        let events = InlineEventService()
+        let action = toggle(events: events)
+        let label = BasicTextViewModel(value: "Show more information", defaultStyle: [textStyles.default],
+                                       pressedStyle: textStyles.pressed.map { [$0] },
+                                       hoveredStyle: textStyles.hovered.map { [$0] },
+                                       disabledStyle: textStyles.disabled.map { [$0] },
+                                       layoutState: nil, diagnosticService: nil)
+        let model = InlineContainerViewModel(children: [
+            .text(text("Read the product details. ")),
+            .toggle(action, label: [label], styles: styles)
+        ])
+        let view = render(model, width: 230)
+        let original = NSAttributedString(attributedString: view.attributedText)
+        view.onInteractionStateChange = { id, state in model.setStyleState(state, childID: id) }
+        if state == .hovered || state == .disabled {
+            let run = try XCTUnwrap(view.runs.first { $0.id == action.id }, file: file, line: line)
+            let rect = try XCTUnwrap(view.rects(for: run.range).first, file: file, line: line)
+            hover(view, at: CGPoint(x: rect.midX, y: rect.midY), state: .began)
+            if state == .disabled { view.actionsEnabled = false }
+        } else {
+            model.setStyleState(state, childID: action.id)
+        }
+        update(view, model: model, width: 230)
+        XCTAssertEqual(label.styleState, state, file: file, line: line)
+        XCTAssertFalse(original.isEqual(to: view.attributedText), file: file, line: line)
+        if state == .disabled {
+            XCTAssertFalse(view.activateRun(id: action.id), file: file, line: line)
+            let element = try XCTUnwrap(view.accessibilityElements?.last as? UIAccessibilityElement, file: file, line: line)
+            XCTAssertTrue(element.accessibilityTraits.contains(.notEnabled), file: file, line: line)
+            XCTAssertFalse(element.accessibilityActivate(), file: file, line: line)
+        }
+        XCTAssertEqual(events.interactionCount, 0, file: file, line: line)
+        assertInlineSnapshot(view, file: file, testName: testName, line: line)
     }
 
     private func decorationPixels(borderWidth: String, borderStyle: String) throws -> Data {
@@ -572,7 +642,7 @@ final class TestInlineContainerComponent: XCTestCase {
                 }
             }
         }
-        assertSnapshot(of: controller, as: strategy, named: "inline", file: file, testName: testName, line: line)
+        assertSnapshot(of: controller, as: strategy, file: file, testName: testName, line: line)
     }
 
     private func exportSnapshot(_ image: UIImage, testName: String, file: StaticString) throws {
@@ -582,7 +652,7 @@ final class TestInlineContainerComponent: XCTestCase {
         let directory = URL(fileURLWithPath: path).appendingPathComponent(suite)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let name = testName.replacingOccurrences(of: "()", with: "")
-        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).inline.png"))
+        try XCTUnwrap(image.pngData()).write(to: directory.appendingPathComponent("\(name).1.png"))
     }
 
     private func render(_ model: InlineContainerViewModel, width: CGFloat,

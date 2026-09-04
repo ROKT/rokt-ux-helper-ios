@@ -180,6 +180,7 @@ struct CarouselDistributionComponent: View {
                 currentPage = v
             }
             .onChange(of: model.customStateMap) { _ in
+                model.layoutState?.publishStateChange()
                 model.layoutState?.capturePluginViewState(offerIndex: nil, dismiss: false)
             }
             .onChange(of: globalScreenSize.width) { newSize in

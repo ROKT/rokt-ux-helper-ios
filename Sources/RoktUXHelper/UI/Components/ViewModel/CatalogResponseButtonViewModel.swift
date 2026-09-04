@@ -10,6 +10,7 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
     let catalogItem: CatalogItem?
     let catalogItemContext: CatalogItemContext?
     let responseKey: String?
+    let accessibilityLabel: String?
     var productResponse: ((CatalogItemContext, String?) -> Void)?
     var children: [LayoutSchemaViewModel]?
     weak var eventService: EventDiagnosticServicing?
@@ -43,10 +44,12 @@ class CatalogResponseButtonViewModel: Identifiable, Hashable, ScreenSizeAdaptive
          disabledStyle: [CatalogResponseButtonStyles]?,
          transactionData: TransactionData? = nil,
          catalogItemContext: CatalogItemContext? = nil,
-         responseKey: String? = nil) {
+         responseKey: String? = nil,
+         accessibilityLabel: String? = nil) {
         self.catalogItem = catalogItemContext?.catalogItem ?? catalogItem
         self.catalogItemContext = catalogItemContext
         self.responseKey = responseKey
+        self.accessibilityLabel = accessibilityLabel
         self.children = children
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
