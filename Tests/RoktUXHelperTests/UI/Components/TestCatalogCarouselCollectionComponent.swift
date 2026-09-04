@@ -28,6 +28,11 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
         try snapshot(itemCount: 4, width: 230)
     }
 
+    /// Product cards with different intrinsic title heights fill one shared row height.
+    func testSnapshot_mixedIntrinsicCardHeights() throws {
+        try snapshot(itemCount: 2, width: 350, viewableItems: 2)
+    }
+
     /// The typed layout renders collapsed offer copy, synchronous product images, selectors, and response buttons together.
     func testSnapshot_productLayoutWithCollapsedDescription() throws {
         try snapshotProductLayout()

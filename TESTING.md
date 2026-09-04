@@ -36,6 +36,7 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.1.png
   TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.1.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_mixedIntrinsicCardHeights.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
   TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.1.png
@@ -270,6 +271,10 @@ These checks do not simulate touch arbitration. Also exercise a JSON-rendered ca
 
 #### CatalogCarouselCollection
 
+`CatalogCarouselStretchLayoutTests` mounts the real carousel and measures rendered card surfaces with different text lengths. It checks equal card heights, growth and shrinkage after text changes, narrow and wide host widths, and stable mount/scroll callbacks. These are native layout assertions with synthetic colors, not recorded image snapshots or product-button gesture coverage.
+
+- [x] Product cards with different intrinsic title heights share a row height (`testSnapshot_mixedIntrinsicCardHeights`). This checks the card surfaces, not aligned internal buttons or full-template styling.
+
 - [x] Empty catalog -- no reserved carousel space (`testSnapshot_zeroProducts`)
 - [x] Single product -- full-width card (`testSnapshot_oneProduct`)
 - [x] Multiple products -- grouped width, gap, and peek (`testSnapshot_manyProducts`)
@@ -295,6 +300,7 @@ The accessible RTL case scales the inline description; product labels retain the
 - [ ] Standalone inline layout at accessible text sizes
 
 The typed product layout cases above also exercise inline copy within its surrounding layout. The hover snapshot uses the existing test recognizer to select hover styling; the disabled snapshot then disables that action. The pressed snapshot selects the existing model style state directly. These snapshots cover appearance, not real pointer or touch delivery. Dynamic Type and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
+
 
 #### Placeholder Resolution (Runtime + Transaction Data)
 

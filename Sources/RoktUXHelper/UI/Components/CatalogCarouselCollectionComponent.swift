@@ -78,9 +78,8 @@ struct CatalogCarouselCollectionComponent: View {
                                       parentOverride: ComponentParentOverride(parentVerticalAlignment: .top,
                                                                               parentHorizontalAlignment: .leading,
                                                                               parentBackgroundStyle: background,
-                                                                              stretchChildren: false))
+                                                                              stretchChildren: true))
                     .frame(width: geometry.itemWidth)
-                    .fixedSize(horizontal: false, vertical: true)
                     .readSize { size in
                         model.recordHeight(size.height, itemIndex: card.context.itemIndex, itemWidth: geometry.itemWidth)
                     }
