@@ -112,7 +112,7 @@ extension UIViewController {
         guard layoutState.bottomSheetPresentation() == .fullBleed else { return false }
         // Regular width is UIKit's centred, width-limited card. Pinning to the full container
         // width there would stretch the sheet across an iPad, so the platform presentation stays.
-        // Positive test: an unspecified size class falls back to the platform sheet.
+        // Matched positively so an unspecified size class falls back to the platform sheet.
         return traitCollection.horizontalSizeClass == .compact
     }
 
@@ -218,7 +218,7 @@ extension UIViewController {
                 }) ?? false
                 let target = isExpanded ? controller.maximumSheetHeight : controller.collapsedHeight
                 guard abs(controller.resolvedSheetHeight - target) > 0.5 else { return }
-                controller.setSheetHeight(target, animated: true)
+                controller.setExpanded(isExpanded, animated: true)
             }
     }
 

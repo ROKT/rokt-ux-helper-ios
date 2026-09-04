@@ -52,9 +52,11 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
     }
 
     /// Maps the layout's height styling onto a resolver over the available height, mirroring the
-    /// rules the custom-detent path applies. A layout with no height, or wrap-content, has its
-    /// height reported by its content instead, so it starts at half the available height for the
-    /// same reason the detent path starts at `.medium`: to give the content room to measure in.
+    /// rules the custom-detent path applies. No height, or wrap-content, starts at half the
+    /// available height for the same reason the detent path starts at `.medium`: to give the
+    /// content room to measure in. On the dynamic path the content then reports its own height
+    /// and replaces this. Below iOS 16 that path is unavailable and the sheet stays at half —
+    /// which is what the legacy path did there too, pinning every sheet to `.medium()`.
     static func heightResolver(for height: DimensionHeightValue?) -> (CGFloat) -> CGFloat {
         switch height {
         case .fixed(let value):
@@ -118,6 +120,13 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
     /// and the expanded-state path (the layout toggles between two heights).
     func setSheetHeight(_ height: CGFloat, animated: Bool, completion: (() -> Void)? = nil) {
         setSheetHeight({ _ in height }, animated: animated, completion: completion)
+    }
+
+    /// Switches between the layout's own height and the full available height. Both stay
+    /// resolvers rather than resolved points, so a container change re-resolves them instead of
+    /// stranding the sheet at a height computed for the previous container.
+    func setExpanded(_ expanded: Bool, animated: Bool) {
+        setSheetHeight(expanded ? { $0 } : collapsedResolver, animated: animated)
     }
 
     func setSheetHeight(_ resolver: @escaping (CGFloat) -> CGFloat,
