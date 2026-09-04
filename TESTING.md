@@ -36,6 +36,7 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.1.png
   TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.1.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_mixedIntrinsicCardHeights.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
   TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.1.png
@@ -254,11 +255,27 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 - [ ] Image rendering with sizing constraints
 
+#### CatalogResponseButton
+
+`CatalogResponseButtonInteractionTests` covers behavior with ViewInspector, not snapshots:
+
+- Product responses use a native button and invoke the bound product callback exactly once.
+- Product labels have no competing tap or long-press handlers; disabled and invalid responses cannot activate.
+- Existing catalog purchase buttons retain their gesture and purchase behavior.
+
+These checks do not simulate touch arbitration. Also exercise a JSON-rendered carousel in the Example app: drag from a visible card to reveal an initially offscreen card, verify that its horizontal position changes, then drag back. Repeat after holding the card before dragging. Neither gesture should open a destination or submit a response. Check vertical host scrolling and ordinary product taps separately; checking a card that was already visible does not establish that scrolling worked.
+
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
 
 #### CatalogCarouselCollection
+
+`CatalogCarouselStretchLayoutTests` mounts the real carousel and measures rendered card surfaces with different text lengths. It checks equal card heights, growth and shrinkage after text changes, narrow and wide host widths, and stable mount/scroll callbacks. These are native layout assertions with synthetic colors, not recorded image snapshots or product-button gesture coverage.
+
+The same suite checks that intrinsic-width cards retain their leading edge and that full-width cards preserve authored center/end child alignment in both layout directions. Snapshot readiness requires measurements for every card at the current width, unchanged measurements across consecutive layout checks, and a scroll host height matching the measured maximum. A first positive height alone is insufficient because later cards can change that maximum.
+
+- [x] Product cards with different intrinsic title heights share a row height (`testSnapshot_mixedIntrinsicCardHeights`). This checks the card surfaces, not aligned internal buttons or full-template styling.
 
 - [x] Empty catalog -- no reserved carousel space (`testSnapshot_zeroProducts`)
 - [x] Single product -- full-width card (`testSnapshot_oneProduct`)

@@ -104,6 +104,28 @@ final class CatalogCarouselCollectionViewModelTests: XCTestCase {
         model.recordHeight(.nan, itemIndex: 0, itemWidth: wide.itemWidth)
         XCTAssertEqual(model.contentHeight, 70)
     }
+
+    func test_allCardMeasurementsAreAvailableEvenWhenMaximumHeightDoesNotChange() throws {
+        let model = CatalogCarouselTestFixture.model(slots: try CatalogCarouselTestFixture.slots(count: 2))
+        let geometry = model.geometry(viewportWidth: 200, breakpointIndex: 0)
+        model.layoutChanged(geometry: geometry)
+        model.recordHeight(120, itemIndex: 0, itemWidth: geometry.itemWidth)
+        XCTAssertEqual(model.itemHeights, [0: 120])
+        XCTAssertEqual(model.contentHeight, 120)
+        model.recordHeight(80, itemIndex: 1, itemWidth: geometry.itemWidth)
+        XCTAssertEqual(model.itemHeights, [0: 120, 1: 80])
+        XCTAssertEqual(model.contentHeight, 120)
+
+        let wider = model.geometry(viewportWidth: 400, breakpointIndex: 0)
+        model.layoutChanged(geometry: wider)
+        XCTAssertTrue(model.itemHeights.isEmpty)
+        model.recordHeight(999, itemIndex: 1, itemWidth: geometry.itemWidth)
+        XCTAssertTrue(model.itemHeights.isEmpty)
+        model.recordHeight(60, itemIndex: 0, itemWidth: wider.itemWidth)
+        model.recordHeight(60, itemIndex: 1, itemWidth: wider.itemWidth)
+        XCTAssertEqual(model.itemHeights, [0: 60, 1: 60])
+        XCTAssertEqual(model.contentHeight, 60)
+    }
 }
 
 @available(iOS 15, *)

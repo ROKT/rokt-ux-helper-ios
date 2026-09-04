@@ -1,6 +1,5 @@
 import XCTest
 import SwiftUI
-import Combine
 import DcuiSchema
 import SnapshotTesting
 @testable import RoktUXHelper
@@ -26,6 +25,11 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
     /// Product text wraps within a narrow host.
     func testSnapshot_smallWidth() throws {
         try snapshot(itemCount: 4, width: 230)
+    }
+
+    /// Product cards with different intrinsic title heights fill one shared row height.
+    func testSnapshot_mixedIntrinsicCardHeights() throws {
+        try snapshot(itemCount: 2, width: 350, viewableItems: 2)
     }
 
     /// The typed layout renders collapsed offer copy, synchronous product images, selectors, and response buttons together.
@@ -104,21 +108,16 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
         .environmentObject(screen)
         .environment(\.colorScheme, .light)
 
-        let measured = expectation(description: "Rendered cards have a stable height")
-        let measurement = model.$contentHeight.compactMap { $0 }.filter { $0 > 0 }
-            .debounce(for: .milliseconds(100), scheduler: RunLoop.main).first().sink { _ in measured.fulfill() }
         let host = UIHostingController(rootView: root)
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: width, height: 844))
         window.rootViewController = host
         window.isHidden = false
         defer {
-            measurement.cancel()
             window.isHidden = true
             window.rootViewController = nil
         }
         host.view.layoutIfNeeded()
-        if itemCount == 0 { measured.fulfill() }
-        wait(for: [measured], timeout: 5)
+        waitForCarousel(model, in: window)
         assertCarouselSnapshot(host, file: file, testName: testName, line: line)
     }
 
@@ -162,21 +161,17 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
             .environment(\.colorScheme, colorScheme)
             .environment(\.sizeCategory, contentSize)
             .environment(\.layoutDirection, direction)
-        let measured = expectation(description: "Typed product cards have a stable height")
-        let measurement = carousel.$contentHeight.compactMap { $0 }.filter { $0 > 120 }
-            .debounce(for: .milliseconds(100), scheduler: RunLoop.main).first().sink { _ in measured.fulfill() }
         let host = UIHostingController(rootView: root)
         host.overrideUserInterfaceStyle = colorScheme == .dark ? .dark : .light
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: width, height: 844))
         window.rootViewController = host
         window.isHidden = false
         defer {
-            measurement.cancel()
             window.isHidden = true
             window.rootViewController = nil
         }
         host.view.layoutIfNeeded()
-        wait(for: [measured], timeout: 5)
+        waitForCarousel(carousel, in: window)
         waitForInline(in: window) { $0.text.contains("See More") }
         let inline = try XCTUnwrap(firstView(InlineTextView.self, in: window), file: file, line: line)
         if expandDescription {
@@ -205,7 +200,24 @@ final class TestCatalogCarouselCollectionComponent: XCTestCase {
                           file: file, line: line)
             XCTAssertEqual(carousel.currentItemIndex, geometry.leadingIndex(at: logicalOffset), file: file, line: line)
         }
+        waitForCarousel(carousel, in: window)
         assertCarouselSnapshot(host, file: file, testName: testName, line: line)
+    }
+
+    private func waitForCarousel(_ carousel: CatalogCarouselCollectionViewModel, in window: UIWindow) {
+        guard !carousel.cards.isEmpty else { return }
+        var previousHeights: [Int: CGFloat]?
+        let ready = expectation(for: NSPredicate { _, _ in
+            window.layoutIfNeeded()
+            let heights = carousel.itemHeights
+            defer { previousHeights = heights }
+            guard heights.count == carousel.cards.count, heights == previousHeights,
+                  let maximumHeight = heights.values.max(), let contentHeight = carousel.contentHeight,
+                  abs(contentHeight - maximumHeight) < 0.5,
+                  let scroll = self.firstView(CatalogCarouselScrollView.self, in: window) else { return false }
+            return scroll.bounds.width > 0 && abs(scroll.bounds.height - max(1, contentHeight)) < 0.5
+        }, evaluatedWith: nil)
+        wait(for: [ready], timeout: 5)
     }
 
     private func productSlots(copy: String, direction: LayoutDirection, missingFirstResponse: Bool) throws -> [SlotModel] {
