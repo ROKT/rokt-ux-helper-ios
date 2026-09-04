@@ -410,14 +410,14 @@ final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControll
             }
             return
         }
-        guard let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>,
-              var map = binding.wrappedValue,
-              map.keys.contains(where: { $0.key == key }) else {
-            // Initial detent callbacks must not create an expansion state the layout never set.
-            return
-        }
         let position = (layoutState.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue ?? 0
         let identifier = CustomStateIdentifiable(position: position, key: key)
+        guard let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>,
+              var map = binding.wrappedValue,
+              map[identifier] != nil else {
+            // A callback must not create expansion state for an offer that never set it.
+            return
+        }
         if map[identifier] != newValue {
             map[identifier] = newValue
             binding.wrappedValue = map

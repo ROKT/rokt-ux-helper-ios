@@ -138,6 +138,28 @@ final class TestBottomSheetState: XCTestCase {
         XCTAssertNil(state.globalCustomStateValue(for: key))
     }
 
+    func testDetentChangeDoesNotCreateStateForADifferentOffer() throws {
+        let state = LayoutState()
+        let owner = CustomStateIdentifiable(position: 7, key: key)
+        let currentOffer = CustomStateIdentifiable(position: 0, key: key)
+        let local = LocalState([owner: 1])
+        state.items[LayoutState.customStateMap] = local.binding
+        state.items[LayoutState.currentProgressKey] = Binding.constant(0)
+        let controller = UIViewController()
+        controller.modalPresentationStyle = .pageSheet
+        let sheet = try XCTUnwrap(controller.sheetPresentationController)
+        sheet.detents = [.custom(identifier: mediumID) { _ in 300 }, .large()]
+        let delegate = BottomSheetDetentSyncDelegate(layoutState: state, mediumId: mediumID)
+        for detent in [mediumID, .large] {
+            sheet.selectedDetentIdentifier = detent
+            delegate.sheetPresentationControllerDidChangeSelectedDetentIdentifier(sheet)
+
+            XCTAssertNil(local.values?[currentOffer])
+            XCTAssertEqual(local.values, [owner: 1])
+            XCTAssertNil(state.globalCustomStateValue(for: key))
+        }
+    }
+
     func testOfferToggleAndNavigationKeepExistingLocalBehaviour() async throws {
         let state = LayoutState()
         let schema = try JSONDecoder().decode(LayoutSchemaModel.self, from: Data(#"""
