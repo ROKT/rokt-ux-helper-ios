@@ -51,6 +51,23 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
         max(containerHeight - topSafeArea, 0)
     }
 
+    /// Whether a layout gets SDK-owned presentation. Regular width is UIKit's centred,
+    /// width-limited card; pinning to the full container width there would stretch the sheet
+    /// across an iPad, so the platform presentation stays. Matched positively so an unspecified
+    /// size class also falls back to the platform sheet.
+    static func shouldPresentFullBleed(presentation: BottomSheetPresentation?,
+                                       horizontalSizeClass: UIUserInterfaceSizeClass) -> Bool {
+        presentation == .fullBleed && horizontalSizeClass == .compact
+    }
+
+    /// The resolver for an expanded state. Both states stay resolvers rather than resolved
+    /// points, so a container change re-resolves them instead of stranding the sheet at a height
+    /// computed for the previous container.
+    static func resolver(expanded: Bool,
+                         collapsed: @escaping (CGFloat) -> CGFloat) -> (CGFloat) -> CGFloat {
+        expanded ? { $0 } : collapsed
+    }
+
     /// Maps the layout's height styling onto a resolver over the available height, mirroring the
     /// rules the custom-detent path applies. No height, or wrap-content, starts at half the
     /// available height for the same reason the detent path starts at `.medium`: to give the
@@ -122,11 +139,10 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
         setSheetHeight({ _ in height }, animated: animated, completion: completion)
     }
 
-    /// Switches between the layout's own height and the full available height. Both stay
-    /// resolvers rather than resolved points, so a container change re-resolves them instead of
-    /// stranding the sheet at a height computed for the previous container.
+    /// Switches between the layout's own height and the full available height.
     func setExpanded(_ expanded: Bool, animated: Bool) {
-        setSheetHeight(expanded ? { $0 } : collapsedResolver, animated: animated)
+        setSheetHeight(Self.resolver(expanded: expanded, collapsed: collapsedResolver),
+                       animated: animated)
     }
 
     func setSheetHeight(_ resolver: @escaping (CGFloat) -> CGFloat,

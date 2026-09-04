@@ -1,5 +1,6 @@
 import XCTest
 import UIKit
+import SwiftUI
 import DcuiSchema
 @testable import RoktUXHelper
 
@@ -197,5 +198,78 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
         let controller = makeController(allowBackdropToClose: false)
 
         XCTAssertFalse(controller.performAccessibilityEscape())
+    }
+
+    // MARK: Presentation gate
+
+    private func shouldPresentFullBleed(_ presentation: BottomSheetPresentation?,
+                                        _ sizeClass: UIUserInterfaceSizeClass) -> Bool {
+        RoktBottomSheetPresentationController.shouldPresentFullBleed(presentation: presentation,
+                                                                     horizontalSizeClass: sizeClass)
+    }
+
+    func testFullBleedIsUsedOnlyForTheFullBleedSettingInCompactWidth() {
+        XCTAssertTrue(shouldPresentFullBleed(.fullBleed, .compact))
+    }
+
+    // Every layout published before schema 2.10 decodes with the field absent.
+    func testAbsentPresentationKeepsThePlatformSheet() {
+        XCTAssertFalse(shouldPresentFullBleed(nil, .compact))
+    }
+
+    func testPlatformDefaultKeepsThePlatformSheet() {
+        XCTAssertFalse(shouldPresentFullBleed(.platformDefault, .compact))
+    }
+
+    // Regular width would stretch the sheet across an iPad.
+    func testRegularWidthKeepsThePlatformSheet() {
+        XCTAssertFalse(shouldPresentFullBleed(.fullBleed, .regular))
+    }
+
+    // Matched positively, so an unknown size class must not opt in.
+    func testUnspecifiedSizeClassKeepsThePlatformSheet() {
+        XCTAssertFalse(shouldPresentFullBleed(.fullBleed, .unspecified))
+    }
+
+    // MARK: Expanded-state resolvers
+
+    // The bug this guards: passing a resolved point value in would freeze the sheet at a height
+    // computed for the previous container, so a rotation would strand it.
+    func testExpandedAndCollapsedResolversBothStayRelative() {
+        let collapsed: (CGFloat) -> CGFloat = { $0 * 0.6 }
+
+        let expandedResolver = RoktBottomSheetPresentationController.resolver(expanded: true,
+                                                                              collapsed: collapsed)
+        let collapsedResolver = RoktBottomSheetPresentationController.resolver(expanded: false,
+                                                                               collapsed: collapsed)
+
+        // Same resolvers, two container heights: both re-resolve rather than returning a constant.
+        XCTAssertEqual(expandedResolver(785), 785, accuracy: 0.001)
+        XCTAssertEqual(expandedResolver(331), 331, accuracy: 0.001)
+        XCTAssertEqual(collapsedResolver(785), 471, accuracy: 0.001)
+        XCTAssertEqual(collapsedResolver(331), 198.6, accuracy: 0.001)
+    }
+
+    // MARK: Expanded-state reading
+
+    private func items(expandedStateValue: Int?) -> [String: Any] {
+        guard let expandedStateValue else { return [:] }
+        let map = RoktUXCustomStateMap(uniqueKeysWithValues: [
+            (key: CustomStateIdentifiable(position: nil, key: "BottomSheetExpandedState"),
+             value: expandedStateValue)
+        ])
+        return [LayoutState.customStateMap: Binding<RoktUXCustomStateMap?>.constant(map)]
+    }
+
+    func testExpandedStateIsReadFromTheLayoutsCustomStateMap() {
+        XCTAssertTrue(UIViewController.isBottomSheetExpanded(in: items(expandedStateValue: 1)))
+    }
+
+    func testExpandedStateIsOffWhenTheFlagIsZero() {
+        XCTAssertFalse(UIViewController.isBottomSheetExpanded(in: items(expandedStateValue: 0)))
+    }
+
+    func testExpandedStateIsOffWhenThereIsNoCustomStateMap() {
+        XCTAssertFalse(UIViewController.isBottomSheetExpanded(in: items(expandedStateValue: nil)))
     }
 }

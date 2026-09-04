@@ -109,11 +109,10 @@ extension UIViewController {
     /// A layout opts into SDK-owned presentation by setting `bottomSheetPresentation` to
     /// `fullBleed`. Absent — every layout published before schema 2.10 — keeps UIKit's sheet.
     private func shouldUseFullBleedBottomSheet(layoutState: LayoutState) -> Bool {
-        guard layoutState.bottomSheetPresentation() == .fullBleed else { return false }
-        // Regular width is UIKit's centred, width-limited card. Pinning to the full container
-        // width there would stretch the sheet across an iPad, so the platform presentation stays.
-        // Matched positively so an unspecified size class falls back to the platform sheet.
-        return traitCollection.horizontalSizeClass == .compact
+        RoktBottomSheetPresentationController.shouldPresentFullBleed(
+            presentation: layoutState.bottomSheetPresentation(),
+            horizontalSizeClass: traitCollection.horizontalSizeClass
+        )
     }
 
     private func presentFullBleedBottomSheet<Content: View>(
@@ -212,10 +211,7 @@ extension UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak modal] items in
                 guard let controller = modal?.bottomSheetPresentationController else { return }
-                let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
-                let isExpanded = map?.contains(where: { entry in
-                    entry.key.key == Self.expandedStateKey && entry.value == 1
-                }) ?? false
+                let isExpanded = Self.isBottomSheetExpanded(in: items)
                 let target = isExpanded ? controller.maximumSheetHeight : controller.collapsedHeight
                 guard abs(controller.resolvedSheetHeight - target) > 0.5 else { return }
                 controller.setExpanded(isExpanded, animated: true)
@@ -275,10 +271,7 @@ extension UIViewController {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak sheet] items in
                     guard let sheet = sheet else { return }
-                    let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
-                    let isExpanded = map?.contains(where: { entry in
-                        entry.key.key == Self.expandedStateKey && entry.value == 1
-                    }) ?? false
+                    let isExpanded = Self.isBottomSheetExpanded(in: items)
                     let targetIdentifier: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
                     // Lock the sheet by only ever registering a single detent for the
                     // current state. The transitions between medium and large therefore
@@ -315,6 +308,13 @@ extension UIViewController {
     }
 
     fileprivate static let expandedStateKey = "BottomSheetExpandedState"
+
+    /// Whether the layout has toggled its expanded state on. Read by both the full-bleed and the
+    /// custom-detent paths, so it lives here rather than being spelled out in each observer.
+    static func isBottomSheetExpanded(in items: [String: Any]) -> Bool {
+        let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
+        return map?.contains { $0.key.key == expandedStateKey && $0.value == 1 } ?? false
+    }
     fileprivate static let roktMediumDetentId = "roktMediumPercentage"
 
 }
