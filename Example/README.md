@@ -4,15 +4,10 @@ This example demonstrates two ways to integrate RoktUXHelper using `RoktLayoutVi
 
 ## Prerequisites
 
-- Ensure you have the latest version of Xcode installed.
-- clone the repository using `git clone git@github.com:ROKT/rokt-ux-helper-ios.git`
-- RoktUXHelper is integrated via Swift Package Manager (SPM). To add the package, simply include the following dependency in your `Package.swift` file:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/ROKT/rokt-ux-helper-ios.git", .upToNextMajor(from: "0.1.0"))
-]
-```
+- Use Xcode and an installed iOS simulator; match the [CI environment](../TESTING.md#environment-sensitivity) when comparing snapshots.
+- Clone the repository and open `Example/Example.xcodeproj` with the **Example** scheme. This project already references the helper package locally; a second remote dependency would not test the same source.
+- Follow [Render a local layout](../docs/local-layout-testing.md) to edit outer/variant JSON, generate `experience.json`, select SwiftUI/UIKit, and reload after changes.
+- Review [the public-content checklist](../docs/public-content-checklist.md) before adding fixtures or sharing screenshots and logs.
 
 ## SwiftUI Implementation: `RoktLayoutView`
 
@@ -71,13 +66,13 @@ let roktView = RoktLayoutUIView(
         switch event.type {
         case .externally:
             UIApplication.shared.open(url) { _ in
-                event.onClose?(event.id) // This must be called when the user is ready for the next offer
+                event.onClose?(event.id) // Sample completes on the open callback; see limitations below.
             }
         default:
             let safariVC = SFSafariViewController(url: url)
             safariVC.modalPresentationStyle = .pageSheet
             present(safariVC, animated: true) {
-                event.onClose?(event.id) // This must be called when the user is ready for the next offer
+                event.onClose?(event.id) // Sample completes on presentation, not browser dismissal.
             }
         }
     } else if uxEvent as? RoktUXEvent.LayoutCompleted != nil {
@@ -103,12 +98,29 @@ NSLayoutConstraint.activate([
 
 ```
 
+## URL callback limitations
+
+The sample handlers demonstrate event wiring, not a complete navigation lifecycle. The UIKit
+handler above ignores the external open callback's success value and completes an internal link
+when Safari finishes **presenting**, not when it is dismissed. `SampleViewModel.handleURL` also
+completes immediately after initiating navigation. These examples therefore do not establish
+failed-open, retry, browser-return, or browser-dismissal behavior.
+
+For a consuming app, define the expected lifecycle for external, internal and host-handled links
+and test each separately. When reporting completion or failure, preserve the originating event's
+`id`; do not let a callback for one event complete another. An OS-open callback is not a notification
+that the user returned from the destination. A Safari presentation callback is not its dismissal.
+Do not treat these sample timings as an approved SDK navigation policy.
+
 ## Overlay / bottom sheet (full-screen flows)
 
 The home screen includes **SwiftUI** and **UIKit** buttons that present a full-screen modal and load JSON from the bundle:
 
-- `Example/Resources/experience-overlay.json` — **S2S** experience with a fullscreen **overlay** (`standard-marketing` carousel / multi-offer). Converted from a captured placement payload into `sessionId` + `pageContext` + `plugins`, with JWTs cleared, `targetElementSelector` set to `""` (matches `location: ""` in the Example), Rokt CDN / API URLs replaced with `https://example.invalid/...`, and `rclid` fields removed for public-repo hygiene.
-- `Example/Resources/experience-bottomsheet.json` — **BottomSheet** outer layout with real preview-style slot content, converted from a placement response to **S2S** for the Example app (JWTs cleared, `targetElementSelector` empty to match `location: ""`).
+- `Example/Example/Resources/experience-overlay.json` — sample experience with a fullscreen overlay and an empty `targetElementSelector` to match `location: ""`.
+- `Example/Example/Resources/experience-bottomsheet.json` — sample experience with a bottom-sheet outer layout and an empty `targetElementSelector` to match `location: ""`.
+
+Paths above are from the repository root. Use synthetic replacements for new fixtures; removing
+tokens alone does not make a captured response safe to publish.
 
 Both use an empty `targetElementSelector` and `location: ""` when calling `RoktLayoutView` / `RoktLayoutUIView`. The wiring (`experienceResource` / `layoutLocation`) lives in `SampleView`, `SampleViewModel`, `SampleViewController`, and `FullScreenCheckoutExamples`.
 
