@@ -98,6 +98,31 @@ final class TestInlineContainerComponent: XCTestCase {
         XCTAssertEqual(events.interactionCount, 0)
     }
 
+    func testHoverMayBeginOverCopyWhileTapRequiresAnEnabledAction() throws {
+        let model = InlineContainerViewModel(children: [.text(text("Read details. ")),
+                                                        .toggle(toggle(), label: [text("Change")])])
+        let view = render(model, width: 300)
+        let copy = try XCTUnwrap(view.rects(for: view.runs[0].range).first)
+        let action = try XCTUnwrap(view.rects(for: view.runs[1].range).first)
+        let hover = InlineHoverRecognizer()
+        hover.point = CGPoint(x: copy.midX, y: copy.midY)
+        view.addGestureRecognizer(hover)
+        let tap = InlineTapRecognizer()
+        tap.delegate = view
+        tap.point = hover.point
+        view.addGestureRecognizer(tap)
+
+        XCTAssertNil(view.actionRun(at: hover.point))
+        XCTAssertTrue(view.gestureRecognizerShouldBegin(hover))
+        XCTAssertFalse(view.gestureRecognizerShouldBegin(tap))
+        tap.point = CGPoint(x: action.midX, y: action.midY)
+        XCTAssertTrue(view.gestureRecognizerShouldBegin(tap))
+
+        view.actionsEnabled = false
+        XCTAssertFalse(view.gestureRecognizerShouldBegin(tap))
+        XCTAssertTrue(view.gestureRecognizerShouldBegin(hover))
+    }
+
     func testHoverResetsOnExitCancellationFailureAndDisable() throws {
         let model = InlineContainerViewModel(children: [.toggle(toggle(), label: [text("Change")])])
         let view = render(model, width: 250)
@@ -619,5 +644,10 @@ private final class InlineHoverRecognizer: UIHoverGestureRecognizer {
         get { phase }
         set { phase = newValue }
     }
+    override func location(in view: UIView?) -> CGPoint { point }
+}
+
+private final class InlineTapRecognizer: UITapGestureRecognizer {
+    var point: CGPoint = .zero
     override func location(in view: UIView?) -> CGPoint { point }
 }

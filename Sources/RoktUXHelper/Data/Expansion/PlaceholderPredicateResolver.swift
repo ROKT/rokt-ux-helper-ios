@@ -85,33 +85,42 @@ final class PlaceholderPredicateResolver {
         let parsedPlaceholder = parser.parse(propertyChain: placeholder)
 
         for keyAndNamespace in parsedPlaceholder.parseableChains {
-            switch keyAndNamespace.namespace {
-            case .dataCreativeCopy, .dataCreativeResponse, .dataCreativeLink, .dataImageCarousel:
-                guard let offer = context.offers[safe: context.currentOfferIndex] else { continue }
-                let result = try creativeExtractor.extractDataRepresentedBy(String.self,
-                                                                            propertyChain: keyAndNamespace.withNamespace,
-                                                                            responseKey: nil,
-                                                                            from: offer)
-                return try keyAndNamespace.applyingTextOperations(to: unwrapBinding(result))
-            case .dataCatalogItem:
-                if let catalogItem = context.activeCatalogItem {
-                    let result = try catalogExtractor.extractDataRepresentedBy(String.self,
-                                                                               propertyChain: keyAndNamespace.withNamespace,
-                                                                               responseKey: nil,
-                                                                               from: catalogItem)
-                    return try keyAndNamespace.applyingTextOperations(to: unwrapBinding(result))
+            do {
+                switch keyAndNamespace.namespace {
+                case .dataCreativeCopy, .dataCreativeLink, .dataImageCarousel:
+                    guard let offer = context.offers[safe: context.currentOfferIndex] ?? nil else { continue }
+                    let result = try creativeExtractor.extractDataRepresentedBy(String.self,
+                                                                                propertyChain: keyAndNamespace
+                                                                                .withNamespaceAndOperations,
+                                                                                responseKey: nil,
+                                                                                from: offer)
+                    return unwrapBinding(result)
+                case .dataCatalogItem:
+                    if let catalogItem = context.activeCatalogItem {
+                        let result = try catalogExtractor.extractDataRepresentedBy(String.self,
+                                                                                   propertyChain: keyAndNamespace
+                                                                                   .withNamespaceAndOperations,
+                                                                                   responseKey: nil,
+                                                                                   from: catalogItem)
+                        return unwrapBinding(result)
+                    }
+                case .state:
+                    if keyAndNamespace.key == DataBindingStateKeys.indicatorPosition {
+                        return try keyAndNamespace.applyingTextOperations(to: String(context.currentOfferIndex))
+                    }
+                    if keyAndNamespace.key == DataBindingStateKeys.totalOffers {
+                        return try keyAndNamespace.applyingTextOperations(to: String(context.offers.count))
+                    }
+                case .dataCreativeResponse:
+                    // This context has no response key with which to select a response option.
+                    continue
+                case .dataTransactionData, .dataCatalogRuntime:
+                    // Predicates targeting transactionData / DATA.catalogRuntime.* aren't supported
+                    // through this resolver; the When predicate framework would need its own
+                    // injection. Skip so other chain alternatives can resolve.
+                    continue
                 }
-            case .state:
-                if keyAndNamespace.key == DataBindingStateKeys.indicatorPosition {
-                    return try keyAndNamespace.applyingTextOperations(to: String(context.currentOfferIndex))
-                }
-                if keyAndNamespace.key == DataBindingStateKeys.totalOffers {
-                    return try keyAndNamespace.applyingTextOperations(to: String(context.offers.count))
-                }
-            case .dataTransactionData, .dataCatalogRuntime:
-                // Predicates targeting transactionData / DATA.catalogRuntime.* aren't supported
-                // through this resolver; the When predicate framework would need its own
-                // injection. Skip so other chain alternatives can resolve.
+            } catch is BNFPlaceholderError {
                 continue
             }
         }
@@ -129,7 +138,15 @@ final class PlaceholderPredicateResolver {
 }
 
 private extension BNFKeyAndNamespace {
-    var withNamespace: String {
-        namespace.rawValue + BNFSeparator.namespace.rawValue + key
+    var withNamespaceAndOperations: String {
+        // Probe one candidate without a fallback so missing values throw. The caller
+        // tries the next outer alternative, while a present value sliced to empty still succeeds.
+        let operations = textOperations.map { operation in
+            switch operation {
+            case .sliceCharacters(let count): ":sliceText[Chars,\(count)]"
+            case .invalid: ":invalid"
+            }
+        }.joined()
+        return namespace.rawValue + BNFSeparator.namespace.rawValue + key + operations
     }
 }

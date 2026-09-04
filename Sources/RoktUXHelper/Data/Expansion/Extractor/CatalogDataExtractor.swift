@@ -7,7 +7,7 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
     private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = PlaceholderValidator(),
+        dataValidator: Validator = PlaceholderValidator(validatesTextOperations: false),
         parser: PropertyChainDataParsing = PropertyChainDataParser(),
         dataReflector: any DataReflecting = DataReflector()
     ) {
@@ -30,8 +30,7 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
             return .value(propertyChain as! U)
         }
 
-        guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
-        let resolution = try resolveValue(from: placeholder, data: data)
+        let resolution = try resolveValue(from: placeholder, data: data, allowsTextOperations: type == String.self)
         let mappedData: Any? = resolution.value ?? placeholder.defaultValue
 
         guard let mappedData,
@@ -46,9 +45,16 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
     // can be resolved without coupling the extractor to a specific schema version.
     private func resolveValue(
         from placeholder: BNFPlaceholder,
-        data: CatalogItem?
+        data: CatalogItem?,
+        allowsTextOperations: Bool
     ) throws -> (value: Any?, isStateType: Bool) {
+        var invalidOperation = false
         for keyAndNamespace in placeholder.parseableChains {
+            if keyAndNamespace.textOperations
+                .contains(.invalid) || (!keyAndNamespace.textOperations.isEmpty && !allowsTextOperations) {
+                invalidOperation = true
+                continue
+            }
             switch keyAndNamespace.namespace {
             case .dataCatalogItem:
                 guard let data else { continue }
@@ -59,7 +65,8 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
                 if let resolvedValue {
                     if !keyAndNamespace.textOperations.isEmpty {
                         guard let text = stringValue(from: resolvedValue) else {
-                            throw BNFPlaceholderError.invalidTextOperation
+                            invalidOperation = true
+                            continue
                         }
                         return (try keyAndNamespace.applyingTextOperations(to: text), false)
                     }
@@ -80,7 +87,9 @@ struct CatalogDataExtractor<Validator: DataValidating>: DataExtracting where Val
                 throw LayoutTransformerError.InvalidSyntaxMapping()
             }
         }
-
+        if invalidOperation && (placeholder.defaultValue == nil || !allowsTextOperations) {
+            throw BNFPlaceholderError.invalidTextOperation
+        }
         return (nil, false)
     }
 

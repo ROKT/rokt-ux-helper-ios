@@ -3,6 +3,37 @@ import XCTest
 
 final class CatalogRuntimePlaceholderResolverTests: XCTestCase {
 
+    func test_missingRuntimeAlternativeDoesNotTurnAForeignNamespaceIntoLiteralCopy() {
+        for alternative in ["DATA.creativeCopy.copy", "DATA.catalogItem.title", "DATA.transactionData.metadata.summary",
+                            "STATE.totalOffers"] {
+            let text = "Before %^DATA.catalogRuntime.missing|\(alternative)^% after"
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: [:]), text)
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["missing": "found"]),
+                           "Before found after")
+        }
+    }
+
+    func test_missingRuntimeAndForeignAlternativesUseOnlyTheFinalLiteralDefault() {
+        for fallback in ["Details...", ""] {
+            let text = "Before %^DATA.catalogRuntime.missing|DATA.creativeCopy.copy|\(fallback)^% after"
+            XCTAssertEqual(CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: [:]),
+                           "Before \(fallback) after")
+        }
+    }
+
+    func test_invalidRuntimeAlternativeDefersToTheStateResolver() {
+        let text = "Before %^DATA.catalogRuntime.title:unknown[]|STATE.TotalOffers^% after"
+        for data: [String: String]? in [nil, [:], ["title": "abcdef"]] {
+            let runtimeResolved = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: data)
+            XCTAssertEqual(runtimeResolved, text)
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(runtimeResolved, currentOffer: "2", totalOffers: "4"),
+                           "Before 4 after")
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(NSAttributedString(string: runtimeResolved),
+                                                                currentOffer: "2", totalOffers: "4").string,
+                           "Before 4 after")
+        }
+    }
+
     func test_invalidMandatoryOperationEmptiesTheLineBeforeAndAfterRuntimeDataArrives() {
         for operation in ["sliceText[Chars,-1]", "sliceText[Chars,NaN]", "sliceText[Chars,2", "unknown[]"] {
             let text = "Before %^DATA.catalogRuntime.title:\(operation)^% after"

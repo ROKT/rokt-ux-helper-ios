@@ -148,7 +148,10 @@ final class InlineTextView: UITextView, UIGestureRecognizerDelegate {
     }
 
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        actionRun(at: gestureRecognizer.location(in: self)) != nil
+        guard gestureRecognizer is UITapGestureRecognizer, gestureRecognizer.delegate === self else {
+            return super.gestureRecognizerShouldBegin(gestureRecognizer)
+        }
+        return actionRun(at: gestureRecognizer.location(in: self)) != nil
     }
 
     @objc private func handleTap(_ recognizer: UITapGestureRecognizer) {

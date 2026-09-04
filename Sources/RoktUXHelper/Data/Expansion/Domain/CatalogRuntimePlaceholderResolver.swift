@@ -64,9 +64,11 @@ enum CatalogRuntimePlaceholderResolver {
 
         var fallback: String?
         var invalidOperation = false
-        for part in parts {
+        var hasForeignAlternative = false
+        let parser = PropertyChainDataParser()
+        for (index, part) in parts.enumerated() {
             if part.hasPrefix(prefix) {
-                let parsed = PropertyChainDataParser().parse(propertyChain: part)
+                let parsed = parser.parse(propertyChain: part)
                 guard let binding = parsed.parseableChains.first else { continue }
                 do {
                     // Validate even before the runtime value arrives; malformed syntax cannot become valid later.
@@ -76,14 +78,16 @@ enum CatalogRuntimePlaceholderResolver {
                 } catch {
                     invalidOperation = true
                 }
-            } else if !part.isEmpty || fallback == nil {
-                // Treat trailing literal (no namespace) as the default. An empty trailing
-                // literal "" is also a valid default — preserved on first encounter.
+            } else if let namespace = parser.namespaceIn(placeholder: part), namespace != .dataCatalogRuntime {
+                hasForeignAlternative = true
+            } else if index == parts.count - 1, parser.namespaceIn(placeholder: part) == nil {
+                // Only a final literal without a namespace is a default, including an empty literal.
                 fallback = part
             }
         }
         if let fallback { return fallback }
-        guard !invalidOperation else { return nil }
+        // A foreign candidate may still resolve in its namespace's later pass.
+        guard !invalidOperation || hasForeignAlternative else { return nil }
         return BNFSeparator.startDelimiter.rawValue + chain + BNFSeparator.endDelimiter.rawValue
     }
 }

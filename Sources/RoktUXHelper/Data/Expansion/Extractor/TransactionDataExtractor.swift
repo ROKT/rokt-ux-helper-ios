@@ -7,7 +7,7 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
     private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = PlaceholderValidator(),
+        dataValidator: Validator = PlaceholderValidator(validatesTextOperations: false),
         parser: PropertyChainDataParsing = PropertyChainDataParser(),
         dataReflector: any DataReflecting = DataReflector()
     ) {
@@ -30,8 +30,7 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
             return .value(propertyChain as! U)
         }
 
-        guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
-        let resolved = try resolveValue(from: placeholder, data: data)
+        let resolved = try resolveValue(from: placeholder, data: data, allowsTextOperations: type == String.self)
         let mappedData: Any? = resolved ?? placeholder.defaultValue
 
         guard let mappedData,
@@ -44,9 +43,16 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
 
     private func resolveValue(
         from placeholder: BNFPlaceholder,
-        data: TransactionData?
+        data: TransactionData?,
+        allowsTextOperations: Bool
     ) throws -> Any? {
+        var invalidOperation = false
         for keyAndNamespace in placeholder.parseableChains {
+            if keyAndNamespace.textOperations
+                .contains(.invalid) || (!keyAndNamespace.textOperations.isEmpty && !allowsTextOperations) {
+                invalidOperation = true
+                continue
+            }
             switch keyAndNamespace.namespace {
             case .dataTransactionData:
                 guard let data else { continue }
@@ -57,7 +63,8 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
                 if let resolved {
                     if !keyAndNamespace.textOperations.isEmpty {
                         guard let text = stringValue(from: resolved) else {
-                            throw BNFPlaceholderError.invalidTextOperation
+                            invalidOperation = true
+                            continue
                         }
                         return try keyAndNamespace.applyingTextOperations(to: text)
                     }
@@ -73,6 +80,9 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
                 // Foreign namespaces — handled by other mappers / reactive resolution.
                 throw LayoutTransformerError.InvalidSyntaxMapping()
             }
+        }
+        if invalidOperation && (placeholder.defaultValue == nil || !allowsTextOperations) {
+            throw BNFPlaceholderError.invalidTextOperation
         }
         return nil
     }
