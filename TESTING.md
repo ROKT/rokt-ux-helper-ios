@@ -254,6 +254,16 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 - [ ] Image rendering with sizing constraints
 
+#### CatalogResponseButton
+
+`CatalogResponseButtonInteractionTests` covers behavior with ViewInspector, not snapshots:
+
+- Product responses use a native button and invoke the bound product callback exactly once.
+- Product labels have no competing tap or long-press handlers; disabled and invalid responses cannot activate.
+- Existing catalog purchase buttons retain their gesture and purchase behavior.
+
+These checks do not simulate touch arbitration. Also exercise a JSON-rendered carousel in the Example app: drag from a visible card to reveal an initially offscreen card, verify that its horizontal position changes, then drag back. Repeat after holding the card before dragging. Neither gesture should open a destination or submit a response. Check vertical host scrolling and ordinary product taps separately; checking a card that was already visible does not establish that scrolling worked.
+
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
