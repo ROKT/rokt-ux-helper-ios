@@ -24,7 +24,13 @@ final class CatalogCarouselSnapshotTests: XCTestCase {
         try snapshot(itemCount: 4, width: 230)
     }
 
+    /// Product cards with different intrinsic title heights fill one shared row height.
+    func testSnapshot_mixedIntrinsicCardHeights() throws {
+        try snapshot(itemCount: 2, width: 350, viewableItems: 2, snapshotName: nil)
+    }
+
     private func snapshot(itemCount: Int, width: CGFloat, viewableItems: UInt8 = 1,
+                          snapshotName: String? = "carousel",
                           file: StaticString = #filePath, testName: String = #function, line: UInt = #line) throws {
         let items: [[String: Any]] = (0..<itemCount).map { index in
             ["catalog_item_id": "example-item-\(index)",
@@ -96,7 +102,7 @@ final class CatalogCarouselSnapshotTests: XCTestCase {
                 }
             }
         }
-        assertSnapshot(of: host, as: strategy, named: "carousel", file: file, testName: testName, line: line)
+        assertSnapshot(of: host, as: strategy, named: snapshotName, file: file, testName: testName, line: line)
     }
 
     private func exportSnapshot(_ image: UIImage, testName: String, file: StaticString) throws {
