@@ -1,5 +1,80 @@
 # Testing Guide
 
+## Native testing workflow
+
+Read [the public-content checklist](./docs/public-content-checklist.md) before preparing fixtures
+or sharing test output. Tests and their generated artifacts must not publish Rokt-internal
+information, secrets, or PII.
+
+1. **Identify the candidate.** Record the helper revision, dependency versions and any local
+   overrides. Preserve existing changes; use an isolated checkout for a different candidate.
+   A passing result from another branch or dependency graph does not validate this one.
+2. **Check the environment without changing it:**
+
+   ```bash
+   xcode-select -p
+   xcodebuild -version
+   xcrun simctl list runtimes
+   xcrun simctl list devices available
+   ```
+
+   Compare with [the current CI configuration](#environment-sensitivity). If Xcode setup,
+   license acceptance, or a runtime installation is incomplete, arrange that explicitly; do not
+   repeatedly download runtimes or accept agreements on another user's behalf.
+
+3. **Agree on simulator ownership.** Select one installed destination by identifier. Do not run
+   automated UI tests on a simulator being used for manual review, or shut down/reset unrelated
+   simulators. Serial testing avoids parallel test clones interfering with that review.
+4. **Run the affected suite, then the full package suite for code changes.** From the repository
+   root, replace the placeholder with the selected simulator identifier:
+
+   ```bash
+   TEST_DESTINATION='platform=iOS Simulator,id=<simulator-udid>'
+   TEST_OUTPUT=$(mktemp -d "${TMPDIR:-/tmp}/rokt-ux-tests.XXXXXX")
+   xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
+     -destination "$TEST_DESTINATION" \
+     -parallel-testing-enabled NO \
+     -derivedDataPath "$TEST_OUTPUT/DerivedData" \
+     -resultBundlePath "$TEST_OUTPUT/Tests.xcresult" test
+   ```
+
+   Add `-only-testing:RoktUXHelperTests/TestRowComponent` to target an existing suite. Use a fresh
+   result path for each run. If piping output to `xcbeautify`, enable `set -o pipefail` first so a
+   failing build remains a failing command. Do not use host `swift build` or `swift test`: UIKit
+   requires the iOS destination.
+
+5. **Investigate failures before retrying.** Preserve the first result bundle and error. Separate
+   compilation, dependency, environment, assertion and snapshot failures. A passing retry does
+   not explain an earlier failure; report both. Do not replace references, relax tolerances,
+   remove assertions, change CI or alter lint baselines merely to get a green result.
+6. **Test the assembled layout when rendering changes.** Follow the
+   [existing Example app walkthrough](./docs/local-layout-testing.md) for fixture generation,
+   SwiftUI/UIKit rendering and reload steps. Programmatic scrolling and component snapshots do
+   not prove real gesture delivery, browser behavior, or event transport.
+7. **Complete the relevant repository checks.** Use Trunk and the documented Example build;
+   validate both package managers when dependencies change. Documentation-only changes should
+   check formatting, links, examples and source accuracy, and explicitly say native tests were
+   not run rather than claim a runtime pass.
+
+## Validation record
+
+Include a safe summary in the PR and retain detailed evidence privately when it contains
+sensitive data. Review every attachment using the public-content checklist before uploading it.
+
+| Field           | Record                                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Candidate       | Commit and exact dependency versions; identify local overrides and later changes                                      |
+| Environment     | Xcode, runtime, device, SwiftUI/UIKit host and outer layout used                                                      |
+| Scope           | Suites and meaningful assertions; for gestures, measured motion and unintended-response checks                        |
+| Result          | Passed, failed and skipped counts; preserve the initial failure and each retry separately                             |
+| Evidence        | Result bundle and reviewed visual comparison; share only sanitized, public-safe output                                |
+| Test doubles    | Whether images, URL opening, callbacks, data and event transport were real or mocked                                  |
+| Remaining gates | Published dependencies, consuming SDK/app tests, supported OS/device, VoiceOver, Dynamic Type and human visual review |
+
+Check test counts and skips in the result bundle, not just a successful process exit. Passing
+component tests, a local app build, current-head CI, published-dependency validation and manual
+acceptance are distinct results. A size-report job passing does not itself approve a size increase.
+
 ## Snapshot Testing
 
 ### Overview
@@ -86,7 +161,9 @@ func testSnapshot_myNewCase() {
         .frame(width: 350, height: 200)
 
     let hostingController = UIHostingController(rootView: view)
-    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice,
+                                                  precision: snapshotPrecision,
+                                                  perceptualPrecision: snapshotPerceptualPrecision))
 }
 ```
 
@@ -100,7 +177,14 @@ func testSnapshot_myNewCase() {
 
 ### Updating Snapshots After an Intentional UI Change
 
-If you change component styling, layout, or rendering logic, existing snapshot tests **will fail** -- this is expected and means the tests are doing their job. Here is how to update them:
+First compare the existing reference with the actual rendering and explain every meaningful
+difference. An unexpected alignment, clipping, spacing, or interaction change is a regression to
+fix against the existing reference. Check the toolchain before attributing a difference to the
+code, but do not assume an environment mismatch makes the difference harmless.
+
+Use the following recording steps **only after an intentional appearance change has been
+reviewed**. Keep the original reference available for comparison. Do not delete a reference,
+enable record mode, or lower precision merely because a test failed.
 
 #### Option A: Delete and re-record (recommended for a few snapshots)
 
@@ -116,32 +200,37 @@ rm Tests/RoktUXHelperTests/UI/Components/__Snapshots__/TestRichTextComponent/tes
 5. **Run the tests a third time.** They should now pass.
 6. **Commit the updated PNGs** alongside your code changes in the same PR.
 
-#### Option B: Use `isRecording` flag (recommended for bulk updates)
+#### Option B: Scoped recording for an intentional update
 
 When many snapshots need re-recording at once (e.g. changing the shared device config or a global style):
 
-1. **Set the global recording flag** at the top of the test file or in `setUp()`:
+1. **Temporarily wrap only the intended assertions** in scoped recording. The pinned library
+   deprecates the global `isRecording` flag:
 
 ```swift
-override func setUp() {
-    super.setUp()
-    isRecording = true
+withSnapshotTesting(record: .all) {
+    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice,
+                                                  precision: snapshotPrecision,
+                                                  perceptualPrecision: snapshotPerceptualPrecision))
 }
 ```
 
-2. **Run all snapshot tests** (Cmd+U). Every snapshot is re-recorded and the tests fail.
-3. **Remove `isRecording = true`** -- do not commit it.
+2. **Run the selected tests.** They record the selected images and report recording failures.
+3. **Remove the record-mode wrapper** -- do not commit it.
 4. **Run the tests again** to confirm they pass with the new references.
 5. **Review the git diff** of the changed PNGs to verify the visual changes are intentional.
 6. **Commit the updated PNGs** alongside your code changes.
 
-> **Important:** Never commit `isRecording = true`. It disables regression detection. PR reviewers should flag this if spotted.
+> **Important:** Never commit a record-mode override, including `isRecording = true` or
+> `withSnapshotTesting(record: .all)`. It bypasses the intended reference comparison.
 
 #### Checklist for PR authors
 
-- [ ] All snapshot tests pass locally after re-recording
+- [ ] Every changed reference represents an intentional, reviewed appearance change
+- [ ] Unexpected differences were fixed against the original references
+- [ ] All snapshot tests pass with recording disabled
 - [ ] Updated reference PNGs are committed in the PR
-- [ ] `isRecording = true` is **not** present in committed code
+- [ ] No record-mode override or unapproved precision change is present in committed code
 - [ ] New PNGs have been visually inspected
 
 ### Debugging CI Failures
@@ -150,26 +239,39 @@ When snapshot tests fail in CI:
 
 1. Go to the failed GitHub Actions run.
 2. Download the **snapshot-failures** artifact (uploaded automatically on test failure).
-3. The artifact contains the actual rendered image and a diff highlighting pixel differences.
+3. Inspect the actual rendered images and any exported diff images. Artifact contents depend on
+   the test helper; a rendered PNG alone is not a diff. Retrieve the committed reference from the
+   tested revision for comparison.
 4. Compare against the committed reference to determine if the change is intentional or a regression.
 5. If intentional, follow the update process above and push updated reference PNGs. If unexpected, investigate the code change that caused the diff.
 
 ### Environment Sensitivity
 
-Snapshot images are sensitive to the OS version and simulator device. The CI uses:
+Snapshot images are sensitive to the OS version and simulator device. The repository variables
+were verified on 4 September 2026 as:
 
 - **Xcode**: 26.2
 - **Simulator**: iPhone 17, iOS 26.2 (pinned to the runtime bundled with Xcode 26.2)
 - **Viewport**: Set by `snapshotDevice` (currently `ViewImageConfig.iPhone13Pro(.portrait)`)
 
-The CI runner label, Xcode version, simulator model, and iOS runtime are supplied by **repository variables** so a runner-image change (GitHub bumping Xcode or the available simulators) can be handled by editing a variable in repo settings — no code PR required. Defaults in parentheses are used when the variable is unset:
+The runner label, Xcode version, simulator model, and iOS runtime come from **repository
+variables**. Verify them before reproducing a snapshot failure; the dated values above can drift.
+For contributors with repository access:
 
-- `CI_MACOS_RUNNER` (`macos-latest`) — `runs-on` for the test jobs
-- `CI_XCODE_VERSION` (`26.2`) — Xcode version selected by `setup-xcode`
-- `CI_SIMULATOR_MODEL` (`iPhone 17`) — simulator device model
-- `CI_SIMULATOR_OS` (`26.2`) — simulator iOS runtime (keep aligned with the runtime bundled by `CI_XCODE_VERSION`)
+```bash
+gh api repos/ROKT/rokt-ux-helper-ios/actions/variables \
+  --jq '.variables[] | select(.name | startswith("CI_")) | "\(.name)=\(.value)"'
+```
 
-Set these under **Settings → Secrets and variables → Actions → Variables**. Changing `CI_MACOS_RUNNER` or `CI_SIMULATOR_MODEL` does not affect rendering (the `ViewImageConfig` sets the viewport explicitly). **Changing `CI_XCODE_VERSION` or `CI_SIMULATOR_OS` can** — font rendering varies across Xcode/OS versions, so after such a change the reference PNGs may need re-recording (the small precision tolerance in `SnapshotConfig` absorbs minor anti-aliasing differences, but not a full toolchain jump). If you see unexpected diffs, ensure your local Xcode and simulator match CI.
+Without access, use the workflow run's setup logs or ask a maintainer to confirm the environment.
+The workflow provides `macos-latest` as the runner fallback. The composite action requires the
+Xcode/model/runtime inputs and declares **no defaults** for them; do not assume missing variables
+will fall back to the values in this guide. Do not change repository variables to make a local
+failure disappear.
+
+`snapshotDevice` sets the viewport independently of the simulator's model. Matching that viewport
+alone does not match the OS font renderer, toolchain, or all device behavior. Reproduce with the
+same Xcode/runtime first; treat other supported OS versions as a separate compatibility check.
 
 ### Async Considerations
 
