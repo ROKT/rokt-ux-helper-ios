@@ -82,7 +82,14 @@ Open the `Package.swift` file with Xcode to start development.
 
 ### How to run unit tests locally?
 
-Press `command + U`, or `Product -> Test` from the menu bar.
+Use the `RoktUXHelper` scheme with an iOS Simulator, then press `command + U` or select
+`Product -> Test`. Follow [TESTING.md](./TESTING.md#native-testing-workflow) for environment checks,
+CLI commands, failure diagnosis and validation records. Host `swift test` cannot build UIKit.
+
+To render authored JSON, start with [the local layout walkthrough](./docs/local-layout-testing.md).
+It uses the existing Example app and `tools/merge_layout.py`; no separate playground is needed.
+Before contributing code, PR text, comments or attachments, read
+[the mandatory public-content checklist](./docs/public-content-checklist.md).
 
 ## Snapshot Testing
 
@@ -109,8 +116,8 @@ See [TESTING.md](./TESTING.md) for the full coverage matrix including known gaps
 **Workflow:**
 
 1. **First run** -- no reference image exists; the library records one and fails. Review the PNG, then commit it.
-2. **Subsequent runs** -- rendered output is compared against the reference. Any pixel difference fails the test.
-3. **Intentional UI changes** -- if your code change intentionally alters component appearance, snapshot tests will fail. Delete the old PNGs from `__Snapshots__/`, re-run to re-record, visually inspect, and commit the updated images with your PR. See [TESTING.md](./TESTING.md) for the full step-by-step process.
+2. **Subsequent runs** -- rendered output is compared against the reference using the configured precision. Meaningful differences must be investigated.
+3. **Intentional UI changes** -- compare expected and actual images before deciding to re-record. Fix unintended regressions against the original PNGs. Only record reviewed appearance changes; see [TESTING.md](./TESTING.md#updating-snapshots-after-an-intentional-ui-change).
 4. **CI failures** -- download the `snapshot-failures` artifact from the Actions run to inspect the actual vs. expected diff.
 
 Reference images live at:
@@ -137,11 +144,11 @@ For a detailed guide on adding new snapshots, see [TESTING.md](./TESTING.md).
 
 ### How to Update the Layouts Schema File
 
-1. Ensure the Swift version of SSOT has been released in [DCUI-Schema-Repo](https://github.com/ROKT/dcui-layout-schema)
-2. Update dcui-swift-schema dependency version in package.swift to the latest version
-   `.package(url: "https://github.com/ROKT/dcui-swift-schema.git", exact: "x.y.z"),`
-3. Update `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` to match the same `x.y.z`. `SchemaVersionConsistencyTests` fails the build if these two values drift.
-4. Verify `schema.swift` is updated
+1. Confirm the intended version is available from both the [Swift schema package](https://github.com/ROKT/dcui-swift-schema) and CocoaPods. A Swift tag alone does not establish that the matching pod was published.
+2. Update the exact schema dependency in `Package.swift` and `RoktUXHelper.podspec` together. Change the pod's dependency, not the helper version field owned by the release workflow.
+3. Update `Constants.layoutSchemaVersion` in `Sources/RoktUXHelper/Data/Model/RoktIntegrationInfoDetails.swift` to match. `SchemaVersionConsistencyTests` guards the SPM pin and reported version; it does not replace checking the podspec.
+4. Resolve the package and Example dependencies, review their lockfiles, and verify the intended generated types. Run schema/transformer tests, the native suite, Example builds, and the normal `pod lib lint RoktUXHelper.podspec --allow-warnings --verbose` check.
+5. If local overrides were used while developing, repeat acceptance with the intended published versions. Do not ship local package paths or treat a local override as proof of registry availability. Report the dependency combination to consuming SDK/app maintainers; their validation is separate.
 
 ## Example App
 

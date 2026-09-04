@@ -7,6 +7,18 @@ for the layout. Human docs: [README.md](./README.md) (architecture, schema bumps
 [TESTING.md](./TESTING.md) (snapshot workflow, CI toolchain pins), [RELEASING.md](./RELEASING.md),
 [MIGRATING.md](./MIGRATING.md).
 
+## Essential rule: review every public write for confidentiality
+
+**Never publish Rokt-internal information, secrets, or personally identifiable information (PII).**
+This applies to draft and ready PRs, titles, descriptions, issue comments, review comments and
+replies, commits, branch names, code, fixtures, screenshots, recordings, logs, and test artifacts.
+A request to open a PR or answer a reviewer is not permission to disclose private context.
+
+Before **each** push, PR submission, comment, reply, or attachment, inspect the exact outgoing
+content using [the public-content checklist](./docs/public-content-checklist.md). Use synthetic
+examples and public client-side explanations. If safe disclosure is uncertain, omit the detail
+and ask privately; do not publish first and edit it out later. A secret scan alone is insufficient.
+
 <!-- COMMON SECTION - kept in sync by hand with ROKT/rokt-ux-helper-android's AGENTS.md.
      Change it in both repositories or in neither. -->
 
@@ -24,6 +36,11 @@ Describe client-side behavior only — what the SDK sends and receives and why, 
 <!-- END COMMON SECTION -->
 
 ## Commands
+
+Start with [the native testing workflow](./TESTING.md#native-testing-workflow). To render an
+authored layout, follow [the existing Example app walkthrough](./docs/local-layout-testing.md)
+before creating a separate test host. Keep automated tests off a simulator being used for manual
+review; agree on a destination and preserve other checkouts, fixtures, and running apps.
 
 In Xcode: `open Package.swift`, then `⌘U`. From the CLI, substituting the CI simulator model and
 runtime for `<model>`/`<runtime>` (see trap 3):
@@ -52,11 +69,14 @@ xcodebuild -project Example/Example.xcodeproj -scheme Example \
 3. **Put the OS in `-destination`, not just the model.** Snapshot PNGs are valid only for the Xcode +
    iOS runtime pair CI uses, and CI reads that pair from repository Actions variables
    (`CI_XCODE_VERSION`, `CI_SIMULATOR_MODEL`, `CI_SIMULATOR_OS`) that a checkout cannot see —
-   TESTING.md records their current values. A `name=`-only destination resolves against whatever
-   runtimes you happen to have installed, and every snapshot test then "fails" with nothing broken.
-4. **`isRecording` is deprecated in the pinned `swift-snapshot-testing`.** Delete the stale PNG and
-   re-run, or wrap the assertion in `withSnapshotTesting(record: .all) { … }`. Never commit a
-   record-mode override; it disables regression detection for that test.
+   TESTING.md explains how to verify their current values. A `name=`-only destination can select a
+   different installed runtime. An environment mismatch can cause visual differences, but does
+   not establish that a failing snapshot is harmless.
+4. **Investigate snapshot failures before replacing references.** Compare the expected and actual
+   images and fix unintended changes against the existing PNGs. Re-record only an intentional,
+   reviewed appearance change using [TESTING.md](./TESTING.md#updating-snapshots-after-an-intentional-ui-change).
+   `isRecording` is deprecated in the pinned library. Never commit a record-mode override or loosen
+   precision merely to obtain a passing check.
 5. **`trunk` is the lint gate, and on a PR it only sees your diff.**
    `.github/workflows/pull-request.yml` leaves trunk-action's check mode unset, so the action
    autodetects it per event: a PR is checked against its base sha, a push against the previous tip,
