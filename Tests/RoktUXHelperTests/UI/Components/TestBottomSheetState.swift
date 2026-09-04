@@ -210,6 +210,74 @@ final class TestBottomSheetState: XCTestCase {
         XCTAssertNil(state.globalCustomStateValue(for: key))
     }
 
+    func testFullBleedCompletionAppliesExpansionBeforeOnLoad() throws {
+        let state = restoredState(globalValue: 1)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                    bottomSheetPresentation: .fullBleed)
+        let presenter = TestPresenter()
+        var controller: RoktBottomSheetPresentationController?
+        var loadCount = 0
+        presenter.present(placementType: .BottomSheet(.fixed), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: {
+                              loadCount += 1
+                              _ = controller?.resolvedSheetHeight
+                          }, onUnLoad: {}) { _ in Text("Example offer") }
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        controller = try XCTUnwrap(modal.bottomSheetPresentationController)
+        let sheet = try XCTUnwrap(controller)
+        // Isolate the completion replay from publications, as when the first publication
+        // arrives before UIKit has a presentation controller or container geometry.
+        modal.detentObserverCancellable?.cancel()
+        var previousResolverCalls = 0
+        sheet.setSheetHeight({ maximum in
+            previousResolverCalls += 1
+            return maximum/2
+        }, animated: false)
+        previousResolverCalls = 0
+        _ = sheet.resolvedSheetHeight
+        XCTAssertEqual(previousResolverCalls, 1, "The resolver spy must observe a real resolution")
+        previousResolverCalls = 0
+        XCTAssertEqual(loadCount, 0)
+
+        try XCTUnwrap(presenter.presentationCompletion)()
+
+        XCTAssertEqual(loadCount, 1)
+        XCTAssertEqual(previousResolverCalls, 0, "Expansion must replace the old resolver before onLoad")
+        XCTAssertEqual(state.globalCustomStateValue(for: key), 1)
+    }
+
+    func testDynamicFullBleedLoadsOnceAfterMeasurementNotPresentation() async throws {
+        let state = restoredState(globalValue: 1)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                    bottomSheetPresentation: .fullBleed)
+        let presenter = TestPresenter()
+        var sizeChanged: ((CGFloat) -> Void)?
+        var loadCount = 0
+        presenter.present(placementType: .BottomSheet(.dynamic), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: { loadCount += 1 }, onUnLoad: {}) { callback in
+            let _ = { sizeChanged = callback }()
+            Text("Example offer")
+        }
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        XCTAssertNil(modal.detentObserverCancellable, "Dynamic height must not observe expansion state")
+        let completePresentation = try XCTUnwrap(presenter.presentationCompletion)
+        completePresentation()
+        XCTAssertEqual(loadCount, 0, "Presentation alone cannot load an unmeasured dynamic sheet")
+        let reportSize = try XCTUnwrap(sizeChanged)
+        reportSize(180)
+        await waitUntil("First measurement loads the dynamic sheet") { loadCount == 1 }
+
+        reportSize(240)
+        // Both size callbacks dispatch to the main queue. Drain the second before checking
+        // that later measurements and completion have not delivered another load event.
+        let drained = expectation(description: "Second measurement processed")
+        DispatchQueue.main.async { drained.fulfill() }
+        let result = await XCTWaiter.fulfillment(of: [drained], timeout: 3)
+        XCTAssertEqual(result, .completed)
+        completePresentation()
+        XCTAssertEqual(loadCount, 1)
+    }
+
     private func restoredState(globalValue: Int, onChange: ((RoktPluginViewState) -> Void)? = nil) -> LayoutState {
         LayoutState(pluginId: "example-plugin",
                     initialPluginViewState: RoktPluginViewState(pluginId: "example-plugin", offerIndex: 0,
@@ -234,11 +302,7 @@ final class TestBottomSheetState: XCTestCase {
     }
 
     private func configureSheet<Content: View>(state: LayoutState, content: Content) throws -> Scene {
-        let style = try JSONDecoder().decode(BottomSheetStyles.self, from: Data(#"""
-        {"dimension":{"height":{"type":"percentage","value":50}}}
-        """#.utf8))
-        let model = BottomSheetViewModel(children: nil, allowBackdropToClose: false, defaultStyle: [style],
-                                         eventService: nil, layoutState: state)
+        let model = try makeSheetModel(state: state)
         let presenter = TestPresenter()
         presenter.present(placementType: .BottomSheet(.fixed), bottomSheetUIModel: model, layoutState: state,
                           eventService: nil, onLoad: {}, onUnLoad: {}) { _ in content }
@@ -249,6 +313,14 @@ final class TestBottomSheetState: XCTestCase {
         window.makeKeyAndVisible()
         modal.view.layoutIfNeeded()
         return Scene(window: window, modal: modal, sheet: sheet)
+    }
+
+    private func makeSheetModel(state: LayoutState) throws -> BottomSheetViewModel {
+        let style = try JSONDecoder().decode(BottomSheetStyles.self, from: Data(#"""
+        {"dimension":{"height":{"type":"percentage","value":50}}}
+        """#.utf8))
+        return BottomSheetViewModel(children: nil, allowBackdropToClose: false, defaultStyle: [style],
+                                    eventService: nil, layoutState: state)
     }
 
     private func waitForDetent(_ sheet: UISheetPresentationController, expanded: Bool,
@@ -281,9 +353,12 @@ final class TestBottomSheetState: XCTestCase {
     // These tests assert state and registered detents, not animated presentation geometry.
     private final class TestPresenter: UIViewController {
         var configuredController: UIViewController?
+        var presentationCompletion: (() -> Void)?
+        override var traitCollection: UITraitCollection { UITraitCollection(horizontalSizeClass: .compact) }
         override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool,
                               completion: (() -> Void)? = nil) {
             configuredController = viewControllerToPresent
+            presentationCompletion = completion
         }
     }
 

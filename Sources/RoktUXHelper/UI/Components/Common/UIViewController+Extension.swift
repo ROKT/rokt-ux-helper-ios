@@ -164,14 +164,25 @@ extension UIViewController {
         // UIViewController holds transitioningDelegate weakly.
         modal.bottomSheetTransitioningDelegate = transitioningDelegate
 
+        let isExpandable: Bool
         if !isDynamic, case .percentage = bottomSheetHeightDimension(bottomSheetUIModel) {
+            isExpandable = true
             observeExpandedState(modal: modal, layoutState: layoutState)
+        } else {
+            isExpandable = false
         }
 
         self.present(modal, animated: true, completion: { [weak modal] in
             if let modal, let pending = modal.pendingBottomSheetHeight {
                 modal.pendingBottomSheetHeight = nil
                 modal.bottomSheetPresentationController?.setSheetHeight(pending, animated: false)
+            }
+            if isExpandable, let modal {
+                // The initial publication can precede the controller or its container geometry.
+                // Reconcile the latest state before onLoad, without waiting for another toggle.
+                modal.bottomSheetPresentationController?.setExpanded(
+                    Self.isBottomSheetExpanded(in: layoutState.items), animated: false
+                )
             }
             if !isDynamic {
                 onLoad()
