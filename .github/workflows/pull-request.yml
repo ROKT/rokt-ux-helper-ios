@@ -9,6 +9,9 @@ permissions:
   id-token: write
 
 on:
+  # workflow_dispatch keeps an on-demand whole-repo Trunk scan available now that
+  # the PR gate only checks the diff (the action autodetects check-mode all here).
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -18,15 +21,20 @@ on:
 jobs:
   trunk-check:
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
+    permissions:
+      contents: read
+      # Diff-scoped mode posts findings as PR annotations via the Checks API.
+      checks: write
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # check-mode is deliberately unset: the action then autodetects
+      # pull_request (diff vs the base sha) on PRs, push on branch pushes and
+      # all on workflow_dispatch.
       - name: Trunk Check
-        uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
-        with:
-          check-mode: all
+        uses: trunk-io/trunk-action@e1234e67a86010d61ddac8d8ebf4b783e2ffd2fa # v2.0.0
 
   podspec-lint:
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
