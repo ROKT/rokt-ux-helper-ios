@@ -81,6 +81,7 @@ private extension RoktUXEventType {
         case .SignalImpression: return ("impression", [:])
         case .SignalViewed: return ("viewed", [:])
         case .SignalResponse: return ("signal_response", [:])
+        case .SignalProductItemResponse: return ("product_item_response", [:])
         case .SignalGatedResponse: return ("signal_gated_response", [:])
         case .SignalDismissal: return ("dismissal", [:])
         case .SignalInitialize: return ("signal_initialize", [:])

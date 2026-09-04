@@ -8,6 +8,7 @@ class LayoutState: LayoutStateRepresenting {
 
     static let breakPointsSharedKey = "breakPoints" // BreakPoint
     static let currentProgressKey = "currentProgress" // Binding<Int>
+    static let visibleOfferIndexesKey = "visibleOfferIndexes" // [Int], independent of page/group progress
     static let totalItemsKey = "totalItems" // Int
     static let layoutType = "layoutCode" // PlacementLayoutCode
     static let viewableItemsKey = "viewableItems" // Binding<Int>
@@ -16,6 +17,7 @@ class LayoutState: LayoutStateRepresenting {
     static let globalCustomStateMapKey = "globalCustomStateMap" // Global CustomStateMap
     static let activeCatalogItemKey = "activeCatalogItem" // CatalogItem
     static let fullOfferKey = "fullOffer" // OfferModel
+    static let catalogProductProgressionKey = "catalogProductProgression"
     static let catalogDropdownSelectedIndexKey = "catalogDropdownSelectedIndex" // [Int: Int] (attributeIndex -> optionIndex)
     // Holds runtime catalog values pushed by the host SDK after API calls
     // (e.g. {subtotal, tax, shipping, total} after `/cart/initialize-purchase`)

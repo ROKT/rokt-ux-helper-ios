@@ -127,6 +127,40 @@ class EventService: Hashable, EventDiagnosticServicing {
         )
     }
 
+    func sendCatalogProductResponse(_ response: CatalogProductResponse) {
+        sendEngagementEventCallback(isPositive: true)
+        sendEvent(
+            .SignalProductItemResponse,
+            parentGuid: response.option.instanceGuid,
+            objectData: response.metadata,
+            jwtToken: response.option.responseJWTToken
+        )
+    }
+
+    func sendCatalogItemImpression(context: CatalogItemContext) {
+        let item = context.catalogItem
+        guard !item.instanceGuid.isEmpty, !item.token.isEmpty else { return }
+        sendEvent(.SignalImpression, parentGuid: item.instanceGuid, jwtToken: item.token)
+    }
+
+    func sendCatalogCarouselScroll(context: CatalogItemContext, lastCardIndex: Int) {
+        let creative = context.offer.creative
+        guard !creative.instanceGuid.isEmpty, !creative.jwtToken.isEmpty,
+              lastCardIndex == (context.offer.catalogItems?.count ?? 0) - 1 else { return }
+        sendEvent(
+            .SignalUserInteraction,
+            parentGuid: creative.instanceGuid,
+            objectData: [
+                kAction: UserInteraction.Scroll.rawValue,
+                kContext: UserInteractionContext.CatalogCarousel.rawValue,
+                kInteractionType: UserInteraction.Scroll.rawValue,
+                "cardIndex": String(context.itemIndex),
+                "lastCardIndex": String(lastCardIndex)
+            ],
+            jwtToken: creative.jwtToken
+        )
+    }
+
     func sendGatedSignalResponseEvent(
         instanceGuid: String,
         jwtToken: String,

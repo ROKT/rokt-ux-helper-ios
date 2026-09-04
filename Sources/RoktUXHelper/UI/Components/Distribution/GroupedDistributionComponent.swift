@@ -29,7 +29,7 @@ struct GroupedDistributionComponent: View {
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
-    @State var currentGroup = 0
+    @State var currentGroup: Int
     @State private var toggleTransition = false
     @State private var currentLeadingOffer: Int
 
@@ -63,9 +63,10 @@ struct GroupedDistributionComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
-        _currentLeadingOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        let initialOfferIndex = min(max(model.initialCurrentIndex ?? 0, 0), max((model.children?.count ?? 0) - 1, 0))
+        _currentGroup = State(wrappedValue: initialOfferIndex)
+        _currentLeadingOffer = State(wrappedValue: initialOfferIndex)
         _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
-        setRecalculatedCurrentGroup()
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -153,6 +154,7 @@ struct GroupedDistributionComponent: View {
                 .accessibilityFocused($shouldFocusAccessibility)
                 .accessibilityLabel(accessibilityAnnouncement)
                 .onChange(of: currentLeadingOffer) { newValue in
+                    model.publishVisibleOfferIndexes(firstIndex: newValue, count: viewableItems)
                     model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     model.sendViewableImpressionEvents(viewableItems: viewableItems,
                                                        currentLeadingOffer: newValue)
@@ -218,6 +220,7 @@ struct GroupedDistributionComponent: View {
             viewableItems: $viewableItems,
             customStateMap: $customStateMap
         )
+        model.publishVisibleOfferIndexes(firstIndex: currentGroup * viewableItems, count: viewableItems)
     }
 
     func goToNextGroup(_: Any? = nil) {
@@ -348,21 +351,18 @@ struct GroupedDistributionComponent: View {
                 newPageIndex += 1
             }
         }
-    }
-
-    func setRecalculatedCurrentGroup() {
-        if currentLeadingOffer >= 0 {
-            self.currentGroup = Int(floor(Double(currentLeadingOffer + 1/viewableItems)))
-        }
+        model.publishVisibleOfferIndexes(firstIndex: currentGroup * viewableItems, count: viewableItems)
     }
 
     private func incrementCurrentGroup() {
         currentGroup += 1
         currentLeadingOffer = currentGroup * viewableItems
+        model.publishVisibleOfferIndexes(firstIndex: currentLeadingOffer, count: viewableItems)
     }
 
     private func decrementCurrentGroup() {
         currentGroup -= 1
         currentLeadingOffer = currentGroup * viewableItems
+        model.publishVisibleOfferIndexes(firstIndex: currentLeadingOffer, count: viewableItems)
     }
 }

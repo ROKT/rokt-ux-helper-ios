@@ -78,6 +78,29 @@ final class TestOneByOneDistributionComponent: XCTestCase {
         XCTAssertFalse(SignalResponseCalled)
     }
 
+    func test_emptyDistributionKeepsRestoredIndexAtZeroWithoutClosing() {
+        let childLists: [[LayoutSchemaViewModel]?] = [nil, []]
+        for children in childLists {
+            for restoredIndex in [Int.min, 0, Int.max] {
+                var closed = false
+                let state = LayoutState(initialPluginViewState: .init(pluginId: "example-plugin", offerIndex: restoredIndex))
+                state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true)
+                state.actionCollection[.close] = { _ in closed = true }
+                let model = OneByOneViewModel(children: children, defaultStyle: nil, transition: nil,
+                                              eventService: nil, slots: [], layoutState: state)
+                let component = OneByOneDistributionComponent(config: .init(parent: .column, position: nil), model: model,
+                                                              parentWidth: .constant(300), parentHeight: .constant(nil),
+                                                              styleState: .constant(.default), parentOverride: nil)
+                XCTAssertEqual(component.currentOffer, 0)
+                component.goToNextOffer()
+                component.goToPreviousOffer()
+                XCTAssertEqual(component.currentOffer, 0)
+                XCTAssertFalse(closed)
+                state.actionCollection.reset()
+            }
+        }
+    }
+
     func testEmbeddedOneByOne() {
 //        withSnapshotTesting(diffTool: .ksdiff) {
 //            waitForViewController("embedded_onebyone") { testViewController in
