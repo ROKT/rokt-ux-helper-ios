@@ -273,6 +273,8 @@ These checks do not simulate touch arbitration. Also exercise a JSON-rendered ca
 
 `CatalogCarouselStretchLayoutTests` mounts the real carousel and measures rendered card surfaces with different text lengths. It checks equal card heights, growth and shrinkage after text changes, narrow and wide host widths, and stable mount/scroll callbacks. These are native layout assertions with synthetic colors, not recorded image snapshots or product-button gesture coverage.
 
+The same suite checks that intrinsic-width cards retain their leading edge and that full-width cards preserve authored center/end child alignment in both layout directions. Snapshot readiness requires measurements for every card at the current width, unchanged measurements across consecutive layout checks, and a scroll host height matching the measured maximum. A first positive height alone is insufficient because later cards can change that maximum.
+
 - [x] Product cards with different intrinsic title heights share a row height (`testSnapshot_mixedIntrinsicCardHeights`). This checks the card surfaces, not aligned internal buttons or full-template styling.
 
 - [x] Empty catalog -- no reserved carousel space (`testSnapshot_zeroProducts`)

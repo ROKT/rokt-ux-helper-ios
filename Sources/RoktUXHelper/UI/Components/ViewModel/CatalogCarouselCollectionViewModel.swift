@@ -37,7 +37,7 @@ final class CatalogCarouselCollectionViewModel: Identifiable, Hashable, Observab
     private var hasMounted = false
     private var scrollTracker = CatalogCarouselScrollTracker()
     private var measuredWidth: CGFloat?
-    private var itemHeights: [Int: CGFloat] = [:]
+    private(set) var itemHeights: [Int: CGFloat] = [:]
     private var styleSubscription: AnyCancellable?
 
     var imageLoader: RoktUXImageLoader? { layoutState?.imageLoader }
