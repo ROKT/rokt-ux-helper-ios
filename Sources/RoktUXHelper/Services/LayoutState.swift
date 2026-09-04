@@ -119,6 +119,12 @@ class LayoutState: LayoutStateRepresenting {
         return closeOnComplete
     }
 
+    /// Nil when the layout doesn't ask for a specific presentation, which is the case for every
+    /// layout published before schema 2.10 — callers must treat nil as the platform's own sheet.
+    func bottomSheetPresentation() -> BottomSheetPresentation? {
+        (items[LayoutState.layoutSettingsKey] as? LayoutSettings)?.bottomSheetPresentation
+    }
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         guard let width,
               let globalBreakPoints = items[LayoutState.breakPointsSharedKey] as? BreakPoint,

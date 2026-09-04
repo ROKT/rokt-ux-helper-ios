@@ -173,7 +173,7 @@ final class CatalogProductDistributionTests: XCTestCase {
                       layoutVariant: productSlot.layoutVariant, jwtToken: productSlot.jwtToken)
         }
         let state = LayoutState(initialPluginViewState: .init(pluginId: "example-plugin", offerIndex: initialOfferIndex))
-        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         let delegate = CatalogProductURLDelegate()
         let service = get_mock_event_processor(uxEventDelegate: delegate)
         let children = slots.indices.map { index in

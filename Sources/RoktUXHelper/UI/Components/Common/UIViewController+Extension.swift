@@ -29,7 +29,17 @@ extension UIViewController {
                                                 eventService: eventService,
                                                 layoutState: layoutState,
                                                 onUnload: onUnLoad)
-        if #available(iOS 16.0, *),
+        if let type = placementType,
+           case .BottomSheet(let sheetType) = type,
+           let bottomSheetUIModel,
+           shouldUseFullBleedBottomSheet(layoutState: layoutState) {
+            presentFullBleedBottomSheet(modal: modal,
+                                        sheetType: sheetType,
+                                        bottomSheetUIModel: bottomSheetUIModel,
+                                        layoutState: layoutState,
+                                        onLoad: onLoad,
+                                        builder: builder)
+        } else if #available(iOS 16.0, *),
            let type = placementType,
            type == .BottomSheet(.dynamic),
            let bottomSheetUIModel = bottomSheetUIModel {
@@ -96,6 +106,118 @@ extension UIViewController {
         }
     }
 
+    /// A layout opts into SDK-owned presentation by setting `bottomSheetPresentation` to
+    /// `fullBleed`. Absent — every layout published before schema 2.10 — keeps UIKit's sheet.
+    private func shouldUseFullBleedBottomSheet(layoutState: LayoutState) -> Bool {
+        RoktBottomSheetPresentationController.shouldPresentFullBleed(
+            presentation: layoutState.bottomSheetPresentation(),
+            horizontalSizeClass: traitCollection.horizontalSizeClass
+        )
+    }
+
+    private func presentFullBleedBottomSheet<Content: View>(
+        modal: RoktUXSwiftUIViewController,
+        sheetType: BottomSheetType,
+        bottomSheetUIModel: BottomSheetViewModel,
+        layoutState: LayoutState,
+        onLoad: @escaping (() -> Void),
+        @ViewBuilder builder: (((CGFloat) -> Void)?) -> Content
+    ) {
+        let isDynamic = sheetType == .dynamic
+        var isOnLoadCalled = false
+
+        // The wrap-content path reports its height from SwiftUI, exactly as it does when driving
+        // custom detents. Starting at half the available height gives the hosted tree a non-zero
+        // layout proposal to measure against, the same reason the detent path starts at .medium.
+        let onSizeChange: ((CGFloat) -> Void)? = isDynamic
+            ? { [weak modal] size in
+                DispatchQueue.main.async {
+                    guard let modal else { return }
+                    let height = max(size, 1)
+                    // The presentation controller only exists once presentation is under way.
+                    // A size reported before then is held rather than dropped: dropping it would
+                    // leave the sheet at its initial height and, because onLoad is chained to the
+                    // first size, would stop the impression from ever being sent.
+                    if let controller = modal.bottomSheetPresentationController {
+                        controller.setSheetHeight(height, animated: isOnLoadCalled)
+                    } else {
+                        modal.pendingBottomSheetHeight = height
+                    }
+                    if !isOnLoadCalled {
+                        isOnLoadCalled = true
+                        onLoad()
+                    }
+                }
+            }
+            : nil
+
+        modal.rootView = AnyView(builder(onSizeChange).background(Color.clear))
+
+        let transitioningDelegate = RoktBottomSheetTransitioningDelegate(
+            heightResolver: fullBleedHeightResolver(sheetType: sheetType,
+                                                    bottomSheetUIModel: bottomSheetUIModel),
+            cornerRadius: bottomSheetCornerRadius(bottomSheetUIModel) ?? 0,
+            allowBackdropToClose: bottomSheetUIModel.allowBackdropToClose == true
+        )
+        modal.modalPresentationStyle = .custom
+        modal.transitioningDelegate = transitioningDelegate
+        // UIViewController holds transitioningDelegate weakly.
+        modal.bottomSheetTransitioningDelegate = transitioningDelegate
+
+        if !isDynamic, case .percentage = bottomSheetHeightDimension(bottomSheetUIModel) {
+            observeExpandedState(modal: modal, layoutState: layoutState)
+        }
+
+        self.present(modal, animated: true, completion: { [weak modal] in
+            if let modal, let pending = modal.pendingBottomSheetHeight {
+                modal.pendingBottomSheetHeight = nil
+                modal.bottomSheetPresentationController?.setSheetHeight(pending, animated: false)
+            }
+            if !isDynamic {
+                onLoad()
+            }
+        })
+    }
+
+    /// Resolved against the height actually available to the sheet, rather than UIKit's
+    /// safe-area-relative detent value. The dynamic sheet is sized by its content, so its height
+    /// never comes from styling.
+    private func fullBleedHeightResolver(sheetType: BottomSheetType,
+                                         bottomSheetUIModel: BottomSheetViewModel) -> (CGFloat) -> CGFloat {
+        let height = sheetType == .dynamic ? nil : bottomSheetHeightDimension(bottomSheetUIModel)
+        return RoktBottomSheetPresentationController.heightResolver(for: height)
+    }
+
+    private func bottomSheetHeightDimension(
+        _ bottomSheetUIModel: BottomSheetViewModel
+    ) -> DimensionHeightValue? {
+        bottomSheetUIModel.defaultStyle?.first?.dimension?.height
+    }
+
+    private func bottomSheetCornerRadius(_ bottomSheetUIModel: BottomSheetViewModel) -> CGFloat? {
+        guard let defaultStyle = bottomSheetUIModel.defaultStyle,
+              !defaultStyle.isEmpty,
+              let borderRadius = defaultStyle[0].border?.borderRadius else {
+            return nil
+        }
+        return CGFloat(borderRadius)
+    }
+
+    /// The percentage path is an expandable sheet: the layout toggles "BottomSheetExpandedState"
+    /// and the sheet animates between its percentage height and the full available height. The
+    /// detent path drives this through UIKit; here it is a direct resize.
+    private func observeExpandedState(modal: RoktUXSwiftUIViewController, layoutState: LayoutState) {
+        modal.detentObserverCancellable = layoutState.itemsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak modal] items in
+                guard let controller = modal?.bottomSheetPresentationController else { return }
+                let isExpanded = Self.isBottomSheetExpanded(in: items)
+                let target = isExpanded ? controller.maximumSheetHeight : controller.collapsedHeight
+                guard abs(controller.resolvedSheetHeight - target) > 0.5 else { return }
+                controller.setExpanded(isExpanded, animated: true)
+            }
+    }
+
     private func applyBottomSheetStyles(modal: UIHostingController<AnyView>,
                                         bottomSheetUIModel: BottomSheetViewModel) {
         modal.modalPresentationStyle = .pageSheet
@@ -149,10 +271,7 @@ extension UIViewController {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak sheet] items in
                     guard let sheet = sheet else { return }
-                    let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
-                    let isExpanded = map?.contains(where: { entry in
-                        entry.key.key == Self.expandedStateKey && entry.value == 1
-                    }) ?? false
+                    let isExpanded = Self.isBottomSheetExpanded(in: items)
                     let targetIdentifier: UISheetPresentationController.Detent.Identifier = isExpanded ? .large : mediumId
                     // Lock the sheet by only ever registering a single detent for the
                     // current state. The transitions between medium and large therefore
@@ -189,6 +308,13 @@ extension UIViewController {
     }
 
     fileprivate static let expandedStateKey = "BottomSheetExpandedState"
+
+    /// Whether the layout has toggled its expanded state on. Read by both the full-bleed and the
+    /// custom-detent paths, so it lives here rather than being spelled out in each observer.
+    static func isBottomSheetExpanded(in items: [String: Any]) -> Bool {
+        let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
+        return map?.contains { $0.key.key == expandedStateKey && $0.value == 1 } ?? false
+    }
     fileprivate static let roktMediumDetentId = "roktMediumPercentage"
 
 }
@@ -202,6 +328,22 @@ public final class RoktUXSwiftUIViewController: UIHostingController<AnyView> {
     var detentObserverCancellable: AnyCancellable?
     // Strong reference to the sheet delegate (UISheetPresentationController holds delegate weakly).
     var sheetSyncDelegate: NSObject?
+    // Strong reference to the full-bleed delegate (UIViewController holds transitioningDelegate weakly).
+    var bottomSheetTransitioningDelegate: RoktBottomSheetTransitioningDelegate?
+
+    // Height reported by the content before the presentation controller existed.
+    var pendingBottomSheetHeight: CGFloat?
+
+    var bottomSheetPresentationController: RoktBottomSheetPresentationController? {
+        presentationController as? RoktBottomSheetPresentationController
+    }
+
+    override public func accessibilityPerformEscape() -> Bool {
+        guard let controller = bottomSheetPresentationController else {
+            return super.accessibilityPerformEscape()
+        }
+        return controller.performAccessibilityEscape()
+    }
 
     required init?(coder: NSCoder) {
         self.onUnload = nil
