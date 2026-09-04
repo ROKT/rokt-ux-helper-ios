@@ -312,6 +312,11 @@ extension UIViewController {
     /// Whether the layout has toggled its expanded state on. Read by both the full-bleed and the
     /// custom-detent paths, so it lives here rather than being spelled out in each observer.
     static func isBottomSheetExpanded(in items: [String: Any]) -> Bool {
+        let global = (items[LayoutState.globalCustomStateMapKey] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
+        if let value = global?[CustomStateIdentifiable(position: nil, key: expandedStateKey)] {
+            // An explicit global collapse must win over retained per-offer expansion state.
+            return value == 1
+        }
         let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
         return map?.contains { $0.key.key == expandedStateKey && $0.value == 1 } ?? false
     }
@@ -395,15 +400,24 @@ final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControll
     }
 
     func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheet: UISheetPresentationController) {
-        guard let layoutState,
-              let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> else {
+        guard let layoutState else { return }
+        let key = UIViewController.expandedStateKey
+        let newValue = sheet.selectedDetentIdentifier == .large ? 1 : 0
+        if let globalValue = layoutState.globalCustomStateValue(for: key) {
+            if globalValue != newValue {
+                layoutState.setGlobalCustomState(key: key, value: newValue)
+                layoutState.capturePluginViewState(offerIndex: nil, dismiss: false)
+            }
             return
         }
-        let isLarge = sheet.selectedDetentIdentifier == .large
+        guard let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>,
+              var map = binding.wrappedValue,
+              map.keys.contains(where: { $0.key == key }) else {
+            // Initial detent callbacks must not create an expansion state the layout never set.
+            return
+        }
         let position = (layoutState.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue ?? 0
-        let identifier = CustomStateIdentifiable(position: position, key: "BottomSheetExpandedState")
-        var map = binding.wrappedValue ?? RoktUXCustomStateMap()
-        let newValue = isLarge ? 1 : 0
+        let identifier = CustomStateIdentifiable(position: position, key: key)
         if map[identifier] != newValue {
             map[identifier] = newValue
             binding.wrappedValue = map
