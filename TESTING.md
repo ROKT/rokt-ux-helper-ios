@@ -301,7 +301,6 @@ The accessible RTL case scales the inline description; product labels retain the
 
 The typed product layout cases above also exercise inline copy within its surrounding layout. The hover snapshot uses the existing test recognizer to select hover styling; the disabled snapshot then disables that action. The pressed snapshot selects the existing model style state directly. These snapshots cover appearance, not real pointer or touch delivery. Dynamic Type and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
 
-
 #### Placeholder Resolution (Runtime + Transaction Data)
 
 End-to-end coverage for the placeholder namespaces and the finalize step. These
