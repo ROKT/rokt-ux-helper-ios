@@ -29,7 +29,7 @@ struct GroupedDistributionComponent: View {
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
-    @State var currentGroup = 0
+    @State var currentGroup: Int
     @State private var toggleTransition = false
     @State private var currentLeadingOffer: Int
 
@@ -63,9 +63,10 @@ struct GroupedDistributionComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
-        _currentLeadingOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        let initialOfferIndex = min(max(model.initialCurrentIndex ?? 0, 0), max((model.children?.count ?? 0) - 1, 0))
+        _currentGroup = State(wrappedValue: initialOfferIndex)
+        _currentLeadingOffer = State(wrappedValue: initialOfferIndex)
         _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
-        setRecalculatedCurrentGroup()
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -352,12 +353,6 @@ struct GroupedDistributionComponent: View {
             }
         }
         model.publishVisibleOfferIndexes(firstIndex: currentGroup * viewableItems, count: viewableItems)
-    }
-
-    func setRecalculatedCurrentGroup() {
-        if currentLeadingOffer >= 0 {
-            self.currentGroup = Int(floor(Double(currentLeadingOffer + 1/viewableItems)))
-        }
     }
 
     private func incrementCurrentGroup() {
