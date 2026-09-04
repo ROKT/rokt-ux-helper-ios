@@ -100,12 +100,18 @@ struct CatalogResponseButtonComponent: View {
     var body: some View {
         if model.isRenderable {
             if model.catalogItemContext != nil {
-                content
-                    .disabled(isProductInteractionDisabled)
-                    .allowsHitTesting(!isProductInteractionDisabled)
-                    .accessibilityAction { handleButtonTapped() }
-                    .onAppear(perform: updateStyleState)
-                    .onChange(of: isEnabled) { _ in updateStyleState() }
+                // Let the scroll view cancel a product press without submitting a response.
+                Button(action: handleButtonTapped) {
+                    styledContent
+                }
+                .buttonStyle(StateButtonStyle { pressed in
+                    isPressed = pressed
+                    updateStyleState()
+                })
+                .disabled(isProductInteractionDisabled)
+                .allowsHitTesting(!isProductInteractionDisabled)
+                .onAppear(perform: updateStyleState)
+                .onChange(of: isEnabled) { _ in updateStyleState() }
             } else {
                 content
             }
@@ -113,6 +119,35 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private var content: some View {
+        styledContent
+            .onTapGesture {
+                handleButtonTapped()
+            }
+            // consecutive gestures to track when long press is held vs released
+            .gesture(LongPressGesture()
+                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
+                .updating($isPressingDown) { value, state, _ in
+                    switch value {
+                    case .second(true, nil):
+                        state = true
+                    default:
+                        break
+                    }
+                })
+            .onChange(of: isPressingDown) { value in
+                if !value {
+                    // handle link when long press is released
+                    handleButtonTapped()
+                }
+            }
+            .onLongPressGesture(perform: {
+            }, onPressingChanged: { isPressed in
+                self.isPressed = isPressed
+                updateStyleState()
+            })
+    }
+
+    private var styledContent: some View {
         build()
             .onHover { isHovered in
                 self.isHovered = isHovered
@@ -158,31 +193,6 @@ struct CatalogResponseButtonComponent: View {
                 availableWidth = size.width
                 availableHeight = size.height
             }
-            .onTapGesture {
-                handleButtonTapped()
-            }
-            // consecutive gestures to track when long press is held vs released
-            .gesture(LongPressGesture()
-                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
-                .updating($isPressingDown) { value, state, _ in
-                    switch value {
-                    case .second(true, nil):
-                        state = true
-                    default:
-                        break
-                    }
-                })
-            .onChange(of: isPressingDown) { value in
-                if !value {
-                    // handle link when long press is released
-                    handleButtonTapped()
-                }
-            }
-            .onLongPressGesture(perform: {
-            }, onPressingChanged: { isPressed in
-                self.isPressed = isPressed
-                updateStyleState()
-            })
     }
 
     func build() -> some View {
