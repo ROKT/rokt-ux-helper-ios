@@ -6,7 +6,6 @@ final class CatalogProductResponseViewModel {
     let context: CatalogItemContext
     let responseKey: String?
     weak var eventService: EventDiagnosticServicing?
-    weak var layoutState: (any LayoutStateRepresenting)?
     private let progression: CatalogProductProgression
 
     init(context: CatalogItemContext,
@@ -16,7 +15,6 @@ final class CatalogProductResponseViewModel {
         self.context = context
         self.responseKey = responseKey
         self.eventService = eventService
-        self.layoutState = layoutState
         self.progression = CatalogProductProgression.shared(in: layoutState)
     }
 
