@@ -6,7 +6,6 @@ class DataImageViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAd
     let id: UUID = UUID()
 
     let image: CreativeImage?
-    let catalogItemContext: CatalogItemContext?
     let defaultStyle: [DataImageStyles]?
     let pressedStyle: [DataImageStyles]?
     let hoveredStyle: [DataImageStyles]?
@@ -21,10 +20,8 @@ class DataImageViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAd
          pressedStyle: [DataImageStyles]?,
          hoveredStyle: [DataImageStyles]?,
          disabledStyle: [DataImageStyles]?,
-         layoutState: (any LayoutStateRepresenting)?,
-         catalogItemContext: CatalogItemContext? = nil) {
+         layoutState: (any LayoutStateRepresenting)?) {
         self.image = image
-        self.catalogItemContext = catalogItemContext
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
         self.hoveredStyle = hoveredStyle
