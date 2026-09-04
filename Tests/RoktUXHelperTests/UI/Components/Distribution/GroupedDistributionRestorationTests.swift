@@ -95,7 +95,7 @@ final class GroupedDistributionRestorationTests: XCTestCase {
             SlotModel(instanceGuid: "example-slot-\(index)", offer: .mock(), layoutVariant: nil, jwtToken: "")
         }
         let state = LayoutState(initialPluginViewState: .init(pluginId: "example-plugin", offerIndex: initialOfferIndex))
-        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         state.items[LayoutState.breakPointsSharedKey] = ["wide": Float(400)]
         let children = heights.enumerated().map { index, height in
             let style = BasicTextStyle(dimension: .init(minWidth: nil, maxWidth: nil, width: nil,

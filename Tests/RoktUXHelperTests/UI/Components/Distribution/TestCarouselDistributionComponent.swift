@@ -45,7 +45,7 @@ final class TestCarouselDistributionComponent: XCTestCase {
 
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
-        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         let view = try TestPlaceHolder.make(
             layoutSettings: closeOnCompleteSettings,
             eventHandler: { event in

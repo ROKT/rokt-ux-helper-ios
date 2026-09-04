@@ -54,6 +54,11 @@ class MockLayoutState: LayoutStateRepresenting {
         return shouldCloseOnComplete
     }
 
+    var mockBottomSheetPresentation: BottomSheetPresentation?
+    func bottomSheetPresentation() -> BottomSheetPresentation? {
+        return mockBottomSheetPresentation
+    }
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         return mockBreakpointIndex
     }

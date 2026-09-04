@@ -51,7 +51,7 @@ final class TestOneByOneDistributionComponent: XCTestCase {
         var closeActionCalled = false
         var SignalResponseCalled = false
 
-        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
 
         let view = try TestPlaceHolder.make(
             layoutSettings: closeOnCompleteSettings,
@@ -84,7 +84,7 @@ final class TestOneByOneDistributionComponent: XCTestCase {
             for restoredIndex in [Int.min, 0, Int.max] {
                 var closed = false
                 let state = LayoutState(initialPluginViewState: .init(pluginId: "example-plugin", offerIndex: restoredIndex))
-                state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true)
+                state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true, bottomSheetPresentation: nil)
                 state.actionCollection[.close] = { _ in closed = true }
                 let model = OneByOneViewModel(children: children, defaultStyle: nil, transition: nil,
                                               eventService: nil, slots: [], layoutState: state)
