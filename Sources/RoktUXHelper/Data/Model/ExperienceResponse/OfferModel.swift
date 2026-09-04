@@ -6,6 +6,24 @@ struct OfferModel: Codable {
     let catalogItems: [CatalogItem]?
     let catalogItemGroup: CatalogItemGroup?
     let transactionData: TransactionData?
+    let accountId: String?
+    let catalogItemResponseAction: String?
+
+    init(campaignId: String?,
+         creative: CreativeModel,
+         catalogItems: [CatalogItem]?,
+         catalogItemGroup: CatalogItemGroup?,
+         transactionData: TransactionData?,
+         accountId: String? = nil,
+         catalogItemResponseAction: String? = nil) {
+        self.campaignId = campaignId
+        self.creative = creative
+        self.catalogItems = catalogItems
+        self.catalogItemGroup = catalogItemGroup
+        self.transactionData = transactionData
+        self.accountId = accountId
+        self.catalogItemResponseAction = catalogItemResponseAction
+    }
 }
 
 struct CreativeModel: Codable {

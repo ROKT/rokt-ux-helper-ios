@@ -170,6 +170,8 @@ struct SelectOffer: Decodable {
     let catalogItems: [SelectCatalogItem]?
     let catalogItemGroup: SelectCatalogItemGroup?
     let transactionData: SelectTransactionData?
+    let accountId: String?
+    let catalogItemResponseAction: String?
 
     enum CodingKeys: String, CodingKey {
         case campaignId = "campaign_id"
@@ -177,6 +179,8 @@ struct SelectOffer: Decodable {
         case catalogItems = "catalog_items"
         case catalogItemGroup = "catalog_item_group"
         case transactionData = "transaction_data"
+        case accountId = "account_id"
+        case catalogItemResponseAction = "catalog_item_response_action"
     }
 }
 
@@ -202,7 +206,7 @@ struct SelectCreative: Decodable {
     }
 }
 
-struct SelectResponseOption: Decodable {
+struct SelectResponseOption: Decodable, Equatable {
     let id: String?
     let action: String?
     let instanceGuid: String?
@@ -214,6 +218,7 @@ struct SelectResponseOption: Decodable {
     let isPositive: Bool
     let url: String?
     let ignoreBranch: Bool?
+    let urlBehavior: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -227,6 +232,7 @@ struct SelectResponseOption: Decodable {
         case isPositive = "is_positive"
         case url
         case ignoreBranch = "ignore_branch"
+        case urlBehavior = "url_behavior"
     }
 
     init(from decoder: Decoder) throws {
@@ -243,6 +249,7 @@ struct SelectResponseOption: Decodable {
         isPositive = try container.decodeIfPresent(Bool.self, forKey: .isPositive) ?? false
         url = try container.decodeIfPresent(String.self, forKey: .url)
         ignoreBranch = try container.decodeIfPresent(Bool.self, forKey: .ignoreBranch)
+        urlBehavior = try container.decodeIfPresent(String.self, forKey: .urlBehavior)
     }
 }
 

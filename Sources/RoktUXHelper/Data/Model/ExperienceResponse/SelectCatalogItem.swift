@@ -2,8 +2,7 @@ import Foundation
 
 /// A shoppable catalog item from an offers selection response.
 ///
-/// Only the fields the renderer / purchase events consume are modelled; the
-/// lenient decoder skips anything else on the wire. All fields are optional —
+/// Unknown fields are ignored. All modelled fields are optional and type-checked;
 /// the mapping into the renderer's ``CatalogItem`` supplies defaults for the
 /// keys the renderer requires but the response can omit.
 struct SelectCatalogItem: Decodable, Equatable {
@@ -32,6 +31,11 @@ struct SelectCatalogItem: Decodable, Equatable {
     let copy: [String: String]?
     let images: [String: SelectImage]?
     let token: String?
+    let responseOptionsMap: [String: SelectResponseOption]?
+    let productCartAttribute1: String?
+    let productCartAttribute2: String?
+    let productSku: String?
+    let catalogId: String?
 
     private enum CodingKeys: String, CodingKey {
         case catalogItemId = "catalog_item_id"
@@ -59,5 +63,10 @@ struct SelectCatalogItem: Decodable, Equatable {
         case copy
         case images
         case token
+        case responseOptionsMap = "response_options_map"
+        case productCartAttribute1 = "product_cart_attribute1"
+        case productCartAttribute2 = "product_cart_attribute2"
+        case productSku = "product_sku"
+        case catalogId = "catalog_id"
     }
 }

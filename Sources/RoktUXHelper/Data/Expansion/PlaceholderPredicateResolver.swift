@@ -6,6 +6,14 @@ struct PlaceholderResolutionContext {
     let activeCatalogItem: CatalogItem?
 }
 
+extension PlaceholderResolutionContext {
+    init(catalogItemContext: CatalogItemContext) {
+        self.init(offers: catalogItemContext.offers,
+                  currentOfferIndex: catalogItemContext.offerIndex,
+                  activeCatalogItem: catalogItemContext.catalogItem)
+    }
+}
+
 final class PlaceholderPredicateResolver {
 
     private let creativeExtractor: CreativeDataExtractor<PlaceholderValidator<DataSanitiser>>

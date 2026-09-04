@@ -1,0 +1,131 @@
+{
+  "session_id": "example-session",
+  "session_token": { "token": "example-session-token", "expires_at": 0 },
+  "plugins": [
+    {
+      "plugin": {
+        "config": {
+          "outer_layout_schema": "{\"layout\":{\"type\":\"Column\",\"node\":{\"children\":[]}}}",
+          "slots": [
+            {
+              "instance_guid": "example-purchase-slot",
+              "layout_variant": { "module_name": "add-to-cart" },
+              "offer": {
+                "account_id": "example-other-account",
+                "creative": {
+                  "copy": { "title": "Other offer", "otherOfferOnly": "Other copy" }
+                }
+              }
+            },
+            {
+              "instance_guid": "example-product-slot",
+              "token": "example-slot-token",
+              "layout_variant": { "module_name": "standard-marketing" },
+              "offer": {
+                "account_id": "example-product-account",
+                "catalog_item_response_action": "Url",
+                "creative": {
+                  "referral_creative_id": "example-creative",
+                  "instance_guid": "creative:example/parent",
+                  "token": "example-creative-token",
+                  "copy": { "title": "Product offer", "parentOnly": "Parent copy" },
+                  "response_options_map": {
+                    "positive": {
+                      "id": "example-creative-response",
+                      "instance_guid": "response:example/creative",
+                      "is_positive": true,
+                      "action": "Url",
+                      "signal_type": "SignalResponse",
+                      "url": "https://example.com/offer",
+                      "url_behavior": "inApp",
+                      "ignore_branch": false,
+                      "token": "example-creative-response-token"
+                    }
+                  }
+                },
+                "catalog_items": [
+                  {
+                    "catalog_item_id": "item:example/product-a",
+                    "instance_guid": "catalog:example/card-a",
+                    "cart_item_id": "example-cart-a",
+                    "title": "Example product A",
+                    "description": "First product",
+                    "price": 12.5,
+                    "price_formatted": "$12.50",
+                    "original_price": 15,
+                    "original_price_formatted": "$15.00",
+                    "currency": "USD",
+                    "product_sku": "example-sku-a",
+                    "catalog_id": "example-catalog-a",
+                    "product_cart_attribute1": "title",
+                    "product_cart_attribute2": "price",
+                    "url": "https://example.com/item-a",
+                    "url_behavior": "self",
+                    "copy": { "provider.productName": "Example product A", "firstCardOnly": "First copy" },
+                    "images": {
+                      "catalogItemImage0": { "light": "https://example.com/a.png", "alt": "Product A" }
+                    },
+                    "token": "example-item-token-a",
+                    "response_options_map": {
+                      "buy-now": {
+                        "id": "example-response-a",
+                        "instance_guid": "response:example/card-a/buy",
+                        "action": "Url",
+                        "signal_type": "SignalProductItemResponse",
+                        "is_positive": true,
+                        "short_label": "View product A",
+                        "long_label": "View example product A",
+                        "short_success_label": "Viewed",
+                        "url": "https://example.com/a?source=card&value=%2F",
+                        "url_behavior": "newTab",
+                        "ignore_branch": true,
+                        "token": "example-response-token-a"
+                      },
+                      "details": {
+                        "id": "example-details-a",
+                        "instance_guid": "response:example/card-a/details",
+                        "action": "Url",
+                        "signal_type": "SignalProductItemResponse",
+                        "is_positive": true,
+                        "url": "https://example.com/a/details",
+                        "url_behavior": "inApp",
+                        "token": "example-details-token-a"
+                      }
+                    }
+                  },
+                  {
+                    "catalog_item_id": "item:example/product-b",
+                    "instance_guid": "catalog:example/card-b",
+                    "title": "Example product B",
+                    "price_formatted": "$24.00",
+                    "product_sku": "example-sku-b",
+                    "catalog_id": "example-catalog-b",
+                    "product_cart_attribute1": "price",
+                    "product_cart_attribute2": "title",
+                    "copy": { "provider.productName": "Example product B" },
+                    "images": {
+                      "catalogItemImage0": { "light": "https://example.com/b.png", "alt": "Product B" }
+                    },
+                    "token": "example-item-token-b",
+                    "response_options_map": {
+                      "positive": {
+                        "id": "example-response-b",
+                        "instance_guid": "response:example/card-b/view",
+                        "action": "Url",
+                        "signal_type": "SignalProductItemResponse",
+                        "is_positive": true,
+                        "url": "https://example.com/b",
+                        "url_behavior": "self",
+                        "token": "example-response-token-b"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

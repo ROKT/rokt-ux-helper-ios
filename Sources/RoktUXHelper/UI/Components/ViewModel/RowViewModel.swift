@@ -13,6 +13,7 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling
     let predicates: [WhenPredicate]?
     let globalBreakPoints: BreakPoint?
     let offers: [OfferModel?]
+    let catalogItemContext: CatalogItemContext?
     var width: CGFloat = 0
     var cancellable: AnyCancellable?
     var componentConfig: ComponentConfig?
@@ -34,7 +35,8 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling
          layoutState: (any LayoutStateRepresenting)?,
          predicates: [WhenPredicate]?,
          globalBreakPoints: BreakPoint?,
-         offers: [OfferModel?]) {
+         offers: [OfferModel?],
+         catalogItemContext: CatalogItemContext? = nil) {
         self.children = children
         self.stylingProperties = stylingProperties
         self.animatableStyle = animatableStyle
@@ -43,6 +45,7 @@ class RowViewModel: Identifiable, Hashable, BaseStyleAdaptive, PredicateHandling
         self.predicates = predicates
         self.globalBreakPoints = globalBreakPoints
         self.offers = offers
+        self.catalogItemContext = catalogItemContext
 
         animate = shouldApply() && !animatableStyle.isNil
         cancellable = layoutState?.itemsPublisher
