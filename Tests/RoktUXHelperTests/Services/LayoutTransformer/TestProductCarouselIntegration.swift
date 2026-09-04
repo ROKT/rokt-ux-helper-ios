@@ -27,14 +27,14 @@ final class TestProductCarouselIntegration: XCTestCase {
                 return XCTFail("Expected description branches")
             }
             let state = get_mock_uistate(currentProgress: 0, totalOffers: 2, position: 1)
-            XCTAssertEqual(short.shouldApply(state), count < 78)
-            XCTAssertEqual(collapsed.shouldApply(state), count >= 78)
+            XCTAssertEqual(short.shouldApply(state), count <= 78)
+            XCTAssertEqual(collapsed.shouldApply(state), count > 78)
             XCTAssertFalse(expanded.shouldApply(state))
             XCTAssertEqual(inline.children[0].texts[0].boundValue, String(copy.prefix(78)) + "... ")
             let active = get_mock_uistate(currentProgress: 0, totalOffers: 2, position: 1,
                                           customStateMap: [CustomStateIdentifiable(position: 1, key: "detailsExpanded"): 1])
             XCTAssertFalse(collapsed.shouldApply(active))
-            XCTAssertEqual(expanded.shouldApply(active), count >= 78)
+            XCTAssertEqual(expanded.shouldApply(active), count > 78)
         }
     }
 

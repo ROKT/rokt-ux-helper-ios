@@ -13,7 +13,7 @@
                                 "content": {
                                     "condition": "is-below",
                                     "input": "%^DATA.creativeCopy.creative.copy^%",
-                                    "value": "78"
+                                    "value": "79"
                                 }
                             }
                         }
@@ -56,7 +56,7 @@
                                 "content": {
                                     "condition": "is-above",
                                     "input": "%^DATA.creativeCopy.creative.copy^%",
-                                    "value": "77"
+                                    "value": "78"
                                 }
                             }
                         },
@@ -168,7 +168,7 @@
                                 "content": {
                                     "condition": "is-above",
                                     "input": "%^DATA.creativeCopy.creative.copy^%",
-                                    "value": "77"
+                                    "value": "78"
                                 }
                             }
                         },

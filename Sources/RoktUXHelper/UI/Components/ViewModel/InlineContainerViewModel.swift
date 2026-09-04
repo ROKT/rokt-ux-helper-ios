@@ -42,7 +42,7 @@ enum InlineContainerChild {
                 let index = model.layoutState?.getGlobalBreakpointIndex(width) ?? 0
                 return Self.select(styles, at: index, state: state) ?? InlineSpanStyle()
             }
-            let index = model.updateBreakpointIndex(for: width)
+            let index = model.layoutState?.getGlobalBreakpointIndex(width) ?? 0
             let style = Self.select(model, at: index, state: state)
             return InlineSpanStyle(spacing: style?.spacing, backgroundColor: style?.background?.backgroundColor,
                                    border: style?.border, opacity: style?.container?.opacity)
@@ -51,7 +51,7 @@ enum InlineContainerChild {
                 let index = model.layoutState?.getGlobalBreakpointIndex(width) ?? 0
                 return Self.select(styles, at: index, state: state) ?? InlineSpanStyle()
             }
-            let index = model.updateBreakpointIndex(for: width)
+            let index = model.layoutState?.getGlobalBreakpointIndex(width) ?? 0
             let values: [ToggleButtonStateTriggerStyle]?
             switch state {
             case .pressed: values = model.pressedStyle ?? model.defaultStyle
@@ -59,7 +59,7 @@ enum InlineContainerChild {
             case .disabled: values = model.disabledStyle ?? model.defaultStyle
             default: values = model.defaultStyle
             }
-            let style = values?[safe: index]
+            let style = values?[safe: max(0, min(index, (values?.count ?? 1) - 1))]
             return InlineSpanStyle(spacing: style?.spacing, backgroundColor: style?.background?.backgroundColor,
                                    border: style?.border, opacity: style?.container?.opacity)
         }
@@ -77,12 +77,14 @@ enum InlineContainerChild {
     }
 
     private static func select(_ model: StaticLinkViewModel, at index: Int, state: StyleState) -> StaticLinkStyles? {
+        let values: [StaticLinkStyles]?
         switch state {
-        case .pressed: return (model.pressedStyle ?? model.defaultStyle)?[safe: index]
-        case .hovered: return (model.hoveredStyle ?? model.defaultStyle)?[safe: index]
-        case .disabled: return (model.disabledStyle ?? model.defaultStyle)?[safe: index]
-        default: return model.defaultStyle?[safe: index]
+        case .pressed: values = model.pressedStyle ?? model.defaultStyle
+        case .hovered: values = model.hoveredStyle ?? model.defaultStyle
+        case .disabled: values = model.disabledStyle ?? model.defaultStyle
+        default: values = model.defaultStyle
         }
+        return values?[safe: max(0, min(index, (values?.count ?? 1) - 1))]
     }
 
     func action(position: Int?) -> InlineTextAction? {

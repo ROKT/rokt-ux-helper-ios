@@ -10,13 +10,16 @@ protocol DataValidating {
 struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where Sanitiser.T == String {
     private let sanitiser: Sanitiser
     private let parser: PropertyChainDataParsing
+    private let validatesTextOperations: Bool
 
     init(
         sanitiser: Sanitiser = DataSanitiser(),
-        parser: PropertyChainDataParsing = PropertyChainDataParser()
+        parser: PropertyChainDataParsing = PropertyChainDataParser(),
+        validatesTextOperations: Bool = true
     ) {
         self.sanitiser = sanitiser
         self.parser = parser
+        self.validatesTextOperations = validatesTextOperations
     }
 
     func isValid(data: String) -> Bool {
@@ -63,7 +66,9 @@ struct PlaceholderValidator<Sanitiser: DataSanitising>: DataValidating where San
         }
 
         let parts = sanitisedBinding.components(separatedBy: ":")
-        guard parts.dropFirst().allSatisfy({ BNFTextOperation($0) != .invalid }) else { return false }
+        // Resolvers validate operations when they attempt an alternative, so an unused
+        // alternative cannot reject a value that has already resolved successfully.
+        guard !validatesTextOperations || parts.dropFirst().allSatisfy({ BNFTextOperation($0) != .invalid }) else { return false }
         sanitisedBinding = parts[0]
         let wordsInBinding = sanitisedBinding.components(separatedBy: BNFSeparator.namespace.rawValue)
 

@@ -57,6 +57,20 @@ final class TestSchemaAdapters: XCTestCase {
         XCTAssertEqual(model.styles?.conditionalTransitions?.duration, 100)
     }
 
+    func testCatalogCarouselDefaultsAndConditionalStylesRemainSupported() throws {
+        let schema = try decode(CatalogCarouselCollectionModel<CatalogCarouselCollectionTemplateNode, WhenPredicate>.self, [
+            "viewableItems": [1], "peekThroughSize": [],
+            "styles": ["elements": ["own": [["default": ["container": ["gap": 4]]]]],
+                       "conditionalTransitions": ["predicates": [customState()], "duration": 100,
+                                                  "value": ["own": ["container": ["opacity": 0.5]]]]],
+            "template": ["type": "Column", "node": ["children": []]]
+        ])
+        let styles = try SchemaStyleAdapter.catalogCarousel(schema.styles)
+        XCTAssertEqual(styles?.elements?.own.first?.default.container?.gap, 4)
+        XCTAssertEqual(styles?.conditionalTransitions?.value.own?.container?.opacity, 0.5)
+        XCTAssertEqual(styles?.conditionalTransitions?.duration, 100)
+    }
+
     func testUnboundInlineConditionsRejectDataOnEitherSideButAllowLocalState() throws {
         let conditions: [[String: Any]] = [
             ["type": "CreativeCopy", "predicate": ["condition": "exists", "value": "title"]],

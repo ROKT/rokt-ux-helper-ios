@@ -7,7 +7,7 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
     private let dataReflector: any DataReflecting
 
     init(
-        dataValidator: Validator = PlaceholderValidator(),
+        dataValidator: Validator = PlaceholderValidator(validatesTextOperations: false),
         parser: PropertyChainDataParsing = PropertyChainDataParser(),
         dataReflector: any DataReflecting = DataReflector()
     ) {
@@ -33,9 +33,9 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
             return .value(propertyChain as! U)
         }
 
+        // Creative values are strings; operation-bearing chains remain restricted to text consumers.
         guard !placeholder.hasTextOperations || type == String.self else { throw BNFPlaceholderError.invalidTextOperation }
-
-        let processedData = try processChains(placeholder.parseableChains, responseKey: responseKey, data: data)
+        let processedData = try processChains(placeholder, responseKey: responseKey, data: data)
 
         // Use default value if no mapping was found
         let finalData = processedData.mappedValue ?? placeholder.defaultValue
@@ -47,13 +47,22 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
         return processedData.isStateType ? .state(finalData as! U) : .value(finalData as! U)
     }
 
-    private func processChains(_ chains: [BNFKeyAndNamespace], responseKey: String?, data: OfferModel?) throws -> ProcessedData {
-        for chain in chains {
+    private func processChains(_ placeholder: BNFPlaceholder, responseKey: String?, data: OfferModel?) throws -> ProcessedData {
+        var invalidOperation = false
+        for chain in placeholder.parseableChains {
+            if chain.textOperations.contains(.invalid) {
+                invalidOperation = true
+                continue
+            }
             let result = try processChain(chain, responseKey: responseKey, data: data)
-            if let value = result.mappedValue, !result.isStateType {
+            guard result != .empty else { continue }
+            if let value = result.mappedValue, !result.isStateType, chain.namespace != .dataCreativeLink {
                 return ProcessedData(mappedValue: try chain.applyingTextOperations(to: value))
             }
-            if result != .empty { return result }
+            return result
+        }
+        if invalidOperation && placeholder.defaultValue == nil {
+            throw BNFPlaceholderError.invalidTextOperation
         }
         return .empty
     }
@@ -157,7 +166,8 @@ class CreativeDataExtractor<Validator: DataValidating>: DataExtracting where Val
         let linkURL = linkObject?.url ?? ""
 
         if !linkTitle.isEmpty && !linkURL.isEmpty {
-            return .init(mappedValue: "<a href=\"\(linkURL)\" target=\"_blank\">\(linkTitle)</a>")
+            let title = try chain.applyingTextOperations(to: linkTitle)
+            return .init(mappedValue: "<a href=\"\(linkURL)\" target=\"_blank\">\(title)</a>")
         } else if chain.isMandatory {
             throw BNFPlaceholderError.mandatoryKeyEmpty
         } else {

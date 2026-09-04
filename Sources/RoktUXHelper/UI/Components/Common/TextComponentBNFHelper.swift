@@ -60,6 +60,9 @@ class TextComponentBNFHelper {
             guard let swiftRange = Range(match.range, in: originalString) else { continue }
 
             let chainOfValues = String(originalString[swiftRange])
+            guard PropertyChainDataParser().parse(propertyChain: chainOfValues).parseableChains.contains(where: {
+                $0.namespace == .state
+            }) else { continue }
             let resolvedValue = resolveStateChain(
                 propertyChain: chainOfValues,
                 currentOfferString: currentOffer,
@@ -77,7 +80,7 @@ class TextComponentBNFHelper {
         currentOfferString: String,
         totalOffersString: String
     ) -> String {
-        let validator = PlaceholderValidator()
+        let validator = PlaceholderValidator(validatesTextOperations: false)
         let parser = PropertyChainDataParser()
         let parsedChain = parser.parse(propertyChain: propertyChain)
         guard validator.isValid(data: propertyChain) else {
@@ -87,7 +90,8 @@ class TextComponentBNFHelper {
 
         for keyAndNamespace in parsedChain.parseableChains {
             guard case .state = keyAndNamespace.namespace,
-                  DataBindingStateKeys.isValidKey(keyAndNamespace.key)
+                  DataBindingStateKeys.isValidKey(keyAndNamespace.key),
+                  !keyAndNamespace.textOperations.contains(.invalid)
             else {
                 continue
             }
