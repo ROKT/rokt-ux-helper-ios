@@ -87,14 +87,19 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
         }
     }
 
-    /// Where the sheet sits: full container width, pinned to the bottom, at the requested height
-    /// clamped to what's available. Kept free of UIKit state so the geometry is directly testable.
+    /// Where the sheet sits: full container width, pinned to the bottom, tall enough that the
+    /// content gets the height the layout asked for. Because the sheet reaches the bottom of the
+    /// screen, UIKit propagates the container's bottom safe-area inset into the hosted content, so
+    /// that inset is added on top of the requested height and the whole thing clamped to what is
+    /// available. This matches a UIKit custom detent, whose value is likewise the height above the
+    /// bottom safe area. Kept free of UIKit state so the geometry is directly testable.
     static func sheetFrame(containerSize: CGSize,
                            topSafeArea: CGFloat,
+                           bottomSafeArea: CGFloat,
                            requestedHeight: CGFloat) -> CGRect {
         let maximum = maximumSheetHeight(containerHeight: containerSize.height,
                                          topSafeArea: topSafeArea)
-        let height = min(max(requestedHeight, 1), maximum)
+        let height = min(max(requestedHeight, 1) + max(bottomSafeArea, 0), maximum)
         return CGRect(x: 0,
                       y: containerSize.height - height,
                       width: containerSize.width,
@@ -122,6 +127,7 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
         guard let containerView else { return .zero }
         return Self.sheetFrame(containerSize: containerView.bounds.size,
                                topSafeArea: containerView.safeAreaInsets.top,
+                               bottomSafeArea: containerView.safeAreaInsets.bottom,
                                requestedHeight: heightResolver(maximumSheetHeight))
     }
 
@@ -255,7 +261,9 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
 
         switch gesture.state {
         case .began:
-            dragStartHeight = presentedView.frame.height
+            // Frame height minus the compensation, so this stays in the same basis as the
+            // requested height sheetFrame takes — otherwise the inset is added twice per drag.
+            dragStartHeight = presentedView.frame.height - containerView.safeAreaInsets.bottom
         case .changed:
             guard let start = dragStartHeight else { return }
             // Upward drags resist rather than grow the sheet: the sheet has one height, and
@@ -263,6 +271,7 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
             let offset = translation > 0 ? translation : translation/4
             presentedView.frame = Self.sheetFrame(containerSize: containerView.bounds.size,
                                                   topSafeArea: containerView.safeAreaInsets.top,
+                                                  bottomSafeArea: containerView.safeAreaInsets.bottom,
                                                   requestedHeight: start - offset)
         case .ended, .cancelled, .failed:
             let velocity = gesture.velocity(in: containerView).y

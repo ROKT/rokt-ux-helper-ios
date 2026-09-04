@@ -11,11 +11,19 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
 
     private let container = CGSize(width: 390, height: 844)
     private let topSafeArea: CGFloat = 59
+    private let bottomSafeArea: CGFloat = 34
 
     private func frame(_ requestedHeight: CGFloat) -> CGRect {
         RoktBottomSheetPresentationController.sheetFrame(containerSize: container,
                                                          topSafeArea: topSafeArea,
+                                                         bottomSafeArea: bottomSafeArea,
                                                          requestedHeight: requestedHeight)
+    }
+
+    /// What the hosted content actually gets: the sheet reaches the bottom of the screen, so
+    /// UIKit insets its content by the bottom safe area.
+    private func contentHeight(_ requestedHeight: CGFloat) -> CGFloat {
+        frame(requestedHeight).height - bottomSafeArea
     }
 
     private func makeController(allowBackdropToClose: Bool) -> RoktBottomSheetPresentationController {
@@ -39,10 +47,24 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
         XCTAssertEqual(frame(400).width, container.width, accuracy: 0.001)
     }
 
-    // The custom-detent path renders `height + safeAreaInsets.bottom`. This must not.
-    func testRequestedHeightIsHonouredExactly() {
-        XCTAssertEqual(frame(400).height, 400, accuracy: 0.001)
-        XCTAssertEqual(frame(437.5).height, 437.5, accuracy: 0.001)
+    // Measured against the custom-detent path on device: a detent of 400 yields a 434pt frame
+    // whose content region is 400. The requested height is the content's, not the frame's.
+    func testContentGetsTheRequestedHeightAndTheFrameCarriesTheSafeArea() {
+        XCTAssertEqual(contentHeight(400), 400, accuracy: 0.001)
+        XCTAssertEqual(frame(400).height, 434, accuracy: 0.001)
+
+        XCTAssertEqual(contentHeight(437.5), 437.5, accuracy: 0.001)
+        XCTAssertEqual(frame(437.5).height, 471.5, accuracy: 0.001)
+    }
+
+    // A device with no home indicator has nothing to compensate for.
+    func testNoBottomSafeAreaMeansNoCompensation() {
+        let sheet = RoktBottomSheetPresentationController.sheetFrame(containerSize: container,
+                                                                     topSafeArea: topSafeArea,
+                                                                     bottomSafeArea: 0,
+                                                                     requestedHeight: 400)
+
+        XCTAssertEqual(sheet.height, 400, accuracy: 0.001)
     }
 
     func testHeightIsClampedToTheAvailableHeight() {
@@ -55,9 +77,11 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
         XCTAssertEqual(frame(100_000).minY, container.height - maximum, accuracy: 0.001)
     }
 
-    func testHeightIsClampedToAtLeastOnePoint() {
-        XCTAssertEqual(frame(0).height, 1, accuracy: 0.001)
-        XCTAssertEqual(frame(-50).height, 1, accuracy: 0.001)
+    // The clamp exists so the hosted tree always gets a non-zero layout proposal to measure
+    // against, so it is the content that must not collapse, not the frame.
+    func testContentIsClampedToAtLeastOnePoint() {
+        XCTAssertEqual(contentHeight(0), 1, accuracy: 0.001)
+        XCTAssertEqual(contentHeight(-50), 1, accuracy: 0.001)
     }
 
     // Expanding stops at the top safe area, where UIKit's .large() detent stops.
@@ -83,6 +107,7 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
     func testZeroSizedContainerDoesNotProduceNegativeGeometry() {
         let sheet = RoktBottomSheetPresentationController.sheetFrame(containerSize: .zero,
                                                                      topSafeArea: 0,
+                                                                     bottomSafeArea: 0,
                                                                      requestedHeight: 400)
 
         XCTAssertGreaterThanOrEqual(sheet.height, 0)

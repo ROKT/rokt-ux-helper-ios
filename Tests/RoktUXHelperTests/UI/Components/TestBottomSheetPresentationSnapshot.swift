@@ -56,6 +56,7 @@ final class TestBottomSheetPresentationSnapshot: XCTestCase {
             sheetView.frame = RoktBottomSheetPresentationController.sheetFrame(
                 containerSize: view.bounds.size,
                 topSafeArea: view.safeAreaInsets.top,
+                bottomSafeArea: view.safeAreaInsets.bottom,
                 requestedHeight: heightResolver(maximum)
             )
         }
