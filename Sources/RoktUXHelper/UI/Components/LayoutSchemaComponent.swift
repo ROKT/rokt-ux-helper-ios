@@ -66,19 +66,21 @@ struct LayoutSchemaComponent: View {
                          styleState: $styleState,
                          parentOverride: parentOverride)
         case .scrollableColumn(let columnModel):
-            ScrollableColumnComponent(config: config,
-                                      model: columnModel,
-                                      parentWidth: $parentWidth,
-                                      parentHeight: $parentHeight,
-                                      styleState: $styleState,
-                                      parentOverride: parentOverride)
+            ColumnComponent(config: config,
+                            model: columnModel,
+                            parentWidth: $parentWidth,
+                            parentHeight: $parentHeight,
+                            styleState: $styleState,
+                            parentOverride: parentOverride,
+                            isScrollable: true)
         case .scrollableRow(let rowModel):
-            ScrollableRowComponent(config: config,
-                                   model: rowModel,
-                                   parentWidth: $parentWidth,
-                                   parentHeight: $parentHeight,
-                                   styleState: $styleState,
-                                   parentOverride: parentOverride)
+            RowComponent(config: config,
+                         model: rowModel,
+                         parentWidth: $parentWidth,
+                         parentHeight: $parentHeight,
+                         styleState: $styleState,
+                         parentOverride: parentOverride,
+                         isScrollable: true)
         case .zStack(let zStackModel):
             ZStackComponent(config: config,
                             model: zStackModel,

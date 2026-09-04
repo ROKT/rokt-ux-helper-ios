@@ -93,6 +93,11 @@ internal extension View {
             alignment.vertical = percentageHeight.alignmentAsVerticalType
         }
 
+        // Only the authored cap may bound a fill; `frameMax*` also carries fit-width and
+        // fit-height defaults, which are derived from the parent and must not act as caps.
+        let authoredMaxWidth = dimension?.maxWidth.map { CGFloat($0) } ?? .infinity
+        let authoredMaxHeight = dimension?.maxHeight.map { CGFloat($0) } ?? .infinity
+
         // update with weight
         let weightProperties = WeightModifier.Properties(weight: weight,
                                                          parent: parent,
@@ -101,11 +106,13 @@ internal extension View {
         let weight = WeightModifier(props: weightProperties)
 
         if let frameMaxWidth = weight.frameMaxWidth {
-            maxWidth = frameMaxWidth
+            // Growing to fill the parent must not lift an explicit upper bound.
+            maxWidth = min(frameMaxWidth, authoredMaxWidth)
             alignment.horizontal = weight.alignment.asHorizontalType ?? WeightModifier.Constant.defaultHorizontalAlignment
         }
         if let frameMaxHeight = weight.frameMaxHeight {
-            maxHeight = frameMaxHeight
+            // Growing to fill the parent must not lift an explicit upper bound.
+            maxHeight = min(frameMaxHeight, authoredMaxHeight)
             alignment.vertical = weight.alignment.asVerticalType ?? WeightModifier.Constant.defaultVerticalAlignment
         }
 
@@ -116,12 +123,14 @@ internal extension View {
                                                         parentWidth: parentWidth,
                                                         parentOverride: parentOverride)
         if let frameMaxWidth = alignSelfStretch.frameMaxWidth {
-            maxWidth = frameMaxWidth
+            // Stretching to fill the parent must not lift an explicit upper bound.
+            maxWidth = min(frameMaxWidth, authoredMaxWidth)
             alignment.horizontal = alignSelfStretch.wrapperAlignment?.asHorizontalType ??
             AlignSelfStretchModifier.Constant.defaultHorizontalAlignment
         }
         if let frameMaxHeight = alignSelfStretch.frameMaxHeight {
-            maxHeight = frameMaxHeight
+            // Stretching to fill the parent must not lift an explicit upper bound.
+            maxHeight = min(frameMaxHeight, authoredMaxHeight)
             alignment.vertical = alignSelfStretch.wrapperAlignment?.asVerticalType ??
             AlignSelfStretchModifier.Constant.defaultVerticalAlignment
         }
