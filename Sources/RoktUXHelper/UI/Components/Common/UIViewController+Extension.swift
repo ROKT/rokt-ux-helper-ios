@@ -275,8 +275,9 @@ extension UIViewController {
             let medium: UISheetPresentationController.Detent = .custom(identifier: mediumId) { context in
                 context.maximumDetentValue * CGFloat(value/100)
             }
-            sheet.detents = [medium]
-            sheet.selectedDetentIdentifier = mediumId
+            let isInitiallyExpanded = Self.isBottomSheetExpanded(in: layoutState.items)
+            sheet.detents = isInitiallyExpanded ? [.large()] : [medium]
+            sheet.selectedDetentIdentifier = isInitiallyExpanded ? .large : mediumId
             // Mirror user-drag detent changes back into BottomSheetExpandedState so the
             // layout's expanded-state Whens render in sync with the sheet height. With
             // only one detent registered at a time the user can't physically drag between

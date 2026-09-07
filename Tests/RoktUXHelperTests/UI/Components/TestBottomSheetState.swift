@@ -77,6 +77,19 @@ final class TestBottomSheetState: XCTestCase {
         XCTAssertNil(state.items[LayoutState.customStateMap])
     }
 
+    func testPlatformSheetRestoredExpansionIsConfiguredBeforePresentationRequest() throws {
+        let state = restoredState(globalValue: 1)
+        let presenter = TestPresenter()
+
+        presenter.present(placementType: .BottomSheet(.fixed), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: {}, onUnLoad: {}) { _ in Text("Example offer") }
+
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        defer { modal.detentObserverCancellable?.cancel() }
+        XCTAssertEqual(presenter.platformDetentsAtRequest, [.large])
+        XCTAssertEqual(presenter.platformSelectedDetentAtRequest, .large)
+    }
+
     func testDetentChangeUpdatesAndPersistsGlobalOwnerWithoutLocalBinding() throws {
         var captured: [RoktPluginViewState] = []
         let state = restoredState(globalValue: 1, onChange: { captured.append($0) })
@@ -399,12 +412,18 @@ final class TestBottomSheetState: XCTestCase {
         var configuredController: UIViewController?
         var presentationCompletion: (() -> Void)?
         var presentationControllerAtRequest: RoktBottomSheetPresentationController?
+        var platformDetentsAtRequest: [UISheetPresentationController.Detent.Identifier]?
+        var platformSelectedDetentAtRequest: UISheetPresentationController.Detent.Identifier?
         override var traitCollection: UITraitCollection { UITraitCollection(horizontalSizeClass: .compact) }
         override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool,
                               completion: (() -> Void)? = nil) {
             // Read the delegate's existing reference without asking UIKit to create a controller.
             presentationControllerAtRequest = (viewControllerToPresent as? RoktUXSwiftUIViewController)?
                 .bottomSheetTransitioningDelegate?.presentationController
+            if let sheet = viewControllerToPresent.sheetPresentationController {
+                platformDetentsAtRequest = sheet.detents.map(\.identifier)
+                platformSelectedDetentAtRequest = sheet.selectedDetentIdentifier
+            }
             configuredController = viewControllerToPresent
             presentationCompletion = completion
         }
