@@ -134,7 +134,8 @@ final class TestBottomSheetState: XCTestCase {
     }
 
     func testDetentChangeKeepsExistingOfferStateLocal() throws {
-        let state = LayoutState()
+        var captured: [RoktPluginViewState] = []
+        let state = LayoutState(pluginId: "example-plugin", onPluginViewStateChange: { captured.append($0) })
         let local = LocalState([CustomStateIdentifiable(position: 2, key: key): 1])
         state.items[LayoutState.customStateMap] = local.binding
         state.items[LayoutState.currentProgressKey] = Binding.constant(2)
@@ -149,6 +150,9 @@ final class TestBottomSheetState: XCTestCase {
 
         XCTAssertEqual(local.values?[CustomStateIdentifiable(position: 2, key: key)], 0)
         XCTAssertNil(state.globalCustomStateValue(for: key))
+        XCTAssertEqual(captured.count, 1)
+        XCTAssertEqual(captured.last?.offerIndex, 2)
+        XCTAssertEqual(captured.last?.customStateMap?[CustomStateIdentifiable(position: 2, key: key)], 0)
     }
 
     func testDetentChangeDoesNotCreateStateForADifferentOffer() throws {
