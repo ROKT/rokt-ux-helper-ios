@@ -134,8 +134,7 @@ final class TestBottomSheetState: XCTestCase {
     }
 
     func testDetentChangeKeepsExistingOfferStateLocal() throws {
-        var captured: [RoktPluginViewState] = []
-        let state = LayoutState(pluginId: "example-plugin", onPluginViewStateChange: { captured.append($0) })
+        let state = LayoutState()
         let local = LocalState([CustomStateIdentifiable(position: 2, key: key): 1])
         state.items[LayoutState.customStateMap] = local.binding
         state.items[LayoutState.currentProgressKey] = Binding.constant(2)
@@ -150,9 +149,55 @@ final class TestBottomSheetState: XCTestCase {
 
         XCTAssertEqual(local.values?[CustomStateIdentifiable(position: 2, key: key)], 0)
         XCTAssertNil(state.globalCustomStateValue(for: key))
+    }
+
+    func testDetentChangePersistsOnceThroughOfferDistribution() async throws {
+        var captured: [RoktPluginViewState] = []
+        let state = LayoutState(pluginId: "example-plugin", onPluginViewStateChange: { captured.append($0) })
+        let schema = try JSONDecoder().decode(LayoutSchemaModel.self, from: Data(#"""
+        {"type":"ToggleButtonStateTrigger","node":{"customStateKey":"BottomSheetExpandedState",
+          "children":[{"type":"BasicText","node":{"value":"Toggle sheet"}}]}}
+        """#.utf8))
+        let slot = SlotModel(instanceGuid: "example-slot", offer: .mock(),
+                             layoutVariant: LayoutVariantModel(layoutVariantSchema: schema,
+                                                               moduleName: "standard-marketing"),
+                             jwtToken: "")
+        let transformer = ProductCarouselIntegrationFixture.transformer(slots: [slot], state: state)
+        let layout = try transformer.transform(ProductCarouselIntegrationFixture.distributions[0],
+                                               context: .outer([slot.offer]))
+        let content = LayoutSchemaComponent(config: .init(parent: .column, position: nil), layout: layout,
+                                            parentWidth: .constant(350), parentHeight: .constant(nil),
+                                            styleState: .constant(.default))
+            .environmentObject(GlobalScreenSize())
+        let scene = try configureSheet(state: state, content: content)
+        defer { scene.tearDown() }
+        let identifier = CustomStateIdentifiable(position: 0, key: key)
+        await waitUntil("Distribution registers its local state") {
+            state.items[LayoutState.customStateMap] != nil
+        }
+
+        state.actionCollection[.toggleCustomState](identifier)
+        await waitUntil("Initial offer state is persisted") {
+            captured.last?.customStateMap?[identifier] == 1
+        }
+        let initialDrain = expectation(description: "Initial state observers settle")
+        DispatchQueue.main.async { initialDrain.fulfill() }
+        _ = await XCTWaiter.fulfillment(of: [initialDrain], timeout: 3)
+        captured.removeAll()
+
+        scene.sheet.selectedDetentIdentifier = mediumID
+        let delegate = try XCTUnwrap(scene.modal.sheetSyncDelegate as? BottomSheetDetentSyncDelegate)
+        delegate.sheetPresentationControllerDidChangeSelectedDetentIdentifier(scene.sheet)
+        await waitUntil("Collapsed offer state is persisted") {
+            captured.last?.customStateMap?[identifier] == 0
+        }
+        let callbackDrain = expectation(description: "Detent state observers settle")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { callbackDrain.fulfill() }
+        _ = await XCTWaiter.fulfillment(of: [callbackDrain], timeout: 3)
+
         XCTAssertEqual(captured.count, 1)
-        XCTAssertEqual(captured.last?.offerIndex, 2)
-        XCTAssertEqual(captured.last?.customStateMap?[CustomStateIdentifiable(position: 2, key: key)], 0)
+        XCTAssertEqual(captured.last?.offerIndex, 0)
+        XCTAssertEqual(captured.last?.customStateMap?[identifier], 0)
     }
 
     func testDetentChangeDoesNotCreateStateForADifferentOffer() throws {

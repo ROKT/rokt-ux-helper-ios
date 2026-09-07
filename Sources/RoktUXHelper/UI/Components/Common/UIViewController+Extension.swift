@@ -442,7 +442,6 @@ final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControll
             map[identifier] = newValue
             binding.wrappedValue = map
             layoutState.publishStateChange()
-            layoutState.capturePluginViewState(offerIndex: position, dismiss: false)
         }
     }
 }
