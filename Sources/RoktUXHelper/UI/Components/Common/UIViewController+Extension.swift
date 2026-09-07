@@ -167,6 +167,9 @@ extension UIViewController {
         let isExpandable: Bool
         if !isDynamic, case .percentage = bottomSheetHeightDimension(bottomSheetUIModel) {
             isExpandable = true
+            modal.bottomSheetPresentationController?.setExpanded(
+                Self.isBottomSheetExpanded(in: layoutState.items), animated: false
+            )
             observeExpandedState(modal: modal, layoutState: layoutState)
         } else {
             isExpandable = false
@@ -223,6 +226,11 @@ extension UIViewController {
             .sink { [weak modal] items in
                 guard let controller = modal?.bottomSheetPresentationController else { return }
                 let isExpanded = Self.isBottomSheetExpanded(in: items)
+                guard controller.maximumSheetHeight > 0 else {
+                    // Preserve the resolver before UIKit can give the sheet a non-zero height.
+                    controller.setExpanded(isExpanded, animated: false)
+                    return
+                }
                 let target = isExpanded ? controller.maximumSheetHeight : controller.collapsedHeight
                 guard abs(controller.resolvedSheetHeight - target) > 0.5 else { return }
                 controller.setExpanded(isExpanded, animated: true)

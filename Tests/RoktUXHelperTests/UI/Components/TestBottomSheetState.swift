@@ -246,6 +246,50 @@ final class TestBottomSheetState: XCTestCase {
         XCTAssertEqual(state.globalCustomStateValue(for: key), 1)
     }
 
+    func testFullBleedControllerIsPreparedBeforePresentationIsRequested() throws {
+        let state = restoredState(globalValue: 1)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                    bottomSheetPresentation: .fullBleed)
+        let presenter = TestPresenter()
+        presenter.present(placementType: .BottomSheet(.fixed), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: {}, onUnLoad: {}) { _ in Text("Example offer") }
+        let prepared = try XCTUnwrap(presenter.presentationControllerAtRequest)
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        defer { modal.detentObserverCancellable?.cancel() }
+        XCTAssertTrue(prepared === modal.bottomSheetPresentationController)
+    }
+
+    func testFullBleedPublicationUpdatesResolverBeforeContainerExists() async throws {
+        let state = restoredState(globalValue: 0)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                    bottomSheetPresentation: .fullBleed)
+        let presenter = TestPresenter()
+        presenter.present(placementType: .BottomSheet(.fixed), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: {}, onUnLoad: {}) { _ in Text("Example offer") }
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        defer { modal.detentObserverCancellable?.cancel() }
+        let sheet = try XCTUnwrap(modal.bottomSheetPresentationController)
+        XCTAssertEqual(sheet.maximumSheetHeight, 0, "This fixture has no presentation container")
+
+        for value in [1, 0] {
+            var previousResolverCalls = 0
+            sheet.setSheetHeight({ maximum in
+                previousResolverCalls += 1
+                return maximum/2
+            }, animated: false)
+            previousResolverCalls = 0
+            _ = sheet.resolvedSheetHeight
+            XCTAssertEqual(previousResolverCalls, 1)
+
+            state.setGlobalCustomState(key: key, value: value)
+            await waitUntil("Publication preserves the resolver before container geometry exists") {
+                let previousCalls = previousResolverCalls
+                _ = sheet.resolvedSheetHeight
+                return previousResolverCalls == previousCalls
+            }
+        }
+    }
+
     func testDynamicFullBleedLoadsOnceAfterMeasurementNotPresentation() async throws {
         let state = restoredState(globalValue: 1)
         state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
@@ -354,9 +398,13 @@ final class TestBottomSheetState: XCTestCase {
     private final class TestPresenter: UIViewController {
         var configuredController: UIViewController?
         var presentationCompletion: (() -> Void)?
+        var presentationControllerAtRequest: RoktBottomSheetPresentationController?
         override var traitCollection: UITraitCollection { UITraitCollection(horizontalSizeClass: .compact) }
         override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool,
                               completion: (() -> Void)? = nil) {
+            // Read the delegate's existing reference without asking UIKit to create a controller.
+            presentationControllerAtRequest = (viewControllerToPresent as? RoktUXSwiftUIViewController)?
+                .bottomSheetTransitioningDelegate?.presentationController
             configuredController = viewControllerToPresent
             presentationCompletion = completion
         }
