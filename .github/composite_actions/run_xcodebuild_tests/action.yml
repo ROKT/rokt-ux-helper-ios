@@ -57,14 +57,9 @@ runs:
         path: snapshot-failures/
         if-no-files-found: warn
 
-    # Coverage post-processing (below) reads the .xcresult bundle that xcodebuild
-    # writes asynchronously in the background. Xcode's own log ('...log hasn't
-    # finished recording after waiting 30 seconds') shows this write can still be
-    # in flight once the test step above has already exited 0. Tests have already
-    # passed or failed by that point, so a coverage-extraction or upload failure
-    # here is marked continue-on-error: it must never flip a green test run red.
-    # A real test failure is unaffected: it fails the untouched "Run unit tests"
-    # step above, which has no continue-on-error and still fails the job.
+    # The .xcresult bundle is written asynchronously, so coverage extraction can
+    # race it. Coverage is non-fatal for that reason; test outcome comes from the
+    # test step, not from these.
     - name: Install xcresultparser
       if: ${{ inputs.codecov-token != '' }}
       continue-on-error: true
