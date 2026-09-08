@@ -14,7 +14,7 @@
   "plugins": [
     {
       "plugin": {
-        "id": "2732370593714667533",
+        "id": "16",
         "name": "test layout",
         "target_element_selector": "Location1",
         "config": {
@@ -91,7 +91,7 @@
                   },
                   "response_options_map": {
                     "positive": {
-                      "id": "2732356166940819464",
+                      "id": "17",
                       "action": "Url",
                       "instance_guid": "549a346b-cd76-4f04-bccd-a1168c870e97",
                       "signal_type": "SignalResponse",
