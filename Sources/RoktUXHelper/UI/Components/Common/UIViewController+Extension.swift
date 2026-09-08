@@ -164,14 +164,28 @@ extension UIViewController {
         // UIViewController holds transitioningDelegate weakly.
         modal.bottomSheetTransitioningDelegate = transitioningDelegate
 
+        let isExpandable: Bool
         if !isDynamic, case .percentage = bottomSheetHeightDimension(bottomSheetUIModel) {
+            isExpandable = true
+            modal.bottomSheetPresentationController?.setExpanded(
+                Self.isBottomSheetExpanded(in: layoutState.items), animated: false
+            )
             observeExpandedState(modal: modal, layoutState: layoutState)
+        } else {
+            isExpandable = false
         }
 
         self.present(modal, animated: true, completion: { [weak modal] in
             if let modal, let pending = modal.pendingBottomSheetHeight {
                 modal.pendingBottomSheetHeight = nil
                 modal.bottomSheetPresentationController?.setSheetHeight(pending, animated: false)
+            }
+            if isExpandable, let modal {
+                // The initial publication can precede the controller or its container geometry.
+                // Reconcile the latest state before onLoad, without waiting for another toggle.
+                modal.bottomSheetPresentationController?.setExpanded(
+                    Self.isBottomSheetExpanded(in: layoutState.items), animated: false
+                )
             }
             if !isDynamic {
                 onLoad()
@@ -212,6 +226,11 @@ extension UIViewController {
             .sink { [weak modal] items in
                 guard let controller = modal?.bottomSheetPresentationController else { return }
                 let isExpanded = Self.isBottomSheetExpanded(in: items)
+                guard controller.maximumSheetHeight > 0 else {
+                    // Preserve the resolver before UIKit can give the sheet a non-zero height.
+                    controller.setExpanded(isExpanded, animated: false)
+                    return
+                }
                 let target = isExpanded ? controller.maximumSheetHeight : controller.collapsedHeight
                 guard abs(controller.resolvedSheetHeight - target) > 0.5 else { return }
                 controller.setExpanded(isExpanded, animated: true)
@@ -256,8 +275,9 @@ extension UIViewController {
             let medium: UISheetPresentationController.Detent = .custom(identifier: mediumId) { context in
                 context.maximumDetentValue * CGFloat(value/100)
             }
-            sheet.detents = [medium]
-            sheet.selectedDetentIdentifier = mediumId
+            let isInitiallyExpanded = Self.isBottomSheetExpanded(in: layoutState.items)
+            sheet.detents = isInitiallyExpanded ? [.large()] : [medium]
+            sheet.selectedDetentIdentifier = isInitiallyExpanded ? .large : mediumId
             // Mirror user-drag detent changes back into BottomSheetExpandedState so the
             // layout's expanded-state Whens render in sync with the sheet height. With
             // only one detent registered at a time the user can't physically drag between
@@ -312,6 +332,11 @@ extension UIViewController {
     /// Whether the layout has toggled its expanded state on. Read by both the full-bleed and the
     /// custom-detent paths, so it lives here rather than being spelled out in each observer.
     static func isBottomSheetExpanded(in items: [String: Any]) -> Bool {
+        let global = (items[LayoutState.globalCustomStateMapKey] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
+        if let value = global?[CustomStateIdentifiable(position: nil, key: expandedStateKey)] {
+            // An explicit global collapse must win over retained per-offer expansion state.
+            return value == 1
+        }
         let map = (items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>)?.wrappedValue
         return map?.contains { $0.key.key == expandedStateKey && $0.value == 1 } ?? false
     }
@@ -395,15 +420,24 @@ final class BottomSheetDetentSyncDelegate: NSObject, UISheetPresentationControll
     }
 
     func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheet: UISheetPresentationController) {
-        guard let layoutState,
-              let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?> else {
+        guard let layoutState else { return }
+        let key = UIViewController.expandedStateKey
+        let newValue = sheet.selectedDetentIdentifier == .large ? 1 : 0
+        if let globalValue = layoutState.globalCustomStateValue(for: key) {
+            if globalValue != newValue {
+                layoutState.setGlobalCustomState(key: key, value: newValue)
+                layoutState.capturePluginViewState(offerIndex: nil, dismiss: false)
+            }
             return
         }
-        let isLarge = sheet.selectedDetentIdentifier == .large
         let position = (layoutState.items[LayoutState.currentProgressKey] as? Binding<Int>)?.wrappedValue ?? 0
-        let identifier = CustomStateIdentifiable(position: position, key: "BottomSheetExpandedState")
-        var map = binding.wrappedValue ?? RoktUXCustomStateMap()
-        let newValue = isLarge ? 1 : 0
+        let identifier = CustomStateIdentifiable(position: position, key: key)
+        guard let binding = layoutState.items[LayoutState.customStateMap] as? Binding<RoktUXCustomStateMap?>,
+              var map = binding.wrappedValue,
+              map[identifier] != nil else {
+            // A callback must not create expansion state for an offer that never set it.
+            return
+        }
         if map[identifier] != newValue {
             map[identifier] = newValue
             binding.wrappedValue = map
