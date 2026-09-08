@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Render products in an independent carousel ([#350](https://github.com/ROKT/rokt-ux-helper-ios/pull/350))
 - Preserve product response data and item context ([#347](https://github.com/ROKT/rokt-ux-helper-ios/pull/347))
 - Add native inline text and character slicing ([#349](https://github.com/ROKT/rokt-ux-helper-ios/pull/349))
-- Surface sessionId and separate no-offers from render f… ([#342](https://github.com/ROKT/rokt-ux-helper-ios/pull/342))
+- Surface sessionId and separate no-offers from render failures ([#342](https://github.com/ROKT/rokt-ux-helper-ios/pull/342))
 
 ### Fixed
 
