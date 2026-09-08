@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-08
+
+### Added
+
+- Present full-bleed bottom sheets from the SDK ([#355](https://github.com/ROKT/rokt-ux-helper-ios/pull/355))
+- Integrate inline copy and product carousels ([#351](https://github.com/ROKT/rokt-ux-helper-ios/pull/351))
+- Route product URLs and emit product events ([#348](https://github.com/ROKT/rokt-ux-helper-ios/pull/348))
+- Render products in an independent carousel ([#350](https://github.com/ROKT/rokt-ux-helper-ios/pull/350))
+- Preserve product response data and item context ([#347](https://github.com/ROKT/rokt-ux-helper-ios/pull/347))
+- Add native inline text and character slicing ([#349](https://github.com/ROKT/rokt-ux-helper-ios/pull/349))
+- Surface sessionId and separate no-offers from render failures ([#342](https://github.com/ROKT/rokt-ux-helper-ios/pull/342))
+
+### Fixed
+
+- Honor global expansion state ([#358](https://github.com/ROKT/rokt-ux-helper-ios/pull/358))
+- Apply scroll container sizing to the viewport ([#345](https://github.com/ROKT/rokt-ux-helper-ios/pull/345))
+
+### Changed
+
+- Clarify native validation and public content rules ([#357](https://github.com/ROKT/rokt-ux-helper-ios/pull/357))
+- Scope Trunk Check to the PR diff instead of the whole repo ([#354](https://github.com/ROKT/rokt-ux-helper-ios/pull/354))
+- Upgrade trunk ([#353](https://github.com/ROKT/rokt-ux-helper-ios/pull/353))
+- Trim AGENTS.md to the non-derivable core ([#352](https://github.com/ROKT/rokt-ux-helper-ios/pull/352))
+- Bump trunk-io/trunk-action from 1.3.1 to 2.0.0 ([#346](https://github.com/ROKT/rokt-ux-helper-ios/pull/346))
+
 ## [2.0.0] - 2026-08-11
 
 ### Breaking Changes
@@ -423,7 +448,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...2.0.0
 [1.0.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...1.0.0
