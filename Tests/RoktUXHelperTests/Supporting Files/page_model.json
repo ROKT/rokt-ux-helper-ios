@@ -1,14 +1,14 @@
 {
-  "session_id": "afbc0187-2d0f-4ac2-b852-a60a1e02b1a0",
+  "session_id": "00000000-0000-4000-8000-000000000006",
   "session_token": {
     "token": "topmost-token",
     "expires_at": 0
   },
-  "page_instance_guid": "afbc0187-2d0f-4ad4-be6b-7545f9273565",
+  "page_instance_guid": "00000000-0000-4000-8000-000000000007",
   "page_context": {
-    "page_id": "edecb4b2-91a5-4fd7-859f-82347b6e79fd",
+    "page_id": "00000000-0000-4000-8000-000000000008",
     "rokt_tag_id": "",
-    "page_instance_guid": "afbc0187-2d0f-4ad4-be6b-7545f9273565",
+    "page_instance_guid": "00000000-0000-4000-8000-000000000007",
     "token": "placement-context-token"
   },
   "plugins": [
@@ -18,7 +18,7 @@
         "name": "test layout",
         "target_element_selector": "Location1",
         "config": {
-          "instance_guid": "21b61e93-24bd-4735-995a-2f14d0673ec2",
+          "instance_guid": "00000000-0000-4000-8000-000000000001",
           "token": "plugin-config-token",
           "outer_layout_schema": "{ \"breakpoints\": { \"Landscape\": 500, \"Portrait\": 560 }, \"layout\": { \"type\": \"Overlay\", \"node\": { \"allowBackdropToClose\": true, \"styles\": { \"elements\": { \"own\": [ { \"default\": { \"border\": { \"borderRadius\": 0 }, \"spacing\": { \"margin\": \"10 10 10 10\" }, \"background\": { \"backgroundColor\": { \"light\": \"#FFFFFFFF\", \"dark\": \"#FFFFFFFF\" } } } } ], \"wrapper\": [ { \"default\": { \"background\": { \"backgroundColor\": { \"light\": \"#520E0A13\", \"dark\": \"#520E0A13\" } } } } ] } }, \"children\": [ { \"type\": \"Column\", \"node\": { \"styles\": { \"elements\": { \"own\": [ { \"default\": { \"spacing\": { \"margin\": \"18 24 0 24\" } } } ] } }, \"children\": [] } }, { \"type\": \"OneByOneDistribution\", \"node\": { \"transition\": { \"type\": \"FadeInOut\", \"settings\": { \"duration\": 500 } } } } ] } } }",
           "slots": [
@@ -93,7 +93,7 @@
                     "positive": {
                       "id": "17",
                       "action": "Url",
-                      "instance_guid": "549a346b-cd76-4f04-bccd-a1168c870e97",
+                      "instance_guid": "00000000-0000-4000-8000-000000000004",
                       "signal_type": "SignalResponse",
                       "short_label": "YES PLEASE,,",
                       "long_label": "Yes",
