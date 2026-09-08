@@ -89,6 +89,7 @@ runs:
         token: ${{ inputs.codecov-token }}
         files: ./artifacts/coverage.xml
         flags: unittests
+        fail_ci_if_error: true
 
     - name: Warn on coverage post-processing failure
       if: >-
