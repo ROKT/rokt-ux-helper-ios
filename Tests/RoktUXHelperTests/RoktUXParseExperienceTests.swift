@@ -265,6 +265,7 @@ final class RoktUXParseExperienceTests: XCTestCase {
         // controller, showOverlay should emit presentationFailed.
         let response = ModelTestData.PageModelData.getJsonString(jsonFilename: "page_model")
         let sut = RoktUX()
+        sut.overlayMaxPresenterRetries = 0
         let failureExpectation = expectation(description: "LayoutFailure.presentationFailed")
 
         sut.loadLayout(

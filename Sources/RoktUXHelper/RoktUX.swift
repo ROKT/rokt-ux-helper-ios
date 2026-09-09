@@ -659,31 +659,26 @@ public class RoktUX: UXEventsDelegate {
         }
     }
 
+    // MARK: - Overlay presentation
+
+    /// Bounds how long overlay and bottom sheet presentation waits for the host UI to become ready.
+    var overlayMaxPresenterRetries = 12
+    var overlayPresenterRetryDelay: TimeInterval = 0.25
+
+    /// Seams that keep presenter resolution and retry timing deterministic in unit tests.
+    var topViewControllerProvider: (() -> UIViewController?)?
+    var scheduleOverlayRetry: ((TimeInterval, @escaping () -> Void) -> Void)?
+
     private func showOverlay<Content: View>(placementType: PlacementType?,
                                             bottomSheetUIModel: BottomSheetViewModel? = nil,
                                             layoutState: LayoutState,
                                             eventService: EventService?,
                                             onLoad: @escaping (() -> Void),
                                             onUnload: @escaping (() -> Void),
-                                            presentationAttempt: Int = 0,
                                             @ViewBuilder builder: @escaping (((CGFloat) -> Void)?) -> Content) {
         DispatchQueue.main.async {
-            if let viewController = self.getTopViewController() {
-                if let transitionCoordinator = viewController.transitionCoordinator,
-                   presentationAttempt < 3 {
-                    transitionCoordinator.animate(alongsideTransition: nil) { _ in
-                        self.showOverlay(placementType: placementType,
-                                         bottomSheetUIModel: bottomSheetUIModel,
-                                         layoutState: layoutState,
-                                         eventService: eventService,
-                                         onLoad: onLoad,
-                                         onUnload: onUnload,
-                                         presentationAttempt: presentationAttempt + 1,
-                                         builder: builder)
-                    }
-                    return
-                }
-
+            self.attemptOverlayPresentation(eventService: eventService,
+                                            onUnload: onUnload) { viewController in
                 viewController.present(placementType: placementType,
                                        bottomSheetUIModel: bottomSheetUIModel,
                                        layoutState: layoutState,
@@ -691,21 +686,68 @@ public class RoktUX: UXEventsDelegate {
                                        onLoad: onLoad,
                                        onUnLoad: onUnload,
                                        builder: builder)
-            } else {
-                RoktUXLogger.shared.error(
-                    "Layout rendering failed: overlay was not presented because no suitable top view "
-                        + "controller was found. Enable RoktUX logging (.warning or lower) for resolver details.",
-                    sessionId: eventService?.sessionId ?? self.sessionId
-                )
-                onUnload()
-                self.onRoktEvent?(
-                    RoktUXEvent.LayoutFailure(
-                        layoutId: eventService?.pluginId,
-                        sessionId: eventService?.sessionId ?? self.sessionId,
-                        reason: .presentationFailed
-                    )
-                )
             }
+        }
+    }
+
+    /// Resolves the presenter and independently bounds transition and presenter retries.
+    func attemptOverlayPresentation(eventService: EventService?,
+                                    onUnload: @escaping () -> Void,
+                                    transitionAttempt: Int = 0,
+                                    presenterRetryCount: Int = 0,
+                                    present: @escaping (UIViewController) -> Void) {
+        let sessionId = eventService?.sessionId ?? self.sessionId
+        let resolveTopVC = topViewControllerProvider ?? { [weak self] in self?.getTopViewController() }
+        let schedule = scheduleOverlayRetry ?? { delay, work in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        }
+
+        if let viewController = resolveTopVC() {
+            if let transitionCoordinator = viewController.transitionCoordinator,
+               transitionAttempt < 3 {
+                transitionCoordinator.animate(alongsideTransition: nil) { _ in
+                    self.attemptOverlayPresentation(eventService: eventService,
+                                                    onUnload: onUnload,
+                                                    transitionAttempt: transitionAttempt + 1,
+                                                    presenterRetryCount: presenterRetryCount,
+                                                    present: present)
+                }
+                return
+            }
+            present(viewController)
+        } else if presenterRetryCount < overlayMaxPresenterRetries {
+            RoktUXLogger.shared.debug(
+                "Overlay presenter not ready "
+                    + "(retry \(presenterRetryCount + 1)/\(overlayMaxPresenterRetries)); retrying.",
+                sessionId: sessionId
+            )
+            schedule(overlayPresenterRetryDelay) {
+                self.attemptOverlayPresentation(eventService: eventService,
+                                                onUnload: onUnload,
+                                                transitionAttempt: transitionAttempt,
+                                                presenterRetryCount: presenterRetryCount + 1,
+                                                present: present)
+            }
+        } else {
+            RoktUXLogger.shared.error(
+                "Layout rendering failed: overlay was not presented because no suitable top view "
+                    + "controller was found after \(overlayMaxPresenterRetries) retries. "
+                    + "Enable RoktUX logging (.warning or lower) for resolver details.",
+                sessionId: sessionId
+            )
+            eventService?.sendDiagnostics(
+                message: kAPIExecuteErrorCode,
+                callStack: kOverlayNotPresentedMessage + " after \(overlayMaxPresenterRetries) retries",
+                severity: .error
+            )
+            onUnload()
+            onRoktEvent?(
+                RoktUXEvent.LayoutFailure(
+                    layoutId: eventService?.pluginId,
+                    sessionId: sessionId,
+                    reason: .presentationFailed
+                )
+            )
         }
     }
 

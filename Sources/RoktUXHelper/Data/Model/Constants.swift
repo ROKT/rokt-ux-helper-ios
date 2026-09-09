@@ -42,6 +42,7 @@ let kPartnerTriggered = "PARTNER_TRIGGERED"
 // MARK: - String keys
 
 let kEmbeddedLayoutDoesntExistMessage = "Error embedded layout doesn't exist "
+let kOverlayNotPresentedMessage = "Error overlay/bottom sheet not presented: no suitable top view controller found"
 let kUIFontErrorMessage = "Font family not found: "
 let kStaticPageError = "Error on static page"
 let kInvalidHTMLFormatError = "Error parsing html: "
