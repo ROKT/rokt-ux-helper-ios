@@ -203,7 +203,7 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
         var transitionCompletion: (() -> Void)?
         ux.deferOverlayPresentation = { _, completion in
             transitionCompletion = completion
-            return true
+            return .registered
         }
         var unloadCount = 0
         var failures: [RoktUXEvent.LayoutFailure] = []
@@ -227,6 +227,37 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
         XCTAssertEqual(unloadCount, 1)
         XCTAssertEqual(failures.count, 1)
         XCTAssertEqual(failures.first?.reason, .presentationFailed)
+    }
+
+    func testRejectedTransitionRegistrationContinuesOnlyOnce() {
+        let ux = RoktUX()
+        let viewController = UIViewController()
+        var resolveCalls = 0
+        ux.topViewControllerProvider = {
+            resolveCalls += 1
+            return viewController
+        }
+        var transitionCompletions: [() -> Void] = []
+        ux.deferOverlayPresentation = { _, completion in
+            transitionCompletions.append(completion)
+            return .rejected
+        }
+        var presentationCount = 0
+
+        ux.attemptOverlayPresentation(eventService: nil, onUnload: {
+            XCTFail("must not unload")
+        }, present: { _ in
+            presentationCount += 1
+        })
+
+        XCTAssertEqual(resolveCalls, 4)
+        XCTAssertEqual(transitionCompletions.count, 3)
+        XCTAssertEqual(presentationCount, 1)
+
+        transitionCompletions.forEach { $0() }
+
+        XCTAssertEqual(resolveCalls, 4)
+        XCTAssertEqual(presentationCount, 1)
     }
 
     private func diagnosticValue(_ name: String, in event: RoktEventRequest?) -> String? {

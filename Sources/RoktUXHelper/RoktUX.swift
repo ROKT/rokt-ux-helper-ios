@@ -670,7 +670,12 @@ public class RoktUX: UXEventsDelegate {
     var topViewControllerProvider: (() -> UIViewController?)?
     var scheduleOverlayRetry: ((TimeInterval, @escaping () -> Void) -> Void)?
     var overlayPresentationTimeProvider: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
-    var deferOverlayPresentation: ((UIViewController, @escaping () -> Void) -> Bool)?
+    enum OverlayPresentationDeferral {
+        case notNeeded
+        case registered
+        case rejected
+    }
+    var deferOverlayPresentation: ((UIViewController, @escaping () -> Void) -> OverlayPresentationDeferral)?
 
     private func showOverlay<Content: View>(placementType: PlacementType?,
                                             bottomSheetUIModel: BottomSheetViewModel? = nil,
@@ -721,14 +726,17 @@ public class RoktUX: UXEventsDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         }
         let deferPresentation = deferOverlayPresentation ?? { viewController, completion in
-            guard let transitionCoordinator = viewController.transitionCoordinator else { return false }
-            transitionCoordinator.animate(alongsideTransition: nil) { _ in completion() }
-            return true
+            guard let transitionCoordinator = viewController.transitionCoordinator else { return .notNeeded }
+            let didRegister = transitionCoordinator.animate(alongsideTransition: nil) { _ in completion() }
+            return didRegister ? .registered : .rejected
         }
 
         if let viewController = resolveTopVC() {
             if transitionAttempt < 3 {
-                let didDeferPresentation = deferPresentation(viewController) {
+                var didContinuePresentation = false
+                let continuePresentation = {
+                    guard !didContinuePresentation else { return }
+                    didContinuePresentation = true
                     self.attemptOverlayPresentation(eventService: eventService,
                                                     onUnload: onUnload,
                                                     transitionAttempt: transitionAttempt + 1,
@@ -736,7 +744,15 @@ public class RoktUX: UXEventsDelegate {
                                                     presentationDeadline: presentationDeadline,
                                                     present: present)
                 }
-                if didDeferPresentation { return }
+                switch deferPresentation(viewController, continuePresentation) {
+                case .notNeeded:
+                    break
+                case .registered:
+                    return
+                case .rejected:
+                    continuePresentation()
+                    return
+                }
             }
             present(viewController)
         } else if presenterRetryCount < overlayMaxPresenterRetries {
