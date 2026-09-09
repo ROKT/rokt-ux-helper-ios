@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'RoktUXHelper'
-  s.version          = '2.1.0'
+  s.version          = '2.1.1'
   s.summary          = 'UX helper library for the Rokt SDK ecosystem.'
   s.swift_version    = '5.9'
 
