@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-09
+
+### Fixed
+
+- Retry overlay and bottom sheet presentation ([#362](https://github.com/ROKT/rokt-ux-helper-ios/pull/362))
+- Stop coverage post-processing flake from failing unit-test ([#361](https://github.com/ROKT/rokt-ux-helper-ios/pull/361))
+
+### Changed
+
+- Sanitise production-shaped values in demo/test fixtures ([#360](https://github.com/ROKT/rokt-ux-helper-ios/pull/360))
+
 ## [2.1.0] - 2026-09-08
 
 ### Added
@@ -448,7 +459,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...2.0.0
 [1.0.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...1.0.1
