@@ -16,7 +16,7 @@
     "plugins": [
         {
             "plugin": {
-                "id": "3578700651080056851",
+                "id": "6",
                 "name": "s2s",
                 "url": "https://wsdk.rokt.com/plugins/torrent/index.html",
                 "target_element_selector": "RoktTest",
@@ -28,24 +28,24 @@
                         {
                             "instance_guid": "slot:00000000-0000-4000-8000-000000000004",
                             "layout_variant": {
-                                "layout_variant_id": "3578700651080056852",
+                                "layout_variant_id": "layout_variant_id-2",
                                 "module_name": "s2s",
                                 "format_type": "Text",
                                 "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
                             },
                             "offer": {
-                                "campaign_id": "3433939246537244943",
-                                "account_id": "3048040266084948354",
+                                "campaign_id": "1",
+                                "account_id": "1",
                                 "max_total_items_qty_in_offer": 1,
                                 "creative": {
-                                    "referral_creative_id": "3505860184831885313",
+                                    "referral_creative_id": "3",
                                     "instance_guid": "ad:00000000-0000-4000-8000-000000000005",
-                                    "vertical_id": "811",
+                                    "vertical_id": "1",
                                     "response_options_map": {
                                         "negative": {
-                                            "id": "3505863543495262209",
+                                            "id": "7",
                                             "action": "CaptureOnly",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:negative:3505863543495262209",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:negative:7",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Decline",
                                             "long_label": "Decline",
@@ -53,9 +53,9 @@
                                             "token": "dummy.jwt.token"
                                         },
                                         "positive": {
-                                            "id": "3505863543495262208",
+                                            "id": "8",
                                             "action": "Url",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:positive:3505863543495262208",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000005:positive:8",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Yes please",
                                             "long_label": "Yes please",
@@ -194,24 +194,24 @@
                         {
                             "instance_guid": "slot:00000000-0000-4000-8000-000000000008",
                             "layout_variant": {
-                                "layout_variant_id": "3578700651080056852",
+                                "layout_variant_id": "layout_variant_id-2",
                                 "module_name": "s2s",
                                 "format_type": "Text",
                                 "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
                             },
                             "offer": {
-                                "campaign_id": "3508864523054088192",
-                                "account_id": "2694701772023591526",
+                                "campaign_id": "2",
+                                "account_id": "2",
                                 "max_total_items_qty_in_offer": 1,
                                 "creative": {
-                                    "referral_creative_id": "3565285369527730176",
+                                    "referral_creative_id": "4",
                                     "instance_guid": "ad:00000000-0000-4000-8000-000000000009",
-                                    "vertical_id": "811",
+                                    "vertical_id": "1",
                                     "response_options_map": {
                                         "negative": {
-                                            "id": "3565288298699161604",
+                                            "id": "9",
                                             "action": "CaptureOnly",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:negative:3565288298699161604",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:negative:9",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Decline",
                                             "long_label": "Decline",
@@ -219,9 +219,9 @@
                                             "token": "dummy.jwt.token"
                                         },
                                         "positive": {
-                                            "id": "3565288298699161600",
+                                            "id": "10",
                                             "action": "Url",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:positive:3565288298699161600",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000009:positive:10",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Claim now",
                                             "long_label": "Claim now",
@@ -322,24 +322,24 @@
                         {
                             "instance_guid": "slot:00000000-0000-4000-8000-000000000012",
                             "layout_variant": {
-                                "layout_variant_id": "3578700651080056853",
+                                "layout_variant_id": "layout_variant_id-3",
                                 "module_name": "s2s",
                                 "format_type": "Benefits",
                                 "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
                             },
                             "offer": {
-                                "campaign_id": "3232796573634789835",
-                                "account_id": "3100361304281724392",
+                                "campaign_id": "3",
+                                "account_id": "3",
                                 "max_total_items_qty_in_offer": 1,
                                 "creative": {
-                                    "referral_creative_id": "3573471263663980544",
+                                    "referral_creative_id": "5",
                                     "instance_guid": "ad:00000000-0000-4000-8000-000000000013",
-                                    "vertical_id": "1404",
+                                    "vertical_id": "2",
                                     "response_options_map": {
                                         "negative": {
-                                            "id": "3573472758305193986",
+                                            "id": "11",
                                             "action": "CaptureOnly",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:negative:3573472758305193986",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:negative:11",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Decline",
                                             "long_label": "Decline",
@@ -347,9 +347,9 @@
                                             "token": "dummy.jwt.token"
                                         },
                                         "positive": {
-                                            "id": "3573472758305193985",
+                                            "id": "12",
                                             "action": "Url",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:positive:3573472758305193985",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000013:positive:12",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Join Acme Auto",
                                             "long_label": "Join Acme Auto",
@@ -439,24 +439,24 @@
                         {
                             "instance_guid": "slot:00000000-0000-4000-8000-000000000015",
                             "layout_variant": {
-                                "layout_variant_id": "3578700651080056852",
+                                "layout_variant_id": "layout_variant_id-2",
                                 "module_name": "s2s",
                                 "format_type": "Text",
                                 "layout_variant_schema": "{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"When\",\"node\":{\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"condition\":\"is-not\",\"value\":\"0\"}}],\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"type\":\"DataImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80.0}},\"flexChild\":{\"alignSelf\":\"center\"},\"spacing\":{\"margin\":\"0 0 16 0\"}}}]}},\"imageKey\":\"creativeImage\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":18.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"700\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.title|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"4 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.copy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"%^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#000000\",\"dark\":\"#000000\"},\"fontSize\":14.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.confirmation|^%\"}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"16 0 0 0\"}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"positive\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\",\"margin\":\"0 0 10 0\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"CreativeResponse\",\"node\":{\"responseKey\":\"negative\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"borderWidth\":\"1\"},\"dimension\":{\"minWidth\":30.0,\"maxWidth\":30.0,\"minHeight\":40.0},\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"8 16 8 16\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#E21216\",\"dark\":\"#E21216\"},\"fontSize\":16.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"textTransform\":\"uppercase\"}}}]}},\"value\":\"%^DATA.creativeResponse.longLabel^%\"}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 0 0 0\"},\"text\":{\"textColor\":{\"light\":\"#6E6D6D\",\"dark\":\"#6E6D6D\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\"}}}]}},\"value\":\"%^DATA.creativeCopy.creative.disclaimer|^%\"}}]}}]}}]}}"
                             },
                             "offer": {
-                                "campaign_id": "3519165035747934208",
-                                "account_id": "3420702250512150528",
+                                "campaign_id": "4",
+                                "account_id": "4",
                                 "max_total_items_qty_in_offer": 1,
                                 "creative": {
-                                    "referral_creative_id": "3573049484987924480",
+                                    "referral_creative_id": "6",
                                     "instance_guid": "ad:00000000-0000-4000-8000-000000000016",
-                                    "vertical_id": "2103",
+                                    "vertical_id": "3",
                                     "response_options_map": {
                                         "negative": {
-                                            "id": "3573049974616883205",
+                                            "id": "13",
                                             "action": "CaptureOnly",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:negative:3573049974616883205",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:negative:13",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Decline",
                                             "long_label": "Decline",
@@ -464,9 +464,9 @@
                                             "token": "dummy.jwt.token"
                                         },
                                         "positive": {
-                                            "id": "3573049974616883204",
+                                            "id": "14",
                                             "action": "Url",
-                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:positive:3573049974616883204",
+                                            "instance_guid": "responseoption:00000000-0000-4000-8000-000000000016:positive:14",
                                             "signal_type": "SignalResponse",
                                             "short_label": "Claim my free week",
                                             "long_label": "Claim my free week",
@@ -545,7 +545,7 @@
                             "token": "dummy.jwt.token"
                         }
                     ],
-                    "instance_guid": "layout:00000000-0000-4000-8000-000000000002:3578700651080056851",
+                    "instance_guid": "layout:00000000-0000-4000-8000-000000000002:6",
                     "outer_layout_schema": "{\"breakpoints\":{\"tablet\":512.0,\"desktop\":640.0},\"layout\":{\"type\":\"Overlay\",\"node\":{\"allowBackdropToClose\":true,\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"maxWidth\":650.0,\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"alignSelf\":\"flex-start\"},\"spacing\":{\"margin\":\"10 10 10 10\"}}}],\"wrapper\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":\"#80000000\"}}}}]}},\"children\":[{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"24 16 16 8\"},\"text\":{\"textColor\":{\"light\":\"#2E3136\",\"dark\":\"#2E3136\"},\"fontSize\":24.0,\"fontFamily\":\"System\",\"fontWeight\":\"700\",\"horizontalTextAlign\":\"left\"}}}]}},\"value\":\"Order confirmed\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":14.0},\"height\":{\"type\":\"fixed\",\"value\":14.0}},\"spacing\":{\"margin\":\"0 16 0 0\"}}}]}},\"children\":[{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=\"}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16 10 10\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"OneByOneDistribution\",\"node\":{\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}}}]}}]}},{\"type\":\"ProgressIndicator\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22.0},\"height\":{\"type\":\"fixed\",\"value\":5.5}},\"spacing\":{\"margin\":\"0 4 0 0\"}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}]}},\"indicator\":\"‏‏‎ ‎\",\"accessibilityHidden\":true}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"flex-start\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 16 24 8\"},\"text\":{\"textColor\":{\"light\":\"#999999\",\"dark\":\"#999999\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"horizontalTextAlign\":\"left\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#266DCC\",\"dark\":\"#266DCC\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"<a href=\\\"https://example.invalid/privacy-policy\\\">Privacy Policy</a>\"}}]}}]}}]}},\"display\":\"FULLSCREEN\"}",
                     "layout_schema_version": "2.8",
                     "token": "dummy.jwt.token"
@@ -583,151 +583,55 @@
             "token": "dummy.jwt.token"
         },
         "ad:00000000-0000-4000-8000-000000000005": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "CampaignImpressionV2",
-                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDA3LThlZTctNmMyZGJiOGVkZWFmMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM0MzM5MzkyNDY1MzcyNDQ5NDNCAzMwNEoTMzA0ODA0MDI2NjA4NDk0ODM1NFITMzUwNTg2MDE4NDgzMTg4NTMxM1okMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTAyNTE4ODY3Nzg3MzgyNzg0"
-                }
-            }
-        },
-        "ad:00000000-0000-4000-8000-000000000009": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "CampaignImpressionV2",
-                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDBjLTg4YTQtY2M5NGViODc5ZjNiMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MDg4NjQ1MjMwNTQwODgxOTJCAzMwNEoTMjY5NDcwMTc3MjAyMzU5MTUyNlITMzU2NTI4NTM2OTUyNzczMDE3NlokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTUyNjg3ODczOTYwOTAyNjU2"
-                }
-            }
-        },
-        "ad:00000000-0000-4000-8000-000000000013": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "CampaignImpressionV2",
-                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDEyLTg0MmMtODhlNTA4ZmJmMTAwMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzMyMzI3OTY1NzM2MzQ3ODk4MzVCAzMwNEoTMzEwMDM2MTMwNDI4MTcyNDM5MlITMzU3MzQ3MTI2MzY2Mzk4MDU0NFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzMzQ5MzUwNjAwMDg3NTAzMjg3"
-                }
-            }
-        },
-        "ad:00000000-0000-4000-8000-000000000016": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "CampaignImpressionV2",
-                    "payload": "CkN0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLkNhbXBhaWduSW1wcmVzc2lvblBheWxvYWREYXRhEqkCCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQASokMDE5ZmQ3YmYtZTg2Yi03NDE2LWIzYTUtMmVlYzA1NTVmY2E0MiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MTkxNjUwMzU3NDc5MzQyMDhCAzMwNEoTMzQyMDcwMjI1MDUxMjE1MDUyOFITMzU3MzA0OTQ4NDk4NzkyNDQ4MFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUN6B2FjcXVpcmWKARMzNTUzMTAxNzc5OTY0OTE5ODA4"
-                }
-            }
-        },
-        "layout:00000000-0000-4000-8000-000000000002:3578700651080056851": {
             "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000005:negative:3505863543495262209": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "NegativeResponseV2",
-                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQwNy04ZWU3LTZjMmRiYjhlZGVhZjIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNDMzOTM5MjQ2NTM3MjQ0OTQzQgMzMDRKEzMwNDgwNDAyNjYwODQ5NDgzNTRSEzM1MDU4NjAxODQ4MzE4ODUzMTNaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
-                }
-            }
+        "ad:00000000-0000-4000-8000-000000000009": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000005:positive:3505863543495262208": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "ReferralV2",
-                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDA3LThlZTctNmMyZGJiOGVkZWFmMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM0MzM5MzkyNDY1MzcyNDQ5NDNCAzMwNEoTMzA0ODA0MDI2NjA4NDk0ODM1NFITMzUwNTg2MDE4NDgzMTg4NTMxM1okMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
-                }
-            }
+        "ad:00000000-0000-4000-8000-000000000013": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000009:negative:3565288298699161604": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "NegativeResponseV2",
-                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQwYy04OGE0LWNjOTRlYjg3OWYzYjIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNTA4ODY0NTIzMDU0MDg4MTkyQgMzMDRKEzI2OTQ3MDE3NzIwMjM1OTE1MjZSEzM1NjUyODUzNjk1Mjc3MzAxNzZaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
-                }
-            }
+        "ad:00000000-0000-4000-8000-000000000016": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000009:positive:3565288298699161600": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "ReferralV2",
-                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDBjLTg4YTQtY2M5NGViODc5ZjNiMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MDg4NjQ1MjMwNTQwODgxOTJCAzMwNEoTMjY5NDcwMTc3MjAyMzU5MTUyNlITMzU2NTI4NTM2OTUyNzczMDE3NlokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
-                }
-            }
+        "layout:00000000-0000-4000-8000-000000000002:6": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000013:negative:3573472758305193986": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "NegativeResponseV2",
-                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQxMi04NDJjLTg4ZTUwOGZiZjEwMDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzMjMyNzk2NTczNjM0Nzg5ODM1QgMzMDRKEzMxMDAzNjEzMDQyODE3MjQzOTJSEzM1NzM0NzEyNjM2NjM5ODA1NDRaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
-                }
-            }
+        "responseoption:00000000-0000-4000-8000-000000000005:negative:7": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000013:positive:3573472758305193985": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "ReferralV2",
-                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDEyLTg0MmMtODhlNTA4ZmJmMTAwMiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzMyMzI3OTY1NzM2MzQ3ODk4MzVCAzMwNEoTMzEwMDM2MTMwNDI4MTcyNDM5MlITMzU3MzQ3MTI2MzY2Mzk4MDU0NFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
-                }
-            }
+        "responseoption:00000000-0000-4000-8000-000000000005:positive:8": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000016:negative:3573049974616883205": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "NegativeResponseV2",
-                    "payload": "Ckl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLk5lZ2F0aXZlQ3JlYXRpdmVSZXNwb25zZVBheWxvYWREYXRhEp0CCiQwMTlmZDdiZi1lN2RhLTdmMzItYWJhMC1iOTYyN2U2ZjZkMTYQBCo3cmVzcC1uZWdhdGl2ZS1pbnN0LTAxOWZkN2JmLWU4NmItNzQxNi1iM2E1LTJlZWMwNTU1ZmNhNDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOhMzNTE5MTY1MDM1NzQ3OTM0MjA4QgMzMDRKEzM0MjA3MDIyNTA1MTIxNTA1MjhSEzM1NzMwNDk0ODQ5ODc5MjQ0ODBaJDAzNTQyOWRhLTc4MjAtNGI2YS1iYmIxLTU1NTc0MTJlN2QyMWIMQ29uZmlybWF0aW9uahMzNTc4NzAwNjUxMDgwMDU2ODUxcgdUUkFGRklD"
-                }
-            }
+        "responseoption:00000000-0000-4000-8000-000000000009:negative:9": {
+            "token": "dummy.jwt.token"
         },
-        "responseoption:00000000-0000-4000-8000-000000000016:positive:3573049974616883204": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalResponse": {
-                    "event_type": "ReferralV2",
-                    "payload": "Cjl0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlJlZmVycmFsUGF5bG9hZERhdGESnQIKJDAxOWZkN2JmLWU3ZGEtN2YzMi1hYmEwLWI5NjI3ZTZmNmQxNhADKjdyZXNwLXBvc2l0aXZlLWluc3QtMDE5ZmQ3YmYtZTg2Yi03NDE2LWIzYTUtMmVlYzA1NTVmY2E0MiQwMTlmZDdiZi1lN2RkLTdhNGQtYjdmZS05Y2FkNjUzODM2N2I6EzM1MTkxNjUwMzU3NDc5MzQyMDhCAzMwNEoTMzQyMDcwMjI1MDUxMjE1MDUyOFITMzU3MzA0OTQ4NDk4NzkyNDQ4MFokMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxYgxDb25maXJtYXRpb25qEzM1Nzg3MDA2NTEwODAwNTY4NTFyB1RSQUZGSUM="
-                }
-            }
+        "responseoption:00000000-0000-4000-8000-000000000009:positive:10": {
+            "token": "dummy.jwt.token"
+        },
+        "responseoption:00000000-0000-4000-8000-000000000013:negative:11": {
+            "token": "dummy.jwt.token"
+        },
+        "responseoption:00000000-0000-4000-8000-000000000013:positive:12": {
+            "token": "dummy.jwt.token"
+        },
+        "responseoption:00000000-0000-4000-8000-000000000016:negative:13": {
+            "token": "dummy.jwt.token"
+        },
+        "responseoption:00000000-0000-4000-8000-000000000016:positive:14": {
+            "token": "dummy.jwt.token"
         },
         "slot:00000000-0000-4000-8000-000000000004": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "PlacementImpressionV2",
-                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwMC1hYjYzLTk4ZmIyMTVmMzVmMDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
-                }
-            }
+            "token": "dummy.jwt.token"
         },
         "slot:00000000-0000-4000-8000-000000000008": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "PlacementImpressionV2",
-                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwYS05MzdhLWI0YTdlMjFmNzFhODIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
-                }
-            }
+            "token": "dummy.jwt.token"
         },
         "slot:00000000-0000-4000-8000-000000000012": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "PlacementImpressionV2",
-                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQwZS04MjY5LWMxZGUwNWU3YTEwZDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
-                }
-            }
+            "token": "dummy.jwt.token"
         },
         "slot:00000000-0000-4000-8000-000000000015": {
-            "token": "dummy.jwt.token",
-            "events": {
-                "SignalImpression": {
-                    "event_type": "PlacementImpressionV2",
-                    "payload": "CkR0eXBlLmdvb2dsZWFwaXMuY29tL3JlYWx0aW1lZXZlbnRzLnYxLlBsYWNlbWVudEltcHJlc3Npb25QYXlsb2FkRGF0YRLoAQokMDE5ZmQ3YmYtZTdkYS03ZjMyLWFiYTAtYjk2MjdlNmY2ZDE2EAIqJDAxOWZkN2JmLWU4NmItNzQxNC04NzFiLTgzNjczZjMwZWZmZDIkMDE5ZmQ3YmYtZTdkZC03YTRkLWI3ZmUtOWNhZDY1MzgzNjdiOgMzMDRCEzM1Nzg3MDA2NTEwODAwNTY4NTFKJGY5OWJhZDVmLTAyMmUtNDQyYi04OTQxLWQ3OGNlMTk4YWFiOFIkMDM1NDI5ZGEtNzgyMC00YjZhLWJiYjEtNTU1NzQxMmU3ZDIxWgxDb25maXJtYXRpb24="
-                }
-            }
+            "token": "dummy.jwt.token"
         }
     }
 }
