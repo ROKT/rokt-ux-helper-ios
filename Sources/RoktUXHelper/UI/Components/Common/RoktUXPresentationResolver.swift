@@ -54,13 +54,16 @@ enum RoktUXPresentationResolver {
 
     static func stableTopViewController(
         startingAt controller: UIViewController?,
+        logFailures: Bool = true,
         isPresenterUsable: (UIViewController) -> Bool = defaultIsPresenterUsable
     ) -> UIViewController? {
         guard let controller else {
-            RoktUXLogger.shared.warning(
-                "Overlay presenter resolution failed: starting view controller was nil "
-                    + "(no key-window rootViewController)."
-            )
+            if logFailures {
+                RoktUXLogger.shared.warning(
+                    "Overlay presenter resolution failed: starting view controller was nil "
+                        + "(no key-window rootViewController)."
+                )
+            }
             return nil
         }
 
@@ -75,7 +78,7 @@ enum RoktUXPresentationResolver {
             bestUsable = presented
             cursor = presented
         }
-        if bestUsable == nil {
+        if bestUsable == nil, logFailures {
             RoktUXLogger.shared.warning(
                 "Overlay presenter resolution failed: no usable view controller in the "
                     + "presentation chain (e.g. detached or dismissing). "
