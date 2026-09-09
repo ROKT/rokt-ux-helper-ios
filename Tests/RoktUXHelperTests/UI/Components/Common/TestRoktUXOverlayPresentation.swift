@@ -23,9 +23,9 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
         var presentedViewController: UIViewController?
         ux.attemptOverlayPresentation(eventService: nil, onUnload: {
             XCTFail("must not unload")
-        }) {
+        }, present: {
             presentedViewController = $0
-        }
+        })
 
         XCTAssertTrue(presentedViewController === viewController)
         XCTAssertEqual(resolveCalls, 1)
@@ -34,10 +34,12 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
 
     func testRetriesUntilTopViewControllerBecomesAvailable() {
         let ux = RoktUX()
-        ux.overlayPresenterRetryDelay = 0
+        var currentTime: TimeInterval = 0
+        ux.overlayPresentationTimeProvider = { currentTime }
         var scheduledRetries = 0
-        ux.scheduleOverlayRetry = { _, work in
+        ux.scheduleOverlayRetry = { delay, work in
             scheduledRetries += 1
+            currentTime += delay
             work()
         }
         let viewController = UIViewController()
@@ -53,9 +55,9 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
         var presentedViewController: UIViewController?
         ux.attemptOverlayPresentation(eventService: nil, onUnload: {
             unloadCount += 1
-        }) {
+        }, present: {
             presentedViewController = $0
-        }
+        })
 
         XCTAssertTrue(presentedViewController === viewController)
         XCTAssertEqual(resolveCalls, 3)
@@ -77,9 +79,10 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
 
         ux.attemptOverlayPresentation(eventService: nil,
                                       onUnload: {},
-                                      transitionAttempt: 3) { _ in
+                                      transitionAttempt: 3,
+                                      present: { _ in
             XCTFail("must not present without a view controller")
-        }
+        })
 
         XCTAssertEqual(resolveCalls, ux.overlayMaxPresenterRetries + 1)
     }
@@ -105,9 +108,9 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
 
         ux.attemptOverlayPresentation(eventService: eventService, onUnload: {
             unloadCount += 1
-        }) { _ in
+        }, present: { _ in
             XCTFail("must not present without a view controller")
-        }
+        })
 
         XCTAssertEqual(resolveCalls, ux.overlayMaxPresenterRetries + 1)
         XCTAssertEqual(unloadCount, 1)
@@ -131,15 +134,99 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
             }
         })
 
-        ux.attemptOverlayPresentation(eventService: eventService, onUnload: {}) { _ in
+        ux.attemptOverlayPresentation(eventService: eventService, onUnload: {}, present: { _ in
             XCTFail("must not present without a view controller")
-        }
+        })
 
         XCTAssertEqual(diagnostics.count, 1)
         XCTAssertEqual(diagnosticValue(kErrorCode, in: diagnostics.first), kAPIExecuteErrorCode)
         XCTAssertEqual(diagnosticValue(kErrorStackTrace, in: diagnostics.first),
                        kOverlayNotPresentedMessage + " after 0 retries")
         XCTAssertEqual(diagnosticValue(kErrorSeverity, in: diagnostics.first), Severity.error.rawValue)
+    }
+
+    func testDeadlineExhaustionStopsBeforeAnotherResolutionAttempt() {
+        let ux = RoktUX()
+        var currentTime: TimeInterval = 0
+        ux.overlayPresentationTimeProvider = { currentTime }
+        var scheduledRetries = 0
+        ux.scheduleOverlayRetry = { _, work in
+            scheduledRetries += 1
+            currentTime = ux.overlayPresenterRetryTimeout
+            work()
+        }
+        var resolveCalls = 0
+        ux.topViewControllerProvider = {
+            resolveCalls += 1
+            return nil
+        }
+        var diagnostics: [RoktEventRequest] = []
+        let eventService = get_mock_event_processor(useDiagnosticEvents: true, eventHandler: { event in
+            if event.eventType == .SignalSdkDiagnostic {
+                diagnostics.append(event)
+            }
+        })
+        var unloadCount = 0
+        var failures: [RoktUXEvent.LayoutFailure] = []
+        ux.onRoktEvent = { event in
+            if let failure = event as? RoktUXEvent.LayoutFailure {
+                failures.append(failure)
+            }
+        }
+
+        ux.attemptOverlayPresentation(eventService: eventService, onUnload: {
+            unloadCount += 1
+        }, present: { _ in
+            XCTFail("must not present after the deadline")
+        })
+
+        XCTAssertEqual(resolveCalls, 1)
+        XCTAssertEqual(scheduledRetries, 1)
+        XCTAssertEqual(unloadCount, 1)
+        XCTAssertEqual(failures.count, 1)
+        XCTAssertEqual(failures.first?.layoutId, mockPluginId)
+        XCTAssertEqual(failures.first?.sessionId, "session")
+        XCTAssertEqual(failures.first?.reason, .presentationFailed)
+        XCTAssertEqual(diagnostics.count, 1)
+    }
+
+    func testTransitionCompletionAfterDeadlineDoesNotPresentStaleLayout() {
+        let ux = RoktUX()
+        var currentTime: TimeInterval = 0
+        ux.overlayPresentationTimeProvider = { currentTime }
+        let viewController = UIViewController()
+        var resolveCalls = 0
+        ux.topViewControllerProvider = {
+            resolveCalls += 1
+            return viewController
+        }
+        var transitionCompletion: (() -> Void)?
+        ux.deferOverlayPresentation = { _, completion in
+            transitionCompletion = completion
+            return true
+        }
+        var unloadCount = 0
+        var failures: [RoktUXEvent.LayoutFailure] = []
+        ux.onRoktEvent = { event in
+            if let failure = event as? RoktUXEvent.LayoutFailure {
+                failures.append(failure)
+            }
+        }
+        var presentedViewController: UIViewController?
+
+        ux.attemptOverlayPresentation(eventService: nil, onUnload: {
+            unloadCount += 1
+        }, present: {
+            presentedViewController = $0
+        })
+        currentTime = ux.overlayPresenterRetryTimeout
+        transitionCompletion?()
+
+        XCTAssertEqual(resolveCalls, 1)
+        XCTAssertNil(presentedViewController)
+        XCTAssertEqual(unloadCount, 1)
+        XCTAssertEqual(failures.count, 1)
+        XCTAssertEqual(failures.first?.reason, .presentationFailed)
     }
 
     private func diagnosticValue(_ name: String, in event: RoktEventRequest?) -> String? {
