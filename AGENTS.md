@@ -11,7 +11,7 @@ for the layout. Human docs: [README.md](./README.md) (architecture, schema bumps
 
 **Never publish Rokt-internal information, secrets, or personally identifiable information (PII).**
 This applies to draft and ready PRs, titles, descriptions, issue comments, review comments and
-replies, commits, branch names, code, fixtures, screenshots, recordings, logs, and test artifacts.
+replies, commit messages, branch names, code, fixtures, screenshots, recordings, logs, and test artifacts.
 A request to open a PR or answer a reviewer is not permission to disclose private context.
 
 Before **each** push, PR submission, comment, reply, or attachment, inspect the exact outgoing
