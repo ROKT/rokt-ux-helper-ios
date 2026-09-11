@@ -269,7 +269,6 @@ public class RoktUX: UXEventsDelegate {
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
        - success: whether the purchase succeeded or failed.
-       - failureReason: stable reason for a failed purchase; defaults to an unknown failure.
      */
     public func instantPurchaseFinalized(layoutId: String, catalogItemId: String, success: Bool) {
         if success {
@@ -285,20 +284,27 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
+       - paymentAttemptId: Id supplied by the `CartItemDevicePay` event.
        - success: whether the purchase succeeded or failed.
+       - failureReason: stable reason for a failed purchase; defaults to an unknown failure.
      */
     public func devicePayFinalized(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         success: Bool,
         failureReason: String? = nil
     ) {
         if success {
-            eventServices[layoutId]?.cartItemDevicePaySuccess(itemId: catalogItemId)
+            eventServices[layoutId]?.cartItemDevicePaySuccess(
+                itemId: catalogItemId,
+                paymentAttemptId: paymentAttemptId
+            )
         } else {
             eventServices[layoutId]?.cartItemDevicePayFailure(
                 itemId: catalogItemId,
-                failureReason: failureReason
+                failureReason: failureReason,
+                paymentAttemptId: paymentAttemptId
             )
         }
     }
@@ -309,10 +315,12 @@ public class RoktUX: UXEventsDelegate {
      */
     public func devicePayRetry(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
         eventServices[layoutId]?.cartItemDevicePayRetry(
-            itemId: catalogItemId
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -322,11 +330,13 @@ public class RoktUX: UXEventsDelegate {
     public func devicePayLoadingFailed(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         failureReason: String? = nil
     ) {
         eventServices[layoutId]?.cartItemDevicePayLoadingFailure(
             itemId: catalogItemId,
-            failureReason: failureReason
+            failureReason: failureReason,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -335,33 +345,39 @@ public class RoktUX: UXEventsDelegate {
      */
     public func devicePayRetryableFailure(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
         eventServices[layoutId]?.cartItemDevicePayRetryableFailure(
-            itemId: catalogItemId
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
     /// Call after the provider payment UI is visibly presented to the customer.
     /// Do not call this for the helper-rendered confirmation UI; `devicePayShowConfirmation`
-    /// records that presentation automatically.
-    public func devicePayDetailsOpened(
+    /// is a separate lifecycle transition.
+    public func devicePayProviderUIOpened(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
-        eventServices[layoutId]?.cartItemDevicePayDetailsOpened(
-            itemId: catalogItemId
+        eventServices[layoutId]?.cartItemDevicePayProviderUIOpened(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
     /// Call when the customer dismisses the provider payment UI without purchasing.
-    /// This emits both PaymentDetailsClosed and a DEVICE_PAY_CANCELLED terminal failure.
-    public func devicePayDetailsClosed(
+    /// This emits PaymentProviderUIClosed, DevicePayCancelled, and a DEVICE_PAY_CANCELLED failure.
+    public func devicePayProviderUIClosed(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
-        eventServices[layoutId]?.cartItemDevicePayDetailsClosed(
-            itemId: catalogItemId
+        eventServices[layoutId]?.cartItemDevicePayProviderUIClosed(
+            itemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -373,6 +389,7 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
+       - paymentAttemptId: Id supplied by the `CartItemDevicePay` event.
        - catalogRuntimeData: dictionary of pre-formatted runtime values keyed to match
          `%^DATA.catalogRuntime.<key>^%` placeholders in the layout — typically the order
          breakdown (e.g. `["subtotal": "$24.00", "tax": "$1.94", "shipping": "$0.00", "total": "$26.72"]`).
@@ -380,11 +397,13 @@ public class RoktUX: UXEventsDelegate {
     public func devicePayShowConfirmation(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         catalogRuntimeData: [String: String]
     ) {
         eventServices[layoutId]?.cartItemDevicePayPendingConfirmation(
             itemId: catalogItemId,
-            catalogRuntimeData: catalogRuntimeData
+            catalogRuntimeData: catalogRuntimeData,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -396,12 +415,14 @@ public class RoktUX: UXEventsDelegate {
      - Parameters:
        - layoutId: layout Id for the relevant displayed catalog item.
        - catalogItemId: Id of the catalog item that was selected.
+       - paymentAttemptId: originating Id supplied by `CartItemForwardPayment`, or `nil` for a standalone forward payment.
        - success: whether the payment succeeded or failed.
        - failureReason: optional; when provided alongside `success: false`, it is emitted on the failure signal. Ignored when `success` is `true`.
      */
     public func forwardPaymentFinalized(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String?,
         success: Bool,
         failureReason: String? = nil
     ) {
@@ -412,11 +433,15 @@ public class RoktUX: UXEventsDelegate {
             return
         }
         if success {
-            eventService.cartItemForwardPaymentSuccess(itemId: catalogItemId)
+            eventService.cartItemForwardPaymentSuccess(
+                itemId: catalogItemId,
+                paymentAttemptId: paymentAttemptId
+            )
         } else {
             eventService.cartItemForwardPaymentFailure(
                 itemId: catalogItemId,
-                failureReason: failureReason
+                failureReason: failureReason,
+                paymentAttemptId: paymentAttemptId
             )
         }
     }
@@ -858,7 +883,8 @@ public class RoktUX: UXEventsDelegate {
         _ layoutId: String,
         catalogItem: CatalogItem,
         paymentProvider: PaymentProvider,
-        transactionData: TransactionData?
+        transactionData: TransactionData?,
+        paymentAttemptId: String
     ) {
         onRoktEvent?(RoktUXEvent.CartItemDevicePay(
             layoutId: layoutId,
@@ -873,14 +899,16 @@ public class RoktUX: UXEventsDelegate {
             totalPrice: catalogItem.price,
             unitPrice: catalogItem.price,
             paymentProvider: paymentProvider,
-            transactionData: transactionData
+            transactionData: transactionData,
+            paymentAttemptId: paymentAttemptId
         ))
     }
 
     func onCartItemForwardPayment(
         _ layoutId: String,
         catalogItem: CatalogItem,
-        transactionData: TransactionData?
+        transactionData: TransactionData?,
+        paymentAttemptId: String?
     ) {
         onRoktEvent?(RoktUXEvent.CartItemForwardPayment(
             layoutId: layoutId,
@@ -894,7 +922,8 @@ public class RoktUX: UXEventsDelegate {
             quantity: 1,
             totalPrice: catalogItem.price,
             unitPrice: catalogItem.price,
-            transactionData: transactionData
+            transactionData: transactionData,
+            paymentAttemptId: paymentAttemptId
         ))
     }
 }

@@ -108,12 +108,14 @@ import SwiftUI
     public func devicePayFinalized(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         success: Bool,
         failureReason: String? = nil
     ) {
         uxHelper?.devicePayFinalized(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId,
             success: success,
             failureReason: failureReason
         )
@@ -122,11 +124,13 @@ import SwiftUI
     /// Call when the user cancels device pay without completing the purchase.
     public func devicePayRetry(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
         uxHelper?.devicePayRetry(
             layoutId: layoutId,
-            catalogItemId: catalogItemId
+            catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -134,11 +138,13 @@ import SwiftUI
     public func devicePayLoadingFailed(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         failureReason: String? = nil
     ) {
         uxHelper?.devicePayLoadingFailed(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId,
             failureReason: failureReason
         )
     }
@@ -146,34 +152,40 @@ import SwiftUI
     /// Call when the customer may retry after a decline.
     public func devicePayRetryableFailure(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
         uxHelper?.devicePayRetryableFailure(
             layoutId: layoutId,
-            catalogItemId: catalogItemId
+            catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
     /// Call after the provider payment UI is visibly presented. The helper-rendered
-    /// confirmation UI is recorded automatically by `devicePayShowConfirmation`.
-    public func devicePayDetailsOpened(
+    /// confirmation UI is a separate lifecycle transition.
+    public func devicePayProviderUIOpened(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
-        uxHelper?.devicePayDetailsOpened(
+        uxHelper?.devicePayProviderUIOpened(
             layoutId: layoutId,
-            catalogItemId: catalogItemId
+            catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
     /// Call when the customer dismisses the provider payment UI without purchasing.
-    public func devicePayDetailsClosed(
+    public func devicePayProviderUIClosed(
         layoutId: String,
-        catalogItemId: String
+        catalogItemId: String,
+        paymentAttemptId: String
     ) {
-        uxHelper?.devicePayDetailsClosed(
+        uxHelper?.devicePayProviderUIClosed(
             layoutId: layoutId,
-            catalogItemId: catalogItemId
+            catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
@@ -188,11 +200,13 @@ import SwiftUI
     public func devicePayShowConfirmation(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String,
         catalogRuntimeData: [String: String]
     ) {
         uxHelper?.devicePayShowConfirmation(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId,
             catalogRuntimeData: catalogRuntimeData
         )
     }
@@ -206,12 +220,14 @@ import SwiftUI
     public func forwardPaymentFinalized(
         layoutId: String,
         catalogItemId: String,
+        paymentAttemptId: String?,
         success: Bool,
         failureReason: String? = nil
     ) {
         uxHelper?.forwardPaymentFinalized(
             layoutId: layoutId,
             catalogItemId: catalogItemId,
+            paymentAttemptId: paymentAttemptId,
             success: success,
             failureReason: failureReason
         )

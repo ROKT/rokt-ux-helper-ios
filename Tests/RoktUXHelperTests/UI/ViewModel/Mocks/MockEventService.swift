@@ -155,35 +155,36 @@ class MockEventService: EventDiagnosticServicing {
         cartItemDevicePayCompletionCallback = completion
     }
 
-    func cartItemDevicePaySuccess(itemId: String) {
+    func cartItemDevicePaySuccess(itemId: String, paymentAttemptId: String) {
         cartItemDevicePaySuccessCalled = true
     }
 
-    func cartItemDevicePayFailure(itemId: String, failureReason: String?) {
+    func cartItemDevicePayFailure(itemId: String, failureReason: String?, paymentAttemptId: String) {
         cartItemDevicePayFailureCalled = true
     }
 
-    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?) {
+    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?, paymentAttemptId: String) {
         cartItemDevicePayFailureCalled = true
     }
 
-    func cartItemDevicePayRetryableFailure(itemId: String) {
+    func cartItemDevicePayRetryableFailure(itemId: String, paymentAttemptId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
-    func cartItemDevicePayRetry(itemId: String) {
+    func cartItemDevicePayRetry(itemId: String, paymentAttemptId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
-    func cartItemDevicePayDetailsOpened(itemId: String) {}
+    func cartItemDevicePayProviderUIOpened(itemId: String, paymentAttemptId: String) {}
 
-    func cartItemDevicePayDetailsClosed(itemId: String) {
+    func cartItemDevicePayProviderUIClosed(itemId: String, paymentAttemptId: String) {
         cartItemDevicePayRetryCalled = true
     }
 
     func cartItemDevicePayPendingConfirmation(
         itemId: String,
-        catalogRuntimeData: [String: String]
+        catalogRuntimeData: [String: String],
+        paymentAttemptId: String
     ) {
         cartItemDevicePayPendingConfirmationCalled = true
         lastDevicePayPendingConfirmationItemId = itemId
@@ -203,11 +204,11 @@ class MockEventService: EventDiagnosticServicing {
         cartItemForwardPaymentCompletionCallback = completion
     }
 
-    func cartItemForwardPaymentSuccess(itemId: String) {
+    func cartItemForwardPaymentSuccess(itemId: String, paymentAttemptId: String?) {
         cartItemForwardPaymentSuccessCalled = true
     }
 
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?, paymentAttemptId: String?) {
         cartItemForwardPaymentFailureCalled = true
         lastForwardPaymentFailureReason = failureReason
     }

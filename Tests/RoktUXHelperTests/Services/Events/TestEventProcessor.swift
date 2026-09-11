@@ -351,9 +351,9 @@ final class TestEventProcessor: XCTestCase {
 
     func testForwardPaymentStageKeepsSecondInitiationDistinct() {
         let expectation = expectation(description: "forward-payment initiation should remain distinct")
-        var receivedPayload: [RoktEventRequest]?
+        var receivedEventCount: Int?
         let sut = EventProcessor(queue: .userInitiated) { [weak self] payload in
-            receivedPayload = self?.deserialize(payload)?.events
+            receivedEventCount = self?.deserialize(payload)?.events.count
             expectation.fulfill()
         }
         sut.handle(event: mockEvent(
@@ -367,7 +367,7 @@ final class TestEventProcessor: XCTestCase {
         ))
 
         wait(for: [expectation], timeout: 1)
-        XCTAssertEqual(receivedPayload?.count, 2)
+        XCTAssertEqual(receivedEventCount, 2)
     }
 
     func testDelayProcessorDeallocation() {
