@@ -43,6 +43,8 @@ class AttributedStringTransformer {
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .catalogStackedCollection(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
+        case .catalogCarouselCollection(let model):
+            model.cards.forEach { convertRichTextHTMLIfExists(uiModel: $0.layout, config: config) }
         case .catalogCombinedCollection(let parentModel):
             convertRichTextHTMLInChildren(parent: parentModel, config: config)
         case .richText(let richTextUIModel):

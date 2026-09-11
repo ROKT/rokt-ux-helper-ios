@@ -65,7 +65,14 @@ final class TestCreativeResponseComponent: XCTestCase {
     // MARK: - Snapshots
 
     func testSnapshot() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
+        let model = try get_model()
+        guard case .basicText(let label) = model.children?.first else {
+            XCTFail("Expected the response label")
+            return
+        }
+        // This fixture has no response data and snapshots only the container styling.
+        XCTAssertEqual(label.boundValue, "", "Missing response data must not render an unresolved placeholder")
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(model))
             .frame(width: 350, height: 200)
 
         let hostingController = UIHostingController(rootView: view)
@@ -79,11 +86,12 @@ final class TestCreativeResponseComponent: XCTestCase {
     func get_model() throws -> CreativeResponseViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let creativeResponse = ModelTestData.CreativeResponseData.positive()
+        let offer = OfferModel.mock()
         return try transformer.getCreativeResponseUIModel(responseKey: creativeResponse?.responseKey ?? "",
                                                           openLinks: nil,
                                                           styles: creativeResponse?.styles,
                                                           children: transformer.transformChildren(creativeResponse?.children,
-                                                                                                  context: .outer([])),
-                                                          offer: .mock())
+                                                                                                  context: .inner(.positive(offer))),
+                                                          offer: offer)
     }
 }

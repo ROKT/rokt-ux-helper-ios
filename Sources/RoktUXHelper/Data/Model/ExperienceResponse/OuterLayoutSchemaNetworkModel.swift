@@ -7,10 +7,3 @@ struct OuterLayoutSchemaNetworkModel: Decodable {
     let layout: LayoutSchemaModel?
     let settings: LayoutSettings?
 }
-
-@available(iOS 13, *)
-struct OuterLayoutSchemaValidationModel: Decodable {
-    let breakpoints: BreakPoint?
-    let layout: OuterLayoutSchemaModel?
-    let settings: LayoutSettings?
-}

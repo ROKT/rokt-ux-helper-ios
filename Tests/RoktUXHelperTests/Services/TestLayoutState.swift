@@ -69,13 +69,13 @@ class TestLayoutState: XCTestCase {
 
         XCTAssertEqual(layoutState.closeOnComplete(), true)
 
-        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: nil)
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: nil, bottomSheetPresentation: nil)
         XCTAssertEqual(layoutState.closeOnComplete(), true)
 
-        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false)
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         XCTAssertEqual(layoutState.closeOnComplete(), false)
 
-        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true)
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true, bottomSheetPresentation: nil)
         XCTAssertEqual(layoutState.closeOnComplete(), true)
     }
 
@@ -87,5 +87,45 @@ class TestLayoutState: XCTestCase {
         XCTAssertEqual(layoutState.getGlobalBreakpointIndex(250.0), 2)
         XCTAssertEqual(layoutState.getGlobalBreakpointIndex(350.0), 3)
         XCTAssertEqual(layoutState.getGlobalBreakpointIndex(450.0), 3)
+    }
+
+    func testBottomSheetPresentationIsNilWithoutSettings() {
+        layoutState = LayoutState()
+        XCTAssertNil(layoutState.bottomSheetPresentation())
+    }
+
+    // Every layout published before schema 2.10 decodes with the field absent, and absent has to
+    // keep meaning the platform's own sheet.
+    func testBottomSheetPresentationIsNilWhenSettingsOmitTheField() {
+        layoutState = LayoutState()
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                          bottomSheetPresentation: nil)
+        XCTAssertNil(layoutState.bottomSheetPresentation())
+    }
+
+    func testBottomSheetPresentationReadsFullBleed() {
+        layoutState = LayoutState()
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: nil,
+                                                                          bottomSheetPresentation: .fullBleed)
+        XCTAssertEqual(layoutState.bottomSheetPresentation(), .fullBleed)
+    }
+
+    func testBottomSheetPresentationReadsPlatformDefault() {
+        layoutState = LayoutState()
+        layoutState.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: nil,
+                                                                          bottomSheetPresentation: .platformDefault)
+        XCTAssertEqual(layoutState.bottomSheetPresentation(), .platformDefault)
+    }
+
+    func testLayoutSettingsDecodeFullBleedFromWireFormat() throws {
+        let json = Data(#"{"closeOnComplete":true,"bottomSheetPresentation":"full-bleed"}"#.utf8)
+        let settings = try JSONDecoder().decode(LayoutSettings.self, from: json)
+        XCTAssertEqual(settings.bottomSheetPresentation, .fullBleed)
+    }
+
+    func testLayoutSettingsDecodeWithoutPresentationField() throws {
+        let json = Data(#"{"closeOnComplete":true}"#.utf8)
+        let settings = try JSONDecoder().decode(LayoutSettings.self, from: json)
+        XCTAssertNil(settings.bottomSheetPresentation)
     }
 }

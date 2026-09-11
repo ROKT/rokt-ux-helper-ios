@@ -100,7 +100,7 @@ struct CreativeMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.
         // given fullText = "Hello %^DATA.creativeCopy.someValue1^ AND %^DATA.creativeCopy.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
 
-        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let bnfRegexPattern = BNFPlaceholder.expression
         let fullTextRange = NSRange(fullText.startIndex..<fullText.endIndex, in: fullText)
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }

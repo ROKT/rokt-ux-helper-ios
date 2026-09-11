@@ -1,5 +1,80 @@
 # Testing Guide
 
+## Native testing workflow
+
+Read [the public-content checklist](./docs/public-content-checklist.md) before preparing fixtures
+or sharing test output. Tests and their generated artifacts must not publish Rokt-internal
+information, secrets, or PII.
+
+1. **Identify the candidate.** Record the helper revision, dependency versions and any local
+   overrides. Preserve existing changes; use an isolated checkout for a different candidate.
+   A passing result from another branch or dependency graph does not validate this one.
+2. **Check the environment without changing it:**
+
+   ```bash
+   xcode-select -p
+   xcodebuild -version
+   xcrun simctl list runtimes
+   xcrun simctl list devices available
+   ```
+
+   Compare with [the current CI configuration](#environment-sensitivity). If Xcode setup,
+   license acceptance, or a runtime installation is incomplete, arrange that explicitly; do not
+   repeatedly download runtimes or accept agreements on another user's behalf.
+
+3. **Agree on simulator ownership.** Select one installed destination by identifier. Do not run
+   automated UI tests on a simulator being used for manual review, or shut down/reset unrelated
+   simulators. Serial testing avoids parallel test clones interfering with that review.
+4. **Run the affected suite, then the full package suite for code changes.** From the repository
+   root, replace the placeholder with the selected simulator identifier:
+
+   ```bash
+   TEST_DESTINATION='platform=iOS Simulator,id=<simulator-udid>'
+   TEST_OUTPUT=$(mktemp -d "${TMPDIR:-/tmp}/rokt-ux-tests.XXXXXX")
+   xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
+     -destination "$TEST_DESTINATION" \
+     -parallel-testing-enabled NO \
+     -derivedDataPath "$TEST_OUTPUT/DerivedData" \
+     -resultBundlePath "$TEST_OUTPUT/Tests.xcresult" test
+   ```
+
+   Add `-only-testing:RoktUXHelperTests/TestRowComponent` to target an existing suite. Use a fresh
+   result path for each run. If piping output to `xcbeautify`, enable `set -o pipefail` first so a
+   failing build remains a failing command. Do not use host `swift build` or `swift test`: UIKit
+   requires the iOS destination.
+
+5. **Investigate failures before retrying.** Preserve the first result bundle and error. Separate
+   compilation, dependency, environment, assertion and snapshot failures. A passing retry does
+   not explain an earlier failure; report both. Do not replace references, relax tolerances,
+   remove assertions, change CI or alter lint baselines merely to get a green result.
+6. **Test the assembled layout when rendering changes.** Follow the
+   [existing Example app walkthrough](./docs/local-layout-testing.md) for fixture generation,
+   SwiftUI/UIKit rendering and reload steps. Programmatic scrolling and component snapshots do
+   not prove real gesture delivery, browser behavior, or event transport.
+7. **Complete the relevant repository checks.** Use Trunk and the documented Example build;
+   validate both package managers when dependencies change. Documentation-only changes should
+   check formatting, links, examples and source accuracy, and explicitly say native tests were
+   not run rather than claim a runtime pass.
+
+## Validation record
+
+Include a safe summary in the PR and retain detailed evidence privately when it contains
+sensitive data. Review every attachment using the public-content checklist before uploading it.
+
+| Field           | Record                                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Candidate       | Commit and exact dependency versions; identify local overrides and later changes                                      |
+| Environment     | Xcode, runtime, device, SwiftUI/UIKit host and outer layout used                                                      |
+| Scope           | Suites and meaningful assertions; for gestures, measured motion and unintended-response checks                        |
+| Result          | Passed, failed and skipped counts; preserve the initial failure and each retry separately                             |
+| Evidence        | Result bundle and reviewed visual comparison; share only sanitized, public-safe output                                |
+| Test doubles    | Whether images, URL opening, callbacks, data and event transport were real or mocked                                  |
+| Remaining gates | Published dependencies, consuming SDK/app tests, supported OS/device, VoiceOver, Dynamic Type and human visual review |
+
+Check test counts and skips in the result bundle, not just a successful process exit. Passing
+component tests, a local app build, current-head CI, published-dependency validation and manual
+acceptance are distinct results. A size-report job passing does not itself approve a size increase.
+
 ## Snapshot Testing
 
 ### Overview
@@ -25,9 +100,25 @@ Reference PNGs are stored next to the test file in a `__Snapshots__/` directory,
 ```text
 Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestBasicTextComponent/testSnapshot.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_zeroProducts.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_oneProduct.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_manyProducts.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_smallWidth.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithCollapsedDescription.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutInDarkMode.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithMissingResponse.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutAfterExpandingDescription.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutScrolledToLastCard.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_productLayoutWithAccessibleTextRightToLeft.1.png
   TestCatalogImageGalleryComponent/testSnapshot_fullFeatured.1.png
+  TestCatalogCarouselCollectionComponent/testSnapshot_mixedIntrinsicCardHeights.1.png
   TestColumnComponent/testSnapshot.1.png
   TestCreativeResponseComponent/testSnapshot.1.png
+  TestInlineContainerComponent/testSnapshot_narrowWrappingTextAndAction.1.png
+  TestInlineContainerComponent/testSnapshot_expandedRightToLeftInDarkMode.1.png
+  TestInlineContainerComponent/testSnapshot_disabledAction.1.png
+  TestInlineContainerComponent/testSnapshot_hoveredAction.1.png
+  TestInlineContainerComponent/testSnapshot_pressedAction.1.png
   TestRichTextComponent/testSnapshot.1.png
   TestRichTextComponent/testSnapshot_nilDefaultStyle.1.png
   TestRichTextComponent/testSnapshot_nilTextStyle.1.png
@@ -38,6 +129,17 @@ Tests/RoktUXHelperTests/UI/Components/__Snapshots__/
   TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesCatalogRuntimePlaceholders.1.png
   TestRuntimeAndTransactionDataPlaceholders/testSnapshot_basicText_resolvesShippingAddressFromTransactionData.1.png
   TestScrollableColumn/testSnapshot.1.png
+  TestScrollableColumn/testSnapshot_minHeightExpandsViewport.1.png
+  TestScrollableColumn/testSnapshot_percentageChildrenFillViewport.1.png
+  TestScrollableColumn/testSnapshot_shortContentKeepsMainAxisAlignment.1.png
+  TestScrollableColumn/testSnapshot_tallScrollableContentAtBottom.1.png
+  TestScrollableColumn/testSnapshot_tallScrollableContentAtTop.1.png
+  TestScrollableRow/testSnapshot.1.png
+  TestScrollableRow/testSnapshot_minWidthExpandsViewport.1.png
+  TestScrollableRow/testSnapshot_narrowContentKeepsMainAxisAlignment.1.png
+  TestScrollableRow/testSnapshot_percentageChildrenFillViewport.1.png
+  TestScrollableRow/testSnapshot_wideScrollableContentAtEnd.1.png
+  TestScrollableRow/testSnapshot_wideScrollableContentAtStart.1.png
   TestToggleButtonComponent/testSnapshot.1.png
   TestZStackComponent/testSnapshot.1.png
 ```
@@ -59,7 +161,9 @@ func testSnapshot_myNewCase() {
         .frame(width: 350, height: 200)
 
     let hostingController = UIHostingController(rootView: view)
-    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice))
+    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice,
+                                                  precision: snapshotPrecision,
+                                                  perceptualPrecision: snapshotPerceptualPrecision))
 }
 ```
 
@@ -73,7 +177,14 @@ func testSnapshot_myNewCase() {
 
 ### Updating Snapshots After an Intentional UI Change
 
-If you change component styling, layout, or rendering logic, existing snapshot tests **will fail** -- this is expected and means the tests are doing their job. Here is how to update them:
+First compare the existing reference with the actual rendering and explain every meaningful
+difference. An unexpected alignment, clipping, spacing, or interaction change is a regression to
+fix against the existing reference. Check the toolchain before attributing a difference to the
+code, but do not assume an environment mismatch makes the difference harmless.
+
+Use the following recording steps **only after an intentional appearance change has been
+reviewed**. Keep the original reference available for comparison. Do not delete a reference,
+enable record mode, or lower precision merely because a test failed.
 
 #### Option A: Delete and re-record (recommended for a few snapshots)
 
@@ -89,32 +200,37 @@ rm Tests/RoktUXHelperTests/UI/Components/__Snapshots__/TestRichTextComponent/tes
 5. **Run the tests a third time.** They should now pass.
 6. **Commit the updated PNGs** alongside your code changes in the same PR.
 
-#### Option B: Use `isRecording` flag (recommended for bulk updates)
+#### Option B: Scoped recording for an intentional update
 
 When many snapshots need re-recording at once (e.g. changing the shared device config or a global style):
 
-1. **Set the global recording flag** at the top of the test file or in `setUp()`:
+1. **Temporarily wrap only the intended assertions** in scoped recording. The pinned library
+   deprecates the global `isRecording` flag:
 
 ```swift
-override func setUp() {
-    super.setUp()
-    isRecording = true
+withSnapshotTesting(record: .all) {
+    assertSnapshot(of: hostingController, as: .image(on: snapshotDevice,
+                                                  precision: snapshotPrecision,
+                                                  perceptualPrecision: snapshotPerceptualPrecision))
 }
 ```
 
-2. **Run all snapshot tests** (Cmd+U). Every snapshot is re-recorded and the tests fail.
-3. **Remove `isRecording = true`** -- do not commit it.
+2. **Run the selected tests.** They record the selected images and report recording failures.
+3. **Remove the record-mode wrapper** -- do not commit it.
 4. **Run the tests again** to confirm they pass with the new references.
 5. **Review the git diff** of the changed PNGs to verify the visual changes are intentional.
 6. **Commit the updated PNGs** alongside your code changes.
 
-> **Important:** Never commit `isRecording = true`. It disables regression detection. PR reviewers should flag this if spotted.
+> **Important:** Never commit a record-mode override, including `isRecording = true` or
+> `withSnapshotTesting(record: .all)`. It bypasses the intended reference comparison.
 
 #### Checklist for PR authors
 
-- [ ] All snapshot tests pass locally after re-recording
+- [ ] Every changed reference represents an intentional, reviewed appearance change
+- [ ] Unexpected differences were fixed against the original references
+- [ ] All snapshot tests pass with recording disabled
 - [ ] Updated reference PNGs are committed in the PR
-- [ ] `isRecording = true` is **not** present in committed code
+- [ ] No record-mode override or unapproved precision change is present in committed code
 - [ ] New PNGs have been visually inspected
 
 ### Debugging CI Failures
@@ -123,26 +239,39 @@ When snapshot tests fail in CI:
 
 1. Go to the failed GitHub Actions run.
 2. Download the **snapshot-failures** artifact (uploaded automatically on test failure).
-3. The artifact contains the actual rendered image and a diff highlighting pixel differences.
+3. Inspect the actual rendered images and any exported diff images. Artifact contents depend on
+   the test helper; a rendered PNG alone is not a diff. Retrieve the committed reference from the
+   tested revision for comparison.
 4. Compare against the committed reference to determine if the change is intentional or a regression.
 5. If intentional, follow the update process above and push updated reference PNGs. If unexpected, investigate the code change that caused the diff.
 
 ### Environment Sensitivity
 
-Snapshot images are sensitive to the OS version and simulator device. The CI uses:
+Snapshot images are sensitive to the OS version and simulator device. The repository variables
+were verified on 4 September 2026 as:
 
 - **Xcode**: 26.2
 - **Simulator**: iPhone 17, iOS 26.2 (pinned to the runtime bundled with Xcode 26.2)
 - **Viewport**: Set by `snapshotDevice` (currently `ViewImageConfig.iPhone13Pro(.portrait)`)
 
-The CI runner label, Xcode version, simulator model, and iOS runtime are supplied by **repository variables** so a runner-image change (GitHub bumping Xcode or the available simulators) can be handled by editing a variable in repo settings — no code PR required. Defaults in parentheses are used when the variable is unset:
+The runner label, Xcode version, simulator model, and iOS runtime come from **repository
+variables**. Verify them before reproducing a snapshot failure; the dated values above can drift.
+For contributors with repository access:
 
-- `CI_MACOS_RUNNER` (`macos-latest`) — `runs-on` for the test jobs
-- `CI_XCODE_VERSION` (`26.2`) — Xcode version selected by `setup-xcode`
-- `CI_SIMULATOR_MODEL` (`iPhone 17`) — simulator device model
-- `CI_SIMULATOR_OS` (`26.2`) — simulator iOS runtime (keep aligned with the runtime bundled by `CI_XCODE_VERSION`)
+```bash
+gh api repos/ROKT/rokt-ux-helper-ios/actions/variables \
+  --jq '.variables[] | select(.name | startswith("CI_")) | "\(.name)=\(.value)"'
+```
 
-Set these under **Settings → Secrets and variables → Actions → Variables**. Changing `CI_MACOS_RUNNER` or `CI_SIMULATOR_MODEL` does not affect rendering (the `ViewImageConfig` sets the viewport explicitly). **Changing `CI_XCODE_VERSION` or `CI_SIMULATOR_OS` can** — font rendering varies across Xcode/OS versions, so after such a change the reference PNGs may need re-recording (the small precision tolerance in `SnapshotConfig` absorbs minor anti-aliasing differences, but not a full toolchain jump). If you see unexpected diffs, ensure your local Xcode and simulator match CI.
+Without access, use the workflow run's setup logs or ask a maintainer to confirm the environment.
+The workflow provides `macos-latest` as the runner fallback. The composite action requires the
+Xcode/model/runtime inputs and declares **no defaults** for them; do not assume missing variables
+will fall back to the values in this guide. Do not change repository variables to make a local
+failure disappear.
+
+`snapshotDevice` sets the viewport independently of the simulator's model. Matching that viewport
+alone does not match the OS font renderer, toolchain, or all device behavior. Reproduce with the
+same Xcode/runtime first; treat other supported OS versions as a separate compatibility check.
 
 ### Async Considerations
 
@@ -208,12 +337,21 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 #### ScrollableColumn
 
 - [x] Standard rendering -- Column with pink background inside a ScrollView (`testSnapshot`)
-- [ ] Max height constraint variant
+- [x] Max height constrained tall content -- viewport clipped at the max height with a stationary border (`testSnapshot_tallScrollableContentAtTop`)
+- [x] Max height constrained tall content -- bottom viewport shows the final colored sections (`testSnapshot_tallScrollableContentAtBottom`)
+- [x] Min height -- viewport background fills the minimum even though the content is shorter (`testSnapshot_minHeightExpandsViewport`)
+- [x] Percentage-height children -- two 50% children fill a fixed-height viewport (`testSnapshot_percentageChildrenFillViewport`)
+- [x] Main-axis alignment -- `justifyContent: center` centres short content in a taller viewport (`testSnapshot_shortContentKeepsMainAxisAlignment`)
 - [ ] Scroll indicator visibility
 
 #### ScrollableRow
 
-- [ ] Standard rendering
+- [x] Standard rendering -- Row with pink background inside a ScrollView (`testSnapshot`)
+- [x] Wide content -- viewport clipped at the parent width with a stationary border (`testSnapshot_wideScrollableContentAtStart`)
+- [x] Wide content -- trailing viewport shows the final colored sections (`testSnapshot_wideScrollableContentAtEnd`)
+- [x] Min width -- viewport background fills the minimum even though the content is narrower (`testSnapshot_minWidthExpandsViewport`)
+- [x] Percentage-width children -- two 50% children fill a fixed-width viewport (`testSnapshot_percentageChildrenFillViewport`)
+- [x] Main-axis alignment -- `justifyContent: center` centres narrow content in a wider viewport (`testSnapshot_narrowContentKeepsMainAxisAlignment`)
 - [ ] Scroll indicator visibility
 
 #### Overlay
@@ -239,9 +377,53 @@ This matrix tracks which visual scenarios have snapshot tests and which are know
 
 - [ ] Image rendering with sizing constraints
 
+#### CatalogResponseButton
+
+`CatalogResponseButtonInteractionTests` covers behavior with ViewInspector, not snapshots:
+
+- Product responses use a native button and invoke the bound product callback exactly once.
+- Product labels have no competing tap or long-press handlers; disabled and invalid responses cannot activate.
+- Existing catalog purchase buttons retain their gesture and purchase behavior.
+
+These checks do not simulate touch arbitration. Also exercise a JSON-rendered carousel in the Example app: drag from a visible card to reveal an initially offscreen card, verify that its horizontal position changes, then drag back. Repeat after holding the card before dragging. Neither gesture should open a destination or submit a response. Check vertical host scrolling and ordinary product taps separately; checking a card that was already visible does not establish that scrolling worked.
+
 #### CatalogImageGallery
 
 - [x] Full-featured rendering -- gallery image, navigation buttons, pill indicator with dots (`testSnapshot_fullFeatured`)
+
+#### CatalogCarouselCollection
+
+`CatalogCarouselStretchLayoutTests` mounts the real carousel and measures rendered card surfaces with different text lengths. It checks equal card heights, growth and shrinkage after text changes, narrow and wide host widths, and stable mount/scroll callbacks. These are native layout assertions with synthetic colors, not recorded image snapshots or product-button gesture coverage.
+
+The same suite checks that intrinsic-width cards retain their leading edge and that full-width cards preserve authored center/end child alignment in both layout directions. Snapshot readiness requires measurements for every card at the current width, unchanged measurements across consecutive layout checks, and a scroll host height matching the measured maximum. A first positive height alone is insufficient because later cards can change that maximum.
+
+- [x] Product cards with different intrinsic title heights share a row height (`testSnapshot_mixedIntrinsicCardHeights`). This checks the card surfaces, not aligned internal buttons or full-template styling.
+
+- [x] Empty catalog -- no reserved carousel space (`testSnapshot_zeroProducts`)
+- [x] Single product -- full-width card (`testSnapshot_oneProduct`)
+- [x] Multiple products -- grouped width, gap, and peek (`testSnapshot_manyProducts`)
+- [x] Narrow host -- wrapping product title (`testSnapshot_smallWidth`)
+- [x] Typed product layout with collapsed description, data-URI images, selected title/price fields, and response buttons (`testSnapshot_productLayoutWithCollapsedDescription`)
+- [x] Typed product layout after activating See More (`testSnapshot_productLayoutAfterExpandingDescription`)
+- [x] Typed product layout scrolled to its last product (`testSnapshot_productLayoutScrolledToLastCard`)
+- [x] Accessible text with right-to-left offer and product copy (`testSnapshot_productLayoutWithAccessibleTextRightToLeft`)
+- [x] Dark mode offer copy, product labels, and response labels (`testSnapshot_productLayoutInDarkMode`)
+- [x] Product with no response retains its image and labels but omits its button (`testSnapshot_productLayoutWithMissingResponse`)
+
+The typed-layout cases reuse `ProductCarouselIntegrationFixture` and render through `OneByOneDistribution`, including the inline description and catalog cards. They use generic product responses and synchronous data-URI images. The missing-response case removes only the first product's response map and checks that the other products still have renderable responses. It exercises an absent button, not disabled styling for a valid response. Expansion activates the rendered inline action, and the scrolled case moves the real carousel scroll view. These cases are component integration coverage; they do not replace running the assembled template in the SDK example app.
+
+The accessible RTL case scales the inline description; product labels retain their authored size. Its action labels are English. This does not establish full-template Dynamic Type, translated-label, or VoiceOver acceptance.
+
+#### InlineContainer
+
+- [x] Narrow copy/action wrapping with action padding and border (`testSnapshot_narrowWrappingTextAndAction`)
+- [x] Expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`)
+- [x] Disabled action appearance and blocked activation (`testSnapshot_disabledAction`)
+- [x] Pressed action text, background, and border appearance (`testSnapshot_pressedAction`)
+- [x] Pointer-hover action text, background, and border appearance (`testSnapshot_hoveredAction`)
+- [ ] Standalone inline layout at accessible text sizes
+
+The typed product layout cases above also exercise inline copy within its surrounding layout. The hover snapshot uses the existing test recognizer to select hover styling; the disabled snapshot then disables that action. The pressed snapshot selects the existing model style state directly. These snapshots cover appearance, not real pointer or touch delivery. Dynamic Type and accessibility behavior additionally have native assertions in `TestInlineContainerComponent`; those assertions are not visual snapshot coverage.
 
 #### Placeholder Resolution (Runtime + Transaction Data)
 
@@ -261,3 +443,27 @@ rendering drift across simulator runtimes.
 - [ ] Progress bar rendering at various states
 
 > **Contributing:** When you add a new snapshot test, check the box above and note the test method name. When you identify a new scenario worth covering, add an unchecked item.
+
+## Native Inline Text
+
+`TestInlineContainerComponent` builds the text renderer directly from native view models. It covers shared text/action lines, narrow wrapping, Unicode action ranges, natural mixed-font baselines, Dynamic Type, dark mode, right-to-left content, accessible link/button labels, pointer hover, disabled actions, custom-state dispatch, and SwiftUI host height changes. Container tests verify ordered accessibility elements without duplicated text, stale-action removal, and wrapped-action activation points within actual text fragments. These native assertions do not replace app-level touch automation or manual VoiceOver testing. The height coordinator test checks that identical measurements do not keep updating SwiftUI state. The package now pins and advertises `2.10.0`; `TestSchemaAdapters`, `TestProductCarouselIntegration`, and `TestInlineSchemaLifecycle` cover the typed inline and catalog carousel adapters, transformation, state binding, and hosted lifecycle behavior.
+
+Inline range styles cover font/color/baseline/decoration typography, solid background colors, nonnegative padding/margins, solid or dashed borders (including unequal side widths), and opacity. Line height, line limits, and per-span paragraph alignment are not part of the inline text style contract. Parent container styles use the existing layout modifier. The typed adapters explicitly reject unsupported effects, including background images, nonzero blur, and shadows on individual inline ranges. Adapter tests check these rejections in interaction states, conditional transitions, and hidden branches.
+
+`BNFTextOperationTests` and `TextSlicingTests` cover `:sliceText[Chars,N]`, including 77/78/79-character boundaries, joined emoji and combining marks, invalid arguments, and fallback alternatives. `N` is a nonnegative whole number within Swift's `Int` range. Slicing uses the same `String` character semantics as the length predicate. Operations apply to the selected key alternative; literal fallbacks remain unchanged.
+
+`StateTextOperationBindingTests` verifies that creative and catalog mappers preserve deferred STATE tokens, including their operations, until plain and attributed text rendering resolves them. `NumericPredicateTextExpansionTests` verifies that numeric predicates expand their string inputs before numeric conversion. This differs from directly requesting an integer binding from an extractor, which rejects text operations.
+
+The real native view has snapshot tests for narrow copy/action wrapping (`testSnapshot_narrowWrappingTextAndAction`) and expanded right-to-left text in dark mode (`testSnapshot_expandedRightToLeftInDarkMode`). These and the disabled, hovered, and pressed action snapshots use the shared device and precision settings. The original wrapping and right-to-left references were rendered in simulator CI and visually reviewed. New references follow the same record, inspect, and rerun workflow above. The snapshot helper also exports the rendered image to `SNAPSHOT_ARTIFACTS` when set, so CI can expose a first rendering even when a missing reference is recorded beside the tests. Missing references still fail the tests and must be visually reviewed before committing their PNGs.
+
+Run these tests on an iOS simulator using the package's normal `xcodebuild` workflow. Native layout assertions do not replace visual checks: inline wrapping and decoration on iOS 15 and a current OS, VoiceOver, nested scrolling, and example host verification remain release gates.
+
+## Bottom-sheet state regression tests
+
+`TestBottomSheetState` exercises outer toggle callbacks, global state publication, the shared expansion reader used by platform and full-bleed percentage sheets, and the platform sheet's configured detents. It covers restored global values, including configuring an expanded platform detent before presentation is requested, explicit global collapse with retained per-offer expansion, resetting global ownership, detent callback persistence, and the existing per-offer toggle/navigation path through `OneByOneDistribution`. Detent callbacks must not create expansion state for an offer that has not set the key, even when another offer has.
+
+Full-bleed lifecycle tests require a prepared controller before the presentation request, exercise state publications before container geometry exists, and invoke the captured production completion and size callbacks. Resolver spies check that publications and completion replace the previous height resolver; they do not assert physical height. Dynamic sheets must wait for their first measurement, load once, and never register the percentage expansion observer.
+
+The fixture captures the controller configured by production and mounts its SwiftUI content in a window. It does not complete a UIKit modal presentation or assert animated sheet geometry; those behaviours require an app host. Run this suite with `-only-testing:RoktUXHelperTests/TestBottomSheetState` using the simulator/toolchain described above. Before release, exercise an outer expansion toggle in both platform and full-bleed percentage sheets in an app, including collapse and restored state, and verify their actual height changes. These checks do not replace physical-device or VoiceOver acceptance.
+
+For app-hosted restoration checks, supply the global expansion value before presentation and include a delayed presentation with state changes during the delay. Verify that UIKit uses the prepared controller and sample actual presentation-layer height during the entrance, as well as the final frame at `onLoad`, before exercising subsequent expand/collapse actions. The opening animation still needs visual review; a correct final frame alone does not establish its first-frame appearance.

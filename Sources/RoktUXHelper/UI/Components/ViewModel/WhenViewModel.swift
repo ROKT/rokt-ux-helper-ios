@@ -12,6 +12,8 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling, ObservableObject
     let predicates: [WhenPredicate]?
     let transition: WhenTransition?
     let offers: [OfferModel?]
+    let catalogItemContext: CatalogItemContext?
+    let predicateOfferIndex: Int?
     let globalBreakPoints: BreakPoint?
     weak var layoutState: (any LayoutStateRepresenting)?
     var componentConfig: ComponentConfig?
@@ -24,13 +26,17 @@ class WhenViewModel: Identifiable, Hashable, PredicateHandling, ObservableObject
          transition: WhenTransition?,
          offers: [OfferModel?],
          globalBreakPoints: BreakPoint?,
-         layoutState: (any LayoutStateRepresenting)?) {
+         layoutState: (any LayoutStateRepresenting)?,
+         catalogItemContext: CatalogItemContext? = nil,
+         predicateOfferIndex: Int? = nil) {
         self.children = children
         self.predicates = predicates
         self.transition = transition
         self.offers = offers
         self.globalBreakPoints = globalBreakPoints
         self.layoutState = layoutState
+        self.catalogItemContext = catalogItemContext
+        self.predicateOfferIndex = predicateOfferIndex
 
         cancellable = layoutState?.itemsPublisher
             .receive(on: RunLoop.main)

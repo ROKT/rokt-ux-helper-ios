@@ -48,6 +48,9 @@ struct LayoutSchemaComponent: View {
                                styleState: $styleState,
                                parentOverride: parentOverride,
                                expandsToContainerOnSelfAlign: expandsToContainerOnSelfAlign)
+        case .inlineContainer(let model):
+            InlineContainerComponent(config: config, model: model, parentWidth: $parentWidth, parentHeight: $parentHeight,
+                                     parentOverride: parentOverride, styleState: $styleState)
         case .column(let columnModel):
             ColumnComponent(config: config,
                             model: columnModel,
@@ -63,19 +66,21 @@ struct LayoutSchemaComponent: View {
                          styleState: $styleState,
                          parentOverride: parentOverride)
         case .scrollableColumn(let columnModel):
-            ScrollableColumnComponent(config: config,
-                                      model: columnModel,
-                                      parentWidth: $parentWidth,
-                                      parentHeight: $parentHeight,
-                                      styleState: $styleState,
-                                      parentOverride: parentOverride)
+            ColumnComponent(config: config,
+                            model: columnModel,
+                            parentWidth: $parentWidth,
+                            parentHeight: $parentHeight,
+                            styleState: $styleState,
+                            parentOverride: parentOverride,
+                            isScrollable: true)
         case .scrollableRow(let rowModel):
-            ScrollableRowComponent(config: config,
-                                   model: rowModel,
-                                   parentWidth: $parentWidth,
-                                   parentHeight: $parentHeight,
-                                   styleState: $styleState,
-                                   parentOverride: parentOverride)
+            RowComponent(config: config,
+                         model: rowModel,
+                         parentWidth: $parentWidth,
+                         parentHeight: $parentHeight,
+                         styleState: $styleState,
+                         parentOverride: parentOverride,
+                         isScrollable: true)
         case .zStack(let zStackModel):
             ZStackComponent(config: config,
                             model: zStackModel,
@@ -172,6 +177,15 @@ struct LayoutSchemaComponent: View {
                                        parentOverride: parentOverride)
         case .catalogStackedCollection(let model):
             CatalogStackedCollectionComponent(
+                config: config,
+                model: model,
+                parentWidth: $parentWidth,
+                parentHeight: $parentHeight,
+                styleState: $styleState,
+                parentOverride: parentOverride
+            )
+        case .catalogCarouselCollection(let model):
+            CatalogCarouselCollectionComponent(
                 config: config,
                 model: model,
                 parentWidth: $parentWidth,

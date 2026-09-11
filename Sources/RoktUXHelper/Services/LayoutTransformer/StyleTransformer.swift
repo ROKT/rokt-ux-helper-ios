@@ -677,7 +677,8 @@ struct StyleTransformer {
                                           shadow: try updatedShadow(defaultStyle?.shadow, newStyle: newStyle?.shadow),
                                           overflow: newStyle?.overflow ?? defaultStyle?.overflow,
                                           gap: newStyle?.gap ?? defaultStyle?.gap,
-                                          blur: newStyle?.blur ?? defaultStyle?.blur)
+                                          blur: newStyle?.blur ?? defaultStyle?.blur,
+                                          opacity: newStyle?.opacity ?? defaultStyle?.opacity)
     }
 
     static func updatedZStackContainer(_ defaultStyle: ZStackContainerStylingProperties?,
@@ -777,7 +778,7 @@ struct StyleTransformer {
 
     static func updatedShadow(_ defaultStyle: Shadow?,
                               newStyle: Shadow?) throws -> Shadow? {
-        guard let defaultStyle else { return nil }
+        guard let defaultStyle = defaultStyle ?? newStyle else { return nil }
         return Shadow(offsetX: newStyle?.offsetX ?? defaultStyle.offsetX,
                       offsetY: newStyle?.offsetY ?? defaultStyle.offsetY,
                       blurRadius: newStyle?.blurRadius ?? defaultStyle.blurRadius,

@@ -1,0 +1,68 @@
+{
+  "styles": {
+    "elements": {
+      "own": [
+        {
+          "default": {
+            "dimension": {
+              "width": {
+                "type": "fixed",
+                "value": 300
+              }
+            },
+            "container": {
+              "justifyContent": "center",
+              "alignItems": "center"
+            },
+            "background": {
+              "backgroundColor": {
+                "light": "#1D2939"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Centered",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 16,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "fixed",
+                      "value": 120
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 48
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#D92D20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

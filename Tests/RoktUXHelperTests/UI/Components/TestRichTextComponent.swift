@@ -283,6 +283,32 @@ final class TestRichTextComponent: XCTestCase {
         assertRichTextSnapshot(model)
     }
 
+    // MARK: - HTML whitespace regression snapshots
+
+    /// Pretty-printed `<li>` content with inline wrappers renders without
+    /// extra line breaks or missing spaces at inline tag boundaries.
+    func testSnapshot_prettyPrintedListItemsWithInlineSpans() {
+        let value = """
+        <ul>
+        <li>
+        <span><em><strong>High-quality, double-layered satin</strong></em> </span><span>cares for your hair while you sleep</span>
+        </li>
+        <li>
+        <span>Helps maintain hair health by </span><span><em><strong>reducing friction and frizz</strong></em></span>
+        </li>
+        <li>Roomy fit <em><strong>preserves your hairstyle</strong></em> overnight</li>
+        </ul>
+        """
+        let model = RichTextViewModel(
+            value: value,
+            defaultStyle: nil,
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 300)
+    }
+
     // MARK: - Block spacing regression snapshots
 
     //

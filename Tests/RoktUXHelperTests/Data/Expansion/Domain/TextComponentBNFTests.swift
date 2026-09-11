@@ -3,6 +3,18 @@ import XCTest
 
 @available(iOS 15, *)
 final class TextComponentBNFTests: XCTestCase {
+    func test_foreignPlaceholdersRemainUntouchedInPlainAndAttributedText() {
+        for placeholder in ["DATA.creativeCopy.copy", "DATA.catalogItem.title",
+                            "DATA.transactionData.metadata.summary", "DATA.catalogRuntime.total|fallback",
+                            "DATA.creativeCopy.copy:sliceText[Chars,2]"] {
+            let original = "Before %^\(placeholder)^% / %^STATE.totalOffers^% after"
+            let expected = "Before %^\(placeholder)^% / 4 after"
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(original, currentOffer: "2", totalOffers: "4"), expected)
+            XCTAssertEqual(TextComponentBNFHelper.replaceStates(NSAttributedString(string: original),
+                                                                currentOffer: "2", totalOffers: "4").string, expected)
+        }
+    }
+
     func test_parsesCurrentAndTotalOffers() {
         let originalString = "Offer %^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%"
         let result = TextComponentBNFHelper.replaceStates(originalString, currentOffer: "2", totalOffers: "4")

@@ -3,6 +3,18 @@ import DcuiSchema
 
 @available(iOS 15, *)
 extension View {
+    /// Reports this view's own size without contributing a preference, so nested readers
+    /// stay independent -- a scrollable container inside another one measures only itself.
+    func readFrameSize(onChange: @escaping (CGSize) -> Void) -> some View {
+        background(
+            GeometryReader { geometryProxy in
+                Color.clear
+                    .onAppear { onChange(geometryProxy.size.precised()) }
+                    .onChange(of: geometryProxy.size.precised()) { onChange($0) }
+            }
+        )
+    }
+
     func readSize(spacing: SpacingStylingProperties? = nil, onChange: ((CGSize) -> Void)?) -> some View {
         background(
             GeometryReader { geometryProxy in

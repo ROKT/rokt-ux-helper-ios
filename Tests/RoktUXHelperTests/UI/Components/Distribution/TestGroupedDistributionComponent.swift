@@ -73,7 +73,7 @@ final class TestGroupedDistributionComponent: XCTestCase {
     
     func test_goToNextOffer_with_closeOnComplete_false() throws {
         var closeActionCalled = false
-        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         let view = try TestPlaceHolder.make(
             layoutSettings: closeOnCompleteSettings,
             eventHandler: { event in
@@ -98,7 +98,7 @@ final class TestGroupedDistributionComponent: XCTestCase {
     
     func test_goToNextGroup_with_closeOnComplete_false() throws {
         var closeActionCalled = false
-        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false)
+        let closeOnCompleteSettings = LayoutSettings(closeOnComplete: false, bottomSheetPresentation: nil)
         
         let view = try TestPlaceHolder.make(
             layoutSettings: closeOnCompleteSettings,

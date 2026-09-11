@@ -4,6 +4,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct CatalogResponseButtonComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @SwiftUI.Environment(\.isEnabled) private var isEnabled
 
     let config: ComponentConfig
     let model: CatalogResponseButtonViewModel
@@ -35,8 +36,12 @@ struct CatalogResponseButtonComponent: View {
 
     @GestureState private var isPressingDown: Bool = false
 
+    private var isProductInteractionDisabled: Bool {
+        model.catalogItemContext != nil && (!isEnabled || isDisabled || styleState == .disabled)
+    }
+
     var style: CatalogResponseButtonStyles? {
-        switch styleState {
+        switch isProductInteractionDisabled ? .disabled : styleState {
         case .hovered:
             return model.hoveredStyle?.count ?? -1 > breakpointIndex ? model.hoveredStyle?[breakpointIndex] : nil
         case .pressed:
@@ -93,6 +98,56 @@ struct CatalogResponseButtonComponent: View {
     }
 
     var body: some View {
+        if model.isRenderable {
+            if model.catalogItemContext != nil {
+                // Let the scroll view cancel a product press without submitting a response.
+                Button(action: handleButtonTapped) {
+                    styledContent
+                }
+                .buttonStyle(StateButtonStyle { pressed in
+                    isPressed = pressed
+                    updateStyleState()
+                })
+                .disabled(isProductInteractionDisabled)
+                .allowsHitTesting(!isProductInteractionDisabled)
+                .onAppear(perform: updateStyleState)
+                .onChange(of: isEnabled) { _ in updateStyleState() }
+            } else {
+                content
+            }
+        }
+    }
+
+    private var content: some View {
+        styledContent
+            .onTapGesture {
+                handleButtonTapped()
+            }
+            // consecutive gestures to track when long press is held vs released
+            .gesture(LongPressGesture()
+                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
+                .updating($isPressingDown) { value, state, _ in
+                    switch value {
+                    case .second(true, nil):
+                        state = true
+                    default:
+                        break
+                    }
+                })
+            .onChange(of: isPressingDown) { value in
+                if !value {
+                    // handle link when long press is released
+                    handleButtonTapped()
+                }
+            }
+            .onLongPressGesture(perform: {
+            }, onPressingChanged: { isPressed in
+                self.isPressed = isPressed
+                updateStyleState()
+            })
+    }
+
+    private var styledContent: some View {
         build()
             .onHover { isHovered in
                 self.isHovered = isHovered
@@ -138,36 +193,12 @@ struct CatalogResponseButtonComponent: View {
                 availableWidth = size.width
                 availableHeight = size.height
             }
-            .onTapGesture {
-                handleButtonTapped()
-            }
-            // consecutive gestures to track when long press is held vs released
-            .gesture(LongPressGesture()
-                .sequenced(before: LongPressGesture(minimumDuration: .infinity))
-                .updating($isPressingDown) { value, state, _ in
-                    switch value {
-                    case .second(true, nil):
-                        state = true
-                    default:
-                        break
-                    }
-                })
-            .onChange(of: isPressingDown) { value in
-                if !value {
-                    // handle link when long press is released
-                    handleButtonTapped()
-                }
-            }
-            .onLongPressGesture(perform: {
-            }, onPressingChanged: { isPressed in
-                self.isPressed = isPressed
-                updateStyleState()
-            })
     }
 
     func build() -> some View {
         createContainer()
             .accessibilityAddTraits(.isButton)
+            .ifLet(model.accessibilityLabel) { $0.accessibilityElement(children: .ignore).accessibilityLabel($1) }
             .onChange(of: globalScreenSize.width) { newSize in
                 DispatchQueue.main.async {
                     breakpointIndex = model.updateBreakpointIndex(for: newSize)
@@ -206,7 +237,7 @@ struct CatalogResponseButtonComponent: View {
     //   since it will only take up its container's finite height
     // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
     private func shouldExpandToContainerOnSelfAlign() -> Bool {
-        guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
+        guard let heightType = model.defaultStyle?[safe: breakpointIndex]?.dimension?.height else { return false }
 
         switch heightType {
         case .fixed, .percentage:
@@ -217,11 +248,11 @@ struct CatalogResponseButtonComponent: View {
     }
 
     private func handleButtonTapped() {
-        model.cartItemInstantPurchase(position: config.position)
+        model.cartItemInstantPurchase(position: config.position, isEnabled: !isProductInteractionDisabled)
     }
 
     private func updateStyleState() {
-        if isDisabled {
+        if isDisabled || (model.catalogItemContext != nil && !isEnabled) {
             styleState = .disabled
         } else {
             if isPressed {

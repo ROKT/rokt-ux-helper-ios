@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'RoktUXHelper'
-  s.version          = '1.0.0'
+  s.version          = '2.1.1'
   s.summary          = 'UX helper library for the Rokt SDK ecosystem.'
   s.swift_version    = '5.9'
 
@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.resource_bundles = { 'RoktUXHelper' => ['Sources/RoktUXHelper/PrivacyInfo.xcprivacy'] }
   s.frameworks       = 'Foundation', 'UIKit', 'SwiftUI', 'Combine'
 
-  s.dependency 'DcuiSchema', '2.8.1'
+  s.dependency 'DcuiSchema', '2.10.0'
 end

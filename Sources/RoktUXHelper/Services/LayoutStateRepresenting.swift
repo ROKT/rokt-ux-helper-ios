@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import DcuiSchema
 
 @available(iOS 13.0, *)
 protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
@@ -14,6 +15,7 @@ protocol LayoutStateRepresenting: Hashable, Equatable, AnyObject {
     func setLayoutType(_ type: RoktUXPlacementLayoutCode)
     func layoutType() -> RoktUXPlacementLayoutCode
     func closeOnComplete() -> Bool
+    func bottomSheetPresentation() -> BottomSheetPresentation?
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int
     func capturePluginViewState(offerIndex: Int?, dismiss: Bool?)
     func publishStateChange()

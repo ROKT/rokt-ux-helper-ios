@@ -150,6 +150,7 @@ struct StaticLinkComponent: View {
                 updateStyleState()
             })
             .accessibilityAddTraits(.isLink)
+            .ifLet(model.accessibilityLabel) { $0.accessibilityElement(children: .ignore).accessibilityLabel($1) }
     }
 
     func build() -> some View {

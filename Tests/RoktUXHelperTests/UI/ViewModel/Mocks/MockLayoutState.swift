@@ -54,6 +54,11 @@ class MockLayoutState: LayoutStateRepresenting {
         return shouldCloseOnComplete
     }
 
+    var mockBottomSheetPresentation: BottomSheetPresentation?
+    func bottomSheetPresentation() -> BottomSheetPresentation? {
+        return mockBottomSheetPresentation
+    }
+
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
         return mockBreakpointIndex
     }
@@ -63,7 +68,7 @@ class MockLayoutState: LayoutStateRepresenting {
     }
 
     func publishStateChange() {
-        // No-op for mock
+        itemsPublisher.send(items)
     }
 
     func setGlobalCustomState(key: String, value: Int) {

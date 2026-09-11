@@ -3,8 +3,8 @@ import DcuiSchema
 
 /// Helpers for decoding the v2 selection-response layout-schema fields, which
 /// arrive on the wire as JSON **strings** and are parsed into the renderer's
-/// typed schema models. This matches the existing v1 pattern in
-/// ``LayoutVariantModel`` / `PluginConfig`.
+/// typed schema models. This matches the existing pattern in
+/// ``LayoutVariantModel``.
 @available(iOS 13, *)
 enum SelectSchemaParsing {
 

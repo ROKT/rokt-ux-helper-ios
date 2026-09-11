@@ -29,9 +29,14 @@ struct OneByOneDistributionComponent: View {
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
-    @State var currentOffer: Int
+    @State private var storedCurrentOffer: Int
     @State private var toggleTransition = false
     @State var customStateMap: RoktUXCustomStateMap?
+
+    var currentOffer: Int {
+        get { Self.clampedOfferIndex(storedCurrentOffer, childCount: model.children?.count ?? 0) }
+        nonmutating set { storedCurrentOffer = Self.clampedOfferIndex(newValue, childCount: model.children?.count ?? 0) }
+    }
 
     var accessibilityAnnouncement: String {
         String(format: kOneByOneAnnouncement,
@@ -60,8 +65,13 @@ struct OneByOneDistributionComponent: View {
 
         self.parentOverride = parentOverride
         self.model = model
-        _currentOffer = State(wrappedValue: model.initialCurrentIndex ?? 0)
+        _storedCurrentOffer = State(wrappedValue: Self.clampedOfferIndex(model.initialCurrentIndex ?? 0,
+                                                                         childCount: model.children?.count ?? 0))
         _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
+    }
+
+    private static func clampedOfferIndex(_ index: Int, childCount: Int) -> Int {
+        min(max(index, 0), max(childCount - 1, 0))
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -86,7 +96,7 @@ struct OneByOneDistributionComponent: View {
 
     var body: some View {
         if let children = model.children, !children.isEmpty {
-            let safeCurrentOffer = min(max(currentOffer, 0), children.count - 1)
+            let safeCurrentOffer = currentOffer
             Group {
                 LayoutSchemaComponent(config: config.updatePosition(safeCurrentOffer),
                                       layout: children[safeCurrentOffer],
@@ -119,6 +129,7 @@ struct OneByOneDistributionComponent: View {
                                          argument: accessibilityAnnouncement)
                 }
                 .onChange(of: currentOffer) { newValue in
+                    model.publishVisibleOfferIndexes(firstIndex: newValue)
                     model.layoutState?.capturePluginViewState(offerIndex: newValue, dismiss: false)
                     transitionIn()
                     model.sendImpressionEvents(currentOffer: newValue)
@@ -152,14 +163,16 @@ struct OneByOneDistributionComponent: View {
         model.layoutState?.actionCollection[.nextOffer] = goToNextOffer
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
         model.setupBindings(
-            currentProgess: $currentOffer,
+            currentProgess: $storedCurrentOffer,
             customStateMap: $customStateMap,
             totalItems: model.children?.count ?? 0
         )
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     func goToNextOffer(_: Any? = nil) {
-        if currentOffer + 1 < model.children?.count ?? 0 {
+        guard let children = model.children, !children.isEmpty else { return }
+        if currentOffer + 1 < children.count {
             transitionToNextOffer()
         } else if model.layoutState?.closeOnComplete() == true {
             // when on last offer AND closeOnComplete is true
@@ -174,7 +187,7 @@ struct OneByOneDistributionComponent: View {
     }
 
     func goToPreviousOffer(_: Any? = nil) {
-        if currentOffer != 0 {
+        if currentOffer > 0 {
             transitionToPreviousOffer()
         }
     }
@@ -234,11 +247,13 @@ struct OneByOneDistributionComponent: View {
     private func incrementCurrentOffer() {
         customStateMap = RoktUXCustomStateMap()
         currentOffer += 1
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     private func decrementCurrentOffer() {
         customStateMap = RoktUXCustomStateMap()
         currentOffer -= 1
+        model.publishVisibleOfferIndexes(firstIndex: currentOffer)
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

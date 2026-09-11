@@ -1,5 +1,6 @@
 import Foundation
 import DcuiSchema
+import SwiftUI
 
 @available(iOS 15, *)
 class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
@@ -28,13 +29,17 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     let peekThroughSize: [PeekThroughSize]
     @Published var currentPage: Int = 0
     @Published var indexWithinPage: Int = 0
-    @Published var viewableItems: Int = 1
+    @Published var viewableItems: Int = 1 {
+        didSet { publishVisibleOfferIndexes(firstIndex: currentLeadingOfferIndex, count: viewableItems) }
+    }
     @Published var breakpointIndex: Int = 0
     @Published var frameChangeIndex: Int = 0
     @Published var customStateMap: RoktUXCustomStateMap?
 
     /// The left most offer index in a RTL layout
-    @Published var currentLeadingOfferIndex: Int = 0
+    @Published var currentLeadingOfferIndex: Int = 0 {
+        didSet { publishVisibleOfferIndexes(firstIndex: currentLeadingOfferIndex, count: viewableItems) }
+    }
 
     var imageLoader: RoktUXImageLoader? {
         layoutState?.imageLoader
@@ -87,10 +92,16 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         layoutState?.actionCollection[.nextOffer] = goToNextOffer
         layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
-        // Store the raw values instead of bindings
         layoutState?.items[LayoutState.totalItemsKey] = children?.count ?? 0
-        layoutState?.items[LayoutState.viewableItemsKey] = viewableItems
-        layoutState?.items[LayoutState.customStateMap] = customStateMap
+        layoutState?.items[LayoutState.viewableItemsKey] = Binding(
+            get: { [weak self] in self?.viewableItems ?? 1 },
+            set: { [weak self] in self?.viewableItems = $0 }
+        )
+        layoutState?.items[LayoutState.customStateMap] = Binding<RoktUXCustomStateMap?>(
+            get: { [weak self] in self?.customStateMap },
+            set: { [weak self] in self?.customStateMap = $0 }
+        )
+        publishVisibleOfferIndexes(firstIndex: currentLeadingOfferIndex, count: viewableItems)
     }
 
     private func toggleCustomState(_ customStateId: Any?) {

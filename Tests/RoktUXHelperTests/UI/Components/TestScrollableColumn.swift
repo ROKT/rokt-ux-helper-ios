@@ -1,5 +1,6 @@
 import XCTest
 import SwiftUI
+import UIKit
 import ViewInspector
 import SnapshotTesting
 @testable import RoktUXHelper
@@ -7,114 +8,137 @@ import DcuiSchema
 
 @available(iOS 15.0, *)
 final class TestScrollableColumn: XCTestCase {
-
     func test_column() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
 
-        let vstack = try view.inspect().view(TestPlaceHolder.self)
+        let column = try view.inspect().view(TestPlaceHolder.self)
             .view(EmbeddedComponent.self)
             .vStack()[0]
             .view(LayoutSchemaComponent.self)
-            .view(ScrollableColumnComponent.self)
-            .scrollView()
             .view(ColumnComponent.self)
-            .actualView()
-            .inspect()
-            .vStack()
+
+        // A scrollable column is a ColumnComponent whose stack is wrapped in a ScrollView.
+        XCTAssertTrue(try column.actualView().isScrollable)
+
+        // Sizing and decoration are applied to the viewport, so the styling modifiers
+        // wrap the ScrollView rather than the stack inside it.
+        let scrollView = try column.actualView().inspect().scrollView()
 
         // test custom modifier class
-        let paddingModifier = try vstack.modifier(PaddingModifier.self)
+        let paddingModifier = try scrollView.modifier(PaddingModifier.self)
         XCTAssertEqual(try paddingModifier.actualView().padding, FrameAlignmentProperty(top: 18, right: 24, bottom: 0, left: 24))
 
-        // test the effect of custom modifier
-        let padding = try vstack.padding()
-        XCTAssertEqual(padding, EdgeInsets(top: 18.0, leading: 24.0, bottom: 0.0, trailing: 24.0))
-
         // Test weight = 1 add maxHeight .infinity
-        let flexFrame = try vstack.flexFrame()
+        let flexFrame = try scrollView.flexFrame()
         XCTAssertEqual(flexFrame.maxHeight, .infinity)
 
         // background
-        let backgroundModifier = try vstack.modifier(BackgroundModifier.self)
+        let backgroundModifier = try scrollView.modifier(BackgroundModifier.self)
         let backgroundStyle = try backgroundModifier.actualView().backgroundStyle
 
         XCTAssertEqual(backgroundStyle?.backgroundColor, ThemeColor(light: "#F5C1C4", dark: "#F5C1C4"))
 
         // border
-        let borderModifier = try vstack.modifier(BorderModifier.self)
+        let borderModifier = try scrollView.modifier(BorderModifier.self)
         let borderStyle = try borderModifier.actualView().borderStyle
 
         XCTAssertNil(borderStyle)
 
         // alignment
-        let alignment = try vstack.alignment()
+        let alignment = try scrollView.vStack().alignment()
         XCTAssertEqual(alignment, .center)
     }
 
-    // MARK: - Tests for ScrollableColumnComponent computed properties
+    // MARK: - Viewport sizing
 
-    func test_scrollableColumnComponent_computedProperties_withWeight() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model()))
+    func test_scrollableColumn_withMaxHeight_boundsViewportAndScrollsContent() throws {
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnWithTallContent(),
+            hostHeight: 240
+        )
 
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ScrollableColumnComponent.self)
-            .actualView()
-
-        // Test computed properties
-        XCTAssertNotNil(sut.style)
-        XCTAssertNotNil(sut.containerStyle)
-        XCTAssertNotNil(sut.flexStyle)
-        XCTAssertEqual(sut.flexStyle?.weight, 1)
-
-        // Test alignment properties
-        XCTAssertEqual(sut.verticalAlignment, .center)
-        XCTAssertEqual(sut.horizontalAlignment, .center)
-
-        // Test weightProperties
-        XCTAssertEqual(sut.weightProperties.weight, 1)
-        XCTAssertEqual(sut.weightProperties.parent, .column)
-
-        // When only weight is set (no maxHeight in dimensions), dimensionMaxHeight should be nil
-        XCTAssertNil(sut.dimensionMaxHeight)
+        // maxHeight caps the viewport — 200 less the 8pt padding that sits outside it ...
+        XCTAssertEqual(scrollView.bounds.height, 184, accuracy: 1)
+        // ... while the content keeps its full height, so there is somewhere to scroll to.
+        XCTAssertEqual(scrollView.contentSize.height, 6 * 80 + 5 * 8, accuracy: 1)
+        XCTAssertGreaterThan(scrollView.contentSize.height, scrollView.bounds.height)
     }
 
-    func test_scrollableColumnComponent_dimensionMaxHeight_prioritizedOverWeight() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model_with_max_height()))
+    func test_scrollableColumn_withMaxHeightAndWeight_prefersMaxHeight() throws {
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnWithMaxHeight(),
+            hostHeight: 400
+        )
 
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ScrollableColumnComponent.self)
-            .actualView()
-
-        // Test that both weight and maxHeight are present in the style
-        XCTAssertNotNil(sut.flexStyle)
-        XCTAssertEqual(sut.flexStyle?.weight, 1)
-        XCTAssertNotNil(sut.dimensionStyle)
-        XCTAssertEqual(sut.dimensionStyle?.maxHeight, 200)
-
-        // Test that dimensionMaxHeight returns the dimension maxHeight value
-        // This verifies that dimension maxHeight takes precedence over weight
-        XCTAssertEqual(sut.dimensionMaxHeight, 200)
+        // weight 1 alone would fill the 400pt host; maxHeight wins.
+        // 200 less the 18pt top padding, which sits outside the viewport.
+        XCTAssertEqual(scrollView.bounds.height, 182, accuracy: 1)
     }
 
-    func test_scrollableColumnComponent_dimensionStyle_accessible() throws {
-        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.scrollableColumn(try get_model_with_max_height()))
+    func test_scrollableColumn_withMinHeight_expandsViewportBeyondItsContent() throws {
+        // The host is deliberately shorter than minHeight, so a viewport that merely
+        // wrapped its 48pt of content could not pass this.
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnWithMinHeight(),
+            hostHeight: 150
+        )
 
-        let sut = try view.inspect().view(TestPlaceHolder.self)
-            .view(EmbeddedComponent.self)
-            .vStack()[0]
-            .view(LayoutSchemaComponent.self)
-            .view(ScrollableColumnComponent.self)
-            .actualView()
+        // 200pt minimum less the 8pt padding outside the viewport.
+        XCTAssertEqual(scrollView.bounds.height, 184, accuracy: 1)
+    }
 
-        // Verify dimensionStyle is accessible and contains expected values
-        XCTAssertNotNil(sut.dimensionStyle)
-        XCTAssertEqual(sut.dimensionStyle?.maxHeight, 200)
+    func test_scrollableColumn_withPercentageChildren_measuresThemAgainstTheViewport() throws {
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnWithPercentageChildren(),
+            hostHeight: 400
+        )
+
+        // Fixed 200pt viewport, two 50% children: they fill it exactly rather than
+        // resolving against their own intrinsic height.
+        XCTAssertEqual(scrollView.bounds.height, 200, accuracy: 1)
+        XCTAssertEqual(scrollView.contentSize.height, 200, accuracy: 1)
+    }
+
+    func test_scrollableColumn_withoutHeightStyle_wrapsItsContent() throws {
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnWrapsContent(),
+            hostHeight: 400
+        )
+
+        // An 80pt child. A greedy ScrollView would take the full 400 instead.
+        XCTAssertEqual(scrollView.bounds.height, 80, accuracy: 1)
+        XCTAssertEqual(scrollView.contentSize.height, 80, accuracy: 1)
+    }
+
+    func test_scrollableColumn_withShortContent_keepsMainAxisAlignment() throws {
+        let scrollView = try renderScrollableColumn(
+            ModelTestData.ColumnData.scrollableColumnCentersShortContent(),
+            hostHeight: 400
+        )
+
+        // A ScrollView pins its content to the top, so `justifyContent: center` can only be
+        // honoured if the stack fills the viewport rather than sitting at its intrinsic 48pt.
+        XCTAssertEqual(scrollView.bounds.height, 200, accuracy: 1)
+        XCTAssertEqual(scrollView.contentSize.height, 200, accuracy: 1)
+    }
+
+    func test_scrollableColumn_withStretchAndMaxHeight_prefersMaxHeight() throws {
+        // `alignSelf: stretch` inside a Row targets the column's height. Lifting maxHeight
+        // there makes the viewport fill the parent, which leaves tall content unscrollable
+        // again -- the exact failure this change exists to fix.
+        let row = ModelTestData.RowData.rowWithStretchScrollableColumn()
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
+        let model = try transformer.getRow(
+            row.styles,
+            children: transformer.transformChildren(row.children, context: .outer([]))
+        )
+        let host = ScrollViewHost(layout: .row(model), size: CGSize(width: 350, height: 400))
+        let scrollView = try host.settledScrollView()
+
+        XCTAssertEqual(scrollView.bounds.height, 200, accuracy: 1)
+        // Four 80pt sections with three 8pt gaps.
+        XCTAssertEqual(scrollView.contentSize.height, 4 * 80 + 3 * 8, accuracy: 1)
+        XCTAssertGreaterThan(scrollView.contentSize.height, scrollView.bounds.height)
     }
 
     // MARK: - Snapshots
@@ -130,24 +154,107 @@ final class TestScrollableColumn: XCTestCase {
         )
     }
 
+    func testSnapshot_tallScrollableContentAtTop() throws {
+        let host = try makeScrollableColumnHost(
+            ModelTestData.ColumnData.scrollableColumnWithTallContent(),
+            hostHeight: 240
+        )
+        _ = try host.settledScrollView()
+
+        assertSnapshot(
+            of: host.hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
+    }
+
+    func testSnapshot_tallScrollableContentAtBottom() throws {
+        let host = try makeScrollableColumnHost(
+            ModelTestData.ColumnData.scrollableColumnWithTallContent(),
+            hostHeight: 240
+        )
+        let scrollView = try host.settledScrollView()
+
+        scrollView.setContentOffset(
+            CGPoint(x: 0, y: scrollView.contentSize.height - scrollView.bounds.height),
+            animated: false
+        )
+        host.layoutIfNeeded()
+
+        assertSnapshot(
+            of: host.hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
+    }
+
+    func testSnapshot_minHeightExpandsViewport() throws {
+        let host = try makeScrollableColumnHost(
+            ModelTestData.ColumnData.scrollableColumnWithMinHeight(),
+            hostHeight: 300
+        )
+        _ = try host.settledScrollView()
+
+        assertSnapshot(
+            of: host.hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
+    }
+
+    func testSnapshot_percentageChildrenFillViewport() throws {
+        let host = try makeScrollableColumnHost(
+            ModelTestData.ColumnData.scrollableColumnWithPercentageChildren(),
+            hostHeight: 400
+        )
+        _ = try host.settledScrollView()
+
+        assertSnapshot(
+            of: host.hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
+    }
+
+    func testSnapshot_shortContentKeepsMainAxisAlignment() throws {
+        let host = try makeScrollableColumnHost(
+            ModelTestData.ColumnData.scrollableColumnCentersShortContent(),
+            hostHeight: 400
+        )
+        _ = try host.settledScrollView()
+
+        assertSnapshot(
+            of: host.hostingController,
+            as: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+        )
+    }
+
     // MARK: - Helpers
 
     func get_model() throws -> ColumnViewModel {
+        try get_column_model(ModelTestData.ColumnData.columnWithBasicText())
+    }
+
+    private func get_column_model(
+        _ column: ColumnModel<LayoutSchemaModel, WhenPredicate>
+    ) throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let column = ModelTestData.ColumnData.columnWithBasicText()
         return try transformer.getColumn(
             column.styles,
             children: transformer.transformChildren(column.children, context: .outer([]))
         )
     }
 
-    func get_model_with_max_height() throws -> ColumnViewModel {
-        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
-        let column = ModelTestData.ColumnData.scrollableColumnWithMaxHeight()
-        return try transformer.getColumn(
-            column.styles,
-            children: transformer.transformChildren(column.children, context: .outer([]))
-        )
+    private func renderScrollableColumn(
+        _ column: ColumnModel<LayoutSchemaModel, WhenPredicate>,
+        hostHeight: CGFloat
+    ) throws -> UIScrollView {
+        try makeScrollableColumnHost(column, hostHeight: hostHeight).settledScrollView()
     }
 
+    private func makeScrollableColumnHost(
+        _ column: ColumnModel<LayoutSchemaModel, WhenPredicate>,
+        hostHeight: CGFloat
+    ) throws -> ScrollViewHost {
+        ScrollViewHost(
+            layout: .scrollableColumn(try get_column_model(column)),
+            size: CGSize(width: 350, height: hostHeight)
+        )
+    }
 }

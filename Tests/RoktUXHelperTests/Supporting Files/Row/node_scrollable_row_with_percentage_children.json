@@ -1,0 +1,101 @@
+{
+  "styles": {
+    "elements": {
+      "own": [
+        {
+          "default": {
+            "dimension": {
+              "width": {
+                "type": "fixed",
+                "value": 200
+              }
+            },
+            "container": {
+              "alignItems": "center"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Red half",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 14,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "percentage",
+                      "value": 50
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#D92D20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Blue half",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 14,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "width": {
+                      "type": "percentage",
+                      "value": 50
+                    },
+                    "height": {
+                      "type": "fixed",
+                      "value": 80
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#2E90FA"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -11,7 +11,7 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
     func map(consumer: LayoutSchemaViewModel, context: CatalogItem) {
         switch consumer {
         case .richText(let textModel):
-            let originalText = textModel.value ?? ""
+            let originalText = textModel.currentTemplateText
 
             let transformedText = resolveDataExpansion(
                 originalText,
@@ -20,7 +20,7 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
 
             textModel.updateDataBinding(dataBinding: .value(transformedText))
         case .basicText(let textModel):
-            let originalText = textModel.value ?? ""
+            let originalText = textModel.currentTemplateText
 
             let transformedText = resolveDataExpansion(
                 originalText,
@@ -66,7 +66,7 @@ struct CatalogMapper<Extractor: DataExtracting>: SyntaxMapping where Extractor.M
         // given fullText = "Hello %^DATA.catalogItem.someValue1^ AND %^DATA.catalogItem.someValue2^%"
         var placeHolderToResolvedValue: [String: String] = [:]
 
-        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let bnfRegexPattern = BNFPlaceholder.expression
         let fullTextRange = NSRange(fullText.startIndex..<fullText.endIndex, in: fullText)
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }

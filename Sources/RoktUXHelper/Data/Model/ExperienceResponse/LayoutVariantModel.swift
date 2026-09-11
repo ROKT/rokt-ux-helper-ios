@@ -25,7 +25,7 @@ struct LayoutVariantModel: Decodable {
         }
     }
 
-    init(layoutVariantSchema: LayoutSchemaModel,
+    init(layoutVariantSchema: LayoutSchemaModel?,
          moduleName: String?) {
         self.layoutVariantSchema = layoutVariantSchema
         self.moduleName = moduleName

@@ -4,4 +4,5 @@ enum LayoutTransformerError: Error, Equatable {
     case InvalidMapping(line: Int = #line, function: String = #function)
     case InvalidSyntaxMapping(line: Int = #line, function: String = #function)
     case missingData
+    case unsupportedFeature(String)
 }

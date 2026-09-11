@@ -30,6 +30,15 @@ class DistributionViewModel: Hashable {
         sendCreativeImpressionEvent(currentOffer: currentOffer)
     }
 
+    func publishVisibleOfferIndexes(firstIndex: Int, count: Int = 1) {
+        guard let layoutState else { return }
+        let start = min(max(0, firstIndex), slots.count)
+        let end = start + min(max(0, count), slots.count - start)
+        let indexes = Array(start..<end)
+        guard layoutState.items[LayoutState.visibleOfferIndexesKey] as? [Int] != indexes else { return }
+        layoutState.items[LayoutState.visibleOfferIndexesKey] = indexes
+    }
+
     func sendSlotImpressionEvent(currentOffer: Int) {
         guard let slotJWTToken = getSlotJWTToken(currentOffer: currentOffer) else { return }
 

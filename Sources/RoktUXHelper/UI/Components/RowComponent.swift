@@ -37,9 +37,11 @@ struct RowComponent: View {
     @Binding var styleState: StyleState
     @State private var availableWidth: CGFloat?
     @State private var availableHeight: CGFloat?
+    @State private var scrollViewportWidth: CGFloat?
     @State private var currentStyle: BaseStyles?
 
     let parentOverride: ComponentParentOverride?
+    var isScrollable: Bool = false
 
     var passableBackgroundStyle: BackgroundStylingProperties? {
         backgroundStyle ?? parentOverride?.parentBackgroundStyle
@@ -67,6 +69,41 @@ struct RowComponent: View {
 
     var accessibilityBehavior: AccessibilityChildBehavior {
         model.accessibilityGrouped ? .combine : .contain
+    }
+
+    private var widthModifier: WidthModifier {
+        WidthModifier(widthProperty: dimensionStyle?.width,
+                      minimum: dimensionStyle?.minWidth,
+                      maximum: dimensionStyle?.maxWidth,
+                      alignment: horizontalAlignment.getAlignment(),
+                      defaultWidth: .fitWidth,
+                      parentWidth: parentWidth)
+    }
+
+    // A `ScrollView` is greedy along its scroll axis. When no style constrains this
+    // row's width, pin the viewport to its content so a scrollable row wraps exactly
+    // like a non-scrollable one.
+    private var scrollViewWrapsContent: Bool {
+        let stretchesHorizontally = config.parent == .column
+            && (flexStyle?.alignSelf == .stretch || parentOverride?.stretchChildren == true)
+
+        return widthModifier.fixedWidth == nil
+            && widthModifier.frameMinWidth == nil
+            && widthModifier.frameMaxWidth == nil
+            && !widthModifier.isPercentageWidth
+            && flexStyle?.weight == nil
+            && !stretchesHorizontally
+    }
+
+    private var mainAxisAlignment: Alignment {
+        rowPrimaryAxisAlignment(justifyContent: containerStyle?.justifyContent)
+    }
+
+    // A ScrollView pins its content to the leading edge, so `justifyContent` cannot place
+    // the stack on its own. Let the stack fill a viewport that is wider than its content and
+    // carry the alignment; wider content leaves this a no-op and still defines the scroll range.
+    private var scrollContentMinWidth: CGFloat? {
+        scrollViewWrapsContent ? nil : scrollViewportWidth
     }
 
     var body: some View {
@@ -125,7 +162,23 @@ struct RowComponent: View {
         }
     }
 
+    @ViewBuilder
     func build() -> some View {
+        // Horizontal sizing, decoration and margin are applied by `applyLayoutModifier`
+        // outside this `ScrollView`, so they belong to the viewport while the stack
+        // inside stays unbounded and defines the scrollable range.
+        if isScrollable {
+            ScrollView(.horizontal) {
+                stack().frame(minWidth: scrollContentMinWidth, alignment: mainAxisAlignment)
+            }
+            .fixedSize(horizontal: scrollViewWrapsContent, vertical: false)
+            .readFrameSize { scrollViewportWidth = $0.width }
+        } else {
+            stack()
+        }
+    }
+
+    private func stack() -> some View {
         return HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
                       spacing: CGFloat(containerStyle?.gap ?? 0)) {
             if let children = model.children {

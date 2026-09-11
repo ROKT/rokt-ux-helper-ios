@@ -90,14 +90,41 @@ public class RoktUXEvent {
         }
     }
 
-    /// Triggered when a layout could not be displayed due to some failure
+    /// Triggered when a layout could not be displayed due to some failure.
+    ///
+    /// Inspect ``reason`` to distinguish "no offer returned" (not an integration bug)
+    /// from rendering or host-integration failures.
     public class LayoutFailure: RoktUXEvent {
         public let layoutId: String?
+        /// Session ID from the experience response when available.
+        public let sessionId: String?
+        /// Why the layout could not be shown.
+        public let reason: Reason
+
+        /// Why a layout could not be displayed.
+        public enum Reason: String, Sendable {
+            /// Experience response decoded but contained no renderable offers/layouts.
+            /// Not an integration bug — contact your account manager with ``LayoutFailure/sessionId``.
+            case noOffers
+            /// Experience response could not be decoded or mapped.
+            case invalidResponse
+            /// Layout schema failed validation/transform (color, mapping, etc.).
+            case invalidSchema
+            /// Embedded placement target has no `LayoutLoader` in the host app.
+            case missingEmbeddedTarget
+            /// Overlay/bottom sheet could not be presented (no suitable view controller).
+            case presentationFailed
+        }
 
         /// Initializes a LayoutFailure event.
-        /// - Parameter layoutId: The identifier of the layout.
-        init(layoutId: String?) {
+        /// - Parameters:
+        ///   - layoutId: The identifier of the layout, when known.
+        ///   - sessionId: The session identifier from the experience response, when known.
+        ///   - reason: Why the layout could not be shown.
+        init(layoutId: String?, sessionId: String? = nil, reason: Reason) {
             self.layoutId = layoutId
+            self.sessionId = sessionId
+            self.reason = reason
         }
     }
 

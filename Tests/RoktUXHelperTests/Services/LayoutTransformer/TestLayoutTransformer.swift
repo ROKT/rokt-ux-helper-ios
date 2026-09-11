@@ -29,16 +29,21 @@ final class TestLayoutTransformer: XCTestCase {
         let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: [slot]))
         
         // Act
-        let transformedCreativeResponse = try layoutTransformer.getCreativeResponseUIModel(
-            responseKey: model.responseKey,
-            openLinks: nil,
-            styles: model.styles,
-            children: layoutTransformer.transformChildren(model.children, context: .inner(.positive(slot.offer!))),
-            offer: slot.offer!
-        )
+        guard case .creativeResponse(let transformedCreativeResponse) = try layoutTransformer.getCreativeResponse(
+            model: model,
+            context: .inner(.generic(slot.offer))
+        ) else {
+            XCTFail("Expected the selected positive response")
+            return
+        }
         
         // Assert
         XCTAssertEqual(transformedCreativeResponse.responseOptions, responseOption)
+        guard case .basicText(let label) = transformedCreativeResponse.children?.first else {
+            XCTFail("Expected the response label")
+            return
+        }
+        XCTAssertEqual(label.boundValue, "Yes please")
     }
     
     func test_creative_response_includes_positive_response_option_with_external_action() throws {

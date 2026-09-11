@@ -9,6 +9,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-09
+
+### Fixed
+
+- Retry overlay and bottom sheet presentation ([#362](https://github.com/ROKT/rokt-ux-helper-ios/pull/362))
+- Stop coverage post-processing flake from failing unit-test ([#361](https://github.com/ROKT/rokt-ux-helper-ios/pull/361))
+
+### Changed
+
+- Sanitise production-shaped values in demo/test fixtures ([#360](https://github.com/ROKT/rokt-ux-helper-ios/pull/360))
+
+## [2.1.0] - 2026-09-08
+
+### Added
+
+- Present full-bleed bottom sheets from the SDK ([#355](https://github.com/ROKT/rokt-ux-helper-ios/pull/355))
+- Integrate inline copy and product carousels ([#351](https://github.com/ROKT/rokt-ux-helper-ios/pull/351))
+- Route product URLs and emit product events ([#348](https://github.com/ROKT/rokt-ux-helper-ios/pull/348))
+- Render products in an independent carousel ([#350](https://github.com/ROKT/rokt-ux-helper-ios/pull/350))
+- Preserve product response data and item context ([#347](https://github.com/ROKT/rokt-ux-helper-ios/pull/347))
+- Add native inline text and character slicing ([#349](https://github.com/ROKT/rokt-ux-helper-ios/pull/349))
+- Surface sessionId and separate no-offers from render failures ([#342](https://github.com/ROKT/rokt-ux-helper-ios/pull/342))
+
+### Fixed
+
+- Honor global expansion state ([#358](https://github.com/ROKT/rokt-ux-helper-ios/pull/358))
+- Apply scroll container sizing to the viewport ([#345](https://github.com/ROKT/rokt-ux-helper-ios/pull/345))
+
+### Changed
+
+- Clarify native validation and public content rules ([#357](https://github.com/ROKT/rokt-ux-helper-ios/pull/357))
+- Scope Trunk Check to the PR diff instead of the whole repo ([#354](https://github.com/ROKT/rokt-ux-helper-ios/pull/354))
+- Upgrade trunk ([#353](https://github.com/ROKT/rokt-ux-helper-ios/pull/353))
+- Trim AGENTS.md to the non-derivable core ([#352](https://github.com/ROKT/rokt-ux-helper-ios/pull/352))
+- Bump trunk-io/trunk-action from 1.3.1 to 2.0.0 ([#346](https://github.com/ROKT/rokt-ux-helper-ios/pull/346))
+
+## [2.0.0] - 2026-08-11
+
+### Breaking Changes
+
+- Make SelectResponse the canonical experience response ([#338](https://github.com/ROKT/rokt-ux-helper-ios/pull/338))
+
+## [1.0.1] - 2026-08-10
+
+### Added
+
+- Include click destination URL metadata ([#334](https://github.com/ROKT/rokt-ux-helper-ios/pull/334))
+- Populate interactionType on user_interaction objectData ([#333](https://github.com/ROKT/rokt-ux-helper-ios/pull/333))
+
+### Fixed
+
+- Publish the same rounded height that is applied ([#340](https://github.com/ROKT/rokt-ux-helper-ios/pull/340))
+- Collapse HTML whitespace in parser ([#335](https://github.com/ROKT/rokt-ux-helper-ios/pull/335))
+
+### Changed
+
+- Bump actions/checkout from 6.0.3 to 7.0.1 ([#332](https://github.com/ROKT/rokt-ux-helper-ios/pull/332))
+- Bump github.com/pointfreeco/swift-snapshot-testing from 1.19.2 to 1.19.4 ([#336](https://github.com/ROKT/rokt-ux-helper-ios/pull/336))
+- Upgrade trunk ([#317](https://github.com/ROKT/rokt-ux-helper-ios/pull/317))
+
 ## [1.0.0] - 2026-07-16
 
 ### Fixed
@@ -399,7 +459,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...2.1.1
+[2.1.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...2.1.0
+[2.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...2.0.0
+[1.0.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.13.0...1.0.0
 [0.13.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.3...0.13.0
 [0.12.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/0.12.2...0.12.3

@@ -13,6 +13,8 @@ protocol PredicateHandling {
     var globalCustomStateMap: Binding<RoktUXCustomStateMap?> { get }
     var globalBreakPoints: BreakPoint? { get }
     var offers: [OfferModel?] { get }
+    var catalogItemContext: CatalogItemContext? { get }
+    var predicateOfferIndex: Int? { get }
     var width: CGFloat { get }
     var componentConfig: ComponentConfig? { get }
     var animate: Bool { get set }
@@ -26,6 +28,9 @@ protocol PredicateHandling {
 extension PredicateHandling {
 
     var placeholderResolver: PlaceholderPredicateResolver { PlaceholderPredicateResolver() }
+
+    var catalogItemContext: CatalogItemContext? { nil }
+    var predicateOfferIndex: Int? { nil }
 
     var currentProgress: Binding<Int> {
         layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
@@ -48,7 +53,7 @@ extension PredicateHandling {
     }
 
     var activeCatalogItem: CatalogItem? {
-        layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
+        catalogItemContext?.catalogItem ?? layoutState?.items[LayoutState.activeCatalogItemKey] as? CatalogItem
     }
 
     func shouldApply() -> Bool {
@@ -286,6 +291,7 @@ extension PredicateHandling {
     }
 
     private func getCreativeCopy(_ offerPosition: Int) -> [String: String] {
+        if let catalogItemContext { return catalogItemContext.offer.creative.copy }
         guard offers.count > offerPosition else { return [:] }
         return offers[offerPosition]?.creative.copy ?? [:]
     }
@@ -358,7 +364,7 @@ extension PredicateHandling {
         let breakPointsMatched = breakPointOrientationPredicatesMatched(width: uiState.width)
         let darkModeMatched = darkModePredicatesMatched(isDarkMode: uiState.isDarkMode)
         let staticBooleanMatched = staticBooleanPredicatesMatched()
-        let creativeCopyMatched = creativeCopyMatched(offerPosition: uiState.currentProgress)
+        let creativeCopyMatched = creativeCopyMatched(offerPosition: predicateOfferIndex ?? uiState.currentProgress)
         let staticStringMatched = staticStringPredicatesMatched()
         let customStateMatched = customStatePredicatesMatched(customStateMap: uiState.customStateMap,
                                                               globalCustomStateMap: uiState.globalCustomStateMap,
@@ -419,9 +425,14 @@ extension PredicateHandling {
     private func placeholderPredicatesMatched(uiState: WhenComponentUIState) -> Bool? {
         guard !placeholderPredicates.isEmpty else { return nil }
 
-        let context = PlaceholderResolutionContext(offers: offers,
-                                                   currentOfferIndex: uiState.currentProgress,
+        let context: PlaceholderResolutionContext
+        if let catalogItemContext {
+            context = PlaceholderResolutionContext(catalogItemContext: catalogItemContext)
+        } else {
+            context = PlaceholderResolutionContext(offers: offers,
+                                                   currentOfferIndex: predicateOfferIndex ?? uiState.currentProgress,
                                                    activeCatalogItem: activeCatalogItem)
+        }
 
         var matched = true
 

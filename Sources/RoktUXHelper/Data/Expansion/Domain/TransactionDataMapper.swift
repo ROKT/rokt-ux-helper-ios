@@ -50,7 +50,7 @@ struct TransactionDataMapper<Extractor: DataExtracting>: SyntaxMapping where Ext
     ) throws -> [String: String] {
         var placeHolderToResolvedValue: [String: String] = [:]
 
-        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let bnfRegexPattern = BNFPlaceholder.expression
         let fullTextRange = NSRange(fullText.startIndex..<fullText.endIndex, in: fullText)
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }

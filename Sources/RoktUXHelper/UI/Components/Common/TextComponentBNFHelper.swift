@@ -50,7 +50,7 @@ class TextComponentBNFHelper {
     ) -> [String: String] {
         var placeHoldersToResolvedValues: [String: String] = [:]
 
-        let bnfRegexPattern = "(?<=\\%\\^)[a-zA-Z0-9 .|]*(?=\\^\\%)"
+        let bnfRegexPattern = BNFPlaceholder.expression
         let range = NSRange(originalString.startIndex..<originalString.endIndex, in: originalString)
 
         guard let regexCheck = try? NSRegularExpression(pattern: bnfRegexPattern) else { return [:] }
@@ -60,6 +60,9 @@ class TextComponentBNFHelper {
             guard let swiftRange = Range(match.range, in: originalString) else { continue }
 
             let chainOfValues = String(originalString[swiftRange])
+            guard PropertyChainDataParser().parse(propertyChain: chainOfValues).parseableChains.contains(where: {
+                $0.namespace == .state
+            }) else { continue }
             let resolvedValue = resolveStateChain(
                 propertyChain: chainOfValues,
                 currentOfferString: currentOffer,
@@ -77,23 +80,26 @@ class TextComponentBNFHelper {
         currentOfferString: String,
         totalOffersString: String
     ) -> String {
-        let validator = PlaceholderValidator()
-        guard validator.isValid(data: propertyChain) else { return propertyChain }
-
+        let validator = PlaceholderValidator(validatesTextOperations: false)
         let parser = PropertyChainDataParser()
         let parsedChain = parser.parse(propertyChain: propertyChain)
+        guard validator.isValid(data: propertyChain) else {
+            return parsedChain.hasTextOperations
+                ? (parsedChain.defaultValue ?? "") : propertyChain
+        }
 
         for keyAndNamespace in parsedChain.parseableChains {
             guard case .state = keyAndNamespace.namespace,
-                  DataBindingStateKeys.isValidKey(keyAndNamespace.key)
+                  DataBindingStateKeys.isValidKey(keyAndNamespace.key),
+                  !keyAndNamespace.textOperations.contains(.invalid)
             else {
                 continue
             }
 
             if DataBindingStateKeys.isTotalOffers(keyAndNamespace.key) {
-                return totalOffersString
+                return (try? keyAndNamespace.applyingTextOperations(to: totalOffersString)) ?? ""
             } else if DataBindingStateKeys.isIndicatorPosition(keyAndNamespace.key) {
-                return currentOfferString
+                return (try? keyAndNamespace.applyingTextOperations(to: currentOfferString)) ?? ""
             }
         }
 
