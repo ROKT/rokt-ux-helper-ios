@@ -26,6 +26,19 @@ typealias EventDiagnosticServicing = EventServicing & DiagnosticServicing
 
 @available(iOS 13.0, *)
 class EventService: Hashable, EventDiagnosticServicing {
+    private struct ActiveDevicePayAttempt {
+        let catalogItemId: String
+        let paymentAttemptId: String
+        let paymentProvider: PaymentProvider
+        var isProviderUIOpen = false
+    }
+
+    private struct ActiveForwardPayment {
+        let catalogItemId: String
+        let paymentAttemptId: String?
+        let completion: (_ status: ForwardPaymentStatus) -> Void
+    }
+
     let pageId: String?
     let pageInstanceGuid: String
     let sessionId: String
@@ -43,8 +56,13 @@ class EventService: Hashable, EventDiagnosticServicing {
     var isFirstPositiveEngagementSend = false
     var dismissOption: LayoutDismissOptions?
 
+    // No helper-owned timeout is scheduled here: the helper does not know the provider SLA and
+    // cannot distinguish an intentionally backgrounded app from an abandoned payment safely.
+    // The owning payment SDK must finalize the attempt with DEVICE_PAY_RESPONSE_TIMEOUT when its
+    // provider-specific, lifecycle-aware deadline expires.
     private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
-    private var forwardPaymentCompletion: ((_ status: ForwardPaymentStatus) -> Void)?
+    private var activeDevicePayAttempt: ActiveDevicePayAttempt?
+    private var activeForwardPayment: ActiveForwardPayment?
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -182,7 +200,7 @@ class EventService: Hashable, EventDiagnosticServicing {
     }
 
     func sendDismissalEvent() {
-        forwardPaymentCompletion = nil
+        cancelActivePayment()
         sendDismissalEventCallback()
         switch dismissOption {
         case .noMoreOffer:
@@ -288,7 +306,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         transactionData: TransactionData?,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     ) {
-        guard devicePayCompletion == nil else {
+        guard activeDevicePayAttempt == nil, activeForwardPayment == nil else {
             sendDiagnostics(
                 message: kDevicePayProcessingErrorCode,
                 callStack: "Device pay already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
@@ -297,58 +315,259 @@ class EventService: Hashable, EventDiagnosticServicing {
             return
         }
 
-        let objectData = [
-            kCatalogItemId: catalogItem.catalogItemId,
-            kQuantity: "1"
-        ]
+        let attempt = ActiveDevicePayAttempt(
+            catalogItemId: catalogItem.catalogItemId,
+            paymentAttemptId: UUID().uuidString,
+            paymentProvider: paymentProvider
+        )
+        activeDevicePayAttempt = attempt
+        devicePayCompletion = completion
+
+        let objectData = devicePayObjectData(catalogItem: catalogItem, attempt: attempt)
         sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem, objectData: objectData)
         uxEventDelegate?.onCartItemDevicePay(
             pluginId,
             catalogItem: catalogItem,
             paymentProvider: paymentProvider,
-            transactionData: transactionData
+            transactionData: transactionData,
+            paymentAttemptId: attempt.paymentAttemptId
         )
 
-        self.devicePayCompletion = completion
     }
 
-    func cartItemDevicePaySuccess(itemId: String) {
+    func cartItemDevicePaySuccess(itemId: String, paymentAttemptId: String) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         // For two-step flows that already transitioned to .pendingConfirmation,
         // devicePayCompletion was cleared by cartItemDevicePayPendingConfirmation and the
         // Step-2 SignalCartItemForwardPayment* signals own the terminal state. Skip emitting
         // SignalCartItemInstantPurchase here to avoid double-counting.
-        guard let completion = devicePayCompletion else { return }
-        sendCartItemEvent(eventType: .SignalCartItemInstantPurchase, catalogItem: catalogItem)
-        completion(.success)
+        guard let attempt = matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ),
+              let completion = devicePayCompletion else { return }
         devicePayCompletion = nil
+        activeDevicePayAttempt = nil
+        sendCartItemEvent(
+            eventType: .SignalCartItemInstantPurchase,
+            catalogItem: catalogItem,
+            objectData: devicePayObjectData(catalogItem: catalogItem, attempt: attempt)
+        )
+        sendDevicePayInteraction(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            action: .DevicePaySucceeded
+        )
+        completion(.success)
     }
 
-    func cartItemDevicePayFailure(itemId: String) {
+    func cartItemDevicePayFailure(
+        itemId: String,
+        failureReason: String?,
+        paymentAttemptId: String
+    ) {
         guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
         // Symmetric guard with cartItemDevicePaySuccess — once the flow transitioned to
         // forward-payment Step-2, that branch owns the terminal failure signal.
-        guard let completion = devicePayCompletion else { return }
-        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseFailure, catalogItem: catalogItem)
-        completion(.failure)
+        guard let attempt = matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ),
+              let completion = devicePayCompletion else { return }
         devicePayCompletion = nil
+        activeDevicePayAttempt = nil
+        sendDevicePayFailureSignal(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            failureReason: normalizedDevicePayFailureReason(failureReason)
+        )
+        sendDevicePayInteraction(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            action: .DevicePayFailed
+        )
+        completion(.failure)
     }
 
-    func cartItemDevicePayRetry(itemId: String) {
-        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
-        guard let completion = devicePayCompletion else { return }
-        completion(.retry)
+    func cartItemDevicePayLoadingFailure(
+        itemId: String,
+        failureReason: String?,
+        paymentAttemptId: String
+    ) {
+        cartItemDevicePayFailure(
+            itemId: itemId,
+            failureReason: normalizedDevicePayFailureReason(
+                failureReason,
+                fallback: "INSTANT_PURCHASE_PAYMENT_LOADING_FAILURE"
+            ),
+            paymentAttemptId: paymentAttemptId
+        )
+    }
+
+    func cartItemDevicePayRetryableFailure(itemId: String, paymentAttemptId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+        guard let attempt = matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ),
+              let completion = devicePayCompletion else { return }
         devicePayCompletion = nil
+        activeDevicePayAttempt = nil
+        sendDevicePayInteraction(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            action: .DevicePayRetryableFailure
+        )
+        sendDevicePayFailureSignal(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            failureReason: "DEVICE_PAY_RETRYABLE_DECLINE"
+        )
+        completion(.retry)
+    }
+
+    func cartItemDevicePayRetry(itemId: String, paymentAttemptId: String) {
+        guard matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ) != nil else { return }
+        cancelActivePayment()
+    }
+
+    func cartItemDevicePayProviderUIOpened(itemId: String, paymentAttemptId: String) {
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }),
+              var attempt = matchingDevicePayAttempt(
+                  itemId: itemId,
+                  paymentAttemptId: paymentAttemptId
+              ),
+              !attempt.isProviderUIOpen else { return }
+        attempt.isProviderUIOpen = true
+        activeDevicePayAttempt = attempt
+        sendDevicePayInteraction(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            action: .PaymentProviderUIOpened
+        )
+    }
+
+    func cartItemDevicePayProviderUIClosed(itemId: String, paymentAttemptId: String) {
+        guard matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ) != nil else { return }
+        cancelActivePayment()
+    }
+
+    private func cancelActivePayment() {
+        if let forwardPayment = activeForwardPayment {
+            cancelActiveForwardPayment(forwardPayment)
+            return
+        }
+        cancelActiveDevicePay()
+    }
+
+    private func cancelActiveDevicePay() {
+        guard let attempt = activeDevicePayAttempt else { return }
+        let completion = devicePayCompletion
+        devicePayCompletion = nil
+        activeDevicePayAttempt = nil
+        guard let catalogItem = catalogItems.first(where: { $0.catalogItemId == attempt.catalogItemId }) else {
+            completion?(.retry)
+            return
+        }
+        if attempt.isProviderUIOpen {
+            sendDevicePayInteraction(
+                catalogItem: catalogItem,
+                attempt: attempt,
+                action: .PaymentProviderUIClosed
+            )
+        }
+        sendDevicePayInteraction(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            action: .DevicePayCancelled
+        )
+        sendDevicePayFailureSignal(
+            catalogItem: catalogItem,
+            attempt: attempt,
+            failureReason: "DEVICE_PAY_CANCELLED"
+        )
+        completion?(.retry)
+    }
+
+    private func sendDevicePayFailureSignal(
+        catalogItem: CatalogItem,
+        attempt: ActiveDevicePayAttempt,
+        failureReason: String
+    ) {
+        var objectData = devicePayObjectData(catalogItem: catalogItem, attempt: attempt)
+        objectData["failureReason"] = failureReason
+        sendCartItemEvent(
+            eventType: .SignalCartItemInstantPurchaseFailure,
+            catalogItem: catalogItem,
+            objectData: objectData
+        )
+    }
+
+    private func sendDevicePayInteraction(
+        catalogItem: CatalogItem,
+        attempt: ActiveDevicePayAttempt,
+        action: UserInteraction
+    ) {
+        var objectData = devicePayObjectData(catalogItem: catalogItem, attempt: attempt)
+        objectData[kAction] = action.rawValue
+        objectData[kContext] = attempt.paymentProvider.rawValue
+        objectData[kInteractionType] = action.rawValue
+        sendCartItemEvent(
+            eventType: .SignalUserInteraction,
+            catalogItem: catalogItem,
+            objectData: objectData
+        )
+    }
+
+    private func devicePayObjectData(
+        catalogItem: CatalogItem,
+        attempt: ActiveDevicePayAttempt
+    ) -> [String: String] {
+        [
+            kCatalogItemId: catalogItem.catalogItemId,
+            kQuantity: "1",
+            kPaymentAttemptId: attempt.paymentAttemptId
+        ]
+    }
+
+    private func matchingDevicePayAttempt(
+        itemId: String,
+        paymentAttemptId: String
+    ) -> ActiveDevicePayAttempt? {
+        guard let attempt = activeDevicePayAttempt,
+              attempt.catalogItemId == itemId,
+              attempt.paymentAttemptId == paymentAttemptId else { return nil }
+        return attempt
+    }
+
+    private func normalizedDevicePayFailureReason(
+        _ failureReason: String?,
+        fallback: String = "DEVICE_PAY_UNKNOWN_FAILURE"
+    ) -> String {
+        let normalized = failureReason?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return normalized.isEmpty ? fallback : normalized
     }
 
     /// Invoked when the host SDK has fetched the order breakdown from
     /// `/v1/cart/initialize-purchase` (or equivalent) and wants the UX to display the
     /// confirmation screen. Resolves the stored `devicePayCompletion` with the breakdown
-    /// payload so the button view model can publish it to the layout. No new Rokt platform
-    /// signal is emitted here — `SignalCartItemInstantPurchaseInitiated` was already sent
-    /// when the user tapped the device-pay button.
-    func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String]) {
-        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else { return }
+    /// payload so the button view model can publish it to the layout. The purchase initiation
+    /// was already recorded when the user tapped.
+    func cartItemDevicePayPendingConfirmation(
+        itemId: String,
+        catalogRuntimeData: [String: String],
+        paymentAttemptId: String
+    ) {
+        guard matchingDevicePayAttempt(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId
+        ) != nil else { return }
         devicePayCompletion?(.pendingConfirmation(catalogRuntimeData: catalogRuntimeData))
         devicePayCompletion = nil
     }
@@ -358,7 +577,7 @@ class EventService: Hashable, EventDiagnosticServicing {
         transactionData: TransactionData?,
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     ) {
-        guard forwardPaymentCompletion == nil else {
+        guard activeForwardPayment == nil else {
             sendDiagnostics(
                 message: kForwardPaymentProcessingErrorCode,
                 callStack: "Forward payment already processing for layout \(pluginId); dropped \(catalogItem.catalogItemId)"
@@ -366,44 +585,201 @@ class EventService: Hashable, EventDiagnosticServicing {
             return
         }
 
-        self.forwardPaymentCompletion = completion
+        let linkedAttempt: ActiveDevicePayAttempt?
+        if let activeDevicePayAttempt {
+            guard activeDevicePayAttempt.catalogItemId == catalogItem.catalogItemId else {
+                let callStack = "Forward payment item \(catalogItem.catalogItemId) does not match "
+                    + "active device-pay item \(activeDevicePayAttempt.catalogItemId) on layout \(pluginId)"
+                sendDiagnostics(
+                    message: kForwardPaymentProcessingErrorCode,
+                    callStack: callStack
+                )
+                return
+            }
+            linkedAttempt = activeDevicePayAttempt
+        } else {
+            linkedAttempt = nil
+        }
 
-        sendCartItemEvent(eventType: .SignalCartItemInstantPurchaseInitiated, catalogItem: catalogItem)
+        let paymentAttemptId = linkedAttempt?.paymentAttemptId
+        activeForwardPayment = ActiveForwardPayment(
+            catalogItemId: catalogItem.catalogItemId,
+            paymentAttemptId: paymentAttemptId,
+            completion: completion
+        )
+
+        let objectData = linkedAttempt.map {
+            forwardPaymentObjectData(catalogItem: catalogItem, attempt: $0)
+        }
+        sendCartItemEvent(
+            eventType: .SignalCartItemInstantPurchaseInitiated,
+            catalogItem: catalogItem,
+            objectData: objectData
+        )
         uxEventDelegate?.onCartItemForwardPayment(
             pluginId,
             catalogItem: catalogItem,
-            transactionData: transactionData
+            transactionData: transactionData,
+            paymentAttemptId: paymentAttemptId
         )
     }
 
-    func cartItemForwardPaymentSuccess(itemId: String) {
-        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else {
-            sendDiagnostics(
-                message: kForwardPaymentProcessingErrorCode,
-                callStack: "Forward payment success for unknown itemId \(itemId) on layout \(pluginId)"
-            )
-            forwardPaymentCompletion?(.failure(reason: "Unknown catalog item: \(itemId)"))
-            forwardPaymentCompletion = nil
-            return
+    func cartItemForwardPaymentSuccess(itemId: String, paymentAttemptId: String?) {
+        guard let forwardPayment = matchingForwardPayment(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId,
+            transition: "success"
+        ),
+              let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+
+        let linkedAttempt: ActiveDevicePayAttempt?
+        if let paymentAttemptId = forwardPayment.paymentAttemptId {
+            guard let attempt = matchingDevicePayAttempt(
+                itemId: itemId,
+                paymentAttemptId: paymentAttemptId
+            ) else {
+                sendForwardPaymentAttemptMismatchDiagnostic(transition: "success")
+                return
+            }
+            linkedAttempt = attempt
+        } else {
+            linkedAttempt = nil
         }
 
-        forwardPaymentCompletion?(.success)
-        forwardPaymentCompletion = nil
+        activeForwardPayment = nil
+        if let attempt = linkedAttempt {
+            activeDevicePayAttempt = nil
+            sendCartItemEvent(
+                eventType: .SignalCartItemInstantPurchase,
+                catalogItem: catalogItem,
+                objectData: forwardPaymentObjectData(catalogItem: catalogItem, attempt: attempt)
+            )
+            sendDevicePayInteraction(
+                catalogItem: catalogItem,
+                attempt: attempt,
+                action: .DevicePaySucceeded
+            )
+        }
+        forwardPayment.completion(.success)
     }
 
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?) {
-        guard catalogItems.contains(where: { $0.catalogItemId == itemId }) else {
-            sendDiagnostics(
-                message: kForwardPaymentProcessingErrorCode,
-                callStack: "Forward payment failure for unknown itemId \(itemId) on layout \(pluginId)"
-            )
-            forwardPaymentCompletion?(.failure(reason: failureReason ?? "Unknown catalog item: \(itemId)"))
-            forwardPaymentCompletion = nil
-            return
+    func cartItemForwardPaymentFailure(
+        itemId: String,
+        failureReason: String?,
+        paymentAttemptId: String?
+    ) {
+        guard let forwardPayment = matchingForwardPayment(
+            itemId: itemId,
+            paymentAttemptId: paymentAttemptId,
+            transition: "failure"
+        ),
+              let catalogItem = catalogItems.first(where: { $0.catalogItemId == itemId }) else { return }
+
+        let linkedAttempt: ActiveDevicePayAttempt?
+        if let paymentAttemptId = forwardPayment.paymentAttemptId {
+            guard let attempt = matchingDevicePayAttempt(
+                itemId: itemId,
+                paymentAttemptId: paymentAttemptId
+            ) else {
+                sendForwardPaymentAttemptMismatchDiagnostic(transition: "failure")
+                return
+            }
+            linkedAttempt = attempt
+        } else {
+            linkedAttempt = nil
         }
 
-        forwardPaymentCompletion?(.failure(reason: failureReason))
-        forwardPaymentCompletion = nil
+        activeForwardPayment = nil
+        if let attempt = linkedAttempt {
+            activeDevicePayAttempt = nil
+            let normalizedReason = normalizedDevicePayFailureReason(failureReason)
+            var objectData = forwardPaymentObjectData(catalogItem: catalogItem, attempt: attempt)
+            objectData["failureReason"] = normalizedReason
+            sendCartItemEvent(
+                eventType: .SignalCartItemInstantPurchaseFailure,
+                catalogItem: catalogItem,
+                objectData: objectData
+            )
+            sendDevicePayInteraction(
+                catalogItem: catalogItem,
+                attempt: attempt,
+                action: .DevicePayFailed
+            )
+        }
+        forwardPayment.completion(.failure(reason: failureReason))
+    }
+
+    private func forwardPaymentObjectData(
+        catalogItem: CatalogItem,
+        attempt: ActiveDevicePayAttempt
+    ) -> [String: String] {
+        var objectData = devicePayObjectData(catalogItem: catalogItem, attempt: attempt)
+        objectData[kPaymentStage] = "ForwardPayment"
+        return objectData
+    }
+
+    private func matchingForwardPayment(
+        itemId: String,
+        paymentAttemptId: String?,
+        transition: String
+    ) -> ActiveForwardPayment? {
+        guard let forwardPayment = activeForwardPayment else { return nil }
+        guard forwardPayment.catalogItemId == itemId,
+              forwardPayment.paymentAttemptId == paymentAttemptId else {
+            sendDiagnostics(
+                message: kForwardPaymentProcessingErrorCode,
+                callStack: "Forward payment \(transition) did not match active item/attempt on layout \(pluginId); ignoring"
+            )
+            return nil
+        }
+        return forwardPayment
+    }
+
+    private func sendForwardPaymentAttemptMismatchDiagnostic(transition: String) {
+        let callStack = "Forward payment \(transition) no longer matches its originating "
+            + "device-pay attempt on layout \(pluginId); ignoring"
+        sendDiagnostics(
+            message: kForwardPaymentProcessingErrorCode,
+            callStack: callStack
+        )
+    }
+
+    private func cancelActiveForwardPayment(_ forwardPayment: ActiveForwardPayment) {
+        activeForwardPayment = nil
+        let cancellationReason = "DEVICE_PAY_CANCELLED"
+        let linkedAttempt = forwardPayment.paymentAttemptId.flatMap {
+            matchingDevicePayAttempt(
+                itemId: forwardPayment.catalogItemId,
+                paymentAttemptId: $0
+            )
+        }
+        devicePayCompletion = nil
+        activeDevicePayAttempt = nil
+
+        if let attempt = linkedAttempt,
+           let catalogItem = catalogItems.first(where: { $0.catalogItemId == attempt.catalogItemId }) {
+            if attempt.isProviderUIOpen {
+                sendDevicePayInteraction(
+                    catalogItem: catalogItem,
+                    attempt: attempt,
+                    action: .PaymentProviderUIClosed
+                )
+            }
+            sendDevicePayInteraction(
+                catalogItem: catalogItem,
+                attempt: attempt,
+                action: .DevicePayCancelled
+            )
+            var objectData = forwardPaymentObjectData(catalogItem: catalogItem, attempt: attempt)
+            objectData["failureReason"] = cancellationReason
+            sendCartItemEvent(
+                eventType: .SignalCartItemInstantPurchaseFailure,
+                catalogItem: catalogItem,
+                objectData: objectData
+            )
+        }
+
+        forwardPayment.completion(.failure(reason: cancellationReason))
     }
 
     private func sendCartItemEvent(eventType: RoktUXEventType, catalogItem: CatalogItem, objectData: [String: String]? = nil) {
