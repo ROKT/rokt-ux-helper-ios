@@ -211,6 +211,8 @@ public class RoktUXEvent {
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
         public let paymentProvider: PaymentProvider
+        /// Unique identifier for this accepted provider-payment attempt.
+        public let paymentAttemptId: String
         /// Backend-provided transaction data (billing / shipping address, supported
         /// payment methods, partner payment reference). `nil` if the offer did not
         /// include transaction data.
@@ -228,7 +230,8 @@ public class RoktUXEvent {
              totalPrice: Decimal?,
              unitPrice: Decimal?,
              paymentProvider: PaymentProvider,
-             transactionData: TransactionData?) {
+             transactionData: TransactionData?,
+             paymentAttemptId: String) {
             self.layoutId = layoutId
             self.name = name
             self.cartItemId = cartItemId
@@ -242,6 +245,7 @@ public class RoktUXEvent {
             self.unitPrice = unitPrice
             self.paymentProvider = paymentProvider
             self.transactionData = transactionData
+            self.paymentAttemptId = paymentAttemptId
         }
     }
 
@@ -257,6 +261,8 @@ public class RoktUXEvent {
         public let quantity: Decimal
         public let totalPrice: Decimal?
         public let unitPrice: Decimal?
+        /// Originating device-pay attempt, or `nil` for a standalone forward payment.
+        public let paymentAttemptId: String?
         /// Backend-provided transaction data (billing / shipping address, supported
         /// payment methods, partner payment reference). `nil` if the offer did not
         /// include transaction data.
@@ -273,7 +279,8 @@ public class RoktUXEvent {
              quantity: Decimal,
              totalPrice: Decimal?,
              unitPrice: Decimal?,
-             transactionData: TransactionData?) {
+             transactionData: TransactionData?,
+             paymentAttemptId: String?) {
             self.layoutId = layoutId
             self.name = name
             self.cartItemId = cartItemId
@@ -286,6 +293,7 @@ public class RoktUXEvent {
             self.totalPrice = totalPrice
             self.unitPrice = unitPrice
             self.transactionData = transactionData
+            self.paymentAttemptId = paymentAttemptId
         }
     }
 }

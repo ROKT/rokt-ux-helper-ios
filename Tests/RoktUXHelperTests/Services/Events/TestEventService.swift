@@ -10,6 +10,14 @@ final class TestEventService: XCTestCase {
     let responseReceivedDate = Date()
     var stubUXHelper: MockUXHelper!
 
+    private var paymentAttemptId: String {
+        guard let paymentAttemptId = stubUXHelper.devicePayAttemptId else {
+            XCTFail("Expected an active paymentAttemptId")
+            return ""
+        }
+        return paymentAttemptId
+    }
+
     override func setUpWithError() throws {
         events = [RoktEventRequest]()
         self.stubUXHelper = MockUXHelper()
@@ -490,13 +498,21 @@ final class TestEventService: XCTestCase {
         )
         eventService.cartItemDevicePayPendingConfirmation(
             itemId: "catalogItemId",
-            catalogRuntimeData: ["total": "USD 10.00"]
+            catalogRuntimeData: ["total": "USD 10.00"],
+            paymentAttemptId: paymentAttemptId
         )
         events.removeAll()
 
         // Act
-        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
-        eventService.cartItemDevicePayFailure(itemId: "catalogItemId")
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+        eventService.cartItemDevicePayFailure(
+            itemId: "catalogItemId",
+            failureReason: nil,
+            paymentAttemptId: paymentAttemptId
+        )
 
         // Assert: no terminal device-pay signal emitted after pendingConfirmation cleared the completion.
         XCTAssertFalse(events.contains { $0.eventType == .SignalCartItemInstantPurchase })
@@ -523,7 +539,10 @@ final class TestEventService: XCTestCase {
         events.removeAll()
 
         // Act
-        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
 
         // Assert
         XCTAssertTrue(events.contains { $0.eventType == .SignalCartItemInstantPurchase })
@@ -532,7 +551,182 @@ final class TestEventService: XCTestCase {
         }
     }
 
-    func test_devicePayRetry_invokesCompletionWithoutFailureSignal() {
+    func test_devicePayFailure_emitsProvidedFailureReason() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayFailure(
+            itemId: "catalogItemId",
+            failureReason: "card_declined",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(failure?.objectData?["failureReason"], "card_declined")
+        let interaction = events.first { $0.eventType == .SignalUserInteraction }
+        XCTAssertEqual(interaction?.objectData?[kAction], UserInteraction.DevicePayFailed.rawValue)
+        XCTAssertEqual(interaction?.objectData?[kContext], PaymentProvider.applePay.rawValue)
+    }
+
+    func test_devicePayFailure_withWhitespaceReason_emitsUnknownReason() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayFailure(
+            itemId: "catalogItemId",
+            failureReason: "   ",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(failure?.objectData?["failureReason"], "DEVICE_PAY_UNKNOWN_FAILURE")
+    }
+
+    func test_devicePayFailure_preservesSharedTimeoutReason() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayFailure(
+            itemId: "catalogItemId",
+            failureReason: "DEVICE_PAY_RESPONSE_TIMEOUT",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(failure?.objectData?["failureReason"], "DEVICE_PAY_RESPONSE_TIMEOUT")
+    }
+
+    func test_devicePayLoadingFailure_emitsStableReason() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayLoadingFailure(
+            itemId: "catalogItemId",
+            failureReason: nil,
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(
+            failure?.objectData?["failureReason"],
+            "INSTANT_PURCHASE_PAYMENT_LOADING_FAILURE"
+        )
+    }
+
+    func test_devicePaySynchronousLoadingFailure_emitsInitiatedThenFailure() {
+        var eventService: EventService!
+        stubUXHelper.onDevicePayInvoked = { _, catalogItem, paymentAttemptId in
+            eventService.cartItemDevicePayLoadingFailure(
+                itemId: catalogItem.catalogItemId,
+                failureReason: nil,
+                paymentAttemptId: paymentAttemptId
+            )
+        }
+        eventService = get_mock_event_processor(startDate: startDate,
+                                                catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                uxEventDelegate: stubUXHelper,
+                                                eventHandler: { event in
+            self.events.append(event)
+        })
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+
+        XCTAssertEqual(
+            events.map(\.eventType),
+            [
+                .SignalCartItemInstantPurchaseInitiated,
+                .SignalCartItemInstantPurchaseFailure,
+                .SignalUserInteraction
+            ]
+        )
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(
+            failure?.objectData?["failureReason"],
+            "INSTANT_PURCHASE_PAYMENT_LOADING_FAILURE"
+        )
+    }
+
+    func test_devicePayRetryableFailure_emitsFailureAndReturnsRetry() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { event in
+            self.events.append(event)
+        })
+        var completionStatus: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { completionStatus = $0 }
+        )
+        events.removeAll()
+
+        eventService.cartItemDevicePayRetryableFailure(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(failure?.objectData?["failureReason"], "DEVICE_PAY_RETRYABLE_DECLINE")
+        let interaction = events.first { $0.eventType == .SignalUserInteraction }
+        XCTAssertEqual(interaction?.objectData?[kAction], UserInteraction.DevicePayRetryableFailure.rawValue)
+        XCTAssertEqual(interaction?.objectData?[kContext], PaymentProvider.afterpay.rawValue)
+        guard case .retry = completionStatus else {
+            return XCTFail("expected .retry completion, got \(String(describing: completionStatus))")
+        }
+    }
+
+    func test_devicePayRetry_invokesCompletionAndEmitsCancellationSignal() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -548,12 +742,333 @@ final class TestEventService: XCTestCase {
         )
         events.removeAll()
 
-        eventService.cartItemDevicePayRetry(itemId: "catalogItemId")
+        eventService.cartItemDevicePayRetry(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
 
-        XCTAssertTrue(events.isEmpty, "retry must not emit SignalCartItemInstantPurchaseFailure")
+        let failure = events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        XCTAssertEqual(failure?.objectData?["failureReason"], "DEVICE_PAY_CANCELLED")
+        let cancellation = events.first { $0.eventType == .SignalUserInteraction }
+        XCTAssertEqual(cancellation?.objectData?[kAction], UserInteraction.DevicePayCancelled.rawValue)
+        XCTAssertEqual(cancellation?.objectData?[kContext], PaymentProvider.afterpay.rawValue)
         guard case .retry = completionStatus else {
             return XCTFail("expected .retry completion, got \(String(describing: completionStatus))")
         }
+    }
+
+    func test_devicePaySignalsUseExistingCatalogItemData() throws {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let initiated = try XCTUnwrap(events.first { $0.eventType == .SignalCartItemInstantPurchaseInitiated })
+        XCTAssertEqual(initiated.parentGuid, "catalogInstanceGuid")
+        XCTAssertEqual(initiated.objectData?[kCatalogItemId], "catalogItemId")
+        XCTAssertEqual(initiated.objectData?[kPaymentAttemptId], paymentAttemptId)
+
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let success = try XCTUnwrap(events.first { $0.eventType == .SignalCartItemInstantPurchase })
+        XCTAssertEqual(success.parentGuid, "catalogInstanceGuid")
+        XCTAssertEqual(success.objectData?[kCatalogItemId], "catalogItemId")
+        XCTAssertEqual(success.objectData?[kPaymentAttemptId], paymentAttemptId)
+        let interaction = try XCTUnwrap(events.first { $0.eventType == .SignalUserInteraction })
+        XCTAssertEqual(interaction.objectData?[kAction], UserInteraction.DevicePaySucceeded.rawValue)
+        XCTAssertEqual(interaction.objectData?[kContext], PaymentProvider.afterpay.rawValue)
+    }
+
+    func test_sameItemDevicePayRetriesRemainDistinctThroughEventProcessor() throws {
+        let expectation = expectation(description: "both payment attempts should be delivered")
+        var processedEvents: [RoktEventRequest]?
+        let processor = EventProcessor(queue: .userInitiated) { payload in
+            guard let data = try? JSONSerialization.data(withJSONObject: payload),
+                  let decoded = try? JSONDecoder().decode(RoktUXEventsPayload.self, from: data) else {
+                return XCTFail("Expected a valid platform event payload")
+            }
+            processedEvents = decoded.events
+            expectation.fulfill()
+        }
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        let eventService = EventService(
+            pageId: mockPageId,
+            pageInstanceGuid: mockPageInstanceGuid,
+            sessionId: "session",
+            pluginInstanceGuid: mockPluginInstanceGuid,
+            pluginId: mockPluginId,
+            pluginName: mockPluginName,
+            startDate: startDate,
+            catalogItems: [catalogItem],
+            uxEventDelegate: stubUXHelper,
+            processor: processor,
+            responseReceivedDate: responseReceivedDate,
+            pluginConfigJWTToken: mockPluginConfigJWTToken,
+            useDiagnosticEvents: false
+        )
+
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let firstAttemptId = paymentAttemptId
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let secondAttemptId = paymentAttemptId
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: secondAttemptId
+        )
+
+        wait(for: [expectation], timeout: 1)
+        let initiations = processedEvents?.filter {
+            $0.eventType == .SignalCartItemInstantPurchaseInitiated
+        }
+        let successes = processedEvents?.filter {
+            $0.eventType == .SignalCartItemInstantPurchase
+        }
+        XCTAssertEqual(initiations?.count, 2)
+        XCTAssertEqual(successes?.count, 2)
+        XCTAssertEqual(
+            Set(initiations?.compactMap { $0.objectData?[kPaymentAttemptId] } ?? []),
+            Set([firstAttemptId, secondAttemptId])
+        )
+    }
+
+    func test_devicePayOpenCloseReopenEmitsEveryInteraction() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let firstAttemptId = paymentAttemptId
+        eventService.cartItemDevicePayProviderUIOpened(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        eventService.cartItemDevicePayProviderUIClosed(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        eventService.cartItemDevicePayRetry(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        XCTAssertEqual(
+            events.filter { $0.eventType == .SignalCartItemInstantPurchaseFailure }.count,
+            1,
+            "a late duplicate dismissal callback must not emit a second terminal failure"
+        )
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.cartItemDevicePayProviderUIOpened(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let interactions = events.filter { $0.eventType == .SignalUserInteraction }
+        XCTAssertEqual(interactions.map { $0.objectData?[kAction] }, [
+            UserInteraction.PaymentProviderUIOpened.rawValue,
+            UserInteraction.PaymentProviderUIClosed.rawValue,
+            UserInteraction.DevicePayCancelled.rawValue,
+            UserInteraction.PaymentProviderUIOpened.rawValue
+        ])
+        XCTAssertTrue(interactions.allSatisfy { $0.parentGuid == "catalogInstanceGuid" })
+        XCTAssertTrue(interactions.allSatisfy { $0.objectData?[kCatalogItemId] == "catalogItemId" })
+        XCTAssertTrue(interactions.allSatisfy { $0.objectData?[kContext] == PaymentProvider.afterpay.rawValue })
+    }
+
+    func test_pendingConfirmationDoesNotEmitPaymentProviderUIOpened() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let opened = events.first {
+            $0.eventType == .SignalUserInteraction
+                && $0.objectData?[kAction] == UserInteraction.PaymentProviderUIOpened.rawValue
+        }
+        XCTAssertNil(opened)
+    }
+
+    func test_providerUIOpenedThenPendingConfirmationEmitsOpenOnlyOnce() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        var completionStatus: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .paypal,
+            transactionData: nil,
+            completion: { completionStatus = $0 }
+        )
+
+        eventService.cartItemDevicePayProviderUIOpened(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let opened = events.filter {
+            $0.eventType == .SignalUserInteraction
+                && $0.objectData?[kAction] == UserInteraction.PaymentProviderUIOpened.rawValue
+        }
+        XCTAssertEqual(opened.count, 1)
+        XCTAssertEqual(opened.first?.objectData?[kContext], PaymentProvider.paypal.rawValue)
+        guard case .pendingConfirmation(let runtimeData) = completionStatus else {
+            return XCTFail("Expected pending confirmation")
+        }
+        XCTAssertEqual(runtimeData["total"], "$10.00")
+    }
+
+    func test_staleDevicePayCallbackDoesNotCompleteNewSameItemAttempt() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let firstAttemptId = paymentAttemptId
+        eventService.cartItemDevicePayRetry(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+
+        var secondCompletion: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { secondCompletion = $0 }
+        )
+        let secondAttemptId = paymentAttemptId
+        events.removeAll()
+
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        XCTAssertNil(secondCompletion)
+        XCTAssertTrue(events.isEmpty)
+
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: secondAttemptId
+        )
+        guard case .success = secondCompletion else {
+            return XCTFail("Expected the matching attempt to complete")
+        }
+    }
+
+    func test_layoutDismissalCancelsAndClearsActiveDevicePay() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        var firstCompletion: DevicePayStatus?
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { firstCompletion = $0 }
+        )
+
+        eventService.sendDismissalEvent()
+
+        guard case .retry = firstCompletion else {
+            return XCTFail("dismissal should resolve active device pay as retry")
+        }
+        XCTAssertTrue(events.contains {
+            $0.eventType == .SignalUserInteraction
+                && $0.objectData?[kAction] == UserInteraction.DevicePayCancelled.rawValue
+        })
+        XCTAssertFalse(events.contains {
+            $0.eventType == .SignalUserInteraction
+                && $0.objectData?[kAction] == UserInteraction.PaymentProviderUIClosed.rawValue
+        })
+        XCTAssertTrue(events.contains {
+            $0.eventType == .SignalCartItemInstantPurchaseFailure
+                && $0.objectData?["failureReason"] == "DEVICE_PAY_CANCELLED"
+        })
+
+        events.removeAll()
+        let dismissedAttemptId = paymentAttemptId
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: dismissedAttemptId
+        )
+        XCTAssertTrue(events.isEmpty, "late completion after dismissal must not emit")
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        XCTAssertTrue(events.contains { $0.eventType == .SignalCartItemInstantPurchaseInitiated })
     }
 
     func test_device_pay_duplicate_call_short_circuits_with_failure_while_processing() {
@@ -574,6 +1089,7 @@ final class TestEventService: XCTestCase {
             transactionData: nil,
             completion: { status in firstCount += 1; firstStatus = status }
         )
+        let firstAttemptId = paymentAttemptId
         let initiatedAfterFirst = events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count
         let delegateAfterFirst = stubUXHelper.roktEvents.filter { $0 == .CartItemDevicePay }.count
 
@@ -599,7 +1115,10 @@ final class TestEventService: XCTestCase {
             return XCTFail("expected .failure for dropped call, got \(String(describing: secondStatus))")
         }
 
-        eventService.cartItemDevicePaySuccess(itemId: "catalogItemId")
+        eventService.cartItemDevicePaySuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
 
         XCTAssertEqual(firstCount, 1, "first completion still fires on success")
         guard case .success = firstStatus else {
@@ -656,7 +1175,10 @@ final class TestEventService: XCTestCase {
         )
         events.removeAll()
 
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: nil
+        )
 
         XCTAssertTrue(events.isEmpty, "success should not emit a platform event; backend emits it")
 
@@ -681,7 +1203,11 @@ final class TestEventService: XCTestCase {
         )
         events.removeAll()
 
-        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: "card declined")
+        eventService.cartItemForwardPaymentFailure(
+            itemId: "catalogItemId",
+            failureReason: "card declined",
+            paymentAttemptId: nil
+        )
 
         XCTAssertTrue(events.isEmpty, "failure should not emit a platform event; backend emits it")
 
@@ -691,14 +1217,281 @@ final class TestEventService: XCTestCase {
         XCTAssertEqual(reason, "card declined")
     }
 
+    func test_twoStepForwardPaymentSuccessEmitsInitiatedAndTerminal() throws {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: paymentAttemptId
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        XCTAssertEqual(stubUXHelper.forwardPaymentAttemptId, paymentAttemptId)
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let initiated = try XCTUnwrap(
+            events.first { $0.eventType == .SignalCartItemInstantPurchaseInitiated }
+        )
+        let success = try XCTUnwrap(
+            events.first { $0.eventType == .SignalCartItemInstantPurchase }
+        )
+        for event in [initiated, success] {
+            XCTAssertEqual(event.objectData?[kPaymentStage], "ForwardPayment")
+            XCTAssertEqual(event.objectData?[kCatalogItemId], "catalogItemId")
+            XCTAssertEqual(event.parentGuid, "catalogInstanceGuid")
+        }
+        let interaction = try XCTUnwrap(events.first { $0.eventType == .SignalUserInteraction })
+        XCTAssertEqual(interaction.objectData?[kAction], UserInteraction.DevicePaySucceeded.rawValue)
+        XCTAssertEqual(interaction.objectData?[kContext], PaymentProvider.afterpay.rawValue)
+    }
+
+    func test_twoStepForwardPaymentFailureEmitsUnknownFailure() throws {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: paymentAttemptId
+        )
+        events.removeAll()
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: { _ in }
+        )
+
+        eventService.cartItemForwardPaymentFailure(
+            itemId: "catalogItemId",
+            failureReason: nil,
+            paymentAttemptId: paymentAttemptId
+        )
+
+        let failure = try XCTUnwrap(
+            events.first { $0.eventType == .SignalCartItemInstantPurchaseFailure }
+        )
+        XCTAssertEqual(failure.objectData?[kPaymentStage], "ForwardPayment")
+        XCTAssertEqual(failure.objectData?[kCatalogItemId], "catalogItemId")
+        XCTAssertEqual(failure.parentGuid, "catalogInstanceGuid")
+        XCTAssertEqual(failure.objectData?["failureReason"], "DEVICE_PAY_UNKNOWN_FAILURE")
+        let interaction = try XCTUnwrap(events.first { $0.eventType == .SignalUserInteraction })
+        XCTAssertEqual(interaction.objectData?[kAction], UserInteraction.DevicePayFailed.rawValue)
+        XCTAssertEqual(interaction.objectData?[kContext], PaymentProvider.afterpay.rawValue)
+    }
+
+    func test_twoStepForwardPaymentMismatchedCallbacksDoNotConsumeCompletion() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [
+                .mock(catalogItemId: "catalogItemId"),
+                .mock(catalogItemId: "otherCatalogItemId")
+            ],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let attemptId = paymentAttemptId
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: attemptId
+        )
+
+        var completionStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: { completionStatus = $0 }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "otherCatalogItemId",
+            paymentAttemptId: attemptId
+        )
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: "stale-attempt"
+        )
+        XCTAssertNil(completionStatus)
+        XCTAssertTrue(events.isEmpty)
+
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: attemptId
+        )
+        guard case .success = completionStatus else {
+            return XCTFail("Expected matching item and attempt to complete forward payment")
+        }
+    }
+
+    func test_twoStepForwardPaymentDismissalEmitsStagedCancellationAndResolvesCompletion() throws {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .paypal,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let attemptId = paymentAttemptId
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: ["total": "$10.00"],
+            paymentAttemptId: attemptId
+        )
+        var completionStatus: ForwardPaymentStatus?
+        var completionCount = 0
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: {
+                completionCount += 1
+                completionStatus = $0
+            }
+        )
+        events.removeAll()
+
+        eventService.sendDismissalEvent()
+
+        let failure = try XCTUnwrap(events.first {
+            $0.eventType == .SignalCartItemInstantPurchaseFailure
+        })
+        XCTAssertEqual(failure.objectData?[kPaymentStage], "ForwardPayment")
+        XCTAssertEqual(failure.objectData?[kPaymentAttemptId], attemptId)
+        XCTAssertEqual(failure.objectData?["failureReason"], "DEVICE_PAY_CANCELLED")
+        let cancellation = try XCTUnwrap(events.first {
+            $0.eventType == .SignalUserInteraction
+                && $0.objectData?[kAction] == UserInteraction.DevicePayCancelled.rawValue
+        })
+        XCTAssertEqual(cancellation.objectData?[kContext], PaymentProvider.paypal.rawValue)
+        guard case .failure(let reason) = completionStatus else {
+            return XCTFail("Expected dismissal to fail the active forward payment")
+        }
+        XCTAssertEqual(reason, "DEVICE_PAY_CANCELLED")
+
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: attemptId
+        )
+        XCTAssertEqual(completionCount, 1)
+    }
+
+    func test_lateForwardCallbackDoesNotCompleteNewSameItemAttempt() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        let catalogItem = CatalogItem.mock(catalogItemId: "catalogItemId")
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let firstAttemptId = paymentAttemptId
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: [:],
+            paymentAttemptId: firstAttemptId
+        )
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        eventService.sendDismissalEvent()
+
+        eventService.cartItemDevicePay(
+            catalogItem: catalogItem,
+            paymentProvider: .afterpay,
+            transactionData: nil,
+            completion: { _ in }
+        )
+        let secondAttemptId = paymentAttemptId
+        eventService.cartItemDevicePayPendingConfirmation(
+            itemId: "catalogItemId",
+            catalogRuntimeData: [:],
+            paymentAttemptId: secondAttemptId
+        )
+        var secondCompletion: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: catalogItem,
+            transactionData: nil,
+            completion: { secondCompletion = $0 }
+        )
+        events.removeAll()
+
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: firstAttemptId
+        )
+        XCTAssertNil(secondCompletion)
+        XCTAssertTrue(events.isEmpty)
+
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: secondAttemptId
+        )
+        guard case .success = secondCompletion else {
+            return XCTFail("Expected the matching forward-payment attempt to complete")
+        }
+    }
+
     func test_forward_payment_synchronous_host_finalization_invokes_completion() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
                                                     eventHandler: { _ in })
 
-        stubUXHelper.onForwardPaymentInvoked = { [weak eventService] _, catalogItem in
-            eventService?.cartItemForwardPaymentSuccess(itemId: catalogItem.catalogItemId)
+        stubUXHelper.onForwardPaymentInvoked = { [weak eventService] _, catalogItem, paymentAttemptId in
+            eventService?.cartItemForwardPaymentSuccess(
+                itemId: catalogItem.catalogItemId,
+                paymentAttemptId: paymentAttemptId
+            )
         }
 
         var capturedStatus: ForwardPaymentStatus?
@@ -734,9 +1527,13 @@ final class TestEventService: XCTestCase {
             completion: { _ in invocationCount += 1 }
         )
 
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
-        eventService.cartItemForwardPaymentFailure(itemId: "catalogItemId", failureReason: "late")
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId", paymentAttemptId: nil)
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId", paymentAttemptId: nil)
+        eventService.cartItemForwardPaymentFailure(
+            itemId: "catalogItemId",
+            failureReason: "late",
+            paymentAttemptId: nil
+        )
 
         XCTAssertEqual(invocationCount, 1)
     }
@@ -766,45 +1563,51 @@ final class TestEventService: XCTestCase {
 
         XCTAssertEqual(events.filter { $0.eventType == .SignalCartItemInstantPurchaseInitiated }.count, eventsAfterFirst)
 
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId", paymentAttemptId: nil)
 
         XCTAssertEqual(firstCount, 1, "first completion should still fire")
         XCTAssertEqual(secondCount, 0, "duplicate completion should be dropped")
     }
 
-    func test_forward_payment_success_with_unknown_itemId_unlocks_completion() {
-        let eventService = get_mock_event_processor(startDate: startDate,
-                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
-                                                    uxEventDelegate: stubUXHelper,
-                                                    eventHandler: { _ in })
-
-        var capturedStatus: ForwardPaymentStatus?
+    func test_devicePayWhileForwardPaymentIsActive_isRejectedWithoutReplacingForwardPayment() {
+        let eventService = get_mock_event_processor(
+            startDate: startDate,
+            catalogItems: [.mock(catalogItemId: "catalogItemId")],
+            uxEventDelegate: stubUXHelper,
+            eventHandler: { self.events.append($0) }
+        )
+        var forwardStatus: ForwardPaymentStatus?
         eventService.cartItemForwardPayment(
             catalogItem: .mock(catalogItemId: "catalogItemId"),
             transactionData: nil,
-            completion: { capturedStatus = $0 }
+            completion: { forwardStatus = $0 }
+        )
+        let eventCount = events.count
+        var devicePayStatus: DevicePayStatus?
+
+        eventService.cartItemDevicePay(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            paymentProvider: .applePay,
+            transactionData: nil,
+            completion: { devicePayStatus = $0 }
         )
 
-        eventService.cartItemForwardPaymentSuccess(itemId: "unknownItemId")
-
-        guard case .failure = capturedStatus else {
-            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+        guard case .failure = devicePayStatus else {
+            return XCTFail("Expected device pay to be rejected while forward payment is active")
         }
+        XCTAssertEqual(events.count, eventCount)
+        XCTAssertNil(stubUXHelper.devicePayAttemptId)
 
-        var secondStatus: ForwardPaymentStatus?
-        eventService.cartItemForwardPayment(
-            catalogItem: .mock(catalogItemId: "catalogItemId"),
-            transactionData: nil,
-            completion: { secondStatus = $0 }
+        eventService.cartItemForwardPaymentSuccess(
+            itemId: "catalogItemId",
+            paymentAttemptId: nil
         )
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
-
-        guard case .success = secondStatus else {
-            return XCTFail("subsequent attempt should succeed after prior completion cleared")
+        guard case .success = forwardStatus else {
+            return XCTFail("Expected the original forward payment to remain active")
         }
     }
 
-    func test_forward_payment_failure_with_unknown_itemId_unlocks_completion() {
+    func test_forward_payment_success_with_unknown_itemId_doesNotConsumeCompletion() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -817,15 +1620,47 @@ final class TestEventService: XCTestCase {
             completion: { capturedStatus = $0 }
         )
 
-        eventService.cartItemForwardPaymentFailure(itemId: "unknownItemId", failureReason: "nope")
+        eventService.cartItemForwardPaymentSuccess(itemId: "unknownItemId", paymentAttemptId: nil)
 
+        XCTAssertNil(capturedStatus)
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId", paymentAttemptId: nil)
+        guard case .success = capturedStatus else {
+            return XCTFail("matching callback should still complete the original payment")
+        }
+    }
+
+    func test_forward_payment_failure_with_unknown_itemId_doesNotConsumeCompletion() {
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    catalogItems: [.mock(catalogItemId: "catalogItemId")],
+                                                    uxEventDelegate: stubUXHelper,
+                                                    eventHandler: { _ in })
+
+        var capturedStatus: ForwardPaymentStatus?
+        eventService.cartItemForwardPayment(
+            catalogItem: .mock(catalogItemId: "catalogItemId"),
+            transactionData: nil,
+            completion: { capturedStatus = $0 }
+        )
+
+        eventService.cartItemForwardPaymentFailure(
+            itemId: "unknownItemId",
+            failureReason: "nope",
+            paymentAttemptId: nil
+        )
+
+        XCTAssertNil(capturedStatus)
+        eventService.cartItemForwardPaymentFailure(
+            itemId: "catalogItemId",
+            failureReason: "expected failure",
+            paymentAttemptId: nil
+        )
         guard case .failure(let reason) = capturedStatus else {
-            return XCTFail("expected failure for unknown itemId, got \(String(describing: capturedStatus))")
+            return XCTFail("matching callback should still complete the original payment")
         }
-        XCTAssertEqual(reason, "nope")
+        XCTAssertEqual(reason, "expected failure")
     }
 
-    func test_forward_payment_completion_cleared_on_dismissal() {
+    func test_forward_payment_completion_resolvedOnDismissal() {
         let eventService = get_mock_event_processor(startDate: startDate,
                                                     catalogItems: [.mock(catalogItemId: "catalogItemId")],
                                                     uxEventDelegate: stubUXHelper,
@@ -840,9 +1675,9 @@ final class TestEventService: XCTestCase {
 
         eventService.sendDismissalEvent()
 
-        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId")
+        eventService.cartItemForwardPaymentSuccess(itemId: "catalogItemId", paymentAttemptId: nil)
 
-        XCTAssertEqual(invocationCount, 0)
+        XCTAssertEqual(invocationCount, 1)
     }
 }
 
@@ -916,20 +1751,29 @@ class MockUXHelper: UXEventsDelegate {
         self.roktEvents.append(.CartItemInstantPurchase)
     }
 
+    var devicePayAttemptId: String?
+    var onDevicePayInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem, _ paymentAttemptId: String) -> Void)?
     func onCartItemDevicePay(_ layoutId: String,
                              catalogItem: RoktUXHelper.CatalogItem,
                              paymentProvider: DcuiSchema.PaymentProvider,
-                             transactionData: TransactionData?) {
+                             transactionData: TransactionData?,
+                             paymentAttemptId: String) {
         self.roktEvents.append(.CartItemDevicePay)
+        self.devicePayAttemptId = paymentAttemptId
+        onDevicePayInvoked?(layoutId, catalogItem, paymentAttemptId)
     }
 
     var forwardPaymentTransactionData: TransactionData?
-    var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem) -> Void)?
+    var forwardPaymentAttemptId: String?
+    var onForwardPaymentInvoked: ((_ layoutId: String, _ catalogItem: RoktUXHelper.CatalogItem, _ paymentAttemptId: String?)
+        -> Void)?
     func onCartItemForwardPayment(_ layoutId: String,
                                   catalogItem: RoktUXHelper.CatalogItem,
-                                  transactionData: TransactionData?) {
+                                  transactionData: TransactionData?,
+                                  paymentAttemptId: String?) {
         self.roktEvents.append(.CartItemForwardPayment)
         self.forwardPaymentTransactionData = transactionData
-        onForwardPaymentInvoked?(layoutId, catalogItem)
+        self.forwardPaymentAttemptId = paymentAttemptId
+        onForwardPaymentInvoked?(layoutId, catalogItem, paymentAttemptId)
     }
 }

@@ -27,15 +27,23 @@ protocol EventServicing: AnyObject {
         transactionData: TransactionData?,
         completion: @escaping (_ status: DevicePayStatus) -> Void
     )
-    func cartItemDevicePaySuccess(itemId: String)
-    func cartItemDevicePayFailure(itemId: String)
-    func cartItemDevicePayRetry(itemId: String)
-    func cartItemDevicePayPendingConfirmation(itemId: String, catalogRuntimeData: [String: String])
+    func cartItemDevicePaySuccess(itemId: String, paymentAttemptId: String)
+    func cartItemDevicePayFailure(itemId: String, failureReason: String?, paymentAttemptId: String)
+    func cartItemDevicePayLoadingFailure(itemId: String, failureReason: String?, paymentAttemptId: String)
+    func cartItemDevicePayRetryableFailure(itemId: String, paymentAttemptId: String)
+    func cartItemDevicePayRetry(itemId: String, paymentAttemptId: String)
+    func cartItemDevicePayProviderUIOpened(itemId: String, paymentAttemptId: String)
+    func cartItemDevicePayProviderUIClosed(itemId: String, paymentAttemptId: String)
+    func cartItemDevicePayPendingConfirmation(
+        itemId: String,
+        catalogRuntimeData: [String: String],
+        paymentAttemptId: String
+    )
     func cartItemForwardPayment(
         catalogItem: CatalogItem,
         transactionData: TransactionData?,
         completion: @escaping (_ status: ForwardPaymentStatus) -> Void
     )
-    func cartItemForwardPaymentSuccess(itemId: String)
-    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?)
+    func cartItemForwardPaymentSuccess(itemId: String, paymentAttemptId: String?)
+    func cartItemForwardPaymentFailure(itemId: String, failureReason: String?, paymentAttemptId: String?)
 }

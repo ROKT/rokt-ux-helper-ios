@@ -50,6 +50,12 @@ enum UserInteraction: String, Codable, CaseIterable {
     case MainImageSwipeLeft
     case MainImageSwipeRight
     case ToggleButtonStateTriggerClick
+    case PaymentProviderUIOpened
+    case PaymentProviderUIClosed
+    case DevicePayCancelled
+    case DevicePayRetryableFailure
+    case DevicePaySucceeded
+    case DevicePayFailed
 }
 
 enum UserInteractionContext: String, Codable, CaseIterable {
