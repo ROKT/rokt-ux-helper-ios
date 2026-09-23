@@ -5,4 +5,5 @@ enum LayoutTransformerError: Error, Equatable {
     case InvalidSyntaxMapping(line: Int = #line, function: String = #function)
     case missingData
     case unsupportedFeature(String)
+    case layoutTooDeep(depth: Int)
 }
