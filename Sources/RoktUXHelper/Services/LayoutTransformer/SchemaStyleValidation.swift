@@ -1,6 +1,6 @@
 import DcuiSchema
 
-protocol SchemaRenderableStyle: Decodable {
+protocol SchemaRenderableStyle: StyleMergeable {
     var flexChild: FlexChildStylingProperties? { get }
     var schemaShadow: Shadow? { get }
     var schemaActionGap: Float? { get }
