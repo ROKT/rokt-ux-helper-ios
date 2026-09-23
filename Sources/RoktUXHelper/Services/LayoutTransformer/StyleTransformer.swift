@@ -204,82 +204,22 @@ struct StyleTransformer {
         return resultStyles
     }
 
+    /// Merges `newStyle` over `defaultStyle`, or returns `nil` when there is no default to merge into.
+    ///
+    /// Prefer this overload: the constraint resolves the merge statically, so a style type that was
+    /// never wired into `StyleMergeable` is a compile error rather than a silently unstyled state.
+    static func updatedStyle<T: StyleMergeable>(_ defaultStyle: T?,
+                                                newStyle: T?) throws -> T? {
+        guard let defaultStyle else { return nil }
+        return try T.merging(defaultStyle, newStyle)
+    }
+
+    /// Bridge for generic call sites that cannot yet carry the `StyleMergeable` constraint. A style
+    /// type with no conformance yields `nil`, matching the cast chain this replaced.
     static func updatedStyle<T: Decodable>(_ defaultStyle: T?,
                                            newStyle: T?) throws -> T? {
-        if let defaultStyle = defaultStyle as? StylingPropertiesModel {
-            let newStyle = newStyle as? StylingPropertiesModel
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? RowStyle {
-            let newStyle = newStyle as? RowStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ScrollableRowStyle {
-            let newStyle = newStyle as? ScrollableRowStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ColumnStyle {
-            let newStyle = newStyle as? ColumnStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ScrollableColumnStyle {
-            let newStyle = newStyle as? ScrollableColumnStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ZStackStyle {
-            let newStyle = newStyle as? ZStackStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? OneByOneDistributionStyles {
-            let newStyle = newStyle as? OneByOneDistributionStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? BasicTextStyle {
-            let newStyle = newStyle as? BasicTextStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? RichTextStyle {
-            let newStyle = newStyle as? RichTextStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? StaticImageStyles {
-            let newStyle = newStyle as? StaticImageStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? DataImageStyles {
-            let newStyle = newStyle as? DataImageStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? CloseButtonStyles {
-            let newStyle = newStyle as? CloseButtonStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? IndicatorStyles {
-            let newStyle = newStyle as? IndicatorStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ProgressIndicatorStyles {
-            let newStyle = newStyle as? ProgressIndicatorStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? InLineTextStyle {
-            let newStyle = newStyle as? InLineTextStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? StaticLinkStyles {
-            let newStyle = newStyle as? StaticLinkStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? CreativeResponseStyles {
-            let newStyle = newStyle as? CreativeResponseStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ProgressControlStyle {
-            let newStyle = newStyle as? ProgressControlStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? GroupedDistributionStyles {
-            let newStyle = newStyle as? GroupedDistributionStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? ToggleButtonStateTriggerStyle {
-            let newStyle = newStyle as? ToggleButtonStateTriggerStyle
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? DataImageCarouselStyles {
-            let newStyle = newStyle as? DataImageCarouselStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? DataImageCarouselIndicatorStyles {
-            let newStyle = newStyle as? DataImageCarouselIndicatorStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? CatalogDevicePayButtonStyles {
-            let newStyle = newStyle as? CatalogDevicePayButtonStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        } else if let defaultStyle = defaultStyle as? CatalogResponseButtonStyles {
-            let newStyle = newStyle as? CatalogResponseButtonStyles
-            return try getUpdatedStyle(defaultStyle, newStyle: newStyle) as? T
-        }
-        return nil
+        guard let defaultStyle = defaultStyle as? any StyleMergeable else { return nil }
+        return try defaultStyle.merged(with: newStyle) as? T
     }
 
     static func getUpdatedStyle(_ defaultStyle: StylingPropertiesModel?,
