@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-09-23
+
+### Fixed
+
+- Transform nested layouts on a dedicated stack ([#372](https://github.com/ROKT/rokt-ux-helper-ios/pull/372))
+- Restore full-width response buttons ([#373](https://github.com/ROKT/rokt-ux-helper-ios/pull/373))
+
+### Changed
+
+- Dispatch style merging through a StyleMergeable pro… ([#371](https://github.com/ROKT/rokt-ux-helper-ios/pull/371))
+- Inherit org default PR template ([#368](https://github.com/ROKT/rokt-ux-helper-ios/pull/368))
+- Bump actions/upload-artifact from 4.6.2 to 7.0.1 in /.github/composite_actions/run_xcodebuild_tests ([#367](https://github.com/ROKT/rokt-ux-helper-ios/pull/367))
+- Bump futureware-tech/simulator-action from 4 to 5 in /.github/composite_actions/run_xcodebuild_tests ([#366](https://github.com/ROKT/rokt-ux-helper-ios/pull/366))
+- Fix Codecov upload and scan composite actions in Dependabot ([#365](https://github.com/ROKT/rokt-ux-helper-ios/pull/365))
+- Scope public-content PII review to authored material ([#363](https://github.com/ROKT/rokt-ux-helper-ios/pull/363))
+
 ## [2.1.1] - 2026-09-09
 
 ### Fixed
@@ -459,7 +475,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/1.0.1...2.0.0
