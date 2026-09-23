@@ -1,6 +1,40 @@
 import Foundation
 import DcuiSchema
 
+/// Bounds how deep the layout transform is allowed to recurse.
+///
+/// A reference type because `LayoutTransformer` is a struct that copies itself into the escaping
+/// catalog `childBuilder`, and because the depth has to survive the recursion rather than every
+/// `transform` signature having to carry it.
+///
+/// The bound protects the rich-text pass as much as the transform itself: the transform runs on a
+/// wide stack, but `AttributedStringTransformer` walks the same tree afterwards on the caller's
+/// 1 MB main stack, so the tree has to be shallow enough for the narrower of the two.
+///
+/// One counter belongs to one transform, which runs on one thread at a time, so the count needs no
+/// synchronisation.
+final class LayoutDepthCounter {
+
+    /// Far beyond any authored layout, and chosen against the narrower of the two stacks: the
+    /// rich-text pass measures under ~4 KB per level, so this bound occupies roughly a quarter of a
+    /// device main thread. Foundation's JSON parser independently refuses more than 512 nested
+    /// containers, which caps a decodable layout at around 170 levels regardless.
+    static let maxNestingDepth = 64
+
+    private var depth = 0
+
+    func enter() throws {
+        guard depth < Self.maxNestingDepth else {
+            throw LayoutTransformerError.layoutTooDeep(depth: Self.maxNestingDepth)
+        }
+        depth += 1
+    }
+
+    func exit() {
+        depth -= 1
+    }
+}
+
 struct LayoutTransformer<
     CreativeSyntaxMapper: SyntaxMapping,
     AddToCartMapper: SyntaxMapping,
@@ -44,6 +78,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     let addToCartMapper: AddToCartMapper
     let transactionDataMapper: TransactionMapper
     let extractor: Extractor
+    let depthCounter: LayoutDepthCounter
 
     var moduleName: String? {
         layoutPlugin.slots.first?.layoutVariant?.moduleName
@@ -56,9 +91,11 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         transactionDataMapper: TransactionMapper = TransactionDataMapper(),
         extractor: Extractor = CreativeDataExtractor(),
         layoutState: LayoutState = LayoutState(),
-        eventService: EventDiagnosticServicing? = nil
+        eventService: EventDiagnosticServicing? = nil,
+        depthCounter: LayoutDepthCounter = LayoutDepthCounter()
     ) {
         self.layoutPlugin = layoutPlugin
+        self.depthCounter = depthCounter
         self.creativeMapper = creativeMapper
         self.addToCartMapper = addToCartMapper
         self.transactionDataMapper = transactionDataMapper
@@ -81,11 +118,17 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     func transform() throws -> LayoutSchemaViewModel? {
         guard let layout = layoutPlugin.layout else { return nil}
 
-        let transformedUIModels = try transform(
-            layout,
-            context: .outer(layoutPlugin.slots.map(\.offer))
-        )
+        // The descent recurses once per nesting level and would otherwise run on the caller's
+        // 1 MB main-thread stack. The call still blocks, so ordering is unchanged.
+        let transformedUIModels = try WideStack.run(named: "com.rokt.layout-transform") {
+            try transform(
+                layout,
+                context: .outer(layoutPlugin.slots.map(\.offer))
+            )
+        }
 
+        // Stays on the caller's thread: this pass reaches `UITraitCollection.current`, which is
+        // main-thread only. It is kept in bounds by the depth guard instead.
         AttributedStringTransformer.convertRichTextHTMLIfExists(uiModel: transformedUIModels, config: layoutState.config)
 
         return transformedUIModels
@@ -104,7 +147,11 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     }
 
     func transform(_ layout: LayoutSchemaModel, context: Context) throws -> LayoutSchemaViewModel {
-        switch layout {
+        // Every nested node reaches the descent through here, so one guard bounds the whole tree.
+        try depthCounter.enter()
+        defer { depthCounter.exit() }
+
+        return switch layout {
         case .row(let rowModel):
                 .row(
                     try getRow(
@@ -528,44 +575,51 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
 
-        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
-            // Reset counter so dropdowns inside the template get consistent indices across rebuilds
+        // Resets the dropdown counter so dropdowns inside the template get consistent indices
+        // across rebuilds, then transforms the template for one catalog item.
+        let buildTemplate: (CatalogItem) throws -> [LayoutSchemaViewModel] = { catalogItem in
             self.layoutState.nextCatalogDropdownAttributeIndex = 0
-            do {
-                switch model.template {
-                case .column(let templateModel):
-                    let transformedChildren = try self.transformChildren(
-                        templateModel.children,
-                        context: .inner(.addToCart(catalogItem))
-                    )
-                    return [
-                        .column(
-                            try self.getColumn(
-                                templateModel.styles,
-                                children: transformedChildren
-                            )
+            switch model.template {
+            case .column(let templateModel):
+                let transformedChildren = try self.transformChildren(
+                    templateModel.children,
+                    context: .inner(.addToCart(catalogItem))
+                )
+                return [
+                    .column(
+                        try self.getColumn(
+                            templateModel.styles,
+                            children: transformedChildren
                         )
-                    ]
-                case .row(let templateModel):
-                    let transformedChildren = try self.transformChildren(
-                        templateModel.children,
-                        context: .inner(.addToCart(catalogItem))
                     )
-                    return [
-                        .row(
-                            try self.getRow(
-                                templateModel.styles,
-                                children: transformedChildren
-                            )
+                ]
+            case .row(let templateModel):
+                let transformedChildren = try self.transformChildren(
+                    templateModel.children,
+                    context: .inner(.addToCart(catalogItem))
+                )
+                return [
+                    .row(
+                        try self.getRow(
+                            templateModel.styles,
+                            children: transformedChildren
                         )
-                    ]
-                }
-            } catch {
-                return nil
+                    )
+                ]
             }
         }
 
-        let initialChildren = offer.catalogItems?.first.flatMap(childBuilder) ?? []
+        // Rebuilds at render time, on the main thread, long after `transform()` returned, so this
+        // descent needs a wide stack of its own. It must not throw: there is already a rendered
+        // tree, and keeping it is better than tearing down a working layout.
+        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
+            try? WideStack.run(named: "com.rokt.layout-transform") { try buildTemplate(catalogItem) }
+        }
+
+        // The initial build runs inside the transform's own wide-stack thread, so it needs no
+        // second one — and it propagates, so a template that breaches the depth bound surfaces as
+        // a LayoutFailure instead of rendering as an empty collection.
+        let initialChildren = try offer.catalogItems?.first.map(buildTemplate) ?? []
 
         return CatalogCombinedCollectionViewModel(
             children: initialChildren,
