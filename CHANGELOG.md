@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Dispatch style merging through a StyleMergeable pro… ([#371](https://github.com/ROKT/rokt-ux-helper-ios/pull/371))
+- Dispatch style merging through a StyleMergeable protocol ([#371](https://github.com/ROKT/rokt-ux-helper-ios/pull/371))
 - Inherit org default PR template ([#368](https://github.com/ROKT/rokt-ux-helper-ios/pull/368))
 - Bump actions/upload-artifact from 4.6.2 to 7.0.1 in /.github/composite_actions/run_xcodebuild_tests ([#367](https://github.com/ROKT/rokt-ux-helper-ios/pull/367))
 - Bump futureware-tech/simulator-action from 4 to 5 in /.github/composite_actions/run_xcodebuild_tests ([#366](https://github.com/ROKT/rokt-ux-helper-ios/pull/366))
