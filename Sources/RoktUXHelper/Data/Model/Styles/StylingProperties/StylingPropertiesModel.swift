@@ -2,7 +2,7 @@ import Foundation
 import DcuiSchema
 
 @available(iOS 13, *)
-class StylingPropertiesModel: Decodable, Hashable {
+final class StylingPropertiesModel: Decodable, Hashable {
     let container: ContainerStylingProperties?
     let background: BackgroundStylingProperties?
     let dimension: DimensionStylingProperties?
