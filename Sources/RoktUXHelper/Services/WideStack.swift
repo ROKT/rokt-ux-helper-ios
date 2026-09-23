@@ -31,11 +31,11 @@ enum WideStack {
         thread.name = name
         // Must be set before `start()`; it is ignored afterwards.
         thread.stackSize = max(thread.stackSize, stackSize)
-        // Inheriting the caller's QoS keeps the worker at the priority the work was requested at.
-        // Note that `DispatchSemaphore` does not donate priority, so a caller that outranks the
-        // inherited value can end up waiting on lower-priority work; flooring the QoS here would be
-        // the remedy if that ever shows up in a measurement.
-        thread.qualityOfService = Thread.current.qualityOfService
+        // The worker inherits the caller's QoS, except on the main thread, which reports
+        // `.default` even though the scheduler treats it as interactive. Since `DispatchSemaphore`
+        // donates no priority, taking that value literally would leave the main thread blocked on a
+        // worker the scheduler is free to deprioritise.
+        thread.qualityOfService = Thread.isMainThread ? .userInteractive : Thread.current.qualityOfService
         thread.start()
 
         semaphore.wait()

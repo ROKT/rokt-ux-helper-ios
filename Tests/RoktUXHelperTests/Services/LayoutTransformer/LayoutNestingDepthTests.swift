@@ -67,4 +67,31 @@ final class LayoutNestingDepthTests: XCTestCase {
             )
         }
     }
+
+    /// A catalog template is built twice: once inside the transform, and again at render time when
+    /// the selected item changes. Only the render-time rebuild may swallow a failure — the initial
+    /// build has to surface it, or an over-deep template renders as an empty collection while the
+    /// transform reports success.
+    func test_over_deep_catalog_template_fails_the_initial_transform() throws {
+        var template: [String: Any] = ["type": "BasicText", "node": ["value": "Example"]]
+        for _ in 0..<(LayoutDepthCounter.maxNestingDepth + 6) {
+            template = ["type": "Column", "node": ["children": [template]]]
+        }
+        let layout = try JSONDecoder().decode(
+            LayoutSchemaModel.self,
+            from: JSONSerialization.data(withJSONObject: [
+                "type": "CatalogCombinedCollection",
+                "node": ["template": template]
+            ])
+        )
+        let offer = OfferModel.mock(catalogItems: [CatalogItem.mock()])
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
+
+        XCTAssertThrowsError(try transformer.transform(layout, context: .inner(.generic(offer)))) { error in
+            XCTAssertEqual(
+                error as? LayoutTransformerError,
+                .layoutTooDeep(depth: LayoutDepthCounter.maxNestingDepth)
+            )
+        }
+    }
 }

@@ -575,48 +575,51 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
         let updateStyles = try StyleTransformer.updatedStyles(model.styles?.elements?.own)
 
-        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
-            // Reset counter so dropdowns inside the template get consistent indices across rebuilds
+        // Resets the dropdown counter so dropdowns inside the template get consistent indices
+        // across rebuilds, then transforms the template for one catalog item.
+        let buildTemplate: (CatalogItem) throws -> [LayoutSchemaViewModel] = { catalogItem in
             self.layoutState.nextCatalogDropdownAttributeIndex = 0
-            do {
-                // Runs at render time, on the main thread, long after `transform()` returned — so
-                // this descent needs the same wide stack the initial one gets.
-                return try WideStack.run(named: "com.rokt.layout-transform") {
-                    switch model.template {
-                    case .column(let templateModel):
-                        let transformedChildren = try self.transformChildren(
-                            templateModel.children,
-                            context: .inner(.addToCart(catalogItem))
+            switch model.template {
+            case .column(let templateModel):
+                let transformedChildren = try self.transformChildren(
+                    templateModel.children,
+                    context: .inner(.addToCart(catalogItem))
+                )
+                return [
+                    .column(
+                        try self.getColumn(
+                            templateModel.styles,
+                            children: transformedChildren
                         )
-                        return [
-                            .column(
-                                try self.getColumn(
-                                    templateModel.styles,
-                                    children: transformedChildren
-                                )
-                            )
-                        ]
-                    case .row(let templateModel):
-                        let transformedChildren = try self.transformChildren(
-                            templateModel.children,
-                            context: .inner(.addToCart(catalogItem))
+                    )
+                ]
+            case .row(let templateModel):
+                let transformedChildren = try self.transformChildren(
+                    templateModel.children,
+                    context: .inner(.addToCart(catalogItem))
+                )
+                return [
+                    .row(
+                        try self.getRow(
+                            templateModel.styles,
+                            children: transformedChildren
                         )
-                        return [
-                            .row(
-                                try self.getRow(
-                                    templateModel.styles,
-                                    children: transformedChildren
-                                )
-                            )
-                        ]
-                    }
-                }
-            } catch {
-                return nil
+                    )
+                ]
             }
         }
 
-        let initialChildren = offer.catalogItems?.first.flatMap(childBuilder) ?? []
+        // Rebuilds at render time, on the main thread, long after `transform()` returned, so this
+        // descent needs a wide stack of its own. It must not throw: there is already a rendered
+        // tree, and keeping it is better than tearing down a working layout.
+        let childBuilder: (CatalogItem) -> [LayoutSchemaViewModel]? = { catalogItem in
+            try? WideStack.run(named: "com.rokt.layout-transform") { try buildTemplate(catalogItem) }
+        }
+
+        // The initial build runs inside the transform's own wide-stack thread, so it needs no
+        // second one — and it propagates, so a template that breaches the depth bound surfaces as
+        // a LayoutFailure instead of rendering as an empty collection.
+        let initialChildren = try offer.catalogItems?.first.map(buildTemplate) ?? []
 
         return CatalogCombinedCollectionViewModel(
             children: initialChildren,
