@@ -1,0 +1,104 @@
+{
+    "a11yLabel": "Select variant",
+    "placeholderValue": "Please select",
+    "unavailableValue": "Out of stock",
+    "styles": {
+        "elements": {
+            "own": [
+                {
+                    "default": {
+                        "text": {
+                            "fontSize": 14,
+                            "textColor": {
+                                "light": "#262626"
+                            }
+                        }
+                    }
+                }
+            ],
+            "head": [
+                {
+                    "default": {
+                        "background": {
+                            "backgroundColor": {
+                                "light": "#F5F5F5"
+                            }
+                        },
+                        "border": {
+                            "borderColor": {
+                                "light": "#D0D5DD"
+                            },
+                            "borderStyle": "solid",
+                            "borderWidth": "inf"
+                        },
+                        "spacing": {
+                            "padding": "12 nan 8 -4"
+                        },
+                        "text": {
+                            "fontSize": 14,
+                            "textColor": {
+                                "light": "#262626"
+                            }
+                        }
+                    }
+                }
+            ],
+            "icon": [
+                {
+                    "default": {
+                        "text": {
+                            "fontSize": 12,
+                            "textColor": {
+                                "light": "#666666"
+                            }
+                        }
+                    }
+                }
+            ],
+            "optionList": [
+                {
+                    "default": {
+                        "border": {
+                            "borderColor": {
+                                "light": "#D0D5DD"
+                            },
+                            "borderStyle": "solid",
+                            "borderWidth": "1e40"
+                        }
+                    }
+                }
+            ],
+            "option": [
+                {
+                    "default": {
+                        "border": {
+                            "borderColor": {
+                                "light": "#CFCFCF"
+                            },
+                            "borderStyle": "solid",
+                            "borderWidth": "0 0 1e40 0"
+                        },
+                        "spacing": {
+                            "padding": "nan"
+                        }
+                    }
+                }
+            ],
+            "error": [
+                {
+                    "default": {
+                        "text": {
+                            "fontSize": 12,
+                            "textColor": {
+                                "light": "#FF0000"
+                            }
+                        },
+                        "spacing": {
+                            "padding": "-inf"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
