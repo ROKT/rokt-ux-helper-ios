@@ -225,10 +225,35 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         }
     }
 
-    func transformChildren<T: Decodable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
-        try layouts?.map {
-            try transform($0, context: context)
+    /// The descent's own step, for the case every nested layout takes.
+    ///
+    /// Almost every child list in the schema is `[LayoutSchemaModel]`, and overload resolution
+    /// picks this one for them. It matters because it is on the recursive path: routing those
+    /// children through the type-erased overload below put four more frames between one level and
+    /// the next — this function, the `map` closure, `Collection.map` itself, and `transform<T>` —
+    /// and every one of them was reserved again at every level of nesting. A `for` loop calling
+    /// the concrete `transform` leaves two.
+    func transformChildren(_ layouts: [LayoutSchemaModel]?, context: Context) throws -> [LayoutSchemaViewModel]? {
+        guard let layouts else { return nil }
+        var children = [LayoutSchemaViewModel]()
+        children.reserveCapacity(layouts.count)
+        for layout in layouts {
+            children.append(try transform(layout, context: context))
         }
+        return children
+    }
+
+    /// For the child types that are not `LayoutSchemaModel`: the accessibility-grouped children and
+    /// the catalog card nodes. Off the deep-nesting path, so the extra frames it costs are paid a
+    /// bounded number of times rather than once per level.
+    func transformChildren<T: Decodable>(_ layouts: [T]?, context: Context) throws -> [LayoutSchemaViewModel]? {
+        guard let layouts else { return nil }
+        var children = [LayoutSchemaViewModel]()
+        children.reserveCapacity(layouts.count)
+        for layout in layouts {
+            children.append(try transform(layout, context: context))
+        }
+        return children
     }
 
     // attach inner layout into outer layout and transform to UI Model
