@@ -65,6 +65,16 @@ final class TestCatalogDropdownComponent: XCTestCase {
         XCTAssertNotNil(try? inspected.find(ViewType.VStack.self))
     }
 
+    // MARK: - Spacing that layout cannot use
+
+    func test_headPadding_dropsNonFiniteAndNegativeEdges() throws {
+        let padding = try headPaddingWithNonFiniteStyles()
+
+        // "12 nan 8 -4": the two usable edges survive, "nan" and the negative edge become zero,
+        // so the head's measured size stays finite for the UIKit views that read it.
+        XCTAssertEqual(padding, FrameAlignmentProperty(top: 12, right: 0, bottom: 8, left: 0))
+    }
+
     // MARK: - Snapshot
 
     func testSnapshot_collapsed_withProductionStyles() throws {
@@ -91,6 +101,29 @@ final class TestCatalogDropdownComponent: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// The padding applied to the head's content row, from a layout whose head spacing and
+    /// border width are authored as "nan", "inf" and a negative edge.
+    private func headPaddingWithNonFiniteStyles() throws -> FrameAlignmentProperty {
+        let layoutState = makeLayoutState(group: threeOptionGroup())
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState,
+            eventService: get_mock_event_processor()
+        )
+        let viewModel = try transformer.getCatalogDropdown(
+            model: ModelTestData.CatalogDropdownData.catalogDropdownWithNonFiniteSpacing()
+        )
+        let view = TestPlaceHolder(
+            layout: .catalogDropdown(viewModel),
+            layoutState: layoutState
+        )
+        let head = try view.inspectComponent(CatalogDropdownComponent.self)
+            .find(ViewType.Button.self)
+            .labelView()
+            .find(ViewType.HStack.self)
+        return try XCTUnwrap(head.modifier(PaddingModifier.self).actualView().padding)
+    }
 
     private func makePlaceholder(
         layoutState: LayoutState,
