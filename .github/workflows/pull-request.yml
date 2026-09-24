@@ -88,19 +88,20 @@ jobs:
       - name: Install xcbeautify
         run: brew list xcbeautify || brew install xcbeautify
 
-      # A generic destination, so no simulator has to be booted: the check reads frame sizes out
-      # of the compiled object and never runs it. Debug on purpose — at -Onone every local gets
-      # its own slot, which is the worst case and what a partner debugging an integration runs.
+      # A generic device destination, so nothing has to be booted or signed: the check reads frame
+      # sizes out of the compiled object and never runs it. It is also arm64 whatever the runner
+      # is, which a simulator build is not. Debug on purpose — at -Onone every local gets its own
+      # slot, which is the worst case and what a partner debugging an integration runs.
       - name: Build for measurement
         run: >
           set -o pipefail &&
           xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper
-          -destination 'generic/platform=iOS Simulator'
+          -destination 'generic/platform=iOS'
           -derivedDataPath DerivedData build
           | xcbeautify --renderer github-actions
 
       - name: Check frame budget
-        run: tools/frame_budget.py DerivedData/Build/Products/Debug-iphonesimulator/RoktUXHelper.o
+        run: tools/frame_budget.py DerivedData/Build/Products/Debug-iphoneos/RoktUXHelper.o
 
   size-report:
     if: github.event_name == 'pull_request'

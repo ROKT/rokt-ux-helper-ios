@@ -193,8 +193,9 @@ def main() -> int:
         "--budget",
         type=int,
         default=None,
+        # No literal percent sign: argparse %-formats help strings, and 3.14 validates them eagerly.
         help="stack the full-depth descent may use, in bytes "
-        f"(default: {DEFAULT_BUDGET_SHARE:.0%} of WideStack.defaultStackSize)",
+        "(default: a quarter of WideStack.defaultStackSize)",
     )
     parser.add_argument(
         "--prologue-window",
@@ -241,6 +242,16 @@ def main() -> int:
     depth = depth_cap()
     per_level = dispatch[1] + builder[1] + children[1]
     total = per_level * depth
+
+    # A zero total means no prologue was recognised, not a descent that costs nothing. Without
+    # this the check would pass silently on any build it cannot actually read.
+    if per_level == 0:
+        print(
+            f"error: recognised no stack allocation in {args.object}. Expected arm64 with debug "
+            "symbols; an optimised or stripped build cannot be measured.",
+            file=sys.stderr,
+        )
+        return 2
 
     print(f"{'bytes':>9}  frame reserved at every level")
     print(f"{dispatch[1]:>9,}  transform(_:context:)")

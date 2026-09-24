@@ -84,14 +84,16 @@ build:
 
 ```bash
 xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
- -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData build
-tools/frame_budget.py DerivedData/Build/Products/Debug-iphonesimulator/RoktUXHelper.o
+ -destination 'generic/platform=iOS' -derivedDataPath DerivedData build
+tools/frame_budget.py DerivedData/Build/Products/Debug-iphoneos/RoktUXHelper.o
 ```
 
 Measure a Debug build. At `-Onone` every local gets its own stack slot, which is both the worst
 case and what a partner debugging an integration runs; an optimised build overlaps slots and
-reports a smaller, less useful number. No simulator has to be booted, because the check reads
-frame sizes out of the compiled object and never runs it.
+reports a smaller, less useful number. Nothing has to be booted or signed, because the check reads
+frame sizes out of the compiled object and never runs it. The destination is a generic device
+rather than a simulator so the object is arm64 regardless of the host architecture; the parser
+reads arm64 prologues and stops rather than reporting a misleadingly small number otherwise.
 
 The job reports the three frames that are live at every level and, separately, the frames reached
 once at the deepest level. Only the first group is multiplied. A failure means either that a
