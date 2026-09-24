@@ -146,6 +146,36 @@ final class CatalogRuntimePlaceholderResolverTests: XCTestCase {
         XCTAssertEqual(result, "Subtotal: -- / Total: --")
     }
 
+    // MARK: - Adjacent occurrences sharing a delimiter (regression: index past endIndex)
+
+    func test_adjacentOccurrencesSharingADelimiter_resolveTheFirst_andKeepTheRestLiteral() {
+        // `^%^` closes one token and opens the next off the same `%`, so the pattern matches
+        // twice over overlapping spans. Substituting both used to run the second replacement
+        // over a range the first had already shortened, trapping on a String index.
+        let text = "%^DATA.catalogRuntime.x|^%^DATA.catalogRuntime.y|^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: nil)
+
+        XCTAssertEqual(result, "^DATA.catalogRuntime.y|^%")
+    }
+
+    func test_adjacentOccurrencesSharingADelimiter_resolveTheFirstFromRuntimeData() {
+        let text = "Total %^DATA.catalogRuntime.x^%^DATA.catalogRuntime.y^% now"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["x": "$1", "y": "$2"])
+
+        XCTAssertEqual(result, "Total $1^DATA.catalogRuntime.y^% now")
+    }
+
+    func test_adjacentOccurrencesWithTheirOwnDelimiters_bothResolve() {
+        // One `%` more than the shared-delimiter case: two complete tokens, both resolve.
+        let text = "%^DATA.catalogRuntime.x^%%^DATA.catalogRuntime.y^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["x": "$1", "y": "$2"])
+
+        XCTAssertEqual(result, "$1$2")
+    }
+
     // MARK: - Mixed namespaces — non-runtime tokens pass through
 
     func test_nonRuntimePlaceholder_passesThroughUntouched() {

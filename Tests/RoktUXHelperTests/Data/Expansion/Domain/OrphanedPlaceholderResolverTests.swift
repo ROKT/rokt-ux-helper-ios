@@ -109,6 +109,42 @@ final class OrphanedPlaceholderResolverTests: XCTestCase {
         XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "A B A")
     }
 
+    // MARK: - Adjacent orphans sharing a delimiter (regression: index past endIndex)
+
+    func test_adjacentOrphansSharingADelimiter_resolveTheFirst_andKeepTheRestLiteral() {
+        // `^%^` closes one token and opens the next off the same `%`, so the pattern matches
+        // twice over overlapping spans. Substituting both used to run the second replacement
+        // over a range the first had already shortened, trapping on a String index.
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b|^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "^DATA.creativeLink.b|^%")
+    }
+
+    func test_adjacentOrphansSharingADelimiter_withSurroundingCopy() {
+        let text = "Head %^DATA.creativeLink.a | A^%^DATA.creativeLink.b | B^% tail"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "Head A^DATA.creativeLink.b | B^% tail")
+    }
+
+    func test_threeOrphansSharingDelimiters_alternateBetweenSubstitutedAndLiteral() {
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b|^%^DATA.creativeLink.c|^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "^DATA.creativeLink.b|^")
+    }
+
+    func test_adjacentOrphansWithTheirOwnDelimiters_bothSubstituted() {
+        // One `%` more than the shared-delimiter case: two complete tokens, both resolve.
+        let text = "%^DATA.creativeLink.a | A^%%^DATA.creativeLink.b | B^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "AB")
+    }
+
+    func test_mandatoryOrphanSharingADelimiterWithAnOptionalOne_stillZeroesLine() {
+        let text = "%^DATA.creativeLink.a^%^DATA.creativeLink.b|^%"
+
+        XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
+    }
+
     // MARK: - Mixed: deferred + orphan
 
     func test_deferredAlongsideOptionalOrphan_substitutesOptional_keepsDeferred() {

@@ -20,30 +20,23 @@ enum CatalogRuntimePlaceholderResolver {
 
     static func resolve(text: String, catalogRuntimeData: [String: String]?) -> String {
         guard let regex = bnfRegex else { return text }
-        let fullRange = NSRange(text.startIndex..<text.endIndex, in: text)
-        let matches = regex.matches(in: text, options: [], range: fullRange)
-        guard !matches.isEmpty else { return text }
+        let tokens = BNFTokenScanner.tokens(in: text, matching: regex)
+        guard !tokens.isEmpty else { return text }
 
         // Build replacements by walking the chain alternatives in order. Reverse-iterate so
-        // earlier index ranges remain valid as we splice the result string.
+        // earlier token ranges remain valid as we splice the result string.
         var result = text
         let prefix = BNFNamespace.dataCatalogRuntime.withNamespaceSeparator
-        let startLen = BNFSeparator.startDelimiter.charCount
-        let endLen = BNFSeparator.endDelimiter.charCount
-        for match in matches.reversed() {
-            guard let chainRange = Range(match.range, in: result) else { continue }
-            let chain = String(result[chainRange])
+        for token in tokens.reversed() {
             // Skip placeholders that don't reference DATA.catalogRuntime.* in any alternative.
-            guard chain.contains(prefix) else { continue }
+            guard token.chain.contains(prefix) else { continue }
 
-            guard let resolved = resolveChain(chain, prefix: prefix, runtimeData: catalogRuntimeData) else { return "" }
-            // Replace at the regex-derived position (expanded to include `%^` and `^%`).
-            // A global string search would re-target the first identical token if the same
-            // placeholder appears multiple times; reverse iteration keeps positional ranges
-            // valid because earlier indices stay stable when later content shifts.
-            let tokenStart = result.index(chainRange.lowerBound, offsetBy: -startLen)
-            let tokenEnd = result.index(chainRange.upperBound, offsetBy: endLen)
-            result.replaceSubrange(tokenStart..<tokenEnd, with: resolved)
+            guard let resolved = resolveChain(token.chain, prefix: prefix, runtimeData: catalogRuntimeData)
+            else { return "" }
+            // Replace at the scanned position. A global string search would re-target the first
+            // identical token if the same placeholder appears multiple times.
+            guard let tokenRange = Range(token.tokenRange, in: result) else { continue }
+            result.replaceSubrange(tokenRange, with: resolved)
         }
         return result
     }
