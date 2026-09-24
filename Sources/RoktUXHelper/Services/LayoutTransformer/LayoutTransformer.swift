@@ -45,7 +45,11 @@ where CreativeSyntaxMapper.Context == CreativeContext,
       AddToCartMapper.Context == CatalogItem,
       TransactionMapper.Context == TransactionData {
 
-    enum Context {
+    /// `indirect` so the payload lives in a box and a copy is a retain rather than a ~700-byte
+    /// struct copy. Every builder and every `get…` takes a `Context`, and at `-Onone` each of those
+    /// argument copies is its own stack slot, so the inline representation was reserving more of
+    /// the transform's frame than anything else — 31 copies of it in `transform` alone.
+    indirect enum Context {
         case outer([OfferModel?])
         case inner(Inner)
 
@@ -146,191 +150,53 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         }
     }
 
+    /// The recursive step: dispatches one layout node to the builder for its kind.
+    ///
+    /// This is the frame that is paid again at every level of nesting, so it holds as little as
+    /// possible. It switches on `nodeKind`, which carries no payload, and the builder re-matches
+    /// the node to bind its own — so neither the payloads nor the temporaries that build a view
+    /// model are reserved here. Building all 31 inline reserved roughly 80 KB per level, which is
+    /// what exhausted a 1 MB device main thread at a depth the schema allows.
+    ///
+    /// Bodies live in `LayoutTransformer+Nodes.swift`; the exhaustive switch that makes a new
+    /// schema node a compile error is in `LayoutNodeKind.swift`.
     func transform(_ layout: LayoutSchemaModel, context: Context) throws -> LayoutSchemaViewModel {
         // Every nested node reaches the descent through here, so one guard bounds the whole tree.
         try depthCounter.enter()
         defer { depthCounter.exit() }
 
-        return switch layout {
-        case .row(let rowModel):
-                .row(
-                    try getRow(
-                        rowModel.styles,
-                        children: transformChildren(rowModel.children, context: context),
-                        catalogItemContext: context.catalogItemContext
-                    )
-                )
-        case .column(let columnModel):
-                .column(
-                    try getColumn(
-                        columnModel.styles,
-                        children: transformChildren(columnModel.children, context: context)
-                    )
-                )
-        case .zStack(let zStackModel):
-                .zStack(
-                    try getZStack(
-                        zStackModel.styles,
-                        children: transformChildren(zStackModel.children, context: context)
-                    )
-                )
-        case .basicText(let basicTextModel):
-                .basicText(try getBasicText(basicTextModel, context: context))
-        case .staticImage(let imageModel):
-                .staticImage(try getStaticImage(imageModel))
-        case .richText(let richTextModel):
-                .richText(try getRichText(richTextModel, context: context))
-        case .dataImage(let imageModel):
-            try transformWithFallback {
-                .dataImage(try getDataImage(imageModel, context: context))
-            }
-        case .progressIndicator(let progressIndicatorModel):
-                .progressIndicator(try getProgressIndicatorUIModel(progressIndicatorModel, context: context))
-        case .creativeResponse(let model):
-            try getCreativeResponse(
-                model: model,
-                context: context
-            )
-        case .oneByOneDistribution(let oneByOneModel):
-                .oneByOne(try getOneByOne(oneByOneModel: oneByOneModel, context: context))
-        case .overlay(let overlayModel):
-                .overlay(
-                    try getOverlay(
-                        overlayModel.styles,
-                        allowBackdropToClose: overlayModel.allowBackdropToClose,
-                        children: transformChildren(overlayModel.children, context: context)
-                    )
-                )
-        case .bottomSheet(let bottomSheetModel):
-                .bottomSheet(
-                    try getBottomSheet(
-                        bottomSheetModel.styles,
-                        allowBackdropToClose: bottomSheetModel.allowBackdropToClose,
-                        children: transformChildren(bottomSheetModel.children, context: context)
-                    )
-                )
-        case .when(let whenModel):
-                .when(
-                    getWhenNode(
-                        children: try transformChildren(whenModel.children, context: context),
-                        predicates: whenModel.predicates,
-                        transition: whenModel.transition,
-                        catalogItemContext: context.catalogItemContext,
-                        predicateOfferIndex: context.offerIndex
-                    )
-                )
-        case .staticLink(let staticLinkModel):
-                .staticLink(
-                    try getStaticLink(
-                        src: staticLinkModel.src,
-                        open: staticLinkModel.open,
-                        styles: staticLinkModel.styles,
-                        children: transformNonInteractiveChildren(staticLinkModel.children, context: context),
-                        accessibilityLabel: resolveAccessibilityLabel(staticLinkModel.a11yLabel, context: context)
-                    )
-                )
-        case .closeButton(let closeButtonModel):
-                .closeButton(
-                    try getCloseButton(
-                        styles: closeButtonModel.styles,
-                        children: transformNonInteractiveChildren(closeButtonModel.children, context: context),
-                        dismissalMethod: closeButtonModel.dismissalMethod
-                    )
-                )
-        case .carouselDistribution(let carouselModel):
-                .carousel(try getCarousel(carouselModel: carouselModel, context: context))
-        case .groupedDistribution(let groupedModel):
-                .groupDistribution(try getGroupedDistribution(groupedModel: groupedModel, context: context))
-        case .progressControl(let progressControlModel):
-                .progressControl(
-                    try getProgressControl(
-                        styles: progressControlModel.styles,
-                        direction: progressControlModel.direction,
-                        children: transformNonInteractiveChildren(progressControlModel.children,
-                                                                  context: context)
-                    )
-                )
-        case .accessibilityGrouped(let accessibilityGroupedModel):
-            try getAccessibilityGrouped(
-                child: accessibilityGroupedModel.child,
-                context: context
-            )
-        case .scrollableColumn(let columnModel):
-                .scrollableColumn(
-                    try getScrollableColumn(
-                        columnModel.styles,
-                        children:
-                            transformChildren(columnModel.children, context: context)
-                    )
-                )
-        case .scrollableRow(let rowModel):
-                .scrollableRow(
-                    try getScrollableRow(
-                        rowModel.styles,
-                        children: transformChildren(rowModel.children, context: context),
-                        catalogItemContext: context.catalogItemContext
-                    )
-                )
-        case .toggleButtonStateTrigger(let buttonModel):
-                .toggleButton(
-                    try getToggleButton(
-                        customStateKey: buttonModel.customStateKey,
-                        styles: buttonModel.styles,
-                        children: transformNonInteractiveChildren(buttonModel.children,
-                                                                  context: context),
-                        accessibilityLabel: resolveAccessibilityLabel(buttonModel.a11yLabel, context: context)
-                    )
-                )
-        case .dataImageCarousel(let dataImageCarouselModel):
-            try transformWithFallback {
-                .dataImageCarousel(try getDataImageCarousel(dataImageCarouselModel, context: context))
-            }
-        case .catalogStackedCollection(let model):
-                .catalogStackedCollection(
-                    try getCatalogStackedCollectionModel(
-                        model: model,
-                        context: context
-                    )
-                )
-        case .catalogResponseButton(let model):
-                .catalogResponseButton(
-                    try getCatalogResponseButtonModel(
-                        style: model.styles,
-                        children: transformNonInteractiveChildren(model.children, context: context),
-                        context: context,
-                        responseKey: model.responseKey,
-                        accessibilityLabel: model.a11yLabel
-                    )
-                )
-        case .catalogDevicePayButton(let devicePayModel):
-                .catalogDevicePayButton(
-                    try getCatalogDevicePayButton(
-                        model: devicePayModel,
-                        children: transformNonInteractiveChildren(devicePayModel.children, context: context),
-                        context: context
-                    )
-                )
-        case .catalogDropdown(let dropdownModel):
-                .catalogDropdown(
-                    try getCatalogDropdown(
-                        model: dropdownModel,
-                        attributeIndex: layoutState.nextCatalogDropdownAttributeIndex.advanceAndReturnPrevious()
-                    )
-                )
-        case .catalogImageGallery(let galleryModel):
-            try transformWithFallback {
-                .catalogImageGallery(
-                    try getCatalogImageGallery(model: galleryModel, context: context)
-                )
-            }
-        case .catalogCombinedCollection(let model):
-                .catalogCombinedCollection(
-                    try getCatalogCombinedCollection(model: model, context: context)
-                )
-        case .inlineContainer(let model):
-            try withSchemaValidation { .inlineContainer(try getInlineContainer(model, context: context)) }
-        case .catalogCarouselCollection(let model):
-            try withSchemaValidation { .catalogCarouselCollection(try getCatalogCarousel(model, context: context)) }
+        return switch layout.nodeKind {
+        case .row: try transformRow(layout, context: context)
+        case .column: try transformColumn(layout, context: context)
+        case .zStack: try transformZStack(layout, context: context)
+        case .basicText: try transformBasicText(layout, context: context)
+        case .staticImage: try transformStaticImage(layout, context: context)
+        case .richText: try transformRichText(layout, context: context)
+        case .dataImage: try transformDataImage(layout, context: context)
+        case .progressIndicator: try transformProgressIndicator(layout, context: context)
+        case .creativeResponse: try transformCreativeResponse(layout, context: context)
+        case .oneByOneDistribution: try transformOneByOneDistribution(layout, context: context)
+        case .overlay: try transformOverlay(layout, context: context)
+        case .bottomSheet: try transformBottomSheet(layout, context: context)
+        case .when: try transformWhen(layout, context: context)
+        case .staticLink: try transformStaticLink(layout, context: context)
+        case .closeButton: try transformCloseButton(layout, context: context)
+        case .carouselDistribution: try transformCarouselDistribution(layout, context: context)
+        case .groupedDistribution: try transformGroupedDistribution(layout, context: context)
+        case .progressControl: try transformProgressControl(layout, context: context)
+        case .accessibilityGrouped: try transformAccessibilityGrouped(layout, context: context)
+        case .scrollableColumn: try transformScrollableColumn(layout, context: context)
+        case .scrollableRow: try transformScrollableRow(layout, context: context)
+        case .toggleButtonStateTrigger: try transformToggleButtonStateTrigger(layout, context: context)
+        case .dataImageCarousel: try transformDataImageCarousel(layout, context: context)
+        case .catalogStackedCollection: try transformCatalogStackedCollection(layout, context: context)
+        case .catalogResponseButton: try transformCatalogResponseButton(layout, context: context)
+        case .catalogDevicePayButton: try transformCatalogDevicePayButton(layout, context: context)
+        case .catalogDropdown: try transformCatalogDropdown(layout, context: context)
+        case .catalogImageGallery: try transformCatalogImageGallery(layout, context: context)
+        case .catalogCombinedCollection: try transformCatalogCombinedCollection(layout, context: context)
+        case .inlineContainer: try transformInlineContainer(layout, context: context)
+        case .catalogCarouselCollection: try transformCatalogCarouselCollection(layout, context: context)
         }
     }
 
@@ -943,7 +809,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                          disabledStyle: updateStyles.compactMap {$0.disabled})
     }
 
-    private func getCatalogStackedCollectionModel(
+    func getCatalogStackedCollectionModel(
         model: CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>,
         context: Context,
         accessibilityGrouped: Bool = false
@@ -1159,7 +1025,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                                           transition: transition.transtion)
     }
 
-    private func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) throws -> LayoutSchemaViewModel {
+    func transformWithFallback(_ transform: () throws -> LayoutSchemaViewModel) throws -> LayoutSchemaViewModel {
         do {
            return try transform()
         } catch LayoutTransformerError.missingData {
