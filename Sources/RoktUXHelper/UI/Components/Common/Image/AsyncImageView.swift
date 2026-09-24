@@ -24,20 +24,26 @@ struct AsyncImageView: View {
         }
     }
 
-    var stringBase64: String {
-        // we will remove the data URI scheme, data:content/type;base64,
+    // the payload of a data:content/type;base64,<payload> URI, or nil when the
+    // string is not one. The suffix is searched for after the prefix, so the two
+    // markers cannot pair up out of order.
+    private var base64Payload: String? {
         guard let dataImagePrefix = imgURL.range(of: "data:image/"),
-              let base64Suffix = imgURL.range(of: ";base64,")
-        else { return imgURL }
+              let base64Suffix = imgURL.range(of: ";base64,",
+                                              range: dataImagePrefix.upperBound..<imgURL.endIndex)
+        else { return nil }
 
-        let uriSchemeRange = dataImagePrefix.lowerBound..<base64Suffix.upperBound
-        let uriScheme = imgURL[uriSchemeRange]
+        let uriScheme = imgURL[dataImagePrefix.lowerBound..<base64Suffix.upperBound]
 
         return imgURL.replacingOccurrences(of: uriScheme, with: "")
     }
 
+    var stringBase64: String {
+        base64Payload ?? imgURL
+    }
+
     var isURLBase64Image: Bool {
-        imgURL.contains("data:image/") && imgURL.contains(";base64")
+        base64Payload != nil
     }
 
     @Binding var isImageValid: Bool
