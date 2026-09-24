@@ -167,6 +167,28 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         assertBasicTextSnapshot(model)
     }
 
+    func testTransform_adjacentOrphansSharingADelimiter_resolvesTheFirstWithoutTrapping() {
+        // `^%^` closes one placeholder and opens the next off the same `%`, which the token
+        // pattern matches as two tokens whose delimiters overlap. The transform runs
+        // synchronously inside `loadLayout`, so a trap here takes the host app down before
+        // any UI exists. The first placeholder resolves; the remainder stays literal.
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            value: "Read our %^DATA.creativeLink.terms | terms^%^DATA.creativeLink.privacy | privacy^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: LayoutState()
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, "Read our terms^DATA.creativeLink.privacy | privacy^%")
+    }
+
     // MARK: - Helpers
 
     private func assertBasicTextSnapshot(
