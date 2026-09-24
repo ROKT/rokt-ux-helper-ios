@@ -47,12 +47,13 @@ extension UIViewController {
             var isOnLoadCalled = false
             let onSizeChange = { [weak modal] (size: CGFloat) in
                 DispatchQueue.main.async {
-                    let detentHeight = max(size, 1)
                     guard let sheet = modal?.sheetPresentationController else {
                         return
                     }
-                    sheet.animateChanges {
-                        sheet.detents = [.custom { _ in detentHeight }]
+                    if let detentHeight = Self.sheetHeight(reportedBy: size) {
+                        sheet.animateChanges {
+                            sheet.detents = [.custom { _ in detentHeight }]
+                        }
                     }
                     if !isOnLoadCalled {
                         isOnLoadCalled = true
@@ -115,6 +116,18 @@ extension UIViewController {
         )
     }
 
+    /// The height a wrap-content sheet should take for a size its content reported, or `nil` when
+    /// that size is not a height. SwiftUI reports whatever the measured tree produced, and the
+    /// sheet adds its own authored padding and margin to it, so a value that is not a number can
+    /// arrive here from a layout alone. Sizing the sheet from one would put that value into a view
+    /// frame or a detent, and UIKit answers an invalid frame with an exception no caller can catch,
+    /// which stops the host application. Ignoring the report instead leaves the sheet at the height
+    /// it already has, which is the half-height it starts at so its content can measure.
+    static func sheetHeight(reportedBy size: CGFloat) -> CGFloat? {
+        guard size.isFinite else { return nil }
+        return max(size, 1)
+    }
+
     private func presentFullBleedBottomSheet<Content: View>(
         modal: RoktUXSwiftUIViewController,
         sheetType: BottomSheetType,
@@ -133,15 +146,16 @@ extension UIViewController {
             ? { [weak modal] size in
                 DispatchQueue.main.async {
                     guard let modal else { return }
-                    let height = max(size, 1)
                     // The presentation controller only exists once presentation is under way.
                     // A size reported before then is held rather than dropped: dropping it would
                     // leave the sheet at its initial height and, because onLoad is chained to the
                     // first size, would stop the impression from ever being sent.
-                    if let controller = modal.bottomSheetPresentationController {
-                        controller.setSheetHeight(height, animated: isOnLoadCalled)
-                    } else {
-                        modal.pendingBottomSheetHeight = height
+                    if let height = Self.sheetHeight(reportedBy: size) {
+                        if let controller = modal.bottomSheetPresentationController {
+                            controller.setSheetHeight(height, animated: isOnLoadCalled)
+                        } else {
+                            modal.pendingBottomSheetHeight = height
+                        }
                     }
                     if !isOnLoadCalled {
                         isOnLoadCalled = true
