@@ -268,6 +268,56 @@ final class TestCarouselViewModel: XCTestCase {
         XCTAssertEqual(sut.currentLeadingOfferIndex, 2, "Leading offer index should remain unchanged")
     }
 
+    func testGoToNextPage_WhenBreakpointShowsMoreItemsThanFirstBreakpoint_ShouldStopOnLastRenderedPage() {
+        // Given - 6 offers, 1 per page on the first breakpoint and 3 per page on the second
+        sut = CarouselViewModel(
+            children: makeChildren(count: 6),
+            defaultStyle: nil,
+            viewableItems: [1, 3],
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        mockLayoutState.mockBreakpointIndex = 1
+        sut.globalScreenSizeUpdated(1000)
+
+        XCTAssertEqual(sut.viewableItems, 3, "Carousel should render the second breakpoint's viewable items")
+        XCTAssertEqual(sut.totalPages, 2, "6 offers at 3 per page is 2 pages")
+
+        // When - the progress control is tapped more often than there are pages
+        for _ in 0..<10 {
+            sut.goToNextPage(nil)
+        }
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 1, "Current page should stop on the last rendered page")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 3, "Leading offer index should stay within the offers")
+    }
+
+    func testGoToNextPage_WhenViewableItemsIsOne_ShouldStillAdvanceThroughEveryPage() {
+        // Given - one offer per page on every breakpoint
+        sut = CarouselViewModel(
+            children: makeChildren(count: 3),
+            defaultStyle: nil,
+            viewableItems: [1],
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+        sut.globalScreenSizeUpdated(1000)
+
+        // When
+        sut.goToNextPage(nil)
+        sut.goToNextPage(nil)
+        sut.goToNextPage(nil)
+
+        // Then
+        XCTAssertEqual(sut.currentPage, 2, "Current page should reach the last of the three pages")
+        XCTAssertEqual(sut.currentLeadingOfferIndex, 2, "Leading offer index should match the last offer")
+    }
+
     // MARK: - goToNextOffer Tests
 
     func testGoToNextOffer_WhenViewableItemsIsNotOne_ShouldDoNothing() {
@@ -695,5 +745,61 @@ final class TestCarouselViewModel: XCTestCase {
         
         // Then
         XCTAssertEqual(sut.viewableItems, 2, "Should cap viewable items at total number of offers available")
+    }
+
+    func testSetViewableItemsForBreakpoint_WhenBreakpointAsksForZeroItems_ShouldKeepOneItemPerPage() {
+        // Given
+        sut = CarouselViewModel(
+            children: makeChildren(count: 3),
+            defaultStyle: nil,
+            viewableItems: [0],
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+
+        // When
+        sut.globalScreenSizeUpdated(1000)
+
+        // Then
+        XCTAssertEqual(sut.viewableItems, 1, "Viewable items should never drop to zero")
+        XCTAssertEqual(sut.totalPages, 3, "Each offer should get its own page")
+    }
+
+    func testSetViewableItemsForBreakpoint_WhenNoBreakpointsAreDefined_ShouldKeepExistingViewableItems() {
+        // Given
+        sut = CarouselViewModel(
+            children: makeChildren(count: 3),
+            defaultStyle: nil,
+            viewableItems: [],
+            peekThroughSize: [],
+            eventService: mockEventService,
+            slots: [],
+            layoutState: mockLayoutState
+        )
+
+        // When
+        sut.globalScreenSizeUpdated(1000)
+
+        // Then
+        XCTAssertEqual(sut.viewableItems, 1, "Viewable items should fall back to the default of one")
+        XCTAssertEqual(sut.totalPages, 3, "Each offer should get its own page")
+    }
+
+    // MARK: - Helpers
+
+    private func makeChildren(count: Int) -> [LayoutSchemaViewModel] {
+        (0..<count).map { index in
+            .basicText(BasicTextViewModel(
+                value: "Item \(index)",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: mockLayoutState,
+                diagnosticService: nil
+            ))
+        }
     }
 }
