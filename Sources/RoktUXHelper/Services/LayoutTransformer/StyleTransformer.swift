@@ -4,18 +4,92 @@ import DcuiSchema
 @available(iOS 13, *)
 struct StyleTransformer {
 
+    // MARK: - Resolving one output block
+
+    //
+    // Each of these takes the states a loop has accumulated so far and produces the block for one
+    // breakpoint. They are `@inline(never)` and separate from their loops on purpose: a merge
+    // result is a whole style struct, hundreds of bytes and over a kilobyte for some types, and at
+    // `-O` the specialised loop body reserved a slot for every one of them and held it for the
+    // duration of the loop. Resolved in a frame that returns, the same values cost one block's
+    // worth of stack rather than one per state per breakpoint.
+
+    @inline(never)
+    private static func resolvedBasicStateBlock<T: Decodable>(
+        mergeBase: T?,
+        fallbackDefault: T,
+        pressed: T?,
+        hovered: T?,
+        focussed: T?,
+        disabled: T?
+    ) throws -> BasicStateStylingBlock<T> {
+        BasicStateStylingBlock(default: mergeBase ?? fallbackDefault,
+                               pressed: try updatedStyle(mergeBase, newStyle: pressed),
+                               hovered: try updatedStyle(mergeBase, newStyle: hovered),
+                               focussed: try updatedStyle(mergeBase, newStyle: focussed),
+                               disabled: try updatedStyle(mergeBase, newStyle: disabled))
+    }
+
+    @inline(never)
+    private static func resolvedFormStateBlock<T: Decodable>(
+        mergeBase: T?,
+        fallbackDefault: T,
+        pressed: T?,
+        hovered: T?,
+        focussed: T?,
+        disabled: T?,
+        selected: T?,
+        errored: T?
+    ) throws -> FormStateStylingBlock<T> {
+        FormStateStylingBlock(default: mergeBase ?? fallbackDefault,
+                              pressed: try updatedStyle(mergeBase, newStyle: pressed),
+                              hovered: try updatedStyle(mergeBase, newStyle: hovered),
+                              focussed: try updatedStyle(mergeBase, newStyle: focussed),
+                              disabled: try updatedStyle(mergeBase, newStyle: disabled),
+                              selected: try updatedStyle(mergeBase, newStyle: selected),
+                              errored: try updatedStyle(mergeBase, newStyle: errored))
+    }
+
+    /// Indicators have no focussed state and always have a resolved default by this point.
+    @inline(never)
+    private static func resolvedIndicatorBlock<T: Decodable>(
+        default base: T,
+        pressed: T?,
+        hovered: T?,
+        disabled: T?
+    ) throws -> BasicStateStylingBlock<T> {
+        BasicStateStylingBlock(default: base,
+                               pressed: try updatedStyle(base, newStyle: pressed),
+                               hovered: try updatedStyle(base, newStyle: hovered),
+                               focussed: nil,
+                               disabled: try updatedStyle(base, newStyle: disabled))
+    }
+
+    @inline(never)
+    private static func mapped<T: Decodable>(
+        _ block: BasicStateStylingBlock<T>,
+        transform: (T) -> BaseStyles
+    ) -> BasicStateStylingBlock<BaseStyles> {
+        BasicStateStylingBlock(default: transform(block.default),
+                               pressed: block.pressed.map(transform),
+                               hovered: block.hovered.map(transform),
+                               focussed: block.focussed.map(transform),
+                               disabled: block.disabled.map(transform))
+    }
+
+    // MARK: - Breakpoint inheritance
+
     static func updatedStyles<T: Decodable>(
         _ styles: [BasicStateStylingBlock<T>]?,
         transform: (T) -> BaseStyles
     ) throws -> [BasicStateStylingBlock<BaseStyles>] {
-        try updatedStyles(styles).map {
-            BasicStateStylingBlock(
-                default: transform($0.default),
-                pressed: $0.pressed.map(transform),
-                hovered: $0.hovered.map(transform),
-                focussed: $0.focussed.map(transform),
-                disabled: $0.disabled.map(transform))
+        let merged = try updatedStyles(styles)
+        var transformed = [BasicStateStylingBlock<BaseStyles>]()
+        transformed.reserveCapacity(merged.count)
+        for block in merged {
+            transformed.append(mapped(block, transform: transform))
         }
+        return transformed
     }
 
     static func updatedStyles<T: Decodable>(
@@ -23,6 +97,7 @@ struct StyleTransformer {
     ) throws -> [BasicStateStylingBlock<T>] {
         var updatedStyles: [BasicStateStylingBlock<T>] = []
         guard let styles, !styles.isEmpty else { return updatedStyles }
+        updatedStyles.reserveCapacity(styles.count)
 
         var lastDefault: T?
         var lastPressed: T?
@@ -30,7 +105,7 @@ struct StyleTransformer {
         var lastFocussed: T?
         var lastDisabled: T?
 
-        try styles.forEach { style in
+        for style in styles {
             let defaultStyle = style.default
 
             if let lastDefaultValue = lastDefault {
@@ -60,11 +135,12 @@ struct StyleTransformer {
             }
 
             updatedStyles.append(
-                BasicStateStylingBlock(default: lastDefault ?? defaultStyle,
-                                       pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
-                                       hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
-                                       focussed: try updatedStyle(lastDefault, newStyle: lastFocussed),
-                                       disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
+                try resolvedBasicStateBlock(mergeBase: lastDefault,
+                                            fallbackDefault: defaultStyle,
+                                            pressed: lastPressed,
+                                            hovered: lastHovered,
+                                            focussed: lastFocussed,
+                                            disabled: lastDisabled))
         }
 
         return updatedStyles
@@ -75,6 +151,7 @@ struct StyleTransformer {
     ) throws -> [FormStateStylingBlock<T>] {
         var updatedStyles: [FormStateStylingBlock<T>] = []
         guard let styles, !styles.isEmpty else { return updatedStyles }
+        updatedStyles.reserveCapacity(styles.count)
 
         var lastDefault: T?
         var lastPressed: T?
@@ -84,7 +161,7 @@ struct StyleTransformer {
         var lastSelected: T?
         var lastErrored: T?
 
-        try styles.forEach { style in
+        for style in styles {
             let defaultStyle = style.default
 
             lastDefault = try lastDefault.map { try updatedStyle($0, newStyle: defaultStyle) } ?? defaultStyle
@@ -96,13 +173,14 @@ struct StyleTransformer {
             lastErrored = try lastErrored.map { try updatedStyle($0, newStyle: style.errored) } ?? style.errored
 
             updatedStyles.append(
-                FormStateStylingBlock(default: lastDefault ?? defaultStyle,
-                                      pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
-                                      hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
-                                      focussed: try updatedStyle(lastDefault, newStyle: lastFocussed),
-                                      disabled: try updatedStyle(lastDefault, newStyle: lastDisabled),
-                                      selected: try updatedStyle(lastDefault, newStyle: lastSelected),
-                                      errored: try updatedStyle(lastDefault, newStyle: lastErrored)))
+                try resolvedFormStateBlock(mergeBase: lastDefault,
+                                           fallbackDefault: defaultStyle,
+                                           pressed: lastPressed,
+                                           hovered: lastHovered,
+                                           focussed: lastFocussed,
+                                           disabled: lastDisabled,
+                                           selected: lastSelected,
+                                           errored: lastErrored))
         }
 
         return updatedStyles
@@ -111,10 +189,11 @@ struct StyleTransformer {
     static func updatedStyles<T: Decodable>(_ styles: [StatelessStylingBlock<T>]?) throws -> [StatelessStylingBlock<T>] {
         var updatedStyles: [StatelessStylingBlock<T>] = []
         guard let styles, !styles.isEmpty else { return updatedStyles }
+        updatedStyles.reserveCapacity(styles.count)
 
         var lastDefault: T?
 
-        try styles.forEach { style in
+        for style in styles {
             let defaultStyle = style.default
 
             if let lastDefaultValue = lastDefault {
@@ -190,11 +269,10 @@ struct StyleTransformer {
 
             guard let lastDefault else { break }
             resultStyles.append(
-                BasicStateStylingBlock(default: lastDefault,
-                                       pressed: try updatedStyle(lastDefault, newStyle: lastPressed),
-                                       hovered: try updatedStyle(lastDefault, newStyle: lastHovered),
-                                       focussed: nil,
-                                       disabled: try updatedStyle(lastDefault, newStyle: lastDisabled)))
+                try resolvedIndicatorBlock(default: lastDefault,
+                                           pressed: lastPressed,
+                                           hovered: lastHovered,
+                                           disabled: lastDisabled))
 
             styleIndex += 1
             newStyleIndex += 1
