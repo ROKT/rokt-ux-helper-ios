@@ -114,6 +114,97 @@ final class TestRoktBottomSheetPresentationController: XCTestCase {
         XCTAssertFalse(sheet.height.isNaN)
     }
 
+    // MARK: Heights that are not numbers
+
+    // The crash this guards: the frame is assigned to the presented view on every layout pass, and
+    // a view frame holding a value that is not a number raises an exception no caller can catch,
+    // which stops the host application. `min` and `max` pass such a value straight through, so the
+    // existing clamp is not what stops it.
+    func testRequestedHeightThatIsNotANumberNeverReachesTheFrame() {
+        let sheet = frame(.nan)
+
+        XCTAssertTrue(sheet.origin.y.isFinite)
+        XCTAssertTrue(sheet.size.height.isFinite)
+        XCTAssertGreaterThanOrEqual(sheet.height, 0)
+        XCTAssertLessThanOrEqual(sheet.maxY, container.height)
+    }
+
+    // Falls back to the half-height a layout stating no height at all gets, so the sheet is still
+    // on screen and its content still has room to measure itself.
+    func testRequestedHeightThatIsNotANumberFallsBackToHalfTheAvailableHeight() {
+        let maximum = RoktBottomSheetPresentationController.maximumSheetHeight(
+            containerHeight: container.height,
+            topSafeArea: topSafeArea
+        )
+
+        XCTAssertEqual(frame(.nan).height, frame(maximum/2).height, accuracy: 0.001)
+    }
+
+    // An infinite height is treated the same as one that is not a number, matching the rule the
+    // style parser applies to an infinite edge. A very large finite height is still just clamped,
+    // which is what `testHeightIsClampedToTheAvailableHeight` covers.
+    func testInfiniteRequestedHeightFallsBackTheSameWay() {
+        let maximum = RoktBottomSheetPresentationController.maximumSheetHeight(
+            containerHeight: container.height,
+            topSafeArea: topSafeArea
+        )
+
+        XCTAssertEqual(frame(.infinity).height, frame(maximum/2).height, accuracy: 0.001)
+        XCTAssertEqual(frame(-.infinity).height, frame(maximum/2).height, accuracy: 0.001)
+    }
+
+    // UIKit hands the container's own geometry in, so sanitising only the requested height would
+    // leave a second way for a value that is not a number to reach the rect.
+    func testContainerGeometryThatIsNotANumberProducesAFiniteFrame() {
+        let sheet = RoktBottomSheetPresentationController.sheetFrame(
+            containerSize: CGSize(width: CGFloat.nan, height: CGFloat.nan),
+            topSafeArea: .nan,
+            bottomSafeArea: .nan,
+            requestedHeight: 400
+        )
+
+        XCTAssertTrue(sheet.origin.x.isFinite)
+        XCTAssertTrue(sheet.origin.y.isFinite)
+        XCTAssertTrue(sheet.size.width.isFinite)
+        XCTAssertTrue(sheet.size.height.isFinite)
+    }
+
+    func testClampedHeightRejectsAHeightThatIsNotANumber() {
+        XCTAssertEqual(RoktBottomSheetPresentationController.clampedHeight(.nan, maximum: 800),
+                       400,
+                       accuracy: 0.001)
+        XCTAssertEqual(RoktBottomSheetPresentationController.clampedHeight(400, maximum: .nan),
+                       0,
+                       accuracy: 0.001)
+    }
+
+    func testClampedHeightStillClampsOrdinaryHeights() {
+        XCTAssertEqual(RoktBottomSheetPresentationController.clampedHeight(400, maximum: 800),
+                       400,
+                       accuracy: 0.001)
+        XCTAssertEqual(RoktBottomSheetPresentationController.clampedHeight(900, maximum: 800),
+                       800,
+                       accuracy: 0.001)
+        XCTAssertEqual(RoktBottomSheetPresentationController.clampedHeight(-50, maximum: 800),
+                       1,
+                       accuracy: 0.001)
+    }
+
+    // The wrap-content sheet is sized by a height SwiftUI reports for its content, with the
+    // layout's own padding and margin added to it. A report that is not a number is ignored, so
+    // the sheet keeps the height it already has rather than being resized to an invalid one.
+    func testAReportedSizeThatIsNotANumberIsIgnored() {
+        XCTAssertNil(UIViewController.sheetHeight(reportedBy: .nan))
+        XCTAssertNil(UIViewController.sheetHeight(reportedBy: .infinity))
+        XCTAssertNil(UIViewController.sheetHeight(reportedBy: -.infinity))
+    }
+
+    func testAReportedSizeIsUsedAndFlooredAtOnePoint() {
+        XCTAssertEqual(UIViewController.sheetHeight(reportedBy: 437.5), 437.5)
+        XCTAssertEqual(UIViewController.sheetHeight(reportedBy: 0), 1)
+        XCTAssertEqual(UIViewController.sheetHeight(reportedBy: -50), 1)
+    }
+
     // A top safe area larger than the container must not yield a negative maximum.
     func testMaximumHeightNeverGoesNegative() {
         let maximum = RoktBottomSheetPresentationController.maximumSheetHeight(containerHeight: 40,

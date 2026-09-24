@@ -384,6 +384,65 @@ final class TestBottomSheetState: XCTestCase {
         XCTAssertEqual(loadCount, 1)
     }
 
+    // A layout authors the bottom sheet's own padding and margin as text, and the sheet adds the
+    // top and bottom of each to the height it reports for itself. An edge that is not a number
+    // used to make that sum not a number too, whatever the content actually measured, and that
+    // sum is what sizes the sheet.
+    func testAuthoredEdgeThatIsNotANumberLeavesTheReportedHeightUsable() throws {
+        let style = try JSONDecoder().decode(BottomSheetStyles.self, from: Data(#"""
+        {"spacing":{"padding":"nan 0 0 0","margin":"0 0 inf 0"}}
+        """#.utf8))
+        let model = BottomSheetViewModel(children: nil, allowBackdropToClose: false, defaultStyle: [style],
+                                         eventService: nil, layoutState: LayoutState())
+        var reported: [CGFloat] = []
+        let sheet = ResizableBottomSheetComponent(model: model, onSizeChange: { reported.append($0) })
+
+        sheet.onBottomSheetSizeChange(newHeight: 420)
+
+        XCTAssertEqual(reported, [420], "An unusable edge contributes nothing instead of poisoning the height")
+    }
+
+    // The second guard, in case a height that is not a number ever reaches the sheet from
+    // somewhere other than authored styling: the report is ignored, so the sheet keeps the height
+    // it has rather than being resized to an invalid one, and the impression still records because
+    // the load event is chained to the first report.
+    func testDynamicFullBleedIgnoresAReportedSizeThatIsNotANumber() async throws {
+        let state = restoredState(globalValue: 1)
+        state.items[LayoutState.layoutSettingsKey] = LayoutSettings(closeOnComplete: true,
+                                                                    bottomSheetPresentation: .fullBleed)
+        let presenter = TestPresenter()
+        var sizeChanged: ((CGFloat) -> Void)?
+        var loadCount = 0
+        presenter.present(placementType: .BottomSheet(.dynamic), bottomSheetUIModel: try makeSheetModel(state: state),
+                          layoutState: state, eventService: nil, onLoad: { loadCount += 1 }, onUnLoad: {}) { callback in
+            let _ = { sizeChanged = callback }()
+            Text("Example offer")
+        }
+        let modal = try XCTUnwrap(presenter.configuredController as? RoktUXSwiftUIViewController)
+        let controller = try XCTUnwrap(modal.bottomSheetPresentationController)
+        let reportSize = try XCTUnwrap(sizeChanged)
+        var resolverCalls = 0
+        controller.setSheetHeight({ maximum in
+            resolverCalls += 1
+            return maximum/2
+        }, animated: false)
+
+        reportSize(CGFloat.nan)
+        await waitUntil("An unusable measurement still loads the sheet") { loadCount == 1 }
+        resolverCalls = 0
+        _ = controller.resolvedSheetHeight
+        XCTAssertEqual(resolverCalls, 1, "An unusable height must not replace the height the sheet already has")
+        XCTAssertNil(modal.pendingBottomSheetHeight, "An unusable height must not be held for presentation")
+
+        // The guard drops the bad report only; the next usable one still resizes the sheet.
+        reportSize(240)
+        await waitUntil("A usable measurement still resizes the sheet") {
+            let previousCalls = resolverCalls
+            _ = controller.resolvedSheetHeight
+            return resolverCalls == previousCalls
+        }
+    }
+
     private func restoredState(globalValue: Int, onChange: ((RoktPluginViewState) -> Void)? = nil) -> LayoutState {
         LayoutState(pluginId: "example-plugin",
                     initialPluginViewState: RoktPluginViewState(pluginId: "example-plugin", offerIndex: 0,
