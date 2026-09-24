@@ -194,6 +194,15 @@ final class TestStyleModel: XCTestCase {
         XCTAssertEqual(alignment, FrameAlignmentProperty(top: 16, right: 16, bottom: 16, left: 16))
     }
 
+    func test_nonnegative_frame_alignment_rejects_more_than_four_edges() {
+        // Arrange — an edge string names one to four edges; a longer one is not an edge string.
+        let padding = "1 1 1 1 1"
+        // Act
+        let alignment = FrameAlignmentProperty.getNonNegativeFrameAlignment(padding)
+        // Assert
+        XCTAssertEqual(alignment, FrameAlignmentProperty.zeroDimension)
+    }
+
     func test_nonnegative_frame_alignment_nil_default() {
         // Arrange & Act
         let alignment = FrameAlignmentProperty.getNonNegativeFrameAlignment(nil)
