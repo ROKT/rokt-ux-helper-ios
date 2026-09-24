@@ -75,6 +75,31 @@ Check test counts and skips in the result bundle, not just a successful process 
 component tests, a local app build, current-head CI, published-dependency validation and manual
 acceptance are distinct results. A size-report job passing does not itself approve a size increase.
 
+## Layout nesting frame budget
+
+Transforming a layout is a recursive descent, so the stack it needs is the cost of one level
+multiplied by the nesting the schema allows. The `Frame Budget` CI job measures that product and
+fails when it exceeds a quarter of the stack the transform runs on. Run it yourself with a Debug
+build:
+
+```bash
+xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper \
+ -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData build
+tools/frame_budget.py DerivedData/Build/Products/Debug-iphonesimulator/RoktUXHelper.o
+```
+
+Measure a Debug build. At `-Onone` every local gets its own stack slot, which is both the worst
+case and what a partner debugging an integration runs; an optimised build overlaps slots and
+reports a smaller, less useful number. No simulator has to be booted, because the check reads
+frame sizes out of the compiled object and never runs it.
+
+The job reports the three frames that are live at every level and, separately, the frames reached
+once at the deepest level. Only the first group is multiplied. A failure means either that a
+function on the descent grew or that the depth cap was raised — prefer splitting the function that
+grew, so only one branch's locals are live at a time, over widening the stack or the budget. Both
+inputs are read from the sources (`LayoutDepthCounter.maxNestingDepth` and
+`WideStack.defaultStackSize`), so changing either is reflected in the next run.
+
 ## Snapshot Testing
 
 ### Overview
