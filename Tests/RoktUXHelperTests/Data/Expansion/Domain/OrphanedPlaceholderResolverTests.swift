@@ -145,6 +145,26 @@ final class OrphanedPlaceholderResolverTests: XCTestCase {
         XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
     }
 
+    // Regression: the mandatory placeholder here is the *second* of an overlapping pair — the
+    // one BNFTokenScanner marks `isSpliceable == false`. Before the fix, that meant its chain was
+    // never even evaluated, so a mandatory-and-unresolved placeholder silently failed to zero the
+    // line as long as the placeholder sharing its delimiter happened to resolve.
+    func test_mandatoryOrphanAsTheOverlappingSecondToken_stillZeroesLine() {
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b^%"
+
+        XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
+    }
+
+    // Note: Codex flagged a related concern (a replacement starting with a Unicode combining
+    // mark can merge into a preceding token's closing `%` and invalidate that token's stored
+    // range). It cannot reach this resolver in practice — every value this resolver splices in
+    // is `parsed.defaultValue`, always drawn from the matched chain's own grammar-constrained
+    // characters (`a-zA-Z0-9 .|_$-`) or the empty string, none of which can begin with a
+    // combining mark. See `CatalogRuntimePlaceholderResolverTests` for the reachable case: its
+    // replacement values come from an arbitrary host-supplied dictionary, not from the grammar.
+    // The splice here was still switched to NSMutableString to match, since it is strictly
+    // simpler than converting NSRange to a Swift String.Index and carries the same guarantee.
+
     // MARK: - Mixed: deferred + orphan
 
     func test_deferredAlongsideOptionalOrphan_substitutesOptional_keepsDeferred() {

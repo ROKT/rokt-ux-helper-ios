@@ -23,9 +23,12 @@ enum CatalogRuntimePlaceholderResolver {
         let tokens = BNFTokenScanner.tokens(in: text, matching: regex)
         guard !tokens.isEmpty else { return text }
 
-        // Build replacements by walking the chain alternatives in order. Reverse-iterate so
-        // earlier token ranges remain valid as we splice the result string.
-        var result = text
+        // Build replacements by walking the chain alternatives in order. Reverse-iterate,
+        // mutating right to left in UTF-16 units, so a not-yet-processed token's stored range is
+        // never touched by an earlier splice — including when a resolved value starts with a
+        // Unicode combining mark, which would merge into the preceding character and invalidate
+        // that range if this were done through Swift's grapheme-cluster-aware String APIs.
+        let result = NSMutableString(string: text)
         let prefix = BNFNamespace.dataCatalogRuntime.withNamespaceSeparator
         for token in tokens.reversed() {
             // Skip placeholders that don't reference DATA.catalogRuntime.* in any alternative.
@@ -33,12 +36,14 @@ enum CatalogRuntimePlaceholderResolver {
 
             guard let resolved = resolveChain(token.chain, prefix: prefix, runtimeData: catalogRuntimeData)
             else { return "" }
-            // Replace at the scanned position. A global string search would re-target the first
-            // identical token if the same placeholder appears multiple times.
-            guard let tokenRange = Range(token.tokenRange, in: result) else { continue }
-            result.replaceSubrange(tokenRange, with: resolved)
+            // A token that overlaps its neighbor's delimiter is checked above but never spliced;
+            // its span stays in the result as literal text.
+            guard token.isSpliceable else { continue }
+            // Replace at the scanned position (a global string search would re-target the first
+            // identical token if the same placeholder appears multiple times).
+            result.replaceCharacters(in: token.tokenRange, with: resolved)
         }
-        return result
+        return result as String
     }
 
     /// Walks the `|`-separated alternatives. For each `DATA.catalogRuntime.<key>` alternative,
