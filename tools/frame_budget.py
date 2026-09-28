@@ -23,7 +23,7 @@ build: at `-Onone` the compiler gives every local a distinct slot, which is both
 what a partner debugging an integration actually runs.
 
 Usage:
-    tools/frame_budget.py DerivedData/Build/Products/Debug-iphonesimulator/RoktUXHelper.o
+    tools/frame_budget.py DerivedData/Build/Products/Debug-iphoneos/RoktUXHelper.o
 """
 
 from __future__ import annotations
@@ -56,6 +56,15 @@ DEPTH_CAP_RE = re.compile(r"maxNestingDepth\s*=\s*(\d+)")
 STACK_SIZE_RE = re.compile(r"defaultStackSize\s*=\s*([\d\s*]+)")
 # Each builder starts at its @inline(never) attribute and runs to the next one.
 BUILDER_RE = re.compile(r"@inline\(never\)\s*\n\s*func (transform\w+)\(")
+# A function definition, optionally generic (`func f<T>(...)`). Stops at the opening paren of its
+# parameter list; `_function_bodies` walks forward from there to find where the body itself starts.
+FUNC_DEF_RE = re.compile(r"\bfunc\s+(\w+)\s*(?:<[^>]*>)?\s*\(")
+NEXT_FUNC_RE = re.compile(r"\bfunc\s+\w+")
+# A call, or an enum case pattern match (`.foo(`) — both look the same from a name and an open
+# paren, and treating a case match as an edge in the call graph is harmless: it can only ever add
+# a name that was never a real function, which `recursive_builders` filters out by intersecting
+# with the builders it already found.
+CALL_NAME_RE = re.compile(r"\b(\w+)\(")
 
 DISPATCH_SYMBOL = (
     "LayoutTransformer.transform(_: DcuiSchema.LayoutSchemaModel, context:"
@@ -160,23 +169,91 @@ def stack_size() -> int:
     return size
 
 
-def recursive_builders() -> set[str]:
-    """The builders that descend, read from the file that defines them.
+def _function_bodies(source: str) -> "dict[str, str]":
+    """Map each function name in `source` to its body, matched brace by brace.
 
-    Taken from the source rather than from a list kept here, so a builder that starts recursing is
-    counted from the commit that makes it recurse.
+    A regex can find where a function starts but not, in general, where it ends: nested braces
+    (closures, `switch`, control flow) need counting, not pattern matching. A definition with no
+    body of its own — a protocol requirement, an `@objc` bridging overload — is recognised by the
+    next `func` keyword arriving before any `{`, and is left out rather than mistakenly paired with
+    some later function's body.
     """
-    source = NODES_SOURCE.read_text()
-    starts = [(m.start(), m.group(1)) for m in BUILDER_RE.finditer(source)]
+    bodies: "dict[str, str]" = {}
+    for match in FUNC_DEF_RE.finditer(source):
+        name = match.group(1)
+
+        # Walk past the parameter list by counting parens, so a default argument's own closure
+        # (`= { }`) cannot be mistaken for the end of the parameter list.
+        depth = 1
+        pos = match.end()
+        while pos < len(source) and depth > 0:
+            if source[pos] == "(":
+                depth += 1
+            elif source[pos] == ")":
+                depth -= 1
+            pos += 1
+        if depth != 0:
+            continue
+
+        next_func = NEXT_FUNC_RE.search(source, pos)
+        brace_start = source.find("{", pos)
+        if brace_start == -1 or (next_func and next_func.start() < brace_start):
+            continue
+
+        depth = 0
+        end = brace_start
+        for end in range(brace_start, len(source)):
+            if source[end] == "{":
+                depth += 1
+            elif source[end] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+        else:
+            continue
+        bodies[name] = source[brace_start : end + 1]
+    return bodies
+
+
+def recursive_builders() -> set[str]:
+    """The builders that descend, directly or through a forwarding helper, read from source.
+
+    Taken from the source rather than from a list kept here, so a builder that starts recursing —
+    including one that starts forwarding through a helper that itself recurses — is counted from
+    the commit that makes it recurse. Resolved across every file in this directory rather than just
+    the one that defines the builders, because some builders reach `transformChildren` indirectly:
+    `transformNonInteractiveChildren` (`LayoutTransformer+Inline.swift`) and `getAccessibilityGrouped`
+    (`LayoutTransformer.swift`) both call it on a builder's behalf.
+    """
+    nodes_source = NODES_SOURCE.read_text()
+    starts = [(m.start(), m.group(1)) for m in BUILDER_RE.finditer(nodes_source)]
     if not starts:
         raise SystemExit(f"error: no @inline(never) builders found in {NODES_SOURCE}")
+    builder_names = {name for _, name in starts}
 
-    bounds = [s for s, _ in starts] + [len(source)]
-    return {
-        name
-        for index, (_, name) in enumerate(starts)
-        if "transformChildren(" in source[bounds[index] : bounds[index + 1]]
+    bodies = _function_bodies(nodes_source)
+    for path in sorted(TRANSFORMER_DIR.glob("*.swift")):
+        if path == NODES_SOURCE:
+            continue
+        bodies.update(_function_bodies(path.read_text()))
+
+    # A function reaches `transformChildren` if it calls it directly, or calls something that does.
+    # Fixed-point rather than one hop, so a helper that itself forwards through another helper is
+    # still resolved correctly regardless of how many hops away it is.
+    reaches_children = {
+        name for name, body in bodies.items() if "transformChildren(" in body
     }
+    changed = True
+    while changed:
+        changed = False
+        for name, body in bodies.items():
+            if name in reaches_children:
+                continue
+            if any(callee in reaches_children for callee in CALL_NAME_RE.findall(body)):
+                reaches_children.add(name)
+                changed = True
+
+    return builder_names & reaches_children
 
 
 def largest(frames: dict[str, int], predicate) -> tuple[str, int]:
@@ -237,6 +314,13 @@ def main() -> int:
         frames,
         lambda name: any(f"LayoutTransformer.{b}(" in name for b in builders),
     )
+    if not builder[0]:
+        print(
+            f"error: none of the builders known to recurse are in {args.object}. "
+            "Wrong object, or a stripped build?",
+            file=sys.stderr,
+        )
+        return 2
     builder_name = next(b for b in builders if f"LayoutTransformer.{b}(" in builder[0])
 
     depth = depth_cap()

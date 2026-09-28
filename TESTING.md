@@ -102,6 +102,14 @@ grew, so only one branch's locals are live at a time, over widening the stack or
 inputs are read from the sources (`LayoutDepthCounter.maxNestingDepth` and
 `WideStack.defaultStackSize`), so changing either is reflected in the next run.
 
+`tools/frame_budget.py`'s own parsing and budget arithmetic is covered by
+`tools/test_frame_budget.py`, which the `Frame Budget` job runs before it builds anything. Run it
+yourself with:
+
+```bash
+python3 -m unittest discover -s tools -p "test_*.py" -v
+```
+
 ## Snapshot Testing
 
 ### Overview
