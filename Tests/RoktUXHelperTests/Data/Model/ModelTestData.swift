@@ -365,6 +365,12 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_catalog_dropdown")
             return try! JSONDecoder().decode(CatalogDropdownModel<WhenPredicate>.self, from: data)
         }
+
+        /// Spacing and border widths that `Float` accepts but layout cannot use.
+        static func catalogDropdownWithNonFiniteSpacing() -> CatalogDropdownModel<WhenPredicate> {
+            let data = toData(jsonFilename: "node_catalog_dropdown_non_finite_spacing")
+            return try! JSONDecoder().decode(CatalogDropdownModel<WhenPredicate>.self, from: data)
+        }
     }
 
     @available(iOS 13, *)

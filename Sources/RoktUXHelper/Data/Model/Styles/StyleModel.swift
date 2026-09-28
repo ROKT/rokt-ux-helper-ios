@@ -193,6 +193,23 @@ struct FrameAlignmentProperty: Equatable {
                                       left: CGFloat(left ?? 0))
     }
 
+    /// Parses an edge string that is only meaningful as a nonnegative length, such as a padding
+    /// or a border width. `Float` accepts "nan", "inf" and literals that overflow to infinity
+    /// such as "1e40"; an edge like that makes the measured size of every view above it
+    /// non-finite, and UIKit rejects such a size once it becomes a view frame or a constraint
+    /// constant. Use `getFrameAlignment` where a negative edge is meaningful, as a margin is.
+    static func getNonNegativeFrameAlignment(_ frameAlignment: String?) -> FrameAlignmentProperty {
+        let alignment = getFrameAlignment(frameAlignment)
+        return FrameAlignmentProperty(top: nonNegative(alignment.top),
+                                      right: nonNegative(alignment.right),
+                                      bottom: nonNegative(alignment.bottom),
+                                      left: nonNegative(alignment.left))
+    }
+
+    private static func nonNegative(_ value: CGFloat) -> CGFloat {
+        value.isFinite ? max(0, value) : 0
+    }
+
     func isMultiDimension() -> Bool {
         return !(top.isEqual(to: bottom) && top.isEqual(to: left) && top.isEqual(to: right))
     }
