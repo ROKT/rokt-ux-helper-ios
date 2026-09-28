@@ -146,7 +146,39 @@ final class TestStyleModel: XCTestCase {
         // Assert
         XCTAssertEqual(alignment, FrameAlignmentProperty(top: 0, right: 0, bottom: 0, left: 0))
     }
-    
+
+    // A non-finite edge is not a length, and it does not stay on the edge it was written on: the
+    // bottom sheet adds its own padding and margin to the height it reports for itself, and a
+    // sheet height that is not a number stops the host application.
+    func test_frame_alignment_zeroes_not_a_number_edge_by_edge() {
+        // Arrange
+        let padding = "nan 20 NaN 40"
+        // Act
+        let alignment = FrameAlignmentProperty.getFrameAlignment(padding)
+        // Assert
+        XCTAssertEqual(alignment, FrameAlignmentProperty(top: 0, right: 20, bottom: 0, left: 40))
+    }
+
+    func test_frame_alignment_zeroes_infinity() {
+        // Arrange — every spelling `Float` accepts, plus a literal that overflows to infinity.
+        let padding = "inf -INFINITY Infinity 1e40"
+        // Act
+        let alignment = FrameAlignmentProperty.getFrameAlignment(padding)
+        // Assert
+        XCTAssertEqual(alignment, FrameAlignmentProperty(top: 0, right: 0, bottom: 0, left: 0))
+    }
+
+    // A negative edge is meaningful for a margin, so only non-finite values are dropped here.
+    // `getNonNegativeFrameAlignment` is the variant for edges that must not go negative.
+    func test_frame_alignment_keeps_negative_edges() {
+        // Arrange
+        let padding = "-8 -16 -8 -16"
+        // Act
+        let alignment = FrameAlignmentProperty.getFrameAlignment(padding)
+        // Assert
+        XCTAssertEqual(alignment, FrameAlignmentProperty(top: -8, right: -16, bottom: -8, left: -16))
+    }
+
     // MARK: FrameAlignmentProperty nonnegative
 
     func test_nonnegative_frame_alignment_keeps_usable_values() {
@@ -244,6 +276,35 @@ final class TestStyleModel: XCTestCase {
         let offset = OffsetProperty.getOffset(offsetString)
         // Assert
         XCTAssertEqual(offset, OffsetProperty(x: 0, y: 0))
+    }
+
+    // An offset shifts a view after layout, so a non-finite one reaches the same view frames.
+    func test_offset_not_a_number_default() {
+        // Arrange
+        let offsetString = "nan 40"
+        // Act
+        let offset = OffsetProperty.getOffset(offsetString)
+        // Assert
+        XCTAssertEqual(offset, OffsetProperty(x: 0, y: 0))
+    }
+
+    func test_offset_infinity_default() {
+        // Arrange
+        let offsetString = "20 -inf"
+        // Act
+        let offset = OffsetProperty.getOffset(offsetString)
+        // Assert
+        XCTAssertEqual(offset, OffsetProperty(x: 0, y: 0))
+    }
+
+    // A negative offset is the whole point of the property.
+    func test_offset_keeps_negative_values() {
+        // Arrange
+        let offsetString = "-20 -40"
+        // Act
+        let offset = OffsetProperty.getOffset(offsetString)
+        // Assert
+        XCTAssertEqual(offset, OffsetProperty(x: -20, y: -40))
     }
     
     private func assert_alignment(_ horizonAlignment: HorizontalAlignmentProperty,

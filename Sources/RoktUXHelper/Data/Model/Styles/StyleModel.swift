@@ -160,28 +160,28 @@ struct FrameAlignmentProperty: Equatable {
         var bottom: Float?
         var left: Float?
         if frameAlignmentValues.count == 4 {
-            top = Float(frameAlignmentValues[0])
-            right = Float(frameAlignmentValues[1])
-            bottom = Float(frameAlignmentValues[2])
-            left = Float(frameAlignmentValues[3])
+            top = Float(finite: frameAlignmentValues[0])
+            right = Float(finite: frameAlignmentValues[1])
+            bottom = Float(finite: frameAlignmentValues[2])
+            left = Float(finite: frameAlignmentValues[3])
 
         } else if frameAlignmentValues.count == 3 {
-            top = Float(frameAlignmentValues[0])
-            right = Float(frameAlignmentValues[1])
-            bottom = Float(frameAlignmentValues[2])
-            left = Float(frameAlignmentValues[1])
+            top = Float(finite: frameAlignmentValues[0])
+            right = Float(finite: frameAlignmentValues[1])
+            bottom = Float(finite: frameAlignmentValues[2])
+            left = Float(finite: frameAlignmentValues[1])
 
         } else if frameAlignmentValues.count == 2 {
-            top = Float(frameAlignmentValues[0])
-            right = Float(frameAlignmentValues[1])
-            bottom = Float(frameAlignmentValues[0])
-            left = Float(frameAlignmentValues[1])
+            top = Float(finite: frameAlignmentValues[0])
+            right = Float(finite: frameAlignmentValues[1])
+            bottom = Float(finite: frameAlignmentValues[0])
+            left = Float(finite: frameAlignmentValues[1])
 
         } else if frameAlignmentValues.count == 1 {
-            top = Float(frameAlignmentValues[0])
-            right = Float(frameAlignmentValues[0])
-            bottom = Float(frameAlignmentValues[0])
-            left = Float(frameAlignmentValues[0])
+            top = Float(finite: frameAlignmentValues[0])
+            right = Float(finite: frameAlignmentValues[0])
+            bottom = Float(finite: frameAlignmentValues[0])
+            left = Float(finite: frameAlignmentValues[0])
 
         } else {
             return defaultAlignment
@@ -240,8 +240,8 @@ struct OffsetProperty: Equatable {
         let offsetValues = offsetString.split(separator: " ")
 
         guard offsetValues.count == 2,
-              let x = Float(offsetValues[0]),
-              let y = Float(offsetValues[1])
+              let x = Float(finite: offsetValues[0]),
+              let y = Float(finite: offsetValues[1])
         else {
             return defaultOffset
         }
@@ -250,4 +250,17 @@ struct OffsetProperty: Equatable {
     }
 
     static let zeroOffset = OffsetProperty(x: 0, y: 0)
+}
+
+private extension Float {
+    /// Parses one token of a style string, rejecting the values `Float.init` accepts that are not
+    /// lengths: "nan", "inf" and "infinity" in any case or sign, and literals that overflow to
+    /// infinity such as "1e40". A non-finite edge does not stay local, because every sum it
+    /// reaches is non-finite too — a view's measured size, and from there the height a bottom
+    /// sheet reports for itself. UIKit answers a view frame holding such a value with an
+    /// exception no caller can catch, which stops the host application.
+    init?(finite token: Substring) {
+        guard let value = Float(token), value.isFinite else { return nil }
+        self = value
+    }
 }
