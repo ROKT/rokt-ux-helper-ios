@@ -2,10 +2,10 @@ import XCTest
 @testable import RoktUXHelper
 
 final class BNFSeparatorTests: XCTestCase {
-    func test_charCount_shouldReturnPerDelimiter() {
-        XCTAssertEqual(BNFSeparator.startDelimiter.charCount, 2)
-        XCTAssertEqual(BNFSeparator.endDelimiter.charCount, 2)
-        XCTAssertEqual(BNFSeparator.namespace.charCount, 1)
-        XCTAssertEqual(BNFSeparator.alternative.charCount, 1)
+    func test_utf16Count_shouldReturnPerDelimiter() {
+        XCTAssertEqual(BNFSeparator.startDelimiter.utf16Count, 2)
+        XCTAssertEqual(BNFSeparator.endDelimiter.utf16Count, 2)
+        XCTAssertEqual(BNFSeparator.namespace.utf16Count, 1)
+        XCTAssertEqual(BNFSeparator.alternative.utf16Count, 1)
     }
 }
