@@ -44,6 +44,25 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
         XCTAssertEqual(sut.model.selectedIndex, 0)
     }
 
+    // `imageCount: 0` drives the real transformer path with an empty (not nil) `images` array —
+    // the offer has no images, rather than the gallery being reached from an unsupported context.
+    // `mainImageArea` used to index `model.images[0]` unconditionally, which trapped here.
+    @MainActor
+    func test_withNoImagesRendersWithoutTrapping() throws {
+        let vm = try makeCatalogImageGalleryViewModel(imageCount: 0)
+
+        let component = CatalogImageGalleryComponent(
+            model: vm,
+            config: .init(parent: .column, position: 1),
+            parentWidth: .constant(240),
+            parentHeight: .constant(nil),
+            styleState: .constant(.default),
+            parentOverride: nil
+        ).environmentObject(GlobalScreenSize())
+
+        XCTAssertNoThrow(try component.inspect().vStack())
+    }
+
     // MARK: - Snapshots
 
     func testSnapshot_fullFeatured() throws {

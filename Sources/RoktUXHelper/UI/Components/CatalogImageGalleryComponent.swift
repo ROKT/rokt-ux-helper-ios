@@ -375,7 +375,9 @@ struct CatalogImageGalleryComponent: View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
 
         return ZStack {
-            imageViewComponent(for: model.images[0]).opacity(0.0)
+            if let firstImage = model.images.first {
+                imageViewComponent(for: firstImage).opacity(0.0)
+            }
             CatalogHSPageView(
                 page: $page,
                 pages: model.images.count,
