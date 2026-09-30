@@ -166,6 +166,55 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         XCTAssertEqual(model.boundValue, " ")
     }
 
+    func testTransform_transactionDataStructPlaceholder_withDefault_usesDefaultInsteadOfEmpty() {
+        // Same struct-shaped resolution as above, but the placeholder also authors a default.
+        // The unstringifiable `Address` must be treated as unresolved so the default still wins,
+        // rather than the struct pre-empting the default with an empty-string binding.
+        let layoutState = LayoutState()
+        let address = Address(
+            name: "Jane Smith",
+            address1: "123 Main St",
+            address2: nil,
+            city: "New York",
+            state: "NY",
+            stateCode: "NY",
+            country: "US",
+            countryCode: "US",
+            zip: "10001"
+        )
+        let transactionData = TransactionData(
+            shippingAddress: address,
+            billingAddress: nil,
+            paymentType: "paypal",
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
+        )
+        layoutState.items[LayoutState.fullOfferKey] = makeOffer(transactionData: transactionData)
+
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            // `shippingAddress` is present but struct-shaped (unstringifiable) — must fall
+            // through to the default. `billingAddress` is absent entirely — already fell
+            // through to the default before this fix, kept here as a control.
+            value: "%^DATA.transactionData.shippingAddress | Unknown^% "
+                + "%^DATA.transactionData.billingAddress | Unknown^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, "Unknown Unknown")
+    }
+
     // MARK: - OrphanedPlaceholderResolver finalize behaviour
 
     func testSnapshot_basicText_optionalOrphan_substitutesDefault() {

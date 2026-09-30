@@ -31,7 +31,12 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
         }
 
         let resolved = try resolveValue(from: placeholder, data: data, allowsTextOperations: type == String.self)
-        let mappedData: Any? = resolved ?? placeholder.defaultValue
+        // A struct-shaped resolution (e.g. a path stopping at `shippingAddress` itself) can't
+        // satisfy a String request; treat that as unresolved so the placeholder's own
+        // alternatives/default still get a turn instead of being pre-empted by a value that
+        // can only ever coerce to "".
+        let usableResolved = resolved.flatMap { canCoerce($0, to: type) ? $0 : nil }
+        let mappedData: Any? = usableResolved ?? placeholder.defaultValue
 
         guard let mappedData,
               let normalizedData = unwrapOptional(mappedData) else {
@@ -119,6 +124,12 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
             return walk(value: child.value, remainingKeys: next)
         }
         return nil
+    }
+
+    private func canCoerce<U>(_ value: Any, to type: U.Type) -> Bool {
+        if value is U { return true }
+        if type == String.self { return stringValue(from: value) != nil }
+        return true
     }
 
     private func coerce<U>(_ value: Any, to type: U.Type) -> U {
