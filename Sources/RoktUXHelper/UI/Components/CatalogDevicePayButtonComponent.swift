@@ -218,7 +218,7 @@ struct CatalogDevicePayButtonComponent: View {
     }
 
     private func shouldExpandToContainerOnSelfAlign() -> Bool {
-        guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
+        guard let heightType = model.defaultStyle?[safe: breakpointIndex]?.dimension?.height else { return false }
         switch heightType {
         case .fixed, .percentage:
             return true
