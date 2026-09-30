@@ -74,6 +74,7 @@ jobs:
   frame-budget:
     name: Frame Budget
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -87,6 +88,9 @@ jobs:
 
       - name: Install xcbeautify
         run: brew list xcbeautify || brew install xcbeautify
+
+      - name: Run frame_budget.py unit tests
+        run: python3 -m unittest discover -s tools -p "test_*.py" -v
 
       # A generic device destination, so nothing has to be booted or signed: the check reads frame
       # sizes out of the compiled object and never runs it. It is also arm64 whatever the runner
@@ -115,7 +119,7 @@ jobs:
     if: >
       github.event_name == 'pull_request' &&
       github.event.pull_request.draft == false
-    needs: [trunk-check, unit-test, podspec-lint]
+    needs: [trunk-check, unit-test, podspec-lint, frame-budget]
     name: Notify GChat
     uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
     secrets:
