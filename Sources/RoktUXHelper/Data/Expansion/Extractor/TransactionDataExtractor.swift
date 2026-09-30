@@ -126,6 +126,16 @@ struct TransactionDataExtractor<Validator: DataValidating>: DataExtracting where
         if type == String.self, let stringValue = stringValue(from: value) {
             return stringValue as! U
         }
+
+        // Last resort: if the caller wants a String but the value is something
+        // we can't stringify (e.g. a Codable-only struct like Address reached when
+        // a placeholder path stops short of a leaf field), surface as empty so
+        // downstream placeholder logic treats it as "not present" rather than
+        // crashing on the trailing as! cast.
+        if type == String.self {
+            return "" as! U
+        }
+
         return value as! U
     }
 

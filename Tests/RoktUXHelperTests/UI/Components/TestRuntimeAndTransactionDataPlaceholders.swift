@@ -120,6 +120,52 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         assertBasicTextSnapshot(model)
     }
 
+    func testTransform_transactionDataStructPlaceholder_resolvesToEmptyStringWithoutTrapping() {
+        // The placeholder path stops at `shippingAddress` itself rather than one of its
+        // leaf fields (e.g. `.name`), so the resolved value is the `Address` struct, not a
+        // string. `Address` is Codable only (not CustomStringConvertible), so stringifying
+        // it must fall back to an empty binding instead of trapping on the trailing cast.
+        let layoutState = LayoutState()
+        let address = Address(
+            name: "Jane Smith",
+            address1: "123 Main St",
+            address2: nil,
+            city: "New York",
+            state: "NY",
+            stateCode: "NY",
+            country: "US",
+            countryCode: "US",
+            zip: "10001"
+        )
+        let transactionData = TransactionData(
+            shippingAddress: address,
+            billingAddress: address,
+            paymentType: "paypal",
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
+        )
+        layoutState.items[LayoutState.fullOfferKey] = makeOffer(transactionData: transactionData)
+
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            value: "%^DATA.transactionData.shippingAddress^% %^DATA.transactionData.billingAddress^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, " ")
+    }
+
     // MARK: - OrphanedPlaceholderResolver finalize behaviour
 
     func testSnapshot_basicText_optionalOrphan_substitutesDefault() {
