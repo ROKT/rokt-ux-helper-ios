@@ -43,6 +43,7 @@ SERVICES_DIR = REPO_ROOT / "Sources" / "RoktUXHelper" / "Services"
 TRANSFORMER_DIR = SERVICES_DIR / "LayoutTransformer"
 TRANSFORMER_SOURCE = TRANSFORMER_DIR / "LayoutTransformer.swift"
 NODES_SOURCE = TRANSFORMER_DIR / "LayoutTransformer+Nodes.swift"
+INLINE_SOURCE = TRANSFORMER_DIR / "LayoutTransformer+Inline.swift"
 WIDE_STACK_SOURCE = SERVICES_DIR / "WideStack.swift"
 
 SYMBOL_RE = re.compile(r"^([A-Za-z_$][\w$.]*):$")
@@ -220,10 +221,17 @@ def recursive_builders() -> set[str]:
 
     Taken from the source rather than from a list kept here, so a builder that starts recursing —
     including one that starts forwarding through a helper that itself recurses — is counted from
-    the commit that makes it recurse. Resolved across every file in this directory rather than just
-    the one that defines the builders, because some builders reach `transformChildren` indirectly:
-    `transformNonInteractiveChildren` (`LayoutTransformer+Inline.swift`) and `getAccessibilityGrouped`
-    (`LayoutTransformer.swift`) both call it on a builder's behalf.
+    the commit that makes it recurse. Resolved across the files that actually implement the descent
+    rather than just the one that defines the builders, because some builders reach
+    `transformChildren` indirectly: `transformNonInteractiveChildren` (`LayoutTransformer+Inline.swift`)
+    and `getAccessibilityGrouped` (`LayoutTransformer.swift`) both call it on a builder's behalf.
+
+    Deliberately not every `*.swift` file in the directory: it also holds style adapters
+    (`StyleTransformer.swift`, `SchemaStyleAdapter.swift`, ...) that are unrelated to the descent but
+    reuse common words as parameter names — `states(_:transform:)` in `SchemaStyleAdapter.swift`
+    takes a closure literally named `transform` — and a call-graph resolver keyed on bare
+    identifiers can't tell that apart from a call to `LayoutTransformer.transform`. Naming the three
+    files that do participate avoids that collision rather than trying to resolve it.
     """
     nodes_source = NODES_SOURCE.read_text()
     starts = [(m.start(), m.group(1)) for m in BUILDER_RE.finditer(nodes_source)]
@@ -232,10 +240,10 @@ def recursive_builders() -> set[str]:
     builder_names = {name for _, name in starts}
 
     bodies = _function_bodies(nodes_source)
-    for path in sorted(TRANSFORMER_DIR.glob("*.swift")):
-        if path == NODES_SOURCE:
+    for source in (TRANSFORMER_SOURCE, INLINE_SOURCE):
+        if source == NODES_SOURCE:
             continue
-        bodies.update(_function_bodies(path.read_text()))
+        bodies.update(_function_bodies(source.read_text()))
 
     # A function reaches `transformChildren` if it calls it directly, or calls something that does.
     # Fixed-point rather than one hop, so a helper that itself forwards through another helper is

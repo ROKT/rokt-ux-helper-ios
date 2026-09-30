@@ -107,30 +107,42 @@ class SourceParsingTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 frame_budget.stack_size()
 
+    def _patch_recursion_sources(
+        self, *, nodes: str, transformer: str = "", inline: str = ""
+    ) -> None:
+        """Patch NODES_SOURCE/TRANSFORMER_SOURCE/INLINE_SOURCE directly, since
+        recursive_builders() reads those three names rather than globbing a directory — patching
+        TRANSFORMER_DIR alone would leave it reading the real repo's Transformer/Inline files.
+        """
+        sources = {
+            "NODES_SOURCE": self._write("Nodes.swift", nodes),
+            "TRANSFORMER_SOURCE": self._write("Transformer.swift", transformer),
+            "INLINE_SOURCE": self._write("Inline.swift", inline),
+        }
+        for name, path in sources.items():
+            patcher = patch.object(frame_budget, name, path)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
     def test_recursive_builders_flags_only_descending_ones(self):
-        source = self._write(
-            "Nodes.swift",
-            "@inline(never)\n"
-            "func transformRow(_ node: RowModel) throws -> UIModel {\n"
-            "    return try transformChildren(node.children, context: context)\n"
-            "}\n"
-            "@inline(never)\n"
-            "func transformLeaf(_ node: LeafModel) throws -> UIModel {\n"
-            "    return .leaf(node)\n"
-            "}\n",
+        self._patch_recursion_sources(
+            nodes=(
+                "@inline(never)\n"
+                "func transformRow(_ node: RowModel) throws -> UIModel {\n"
+                "    return try transformChildren(node.children, context: context)\n"
+                "}\n"
+                "@inline(never)\n"
+                "func transformLeaf(_ node: LeafModel) throws -> UIModel {\n"
+                "    return .leaf(node)\n"
+                "}\n"
+            )
         )
-        with patch.object(frame_budget, "NODES_SOURCE", source), patch.object(
-            frame_budget, "TRANSFORMER_DIR", self._tmp_dir
-        ):
-            self.assertEqual(frame_budget.recursive_builders(), {"transformRow"})
+        self.assertEqual(frame_budget.recursive_builders(), {"transformRow"})
 
     def test_recursive_builders_raises_when_none_found(self):
-        source = self._write("Nodes.swift", "func helper() {}\n")
-        with patch.object(frame_budget, "NODES_SOURCE", source), patch.object(
-            frame_budget, "TRANSFORMER_DIR", self._tmp_dir
-        ):
-            with self.assertRaises(SystemExit):
-                frame_budget.recursive_builders()
+        self._patch_recursion_sources(nodes="func helper() {}\n")
+        with self.assertRaises(SystemExit):
+            frame_budget.recursive_builders()
 
     def test_recursive_builders_detects_recursion_through_a_helper_in_another_file(
         self,
@@ -140,72 +152,94 @@ class SourceParsingTests(unittest.TestCase):
         `transformChildren` in their own body — the literal-substring check used to miss all of
         them.
         """
-        nodes_source = self._write(
-            "Nodes.swift",
-            "@inline(never)\n"
-            "func transformStaticLink(_ node: StaticLinkModel) throws -> UIModel {\n"
-            "    return .staticLink(children: try transformNonInteractiveChildren(node.children, context: context))\n"
-            "}\n"
-            "@inline(never)\n"
-            "func transformLeaf(_ node: LeafModel) throws -> UIModel {\n"
-            "    return .leaf(node)\n"
-            "}\n",
+        self._patch_recursion_sources(
+            nodes=(
+                "@inline(never)\n"
+                "func transformStaticLink(_ node: StaticLinkModel) throws -> UIModel {\n"
+                "    return .staticLink(children: try transformNonInteractiveChildren(node.children, context: context))\n"
+                "}\n"
+                "@inline(never)\n"
+                "func transformLeaf(_ node: LeafModel) throws -> UIModel {\n"
+                "    return .leaf(node)\n"
+                "}\n"
+            ),
+            inline=(
+                "func transformNonInteractiveChildren(_ children: [LayoutSchemaModel], context: Context) "
+                "throws -> [LayoutSchemaViewModel]? {\n"
+                "    return try transformChildren(children, context: context)\n"
+                "}\n"
+            ),
         )
-        self._write(
-            "Inline.swift",
-            "func transformNonInteractiveChildren(_ children: [LayoutSchemaModel], context: Context) "
-            "throws -> [LayoutSchemaViewModel]? {\n"
-            "    return try transformChildren(children, context: context)\n"
-            "}\n",
-        )
-        with patch.object(frame_budget, "NODES_SOURCE", nodes_source), patch.object(
-            frame_budget, "TRANSFORMER_DIR", self._tmp_dir
-        ):
-            self.assertEqual(frame_budget.recursive_builders(), {"transformStaticLink"})
+        self.assertEqual(frame_budget.recursive_builders(), {"transformStaticLink"})
 
     def test_recursive_builders_follows_two_hops_of_forwarding(self):
-        nodes_source = self._write(
-            "Nodes.swift",
-            "@inline(never)\n"
-            "func transformAccessibilityGrouped(_ layout: LayoutSchemaModel, context: Context) throws -> UIModel {\n"
-            "    return try getAccessibilityGrouped(child: layout, context: context)\n"
-            "}\n",
+        self._patch_recursion_sources(
+            nodes=(
+                "@inline(never)\n"
+                "func transformAccessibilityGrouped(_ layout: LayoutSchemaModel, context: Context) throws -> UIModel {\n"
+                "    return try getAccessibilityGrouped(child: layout, context: context)\n"
+                "}\n"
+            ),
+            transformer=(
+                "func getAccessibilityGrouped(child: AccessibilityGroupedLayoutChildren, context: Context) throws -> UIModel {\n"
+                "    return try forwardOnceMore(child, context: context)\n"
+                "}\n"
+                "func forwardOnceMore(_ child: AccessibilityGroupedLayoutChildren, context: Context) throws -> UIModel {\n"
+                "    return try transformChildren(child.children, context: context)\n"
+                "}\n"
+            ),
         )
-        self._write(
-            "Transformer.swift",
-            "func getAccessibilityGrouped(child: AccessibilityGroupedLayoutChildren, context: Context) throws -> UIModel {\n"
-            "    return try forwardOnceMore(child, context: context)\n"
-            "}\n"
-            "func forwardOnceMore(_ child: AccessibilityGroupedLayoutChildren, context: Context) throws -> UIModel {\n"
-            "    return try transformChildren(child.children, context: context)\n"
-            "}\n",
+        self.assertEqual(
+            frame_budget.recursive_builders(), {"transformAccessibilityGrouped"}
         )
-        with patch.object(frame_budget, "NODES_SOURCE", nodes_source), patch.object(
-            frame_budget, "TRANSFORMER_DIR", self._tmp_dir
-        ):
-            self.assertEqual(
-                frame_budget.recursive_builders(), {"transformAccessibilityGrouped"}
-            )
 
     def test_recursive_builders_ignores_a_helper_that_never_reaches_children(self):
-        nodes_source = self._write(
-            "Nodes.swift",
-            "@inline(never)\n"
-            "func transformCloseButton(_ node: CloseButtonModel) throws -> UIModel {\n"
-            "    return .closeButton(try resolveAccessibilityLabel(node.a11yLabel, context: context))\n"
-            "}\n",
+        self._patch_recursion_sources(
+            nodes=(
+                "@inline(never)\n"
+                "func transformCloseButton(_ node: CloseButtonModel) throws -> UIModel {\n"
+                "    return .closeButton(try resolveAccessibilityLabel(node.a11yLabel, context: context))\n"
+                "}\n"
+            ),
+            inline=(
+                "func resolveAccessibilityLabel(_ value: String?, context: Context) throws -> String? {\n"
+                "    guard let value else { return nil }\n"
+                "    return value\n"
+                "}\n"
+            ),
         )
-        self._write(
-            "Inline.swift",
-            "func resolveAccessibilityLabel(_ value: String?, context: Context) throws -> String? {\n"
-            "    guard let value else { return nil }\n"
-            "    return value\n"
-            "}\n",
+        self.assertEqual(frame_budget.recursive_builders(), set())
+
+    def test_recursive_builders_ignores_an_unrelated_functions_shadowed_parameter_name(
+        self,
+    ):
+        """The bug this guards: a call-graph resolver keyed on bare identifiers can't tell a call
+        to `LayoutTransformer.transform` apart from a call to an unrelated closure PARAMETER that
+        happens to also be named `transform` — recursive_builders() avoids this by only resolving
+        calls within the three files that implement the descent, not every file in the directory.
+        """
+        self._patch_recursion_sources(
+            nodes=(
+                "@inline(never)\n"
+                "func transformInlineContainer(_ node: InlineContainerModel) throws -> UIModel {\n"
+                "    return .inlineContainer(try getInlineContainer(node))\n"
+                "}\n"
+            ),
+            transformer=(
+                "func getInlineContainer(_ node: InlineContainerModel) throws -> UIModel {\n"
+                "    return try SchemaStyleAdapter.inlineContainer(node)\n"
+                "}\n"
+                "enum SchemaStyleAdapter {\n"
+                "    static func inlineContainer(_ node: InlineContainerModel) throws -> UIModel {\n"
+                "        return try states(node, transform: { $0 })\n"
+                "    }\n"
+                "    static func states<T, U>(_ node: T, transform: (T) throws -> U) throws -> U {\n"
+                "        return try transform(node)\n"
+                "    }\n"
+                "}\n"
+            ),
         )
-        with patch.object(frame_budget, "NODES_SOURCE", nodes_source), patch.object(
-            frame_budget, "TRANSFORMER_DIR", self._tmp_dir
-        ):
-            self.assertEqual(frame_budget.recursive_builders(), set())
+        self.assertEqual(frame_budget.recursive_builders(), set())
 
 
 class FunctionBodiesTests(unittest.TestCase):
