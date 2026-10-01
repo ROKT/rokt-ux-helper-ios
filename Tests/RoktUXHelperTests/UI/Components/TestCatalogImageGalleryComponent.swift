@@ -63,6 +63,28 @@ final class TestCatalogImageGalleryComponent: XCTestCase {
         XCTAssertNoThrow(try component.inspect().vStack())
     }
 
+    // A review finding on the above fix: guarding only the hidden sizing image left the page
+    // view's gesture surface (and nav/indicator overlays) active over an empty gallery, so a tap
+    // could still walk `page` out of bounds and fire a real scroll-interaction event. The whole
+    // gallery body must be skipped, not just the sizing image.
+    @MainActor
+    func test_withNoImagesRendersNothingAndSendsNoEvent() throws {
+        let mockEventService = MockEventService()
+        let vm = try makeCatalogImageGalleryViewModel(imageCount: 0, mockEventService: mockEventService)
+
+        let component = CatalogImageGalleryComponent(
+            model: vm,
+            config: .init(parent: .column, position: 1),
+            parentWidth: .constant(240),
+            parentHeight: .constant(nil),
+            styleState: .constant(.default),
+            parentOverride: nil
+        ).environmentObject(GlobalScreenSize())
+
+        XCTAssertThrowsError(try component.inspect().find(ViewType.ZStack.self))
+        XCTAssertFalse(mockEventService.cartItemUserInteractionCalled)
+    }
+
     // MARK: - Snapshots
 
     func testSnapshot_fullFeatured() throws {
