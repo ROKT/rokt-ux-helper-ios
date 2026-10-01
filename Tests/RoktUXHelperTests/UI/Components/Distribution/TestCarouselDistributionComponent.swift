@@ -23,7 +23,9 @@ final class TestCarouselDistributionComponent: XCTestCase {
         XCTAssertEqual(component.getPeekThrough(320), 16)
     }
 
-    private func makeCarouselDistributionComponent(peekThroughSize: [PeekThroughSize]) -> CarouselDistributionComponent {
+    private func makeCarouselDistributionComponent(
+        peekThroughSize: [PeekThroughSize]
+    ) -> CarouselDistributionComponent {
         let model = CarouselViewModel(
             children: [],
             defaultStyle: nil,
@@ -42,6 +44,45 @@ final class TestCarouselDistributionComponent: XCTestCase {
             styleState: .constant(.default),
             parentOverride: nil
         )
+    }
+
+    // MARK: - drag-end geometry
+
+    // A 50%-of-container peek-through with no gap, or a fixed peek-through equal to half the
+    // container width, previously drove pageWidth (and from it, offerWidth) to exactly zero,
+    // which the drag gesture's -translation.width/offerWidth then divided by: a purely
+    // horizontal drag gave ±infinity, a purely vertical one (0/0) gave NaN, and converting
+    // either to Int trapped. offerWidth is now floored above zero regardless.
+
+    func test_getOfferWidth_withFiftyPercentPeekThroughAndNoGap_staysPositiveAndFinite() {
+        let component = makeCarouselDistributionComponent(peekThroughSize: [.percentage(50)])
+        let width: CGFloat = 320
+
+        let peekThrough = component.getPeekThrough(width)
+        let pageWidth = component.getPageWidth(width: width, peekThrough: peekThrough)
+        let offerWidth = component.getOfferWidth(pageWidth: pageWidth, totalOffers: 3)
+
+        XCTAssertTrue(offerWidth.isFinite)
+        XCTAssertGreaterThan(offerWidth, 0)
+
+        // The exact formula used by the drag gesture's onEnded handler.
+        XCTAssertTrue((-CGFloat(0)/offerWidth).isFinite, "a purely vertical drag must not divide by zero")
+        XCTAssertTrue((-width/offerWidth).isFinite, "a purely horizontal drag must not divide by zero")
+    }
+
+    func test_getOfferWidth_withFixedPeekThroughEqualToHalfTheWidth_staysPositiveAndFinite() {
+        let component = makeCarouselDistributionComponent(peekThroughSize: [.fixed(160)])
+        let width: CGFloat = 320
+
+        let peekThrough = component.getPeekThrough(width)
+        let pageWidth = component.getPageWidth(width: width, peekThrough: peekThrough)
+        let offerWidth = component.getOfferWidth(pageWidth: pageWidth, totalOffers: 3)
+
+        XCTAssertTrue(offerWidth.isFinite)
+        XCTAssertGreaterThan(offerWidth, 0)
+
+        XCTAssertTrue((-CGFloat(0)/offerWidth).isFinite, "a purely vertical drag must not divide by zero")
+        XCTAssertTrue((-width/offerWidth).isFinite, "a purely horizontal drag must not divide by zero")
     }
 
     func test_carousel() throws {

@@ -141,6 +141,10 @@ struct CarouselDistributionComponent: View {
                         })
                         .onEnded({ value in
                             let progress = -value.translation.width/offerWidth
+                            // offerWidth is floored above zero, but a purely vertical drag still
+                            // divides a ~zero horizontal translation by it, and Int(Double) traps
+                            // on a non-finite value.
+                            guard progress.isFinite else { return }
                             let roundProgress = Int(progress.rounded())
 
                             model.updateStatesOnDragEnded(roundProgress)
@@ -254,12 +258,21 @@ struct CarouselDistributionComponent: View {
         }
 
         // convert PeekThroughSize to actual width
+        let rawPeekThrough: CGFloat
         switch breakPointPeekThrough {
         case .fixed(let peekthrough):
-            return CGFloat(peekthrough)
+            rawPeekThrough = CGFloat(peekthrough)
         case .percentage(let percentage):
-            return width * CGFloat(percentage/100)
+            rawPeekThrough = width * CGFloat(percentage/100)
         }
+
+        // Keeps pageWidth (width - peekThrough * 2) from reaching zero for an ordinary
+        // container width, regardless of a schema peek-through that is, or rounds up to, half
+        // the container width or more. getOfferWidth's own floor is the backstop for the
+        // remaining edge case: a container width small enough that this clamp alone can't keep
+        // pageWidth meaningfully positive.
+        guard rawPeekThrough.isFinite, width.isFinite else { return 0 }
+        return max(0, min(rawPeekThrough, width/2 - 1))
     }
 
     func getPageWidth(width: CGFloat,
@@ -269,10 +282,19 @@ struct CarouselDistributionComponent: View {
 
     func getOfferWidth(pageWidth: CGFloat,
                        totalOffers: Int) -> CGFloat {
-        return model.viewableItems > 1 && totalOffers > 1
+        let rawOfferWidth = model.viewableItems > 1 && totalOffers > 1
         ? pageWidth/CGFloat(model.viewableItems) - gap
             : pageWidth - gap
+        // A schema gap at or above the per-item width would otherwise drive this to zero or
+        // negative, which the drag gesture then divides by.
+        guard rawOfferWidth.isFinite else { return Self.minimumOfferWidth }
+        return max(Self.minimumOfferWidth, rawOfferWidth)
     }
+
+    /// A floor, not a target: real offers are always wider than this. Only reached when a
+    /// schema's gap/peek-through configuration would otherwise collapse the offer to zero or
+    /// negative width, which the drag gesture divides by.
+    private static let minimumOfferWidth: CGFloat = 1
 
     func getPeekThroughOffset(peekThrough: CGFloat,
                               totalPages: Int) -> CGFloat {
