@@ -116,10 +116,14 @@ struct CarouselDistributionComponent: View {
                 let offerWidth = getOfferWidth(pageWidth: pageWidth,
                                                totalOffers: model.totalOffers)
 
+                let pageStride = getPageStride(pageWidth: pageWidth,
+                                               offerWidth: offerWidth,
+                                               totalOffers: model.totalOffers)
+
                 let peekThroughOffset = getPeekThroughOffset(peekThrough: peekThrough,
                                                              totalPages: model.totalPages)
 
-                let pageOffset = CGFloat(model.currentPage) * -pageWidth
+                let pageOffset = CGFloat(model.currentPage) * -pageStride
                 let indexOffset = CGFloat(model.indexWithinPage) * -offerWidth
 
                 HStack(alignment: rowPerpendicularAxisAlignment(alignItems: containerStyle?.alignItems),
@@ -130,7 +134,7 @@ struct CarouselDistributionComponent: View {
                             build(page: page,
                                   offerWidth: offerWidth)
                         }
-                        .offset(x: (containerProxy.size.width - pageWidth)/2 - peekThrough)
+                        .offset(x: (containerProxy.size.width - pageStride)/2 - peekThrough)
                     }
                 }
                 .offset(x: pageOffset + indexOffset + offset + peekThroughOffset + gapOffset)
@@ -295,6 +299,20 @@ struct CarouselDistributionComponent: View {
     /// schema's gap/peek-through configuration would otherwise collapse the offer to zero or
     /// negative width, which the drag gesture divides by.
     private static let minimumOfferWidth: CGFloat = 1
+
+    /// The page-to-page stride consistent with `offerWidth`. When `offerWidth` wasn't floored,
+    /// this is `pageWidth` (the two formulas are the same relationship solved for different
+    /// variables). When it was floored, the page's actual laid-out width is wider than
+    /// `pageWidth` — reconstructing the stride from the floored `offerWidth` here keeps paging
+    /// and rendering consistent instead of dragging by a stride narrower than what's on screen.
+    func getPageStride(pageWidth: CGFloat,
+                       offerWidth: CGFloat,
+                       totalOffers: Int) -> CGFloat {
+        let renderedWidth = model.viewableItems > 1 && totalOffers > 1
+        ? CGFloat(model.viewableItems) * (offerWidth + gap)
+            : offerWidth + gap
+        return max(pageWidth, renderedWidth)
+    }
 
     func getPeekThroughOffset(peekThrough: CGFloat,
                               totalPages: Int) -> CGFloat {

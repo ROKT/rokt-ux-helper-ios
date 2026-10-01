@@ -24,17 +24,39 @@ final class TestCarouselDistributionComponent: XCTestCase {
     }
 
     private func makeCarouselDistributionComponent(
-        peekThroughSize: [PeekThroughSize]
+        peekThroughSize: [PeekThroughSize],
+        viewableItems: Int = 1,
+        gap: Int = 0
     ) -> CarouselDistributionComponent {
+        let defaultStyle: [CarouselDistributionStyles]? = gap == 0 ? nil : [
+            CarouselDistributionStyles(
+                container: ContainerStylingProperties(
+                    justifyContent: nil,
+                    alignItems: nil,
+                    shadow: nil,
+                    overflow: nil,
+                    gap: Float(gap),
+                    blur: nil,
+                    opacity: nil
+                ),
+                background: nil,
+                border: nil,
+                dimension: nil,
+                flexChild: nil,
+                spacing: nil
+            )
+        ]
+
         let model = CarouselViewModel(
             children: [],
-            defaultStyle: nil,
-            viewableItems: [1],
+            defaultStyle: defaultStyle,
+            viewableItems: [UInt8(viewableItems)],
             peekThroughSize: peekThroughSize,
             eventService: nil,
             slots: [],
             layoutState: LayoutState()
         )
+        model.viewableItems = viewableItems
 
         return CarouselDistributionComponent(
             config: .init(parent: .column, position: 1),
@@ -83,6 +105,49 @@ final class TestCarouselDistributionComponent: XCTestCase {
 
         XCTAssertTrue((-CGFloat(0)/offerWidth).isFinite, "a purely vertical drag must not divide by zero")
         XCTAssertTrue((-width/offerWidth).isFinite, "a purely horizontal drag must not divide by zero")
+    }
+
+    // MARK: - page stride
+
+    // A review finding on the offerWidth floor above: flooring only offerWidth left pageWidth
+    // (the page-to-page drag/paging stride) narrower than what multiple gapped, floored-width
+    // offers actually render at, so dragging would land on the wrong card instead of crashing.
+    // getPageStride reconstructs the stride from the floored offerWidth so paging matches what's
+    // rendered.
+    func test_getPageStride_whenOfferWidthIsFloored_matchesTheRenderedWidth() {
+        let component = makeCarouselDistributionComponent(
+            peekThroughSize: [.percentage(50)],
+            viewableItems: 2,
+            gap: 12
+        )
+        let width: CGFloat = 320
+
+        let peekThrough = component.getPeekThrough(width)
+        let pageWidth = component.getPageWidth(width: width, peekThrough: peekThrough)
+        let offerWidth = component.getOfferWidth(pageWidth: pageWidth, totalOffers: 3)
+        let pageStride = component.getPageStride(pageWidth: pageWidth, offerWidth: offerWidth, totalOffers: 3)
+
+        XCTAssertEqual(pageWidth, 2)
+        XCTAssertEqual(offerWidth, 1)
+        // Two floored-width offers plus the gap between and around them (2 * (1 + 12) = 26) —
+        // what the inner HStack(spacing: gap) actually lays out for two items, not pageWidth's 2.
+        XCTAssertEqual(pageStride, 26)
+    }
+
+    func test_getPageStride_whenOfferWidthIsNotFloored_staysEqualToPageWidth() {
+        let component = makeCarouselDistributionComponent(
+            peekThroughSize: [.fixed(16)],
+            viewableItems: 2,
+            gap: 4
+        )
+        let width: CGFloat = 320
+
+        let peekThrough = component.getPeekThrough(width)
+        let pageWidth = component.getPageWidth(width: width, peekThrough: peekThrough)
+        let offerWidth = component.getOfferWidth(pageWidth: pageWidth, totalOffers: 3)
+        let pageStride = component.getPageStride(pageWidth: pageWidth, offerWidth: offerWidth, totalOffers: 3)
+
+        XCTAssertEqual(pageStride, pageWidth, accuracy: 0.001)
     }
 
     func test_carousel() throws {
