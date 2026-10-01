@@ -702,6 +702,55 @@ final class TestLayoutTransformer: XCTestCase {
         }
     }
 
+    // MARK: Distribution nodes reached from inside a slot variant
+
+    // These three node types are documented as outer-layout-only (they recurse over
+    // `layoutPlugin.slots` themselves, ignoring whatever context they were given). Reached from
+    // inside a slot's own layout tree (context `.inner`, not the top-level `.outer` every real
+    // usage has), one would re-expand every slot again, and if that nested copy also contained a
+    // distribution node, the pattern repeats until `LayoutDepthCounter` trips — a confusing
+    // `layoutTooDeep` failure for what is really just an invalid layout. Each getter now rejects
+    // a non-outer context outright instead.
+
+    func test_getOneByOne_throwsInvalidMapping_whenReachedFromInsideASlotVariant() throws {
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+        let model = try XCTUnwrap(ModelTestData.OneByOneData.oneByOne())
+
+        XCTAssertThrowsError(
+            try layoutTransformer.getOneByOne(oneByOneModel: model, context: .inner(.generic(nil)))
+        ) { error in
+            guard case LayoutTransformerError.InvalidMapping = error else {
+                return XCTFail("expected InvalidMapping, got \(error)")
+            }
+        }
+    }
+
+    func test_getCarousel_throwsInvalidMapping_whenReachedFromInsideASlotVariant() throws {
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+        let model = try XCTUnwrap(ModelTestData.CarouselData.carousel())
+
+        XCTAssertThrowsError(
+            try layoutTransformer.getCarousel(carouselModel: model, context: .inner(.generic(nil)))
+        ) { error in
+            guard case LayoutTransformerError.InvalidMapping = error else {
+                return XCTFail("expected InvalidMapping, got \(error)")
+            }
+        }
+    }
+
+    func test_getGroupedDistribution_throwsInvalidMapping_whenReachedFromInsideASlotVariant() throws {
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+        let model = try XCTUnwrap(ModelTestData.GroupedDistributionData.groupedDistribution())
+
+        XCTAssertThrowsError(
+            try layoutTransformer.getGroupedDistribution(groupedModel: model, context: .inner(.generic(nil)))
+        ) { error in
+            guard case LayoutTransformerError.InvalidMapping = error else {
+                return XCTFail("expected InvalidMapping, got \(error)")
+            }
+        }
+    }
+
     //MARK: mock objects
 
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {
