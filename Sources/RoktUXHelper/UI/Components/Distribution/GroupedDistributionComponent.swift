@@ -329,14 +329,19 @@ struct GroupedDistributionComponent: View {
     }
 
     func setViewableItemsForBreakpoint(_ newSize: CGFloat?) {
+        guard !model.viewableItems.isEmpty else { return }
+
         let maxViewableItemsIndex = (model.viewableItems.count) - 1
-
         let currentBreakpointIndex = model.getGlobalBreakpointIndex(newSize)
-
         let index = max(min(currentBreakpointIndex, maxViewableItemsIndex), 0)
-        let previousLeadingOffer = pages[currentGroup].first
 
-        viewableItems = Int(model.viewableItems[index])
+        // Captured against the OLD viewableItems/pages grouping, so navigateToBreakPointPage can
+        // relocate currentGroup to wherever this same offer lands under the new grouping.
+        let previousLeadingOffer = pages[safe: currentGroup]?.first
+
+        let viewableItemsFromBreakpoints = Int(model.viewableItems[index])
+        // ensure viewableItems doesn't exceed totalOffers and never reaches zero, which pages strides by
+        viewableItems = max(min(viewableItemsFromBreakpoints, totalOffers), 1)
 
         // navigate to the currect page
         navigateToBreakPointPage(previousLeadingOffer)

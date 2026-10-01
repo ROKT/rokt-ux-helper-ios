@@ -121,6 +121,69 @@ final class TestGroupedDistributionComponent: XCTestCase {
         groupedComponent.goToNextGroup()
         XCTAssertFalse(closeActionCalled)
     }
+
+    // MARK: - viewableItems
+
+    // An empty `viewableItems` array previously floored the breakpoint index to 0 and indexed it
+    // directly, trapping. A `[0]` array passed the index lookup but then zero stride-by-zero
+    // trapped on the very next read of `pages`/`totalPages`. Both now resolve to a usable,
+    // positive viewableItems count instead.
+    @MainActor
+    func test_setViewableItemsForBreakpoint_withEmptyViewableItems_leavesViewableItemsUnchanged() throws {
+        let component = try makeGroupedDistributionComponent(viewableItems: [], childCount: 4)
+
+        component.setViewableItemsForBreakpoint(320)
+
+        XCTAssertGreaterThanOrEqual(component.viewableItems, 1)
+    }
+
+    @MainActor
+    func test_setViewableItemsForBreakpoint_withZeroViewableItems_resolvesToAtLeastOne() throws {
+        let component = try makeGroupedDistributionComponent(viewableItems: [0], childCount: 4)
+
+        component.setViewableItemsForBreakpoint(320)
+
+        XCTAssertGreaterThanOrEqual(component.viewableItems, 1)
+        // Must not trap reading pages/totalPages with the resolved viewableItems.
+        XCTAssertGreaterThan(component.totalPages, 0)
+    }
+
+    // MARK: - Helpers
+
+    private func makeGroupedDistributionComponent(
+        viewableItems: [UInt8],
+        childCount: Int
+    ) throws -> GroupedDistributionComponent {
+        let children: [LayoutSchemaViewModel] = (0..<childCount).map { index in
+            .basicText(BasicTextViewModel(
+                value: "Offer \(index)",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: nil,
+                diagnosticService: nil
+            ))
+        }
+        let model = GroupedDistributionViewModel(
+            children: children,
+            defaultStyle: nil,
+            viewableItems: viewableItems,
+            transition: .fadeInOut(FadeInOutTransitionSettings(duration: 0)),
+            eventService: nil,
+            slots: [],
+            layoutState: nil
+        )
+
+        return GroupedDistributionComponent(
+            config: .init(parent: .column, position: 1),
+            model: model,
+            parentWidth: .constant(240),
+            parentHeight: .constant(nil),
+            styleState: .constant(.default),
+            parentOverride: nil
+        )
+    }
 }
 
 @available(iOS 15.0, *)
