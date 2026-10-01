@@ -110,6 +110,56 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(link, URL(string: "https://rokt.com/privacy"))
     }
 
+    func test_space_before_link_is_not_part_of_link() {
+        let html = "Powered by <a href=\"https://example.com\">Example</a> - "
+            + "<a href=\"https://example.com/privacy\">Privacy Policy</a>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "Powered by Example - Privacy Policy")
+
+        let text = result.string as NSString
+        for linkText in ["Example", "Privacy Policy"] {
+            let expected = text.range(of: linkText)
+            XCTAssertNil(result.attribute(.link, at: expected.location - 1, effectiveRange: nil))
+
+            var linkRange = NSRange()
+            XCTAssertNotNil(result.attribute(.link, at: expected.location, effectiveRange: &linkRange))
+            XCTAssertEqual(linkRange, expected)
+        }
+    }
+
+    func test_space_inside_link_stays_part_of_link() {
+        let html = "Read<a href=\"https://example.com\"> terms</a>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read terms")
+
+        var linkRange = NSRange()
+        XCTAssertNotNil(result.attribute(.link, at: 4, effectiveRange: &linkRange))
+        XCTAssertEqual(linkRange, NSRange(location: 4, length: 6))
+    }
+
+    func test_space_before_nested_inline_tags_keeps_outer_style() {
+        let html = "<b>Read </b><u><a href=\"https://example.com\">terms</a></u>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read terms")
+
+        let spaceIndex = 4
+        let spaceFont = result.attribute(.font, at: spaceIndex, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
+        XCTAssertNil(result.attribute(.underlineStyle, at: spaceIndex, effectiveRange: nil))
+        XCTAssertNil(result.attribute(.link, at: spaceIndex, effectiveRange: nil))
+        XCTAssertNotNil(result.attribute(.link, at: spaceIndex + 1, effectiveRange: nil))
+    }
+
+    func test_space_between_strikethrough_siblings_is_not_struck() {
+        let html = "<u>ORDER</u> <s>Number</s>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "ORDER Number")
+
+        XCTAssertNil(result.attribute(.underlineStyle, at: 5, effectiveRange: nil))
+        XCTAssertNil(result.attribute(.strikethroughStyle, at: 5, effectiveRange: nil))
+        XCTAssertNotNil(result.attribute(.strikethroughStyle, at: 6, effectiveRange: nil))
+    }
+
     // MARK: - Font color
 
     func test_font_color_unquoted() {

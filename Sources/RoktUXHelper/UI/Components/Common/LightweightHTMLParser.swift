@@ -61,6 +61,10 @@ enum LightweightHTMLParser {
         var listStack: [ListContext] = []
         var listItemStarts: [OpenListItem] = []
         var pendingCollapsedWhitespace = false
+        // Tag-stack depth at which the pending collapsed space was authored. The
+        // space is emitted with only the tags open at that depth, so a space
+        // written before `<a>` (or `<s>`, `<u>`, …) stays outside that tag.
+        var pendingWhitespaceDepth = 0
         let spacerFontSize = blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio }
             ?? paragraphSpacerFontSize
 
@@ -80,6 +84,9 @@ enum LightweightHTMLParser {
                         listItemStarts: &listItemStarts,
                         styledRanges: &styledRanges
                     )
+                    if pendingCollapsedWhitespace {
+                        pendingWhitespaceDepth = min(pendingWhitespaceDepth, tagStack.count)
+                    }
                 } else {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: "<", attributes: attrs))
@@ -89,14 +96,26 @@ enum LightweightHTMLParser {
                 let (text, nextIndex) = scanText(in: html, from: index)
                 index = nextIndex
                 let decoded = decodeHTMLEntities(text)
-                let collapsed = collapseHTMLWhitespace(
+                let wasPending = pendingCollapsedWhitespace
+                var collapsed = collapseHTMLWhitespace(
                     decoded,
                     after: result.string,
                     pendingCollapsedWhitespace: &pendingCollapsedWhitespace
                 )
+                if wasPending, collapsed.hasPrefix(" "), pendingWhitespaceDepth < tagStack.count {
+                    let outerTags = Array(tagStack.prefix(pendingWhitespaceDepth))
+                    let outerAttrs = buildAttributes(from: outerTags, baseFont: baseFont)
+                    result.append(NSAttributedString(string: " ", attributes: outerAttrs))
+                    collapsed.removeFirst()
+                }
                 if !collapsed.isEmpty {
                     let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
                     result.append(NSAttributedString(string: collapsed, attributes: attrs))
+                }
+                if pendingCollapsedWhitespace {
+                    pendingWhitespaceDepth = wasPending && collapsed.isEmpty
+                        ? min(pendingWhitespaceDepth, tagStack.count)
+                        : tagStack.count
                 }
             }
         }
