@@ -258,6 +258,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
 
     // attach inner layout into outer layout and transform to UI Model
     func getOneByOne(oneByOneModel: OneByOneDistributionModel<WhenPredicate>, context: Context) throws -> OneByOneViewModel {
+        guard case .outer = context else { throw LayoutTransformerError.InvalidMapping() }
         let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
             guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
             return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
@@ -272,6 +273,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
     }
 
     func getCarousel(carouselModel: CarouselDistributionModel<WhenPredicate>, context: Context) throws -> CarouselViewModel {
+        guard case .outer = context else { throw LayoutTransformerError.InvalidMapping() }
         let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
             guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
             return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
@@ -290,6 +292,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
         groupedModel: GroupedDistributionModel<WhenPredicate>,
         context: Context
     ) throws -> GroupedDistributionViewModel {
+        guard case .outer = context else { throw LayoutTransformerError.InvalidMapping() }
         let children: [LayoutSchemaViewModel] = try layoutPlugin.slots.enumerated().compactMap { index, slot in
             guard let innerLayout = slot.layoutVariant?.layoutVariantSchema else { return nil }
             return try transform(innerLayout, context: .inner(.generic(slot.offer, offerIndex: index)))
