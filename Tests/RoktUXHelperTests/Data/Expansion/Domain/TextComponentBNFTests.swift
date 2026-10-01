@@ -93,4 +93,25 @@ final class TextComponentBNFTests: XCTestCase {
         XCTAssertEqual(result, NSAttributedString(string: "  SomeDefaultValue^%"))
     }
 
+    // `^%^` closes one placeholder and opens the next off the same `%`, which the token pattern
+    // matches as two tokens whose spans overlap. `replaceStates(NSAttributedString)` used to find
+    // the second placeholder's delimiters by searching the text for its literal substring, which
+    // failed to find a match once the first placeholder's replacement had already altered the
+    // text, returning `{NSNotFound, 0}` and trapping `NSMutableAttributedString.replaceCharacters`
+    // with an uncaught range exception. The first placeholder now resolves; the remainder,
+    // including the leftover delimiter character, stays literal instead of trapping.
+    func test_adjacentStatePlaceholdersSharingADelimiter_nsattributedstring_resolvesTheFirstWithoutTrapping() {
+        let originalString = NSAttributedString(string: "%^STATE.TotalOffers^%^STATE.IndicatorPosition^%")
+        let result = TextComponentBNFHelper.replaceStates(originalString, currentOffer: "2", totalOffers: "4")
+
+        XCTAssertEqual(result, NSAttributedString(string: "4^STATE.IndicatorPosition^%"))
+    }
+
+    func test_adjacentStatePlaceholdersSharingADelimiter_reversedOrder_nsattributedstring_resolvesTheFirstWithoutTrapping() {
+        let originalString = NSAttributedString(string: "%^STATE.IndicatorPosition^%^STATE.TotalOffers^%")
+        let result = TextComponentBNFHelper.replaceStates(originalString, currentOffer: "2", totalOffers: "4")
+
+        XCTAssertEqual(result, NSAttributedString(string: "2^STATE.TotalOffers^%"))
+    }
+
 }
