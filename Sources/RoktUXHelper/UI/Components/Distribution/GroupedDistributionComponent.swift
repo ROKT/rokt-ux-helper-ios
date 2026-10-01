@@ -29,7 +29,7 @@ struct GroupedDistributionComponent: View {
     @Binding var parentHeight: CGFloat?
     @Binding var styleState: StyleState
 
-    @State var currentGroup: Int
+    @State private var storedCurrentGroup: Int
     @State private var toggleTransition = false
     @State private var currentLeadingOffer: Int
 
@@ -64,9 +64,22 @@ struct GroupedDistributionComponent: View {
         self.parentOverride = parentOverride
         self.model = model
         let initialOfferIndex = min(max(model.initialCurrentIndex ?? 0, 0), max((model.children?.count ?? 0) - 1, 0))
-        _currentGroup = State(wrappedValue: initialOfferIndex)
+        _storedCurrentGroup = State(wrappedValue: initialOfferIndex)
         _currentLeadingOffer = State(wrappedValue: initialOfferIndex)
         _customStateMap = State(wrappedValue: model.initialCustomStateMap ?? RoktUXCustomStateMap())
+    }
+
+    /// Always within `[0, totalPages - 1]` (or `0` with no pages), so every `pages[currentGroup]`
+    /// read is safe without its own bounds check — including against two taps landing inside the
+    /// `.fadeInOut` transition's deferred-mutation window, which previously let the raw index walk
+    /// outside the array before the next render caught up.
+    var currentGroup: Int {
+        get { Self.clampedGroupIndex(storedCurrentGroup, totalPages: totalPages) }
+        nonmutating set { storedCurrentGroup = Self.clampedGroupIndex(newValue, totalPages: totalPages) }
+    }
+
+    private static func clampedGroupIndex(_ index: Int, totalPages: Int) -> Int {
+        min(max(index, 0), max(totalPages - 1, 0))
     }
 
     var verticalAlignment: VerticalAlignmentProperty {
@@ -216,7 +229,7 @@ struct GroupedDistributionComponent: View {
         model.layoutState?.actionCollection[.toggleCustomState] = toggleCustomState
 
         model.setupBindings(
-            currentProgress: $currentGroup,
+            currentProgress: $storedCurrentGroup,
             totalItems: model.children?.count ?? 0,
             viewableItems: $viewableItems,
             customStateMap: $customStateMap
