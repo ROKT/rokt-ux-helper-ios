@@ -679,6 +679,29 @@ final class TestLayoutTransformer: XCTestCase {
         }
     }
 
+    // A context this getter doesn't recognize (no catalog item is reachable from it) previously
+    // fell through to `default: break`, silently returning an empty `images` array rather than
+    // failing the node — the same shape of bug `getDataImage`'s own `default:` already guards
+    // against by throwing `missingData`, which `transformWithFallback` turns into `.empty`.
+    func test_getCatalogImageGallery_throwsMissingData_whenContextHasNoCatalogItem() {
+        let layoutTransformer = LayoutTransformer(layoutPlugin: get_layout_plugin(layout: nil, slots: []))
+        let model = CatalogImageGalleryModel<WhenPredicate>(
+            styles: nil,
+            showIndicators: true,
+            backwardImage: nil,
+            forwardImage: nil,
+            a11yLabel: nil
+        )
+
+        XCTAssertThrowsError(
+            try layoutTransformer.getCatalogImageGallery(model: model, context: .inner(.generic(nil)))
+        ) { error in
+            guard case LayoutTransformerError.missingData = error else {
+                return XCTFail("expected missingData, got \(error)")
+            }
+        }
+    }
+
     //MARK: mock objects
 
     func get_layout_plugin(layout: LayoutSchemaModel?, slots: [SlotModel]) -> LayoutPlugin {

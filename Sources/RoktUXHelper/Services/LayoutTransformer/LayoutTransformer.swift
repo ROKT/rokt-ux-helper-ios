@@ -426,7 +426,7 @@ where CreativeSyntaxMapper.Context == CreativeContext,
                     ) }
             }
         default:
-            break
+            throw LayoutTransformerError.missingData
         }
 
         return CatalogImageGalleryViewModel(

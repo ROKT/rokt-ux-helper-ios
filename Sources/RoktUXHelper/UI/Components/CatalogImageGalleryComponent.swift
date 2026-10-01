@@ -374,56 +374,65 @@ struct CatalogImageGalleryComponent: View {
     private var mainImageArea: some View {
         let overlayAlignment = indicatorOverlayAlignment(for: breakpointIndex)
 
-        return ZStack {
-            imageViewComponent(for: model.images[0]).opacity(0.0)
-            CatalogHSPageView(
-                page: $page,
-                pages: model.images.count,
-                onSwipe: { isForward in
-                    isUpdatingFromSwipe = true
-                    if isForward {
-                        model.goForward()
-                        model.handleSwipeForward()
-                    } else {
-                        model.goBackward()
-                        model.handleSwipeBackward()
-                    }
-                },
-                onTap: { isForward in
-                    if isForward {
-                        model.handleNavButtonForward()
-                    } else {
-                        model.handleNavButtonBackward()
-                    }
-                },
-                content: {
-                    ForEach(0..<model.images.count, id: \.self) { index in
-                        imageViewComponent(for: model.images[index])
-                    }
+        return Group {
+            // An empty image list has nothing to page through or size against: the page view's
+            // own gesture surface would otherwise still cover the frame and could walk `page`
+            // out of bounds (and fire a nav event) on a tap, even though there's nothing to show.
+            if model.images.isEmpty {
+                EmptyView()
+            } else {
+                ZStack {
+                    imageViewComponent(for: model.images[0]).opacity(0.0)
+                    CatalogHSPageView(
+                        page: $page,
+                        pages: model.images.count,
+                        onSwipe: { isForward in
+                            isUpdatingFromSwipe = true
+                            if isForward {
+                                model.goForward()
+                                model.handleSwipeForward()
+                            } else {
+                                model.goBackward()
+                                model.handleSwipeBackward()
+                            }
+                        },
+                        onTap: { isForward in
+                            if isForward {
+                                model.handleNavButtonForward()
+                            } else {
+                                model.handleNavButtonBackward()
+                            }
+                        },
+                        content: {
+                            ForEach(0..<model.images.count, id: \.self) { index in
+                                imageViewComponent(for: model.images[index])
+                            }
+                        }
+                    )
                 }
-            )
-        }
-        .frame(maxWidth: .infinity)
-        .clipped()
-        .overlay { navigationButtonOverlay }
-        .overlay(alignment: overlayAlignment) {
-            indicatorOverlay(alignment: overlayAlignment)
-        }
-        .readSize(spacing: nil) { size in
-            availableWidth = size.width
-            availableHeight = size.height
-        }
-        .onChange(of: page) { newValue in
-            previousPage = page
-            model.selectedIndex = newValue
-            isUpdatingFromSelectedIndex = false
-            isUpdatingFromSwipe = false
-        }
-        .onChange(of: model.selectedIndex) { newIndex in
-            guard page != newIndex else { return }
-            previousPage = page
-            isUpdatingFromSelectedIndex = true
-            page = newIndex
+                .frame(maxWidth: .infinity)
+                .clipped()
+                .overlay { navigationButtonOverlay }
+                .overlay(alignment: overlayAlignment) {
+                    indicatorOverlay(alignment: overlayAlignment)
+                }
+                .readSize(spacing: nil) { size in
+                    availableWidth = size.width
+                    availableHeight = size.height
+                }
+                .onChange(of: page) { newValue in
+                    previousPage = page
+                    model.selectedIndex = newValue
+                    isUpdatingFromSelectedIndex = false
+                    isUpdatingFromSwipe = false
+                }
+                .onChange(of: model.selectedIndex) { newIndex in
+                    guard page != newIndex else { return }
+                    previousPage = page
+                    isUpdatingFromSelectedIndex = true
+                    page = newIndex
+                }
+            }
         }
     }
 
