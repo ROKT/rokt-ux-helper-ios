@@ -8,6 +8,48 @@ import DcuiSchema
 @available(iOS 15.0, *)
 final class TestCreativeResponseComponent: XCTestCase {
 
+    // MARK: - Styling
+
+    @MainActor
+    func test_withoutOwnStylesRendersItsChildWithoutExpandingHeight() throws {
+        // `defaultStyle: []` (no `elements.own` in schema) previously crashed on
+        // `model.defaultStyle?[breakpointIndex]` inside `shouldExpandToContainerOnSelfAlign()`.
+        let child = LayoutSchemaViewModel.basicText(
+            BasicTextViewModel(
+                value: "View offer",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: MockLayoutState(),
+                diagnosticService: nil
+            )
+        )
+        let model = CreativeResponseViewModel(
+            children: [child],
+            responseKey: .positive,
+            responseOptions: nil,
+            openLinks: nil,
+            layoutState: MockLayoutState(),
+            eventService: MockEventService(),
+            defaultStyle: [],
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil
+        )
+
+        let component = CreativeResponseComponent(
+            config: .init(parent: .column, position: 1),
+            model: model,
+            parentWidth: .constant(240),
+            parentHeight: .constant(nil),
+            parentOverride: nil
+        ).environmentObject(GlobalScreenSize())
+
+        let basicTextChild = try component.inspect().find(BasicTextComponent.self).actualView()
+        XCTAssertFalse(basicTextChild.expandsToContainerOnSelfAlign)
+    }
+
     func test_creative_response() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.creativeResponse(try get_model()))
         
@@ -91,7 +133,9 @@ final class TestCreativeResponseComponent: XCTestCase {
                                                           openLinks: nil,
                                                           styles: creativeResponse?.styles,
                                                           children: transformer.transformChildren(creativeResponse?.children,
-                                                                                                  context: .inner(.positive(offer))),
+                                                                                                  context: .inner(
+                                                                                                      .positive(offer)
+                                                                                                  )),
                                                           offer: offer)
     }
 }
