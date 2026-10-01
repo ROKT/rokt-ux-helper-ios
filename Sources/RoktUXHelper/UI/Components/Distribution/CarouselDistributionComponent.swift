@@ -249,7 +249,9 @@ struct CarouselDistributionComponent: View {
     }
 
     func getPeekThrough(_ width: CGFloat) -> CGFloat {
-        let breakPointPeekThrough = model.peekThroughSize[peekThroughBreakpointIndex]
+        guard let breakPointPeekThrough = model.peekThroughSize[safe: peekThroughBreakpointIndex] else {
+            return 0
+        }
 
         // convert PeekThroughSize to actual width
         switch breakPointPeekThrough {

@@ -7,6 +7,43 @@ import DcuiSchema
 @available(iOS 15.0, *)
 final class TestCarouselDistributionComponent: XCTestCase {
 
+    // MARK: - peekThroughSize
+
+    // An empty `peekThroughSize` array previously floored `peekThroughBreakpointIndex` to 0 and
+    // indexed it directly in `getPeekThrough`, trapping on first render inside the GeometryReader.
+    func test_getPeekThrough_withEmptyPeekThroughSize_returnsZero() {
+        let component = makeCarouselDistributionComponent(peekThroughSize: [])
+
+        XCTAssertEqual(component.getPeekThrough(320), 0)
+    }
+
+    func test_getPeekThrough_withNonEmptyPeekThroughSize_resolvesTheBreakpointValue() {
+        let component = makeCarouselDistributionComponent(peekThroughSize: [.fixed(16)])
+
+        XCTAssertEqual(component.getPeekThrough(320), 16)
+    }
+
+    private func makeCarouselDistributionComponent(peekThroughSize: [PeekThroughSize]) -> CarouselDistributionComponent {
+        let model = CarouselViewModel(
+            children: [],
+            defaultStyle: nil,
+            viewableItems: [1],
+            peekThroughSize: peekThroughSize,
+            eventService: nil,
+            slots: [],
+            layoutState: LayoutState()
+        )
+
+        return CarouselDistributionComponent(
+            config: .init(parent: .column, position: 1),
+            model: model,
+            parentWidth: .constant(320),
+            parentHeight: .constant(nil),
+            styleState: .constant(.default),
+            parentOverride: nil
+        )
+    }
+
     func test_carousel() throws {
         var closeActionCalled = false
         let view = try TestPlaceHolder.make(
