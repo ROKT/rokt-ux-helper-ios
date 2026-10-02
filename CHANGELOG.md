@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.3] - 2026-10-02
+
+### Fixed
+
+- Render link spacing and case transforms correctly ([#404](https://github.com/ROKT/rokt-ux-helper-ios/pull/404))
+- Keep a collapsed space outside the inline tag that follows it ([#403](https://github.com/ROKT/rokt-ux-helper-ios/pull/403))
+- Bound the drag divisor and reject non-finite progress ([#400](https://github.com/ROKT/rokt-ux-helper-ios/pull/400))
+- Treat an empty peek-through array as no peek-through ([#399](https://github.com/ROKT/rokt-ux-helper-ios/pull/399))
+- Clamp the page index on every write ([#398](https://github.com/ROKT/rokt-ux-helper-ios/pull/398))
+- Resolve a usable viewable-item count from any schema array ([#397](https://github.com/ROKT/rokt-ux-helper-ios/pull/397))
+- Reject a distribution node reached from inside a slot variant ([#396](https://github.com/ROKT/rokt-ux-helper-ios/pull/396))
+- Render nothing when an image gallery has no images ([#394](https://github.com/ROKT/rokt-ux-helper-ios/pull/394))
+- Resolve STATE placeholders by token span, not by search ([#393](https://github.com/ROKT/rokt-ux-helper-ios/pull/393))
+- Stop a node without own styles from trapping ([#392](https://github.com/ROKT/rokt-ux-helper-ios/pull/392))
+- Stop a device-pay button without own styles from trapping ([#390](https://github.com/ROKT/rokt-ux-helper-ios/pull/390))
+- Treat an unstringifiable placeholder value as unresolved ([#389](https://github.com/ROKT/rokt-ux-helper-ios/pull/389))
+- Stop adjacent placeholders sharing a delimiter from trapping ([#384](https://github.com/ROKT/rokt-ux-helper-ios/pull/384))
+- Pair data-URI markers in order before slicing the string ([#385](https://github.com/ROKT/rokt-ux-helper-ios/pull/385))
+- Count pages from the breakpoint in effect ([#381](https://github.com/ROKT/rokt-ux-helper-ios/pull/381))
+- Stop an authored length that is not a number from sizing the sheet ([#382](https://github.com/ROKT/rokt-ux-helper-ios/pull/382))
+- Drop non-finite dropdown spacing before it reaches layout ([#379](https://github.com/ROKT/rokt-ux-helper-ios/pull/379))
+
+### Changed
+
+- Bump github.com/pointfreeco/swift-snapshot-testing from 1.19.4 to 1.19.6 ([#386](https://github.com/ROKT/rokt-ux-helper-ios/pull/386))
+- Upgrade trunk ([#395](https://github.com/ROKT/rokt-ux-helper-ios/pull/395))
+- Add a snapshot test for the drag-divisor fix's degenerate schemas ([#402](https://github.com/ROKT/rokt-ux-helper-ios/pull/402))
+- Retarget nesting-depth tests at real production paths ([#388](https://github.com/ROKT/rokt-ux-helper-ios/pull/388))
+- Cover frame_budget.py, fix real bugs, and surface it in pr-notify ([#387](https://github.com/ROKT/rokt-ux-helper-ios/pull/387))
+- Fail the build when deep layouts outgrow the stack ([#378](https://github.com/ROKT/rokt-ux-helper-ios/pull/378))
+- Resolve each style block in a frame that returns ([#377](https://github.com/ROKT/rokt-ux-helper-ios/pull/377))
+- Recurse through two frames per level instead of six ([#376](https://github.com/ROKT/rokt-ux-helper-ios/pull/376))
+- Build each layout node in its own stack frame ([#375](https://github.com/ROKT/rokt-ux-helper-ios/pull/375))
+- Bump codecov/codecov-action from 7.0.0 to 7.1.1 in /.github/composite_actions/run_xcodebuild_tests ([#370](https://github.com/ROKT/rokt-ux-helper-ios/pull/370))
+
 ## [2.1.2] - 2026-09-23
 
 ### Fixed
@@ -475,7 +510,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.3...HEAD
+[2.1.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.0.0...2.1.0
