@@ -193,7 +193,19 @@ enum LightweightHTMLParser {
                 lists.removeLast()
             default:
                 if let index = tagStack.lastIndex(where: { $0.name == tag.name }) {
+                    if index != tagStack.count - 1 {
+                        let stillOpen = tagStack[(index + 1)...].map(\.name).joined(separator: ", ")
+                        RoktUXLogger.shared.warning(
+                            "</\(tag.name)> closed while [\(stillOpen)] were still open inside it; "
+                                + "the markup is misnested and may render unexpectedly."
+                        )
+                    }
                     tagStack.remove(at: index)
+                } else {
+                    RoktUXLogger.shared.warning(
+                        "</\(tag.name)> closed but no matching <\(tag.name)> was open; "
+                            + "the markup has a stray closing tag and this one is ignored."
+                    )
                 }
             }
         }
