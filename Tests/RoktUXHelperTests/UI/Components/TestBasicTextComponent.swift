@@ -7,6 +7,28 @@ import SnapshotTesting
 @available(iOS 15.0, *)
 final class TestBasicTextComponent: XCTestCase {
 
+    func test_capitalize_follows_css_word_boundaries() {
+        // Expected values match how a browser renders `text-transform: capitalize`.
+        let cases = [
+            ("(hello)", "(Hello)"),
+            ("'thanks'", "'Thanks'"),
+            ("hello-world", "Hello-World"),
+            ("e-mail", "E-Mail"),
+            ("«quoted» text", "«Quoted» Text"),
+            ("123abc", "123abc"),
+            ("x2y z", "X2y Z"),
+            ("hello_world", "Hello_world"),
+            ("don't", "Don't"),
+            ("don\u{2019}t", "Don\u{2019}t"),
+            ("rock 'n' roll", "Rock 'N' Roll"),
+            ("iPhone USA", "IPhone USA"),
+            ("hello\nworld", "Hello\nWorld")
+        ]
+        for (input, expected) in cases {
+            XCTAssertEqual(BasicTextViewModel.transform(input, using: .capitalize), expected, input)
+        }
+    }
+
     func test_basic_text() throws {
         let view = TestPlaceHolder(layout: LayoutSchemaViewModel.basicText(try get_model()))
         

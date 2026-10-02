@@ -24,28 +24,39 @@ internal extension StringProtocol {
             blockSpacerHeight: blockSpacerHeight
         )
 
-        let transformed = transformAttributedText(parsed, using: textTransform)
+        let transformed = transformAttributedText(
+            parsed,
+            using: textTransform,
+            linkTransform: linkStyles?.textTransform
+        )
         return updateLinkStyles(linkStyles, attrStr: transformed, colorScheme: colorScheme)
     }
 
     /// Transforms each attribute run on its own, so every style stays on the text it
-    /// covered even when case conversion changes the length (e.g. "ß" → "SS").
+    /// covered even when case conversion changes the length (e.g. "ß" → "SS"). Link
+    /// runs then also get `linkTransform`.
     private func transformAttributedText(
         _ attrStr: NSAttributedString,
-        using transform: TextTransform?
+        using transform: TextTransform?,
+        linkTransform: TextTransform?
     ) -> NSMutableAttributedString {
-        guard transform != nil else { return NSMutableAttributedString(attributedString: attrStr) }
+        guard transform != nil || linkTransform != nil else {
+            return NSMutableAttributedString(attributedString: attrStr)
+        }
 
         let result = NSMutableAttributedString()
         let original = attrStr.string as NSString
-        // Carried across runs so a word split by inline tags is capitalized once.
-        var atWordStart = true
+        // Carried across runs, links included, so a word split by inline tags or
+        // links is capitalized once.
+        var inWord = false
         attrStr.enumerateAttributes(in: NSRange(location: 0, length: attrStr.length), options: []) { attributes, range, _ in
-            let run = BasicTextViewModel.transform(
-                original.substring(with: range),
-                using: transform,
-                atWordStart: &atWordStart
-            )
+            let runStartsInWord = inWord
+            var run = BasicTextViewModel.transform(original.substring(with: range), using: transform, inWord: &inWord)
+            if attributes[.link] != nil, linkTransform != nil {
+                // Case conversion keeps letters as letters, so both passes see the same words.
+                var linkInWord = runStartsInWord
+                run = BasicTextViewModel.transform(run, using: linkTransform, inWord: &linkInWord)
+            }
             result.append(NSAttributedString(string: run, attributes: attributes))
         }
         return result
@@ -58,25 +69,16 @@ internal extension StringProtocol {
 
         guard let linkStyles else { return attrStrCopy }
 
-        var linkRanges: [NSRange] = []
-        attrStrCopy.enumerateAttribute(.link, in: NSRange(0..<attrStrCopy.length)) { value, range, _ in
-            if value != nil { linkRanges.append(range) }
-        }
-
-        // Work backwards so a transformed label can change length without
-        // invalidating the original ranges of links that follow it.
-        for range in linkRanges.reversed() {
-            let styledRange = setLinkTextTransform(
-                transform: linkStyles.textTransform,
-                originalStr: attrStrCopy,
-                rangeToChange: range
-            )
+        // Link text was already transformed, so styling never changes its length.
+        let attrRange = NSRange(0..<attrStrCopy.length)
+        attrStrCopy.enumerateAttribute(.link, in: attrRange) { strValue, range, _ in
+            guard strValue != nil else { return }
 
             setLinkColor(textColorHex: linkStyles.textColor?.getAdaptiveColor(colorScheme),
                          originalStr: attrStrCopy,
-                         rangeToChange: styledRange)
-            setLinkTextDecoration(decoration: linkStyles.textDecoration, originalStr: attrStrCopy, rangeToChange: styledRange)
-            setLinkLetterSpacing(spacing: linkStyles.letterSpacing, originalStr: attrStrCopy, rangeToChange: styledRange)
+                         rangeToChange: range)
+            setLinkTextDecoration(decoration: linkStyles.textDecoration, originalStr: attrStrCopy, rangeToChange: range)
+            setLinkLetterSpacing(spacing: linkStyles.letterSpacing, originalStr: attrStrCopy, rangeToChange: range)
 
             setLinkFontProperties(
                 fontFamily: linkStyles.fontFamily,
@@ -85,7 +87,7 @@ internal extension StringProtocol {
                 fontStyle: linkStyles.fontStyle,
                 fontBaselineAlignment: linkStyles.baselineTextAlign,
                 originalStr: attrStrCopy,
-                rangeToChange: styledRange
+                rangeToChange: range
             )
         }
 
@@ -100,19 +102,6 @@ internal extension StringProtocol {
             value: UIColor(hexString: textColorHex),
             range: rangeToChange
         )
-    }
-
-    private func setLinkTextTransform(
-        transform: TextTransform?,
-        originalStr: NSMutableAttributedString,
-        rangeToChange: NSRange
-    ) -> NSRange {
-        guard let transform else { return rangeToChange }
-
-        let source = originalStr.attributedSubstring(from: rangeToChange)
-        let transformed = transformAttributedText(source, using: transform)
-        originalStr.replaceCharacters(in: rangeToChange, with: transformed)
-        return NSRange(location: rangeToChange.location, length: transformed.length)
     }
 
     private func setLinkTextDecoration(

@@ -209,33 +209,48 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     }
 
     static func transform(_ value: String, using transform: TextTransform?) -> String {
-        var atWordStart = true
-        return Self.transform(value, using: transform, atWordStart: &atWordStart)
-    }
-
-    /// Transforms one piece of a longer text. For `.capitalize`, `atWordStart` carries
-    /// whether the next character starts a word, so a word split across pieces is
-    /// capitalized once.
-    static func transform(_ value: String, using transform: TextTransform?, atWordStart: inout Bool) -> String {
         switch transform {
         case .uppercase:
             return value.uppercased()
         case .lowercase:
             return value.lowercased()
         case .capitalize:
-            // Match CSS and Android: capitalize the first letter of each word, keep the rest.
-            var result = ""
-            for character in value {
-                if atWordStart {
-                    result += String(character).capitalized
-                } else {
-                    result.append(character)
-                }
-                atWordStart = character.isWhitespace
-            }
-            return result
+            var inWord = false
+            return capitalize(value, inWord: &inWord)
         default: return value
         }
+    }
+
+    /// Transforms one piece of a longer text. `inWord` says whether the text before
+    /// `value` ended inside a word and is advanced past `value`, so a word split
+    /// across pieces is capitalized once.
+    static func transform(_ value: String, using transform: TextTransform?, inWord: inout Bool) -> String {
+        if transform == .capitalize {
+            return capitalize(value, inWord: &inWord)
+        }
+        inWord = value.reduce(inWord) { continuesWord($1, inWord: $0) }
+        return Self.transform(value, using: transform)
+    }
+
+    /// Matches CSS: capitalizes the first letter of each word and keeps the rest.
+    private static func capitalize(_ value: String, inWord: inout Bool) -> String {
+        var result = ""
+        for character in value {
+            if !inWord, character.isLetter {
+                result += String(character).capitalized
+            } else {
+                result.append(character)
+            }
+            inWord = continuesWord(character, inWord: inWord)
+        }
+        return result
+    }
+
+    /// CSS word rule: letters, digits and "_" join a word, and an apostrophe joins one
+    /// only mid-word. Anything else, including other punctuation, ends the word.
+    private static func continuesWord(_ character: Character, inWord: Bool) -> Bool {
+        character.isLetter || character.isNumber || character == "_"
+            || (inWord && (character == "'" || character == "\u{2019}"))
     }
 
     func validateFont(textStyle: TextStylingProperties?) {

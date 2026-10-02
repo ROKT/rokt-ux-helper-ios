@@ -48,10 +48,18 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         return replacedText
     }
 
+    /// Plain-text fallback shown until `attributedString` is ready. Only this display copy
+    /// is case-transformed: `boundValue` is the HTML source, and transforming it would also
+    /// change tags and link URLs.
     var stateReplacedText: String {
-        TextComponentBNFHelper.replaceStates(boundValue,
-                                             currentOffer: "\(currentIndex.wrappedValue + 1)",
-                                             totalOffers: "\(totalPages)")
+        let text = TextComponentBNFHelper.replaceStates(boundValue,
+                                                        currentOffer: "\(currentIndex.wrappedValue + 1)",
+                                                        totalOffers: "\(totalPages)")
+        return BasicTextViewModel.transform(text, using: breakpointDefaultStyle?.text?.textTransform)
+    }
+
+    private var breakpointDefaultStyle: RichTextStyle? {
+        (defaultStyle?.count ?? -1 > breakpointIndex) ? defaultStyle?[breakpointIndex] : nil
     }
 
     init(
@@ -176,9 +184,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     private func transformValueToAttributedString(_ colorScheme: ColorScheme) {
         let valueToTransform = boundValue
 
-        let breakpointDefaultStyle = (defaultStyle?.count ?? -1 > breakpointIndex)
-            ? defaultStyle?[breakpointIndex]
-            : nil
+        let breakpointDefaultStyle = self.breakpointDefaultStyle
 
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil

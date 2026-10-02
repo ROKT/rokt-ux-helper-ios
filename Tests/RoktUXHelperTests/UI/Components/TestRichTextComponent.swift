@@ -721,6 +721,36 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertEqual(text.attribute(.underlineStyle, at: 11, effectiveRange: nil) as? Int, 1)
     }
 
+    func test_link_capitalize_continues_words_around_links() {
+        let model = RichTextViewModel(
+            value: "under<a href='https://example.com/a'>ground</a>, "
+                + "<a href='https://example.com/b'>fir</a><a href='https://example.com/c'>st</a> and "
+                + "<a href='https://example.com/d'>terms of use</a>",
+            defaultStyle: nil,
+            linkStyle: [linkTextStyle(textTransform: .capitalize)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        // Like CSS, a link that starts mid-word does not start a new word.
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "underground, First and Terms Of Use")
+    }
+
+    func test_fallback_text_uses_base_transform() {
+        let model = RichTextViewModel(
+            value: "read terms",
+            defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .uppercase)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        XCTAssertEqual(model.stateReplacedText, "READ TERMS")
+        XCTAssertEqual(model.boundValue, "read terms")
+    }
+
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
