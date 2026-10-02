@@ -7,6 +7,7 @@ internal extension StringProtocol {
     func htmlToAttributedString(
         textColorHex: String?,
         uiFont: UIFont?,
+        textTransform: TextTransform? = nil,
         linkStyles: InlineTextStylingProperties?,
         colorScheme: ColorScheme,
         blockSpacerHeight: CGFloat? = nil
@@ -23,7 +24,37 @@ internal extension StringProtocol {
             blockSpacerHeight: blockSpacerHeight
         )
 
-        return updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
+        let transformed = transformAttributedText(
+            parsed,
+            using: textTransform,
+            linkTransform: linkStyles?.textTransform
+        )
+        return updateLinkStyles(linkStyles, attrStr: transformed, colorScheme: colorScheme)
+    }
+
+    /// Transforms each attribute run on its own, so every style stays on the text it
+    /// covered even when case conversion changes the length (e.g. "ß" → "SS"). As in
+    /// CSS, a link's own `linkTransform` replaces the inherited `transform`.
+    private func transformAttributedText(
+        _ attrStr: NSAttributedString,
+        using transform: TextTransform?,
+        linkTransform: TextTransform?
+    ) -> NSMutableAttributedString {
+        guard transform != nil || linkTransform != nil else {
+            return NSMutableAttributedString(attributedString: attrStr)
+        }
+
+        let result = NSMutableAttributedString()
+        let original = attrStr.string as NSString
+        // Carried across runs, links included, so a word split by inline tags or
+        // links is capitalized once.
+        var inWord = false
+        attrStr.enumerateAttributes(in: NSRange(location: 0, length: attrStr.length), options: []) { attributes, range, _ in
+            let runTransform = attributes[.link] != nil ? linkTransform ?? transform : transform
+            let run = BasicTextViewModel.transform(original.substring(with: range), using: runTransform, inWord: &inWord)
+            result.append(NSAttributedString(string: run, attributes: attributes))
+        }
+        return result
     }
 
     private func updateLinkStyles(_ linkStyles: InlineTextStylingProperties?,
@@ -33,6 +64,7 @@ internal extension StringProtocol {
 
         guard let linkStyles else { return attrStrCopy }
 
+        // Link text was already transformed, so styling never changes its length.
         let attrRange = NSRange(0..<attrStrCopy.length)
         attrStrCopy.enumerateAttribute(.link, in: attrRange) { strValue, range, _ in
             guard strValue != nil else { return }
@@ -40,7 +72,6 @@ internal extension StringProtocol {
             setLinkColor(textColorHex: linkStyles.textColor?.getAdaptiveColor(colorScheme),
                          originalStr: attrStrCopy,
                          rangeToChange: range)
-            setLinkTextTransform(transform: linkStyles.textTransform, originalStr: attrStrCopy, rangeToChange: range)
             setLinkTextDecoration(decoration: linkStyles.textDecoration, originalStr: attrStrCopy, rangeToChange: range)
             setLinkLetterSpacing(spacing: linkStyles.letterSpacing, originalStr: attrStrCopy, rangeToChange: range)
 
@@ -66,37 +97,6 @@ internal extension StringProtocol {
             value: UIColor(hexString: textColorHex),
             range: rangeToChange
         )
-    }
-
-    private func setLinkTextTransform(
-        transform: TextTransform?,
-        originalStr: NSMutableAttributedString,
-        rangeToChange: NSRange
-    ) {
-        guard let transform else { return }
-
-        let origString = originalStr.string as NSString
-        let displayText = origString.substring(with: rangeToChange)
-
-        switch transform {
-        case .uppercase:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.uppercased()
-            )
-        case .lowercase:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.lowercased()
-            )
-        case .capitalize:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.capitalized
-            )
-        default:
-            break
-        }
     }
 
     private func setLinkTextDecoration(

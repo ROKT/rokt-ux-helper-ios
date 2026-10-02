@@ -9,19 +9,13 @@ import UIKit
 ///   margin because SwiftUI's `Text(AttributedString)` does not honor
 ///   `NSParagraphStyle` indent attributes)
 ///
-/// Also decodes common HTML entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`,
-/// `&apos;`, `&nbsp;`, `&#NNN;`, `&#xHHH;`).
+/// Also decodes numeric character references (`&#NNN;`, `&#xHHH;`) and the
+/// named entities in `namedEntities` (`&amp;`, `&nbsp;`, `&copy;`, `&rsquo;`, …).
 @available(iOS 15, *)
 enum LightweightHTMLParser {
 
     // MARK: - Constants
 
-    private static let paragraphTag = "p"
-    private static let lineBreakTag = "br"
-    private static let unorderedListTag = "ul"
-    private static let orderedListTag = "ol"
-    private static let listItemTag = "li"
-    private static let newline = "\n"
     private static let paragraphSpacing: CGFloat = 8
     /// Whitespace inserted between a list marker (• or 1.) and the item content.
     /// Widen or tighten the visual gap by editing this string.
@@ -40,6 +34,8 @@ enum LightweightHTMLParser {
     /// ~0.4 approximates the visual gap of CSS `margin: 0.5em 0` on `<p>`
     /// once the parser's surrounding newlines are accounted for.
     private static let blockSpacerLineHeightRatio: CGFloat = 0.4
+    private static let spaceUnit = unichar(0x20)
+    private static let newlineUnit = unichar(0x0A)
 
     // MARK: - Public API
 
@@ -53,331 +49,60 @@ enum LightweightHTMLParser {
         baseFont: UIFont?,
         blockSpacerHeight: CGFloat? = nil
     ) -> NSMutableAttributedString {
-        let result = NSMutableAttributedString()
-        var index = html.startIndex
-        var tagStack: [Tag] = []
-        var styledRanges: [(NSRange, NSParagraphStyle)] = []
-        var paragraphStart: Int?
-        var listStack: [ListContext] = []
-        var listItemStarts: [OpenListItem] = []
-        var pendingCollapsedWhitespace = false
-        // Tag-stack depth at which the pending collapsed space was authored. The
-        // space is emitted with only the tags open at that depth, so a space
-        // written before `<a>` (or `<s>`, `<u>`, …) stays outside that tag.
-        var pendingWhitespaceDepth = 0
-        let spacerFontSize = blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio }
-            ?? paragraphSpacerFontSize
+        var builder = Builder(
+            baseFont: baseFont,
+            spacerFontSize: blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio } ?? paragraphSpacerFontSize
+        )
+        var rest = html[...]
+        // A tag needs a closing ">". After the last one, a "<" can only be text,
+        // so skip the scan instead of rereading the rest of the input each time.
+        let lastTagEnd = html.utf8.lastIndex(of: UInt8(ascii: ">"))
 
-        while index < html.endIndex {
-            if html[index] == "<" {
-                if let (tag, nextIndex) = scanTag(in: html, from: index) {
-                    index = nextIndex
-                    handleTag(
-                        tag,
-                        stack: &tagStack,
-                        result: result,
-                        baseFont: baseFont,
-                        spacerFontSize: spacerFontSize,
-                        pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
-                        paragraphStart: &paragraphStart,
-                        listStack: &listStack,
-                        listItemStarts: &listItemStarts,
-                        styledRanges: &styledRanges
-                    )
-                    if pendingCollapsedWhitespace {
-                        pendingWhitespaceDepth = min(pendingWhitespaceDepth, tagStack.count)
-                    }
-                } else {
-                    let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
-                    result.append(NSAttributedString(string: "<", attributes: attrs))
-                    index = html.index(after: index)
-                }
+        while !rest.isEmpty {
+            if rest.hasPrefix("<!--") {
+                rest = rest[(rest.range(of: "-->")?.upperBound ?? rest.endIndex)...]
+            } else if rest.first == "<", let lastTagEnd, rest.startIndex < lastTagEnd,
+                      let (tag, afterTag) = scanTag(rest) {
+                builder.handle(tag)
+                rest = afterTag
             } else {
-                let (text, nextIndex) = scanText(in: html, from: index)
-                index = nextIndex
-                let decoded = decodeHTMLEntities(text)
-                let wasPending = pendingCollapsedWhitespace
-                var collapsed = collapseHTMLWhitespace(
-                    decoded,
-                    after: result.string,
-                    pendingCollapsedWhitespace: &pendingCollapsedWhitespace
-                )
-                if wasPending, collapsed.hasPrefix(" "), pendingWhitespaceDepth < tagStack.count {
-                    let outerTags = Array(tagStack.prefix(pendingWhitespaceDepth))
-                    let outerAttrs = buildAttributes(from: outerTags, baseFont: baseFont)
-                    result.append(NSAttributedString(string: " ", attributes: outerAttrs))
-                    collapsed.removeFirst()
-                }
-                if !collapsed.isEmpty {
-                    let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
-                    result.append(NSAttributedString(string: collapsed, attributes: attrs))
-                }
-                if pendingCollapsedWhitespace {
-                    pendingWhitespaceDepth = wasPending && collapsed.isEmpty
-                        ? min(pendingWhitespaceDepth, tagStack.count)
-                        : tagStack.count
-                }
+                // A `<` that does not start a tag is literal text.
+                let textEnd = rest.dropFirst().firstIndex(of: "<") ?? rest.endIndex
+                builder.appendText(decodeHTMLEntities(rest[..<textEnd]))
+                rest = rest[textEnd...]
             }
         }
 
-        applyParagraphStyles(to: result, ranges: styledRanges)
-        return result
+        return builder.result
     }
 
-    // MARK: - Tag model
+    // MARK: - Model
 
-    struct Tag {
+    private struct Tag {
         let name: String
         let isClosing: Bool
-        let isSelfClosing: Bool
         let attributes: [String: String]
     }
 
     private struct ListContext {
-        enum Kind { case unordered, ordered }
-        let kind: Kind
-        var counter: Int
+        let isOrdered: Bool
+        var counter = 1
         /// Whether the most recently closed `<li>` at this depth contained a
         /// block-level child (currently `<p>`). Drives the CSS-style rule
         /// that bare `<li>` siblings sit flush (no inter-item gap) while
         /// `<li><p>...</p></li>` siblings get a spacer from the `<p>`'s
         /// implied margin.
-        var lastClosedHadBlock: Bool
+        var lastClosedHadBlock = false
+
+        var marker: String {
+            (isOrdered ? "\(counter)." : "•") + listMarkerSeparator
+        }
     }
 
     private struct OpenListItem {
         let contentStart: Int
         let depth: Int
-        var containedBlock: Bool
-    }
-
-    // MARK: - Tag dispatch
-
-    private static func handleTag(
-        _ tag: Tag,
-        stack: inout [Tag],
-        result: NSMutableAttributedString,
-        baseFont: UIFont?,
-        spacerFontSize: CGFloat,
-        pendingCollapsedWhitespace: inout Bool,
-        paragraphStart: inout Int?,
-        listStack: inout [ListContext],
-        listItemStarts: inout [OpenListItem],
-        styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        if tag.isClosing {
-            handleClosingTag(
-                tag,
-                stack: &stack,
-                result: result,
-                pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
-                paragraphStart: &paragraphStart,
-                listStack: &listStack,
-                listItemStarts: &listItemStarts,
-                styledRanges: &styledRanges
-            )
-        } else if tag.isSelfClosing || tag.name == lineBreakTag {
-            pendingCollapsedWhitespace = false
-            result.append(NSAttributedString(string: newline))
-        } else {
-            handleOpeningTag(
-                tag,
-                stack: &stack,
-                result: result,
-                baseFont: baseFont,
-                spacerFontSize: spacerFontSize,
-                pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
-                paragraphStart: &paragraphStart,
-                listStack: &listStack,
-                listItemStarts: &listItemStarts,
-                styledRanges: &styledRanges
-            )
-        }
-    }
-
-    private static func handleOpeningTag(
-        _ tag: Tag,
-        stack: inout [Tag],
-        result: NSMutableAttributedString,
-        baseFont: UIFont?,
-        spacerFontSize: CGFloat,
-        pendingCollapsedWhitespace: inout Bool,
-        paragraphStart: inout Int?,
-        listStack: inout [ListContext],
-        listItemStarts: inout [OpenListItem],
-        styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        switch tag.name {
-        case paragraphTag:
-            pendingCollapsedWhitespace = false
-            // If a previous <p> is still open (no explicit </p>), finalize it
-            // so its range is preserved instead of overwritten.
-            finalizeOpenParagraph(
-                result: result,
-                paragraphStart: &paragraphStart,
-                stack: &stack,
-                styledRanges: &styledRanges
-            )
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            // Mark the innermost open <li> as block-bearing so its closing
-            // propagates the flag to ListContext.lastClosedHadBlock.
-            if !listItemStarts.isEmpty {
-                listItemStarts[listItemStarts.count - 1].containedBlock = true
-            }
-            paragraphStart = result.length
-            stack.append(tag)
-        case unorderedListTag:
-            pendingCollapsedWhitespace = false
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            listStack.append(ListContext(kind: .unordered, counter: 1, lastClosedHadBlock: false))
-            stack.append(tag)
-        case orderedListTag:
-            pendingCollapsedWhitespace = false
-            insertBlockSeparatorIfNeeded(
-                in: result,
-                listItemStarts: listItemStarts,
-                spacerFontSize: spacerFontSize
-            )
-            listStack.append(ListContext(kind: .ordered, counter: 1, lastClosedHadBlock: false))
-            stack.append(tag)
-        case listItemTag:
-            guard !listStack.isEmpty else {
-                stack.append(tag)
-                return
-            }
-            let currentDepth = listStack.count - 1
-            // If a previous <li> at the same depth is still open (no explicit </li>),
-            // finalize it (HTML5 allows omitting </li>).
-            if let last = listItemStarts.last, last.depth == currentDepth {
-                pendingCollapsedWhitespace = false
-                finalizeOpenListItem(
-                    last,
-                    result: result,
-                    listStack: &listStack,
-                    listItemStarts: &listItemStarts,
-                    stack: &stack,
-                    styledRanges: &styledRanges
-                )
-            }
-            pendingCollapsedWhitespace = false
-            ensureTrailingNewline(in: result)
-            // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
-            // child contributes its own margin. We emit the spacer only when
-            // the prior sibling at this depth contained a block child.
-            if listStack[currentDepth].counter > 1, listStack[currentDepth].lastClosedHadBlock {
-                appendBlockSpacer(to: result, fontSize: spacerFontSize)
-            }
-            // Apply the active tag-stack attributes to the marker so it inherits
-            // surrounding font/color/etc. (e.g. <font color=...><ul>...).
-            let prefix = listItemPrefix(for: listStack[currentDepth])
-            let prefixAttrs = buildAttributes(from: stack, baseFont: baseFont)
-            result.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
-            listItemStarts.append(
-                OpenListItem(contentStart: result.length, depth: currentDepth, containedBlock: false)
-            )
-            stack.append(tag)
-        default:
-            stack.append(tag)
-        }
-    }
-
-    private static func handleClosingTag(
-        _ tag: Tag,
-        stack: inout [Tag],
-        result: NSMutableAttributedString,
-        pendingCollapsedWhitespace: inout Bool,
-        paragraphStart: inout Int?,
-        listStack: inout [ListContext],
-        listItemStarts: inout [OpenListItem],
-        styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        switch tag.name {
-        case paragraphTag:
-            pendingCollapsedWhitespace = false
-            finalizeOpenParagraph(
-                result: result,
-                paragraphStart: &paragraphStart,
-                stack: &stack,
-                styledRanges: &styledRanges
-            )
-        case listItemTag:
-            pendingCollapsedWhitespace = false
-            if let last = listItemStarts.last, !listStack.isEmpty {
-                finalizeOpenListItem(
-                    last,
-                    result: result,
-                    listStack: &listStack,
-                    listItemStarts: &listItemStarts,
-                    stack: &stack,
-                    styledRanges: &styledRanges
-                )
-            }
-        case unorderedListTag, orderedListTag:
-            pendingCollapsedWhitespace = false
-            if !listStack.isEmpty { listStack.removeLast() }
-        default:
-            break
-        }
-
-        if let idx = stack.lastIndex(where: { $0.name == tag.name }) {
-            stack.remove(at: idx)
-        }
-    }
-
-    // MARK: - Finalizers
-
-    private static func finalizeOpenParagraph(
-        result: NSMutableAttributedString,
-        paragraphStart: inout Int?,
-        stack: inout [Tag],
-        styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        guard let start = paragraphStart else { return }
-        ensureTrailingNewline(in: result)
-        let length = result.length - start
-        if length > 0 {
-            styledRanges.append((NSRange(location: start, length: length), paragraphStyleForP))
-        }
-        paragraphStart = nil
-        if let openP = stack.lastIndex(where: { $0.name == paragraphTag }) {
-            stack.remove(at: openP)
-        }
-    }
-
-    private static func finalizeOpenListItem(
-        _ item: OpenListItem,
-        result: NSMutableAttributedString,
-        listStack: inout [ListContext],
-        listItemStarts: inout [OpenListItem],
-        stack: inout [Tag],
-        styledRanges: inout [(NSRange, NSParagraphStyle)]
-    ) {
-        ensureTrailingNewline(in: result)
-        if item.depth < listStack.count {
-            listStack[item.depth].counter += 1
-            listStack[item.depth].lastClosedHadBlock = item.containedBlock
-        }
-        listItemStarts.removeLast()
-        if let openLi = stack.lastIndex(where: { $0.name == listItemTag }) {
-            stack.remove(at: openLi)
-        }
-    }
-
-    // MARK: - List helpers
-
-    private static func listItemPrefix(for context: ListContext) -> String {
-        switch context.kind {
-        case .unordered: return "•" + listMarkerSeparator
-        case .ordered: return "\(context.counter)." + listMarkerSeparator
-        }
+        var containedBlock = false
     }
 
     private static let paragraphStyleForP: NSParagraphStyle = {
@@ -386,334 +111,344 @@ enum LightweightHTMLParser {
         return style
     }()
 
-    private static func ensureTrailingNewline(in result: NSMutableAttributedString) {
-        trimTrailingCollapsedSpace(in: result)
-        guard result.length > 0, !result.string.hasSuffix(newline) else { return }
-        result.append(NSAttributedString(string: newline))
-    }
+    // MARK: - Builder
 
-    /// Appends a small-font NBSP + newline so SwiftUI Text renders a visible
-    /// gap between block-level elements (`<p>`, `<li>`). Used because
-    /// `NSParagraphStyle.paragraphSpacing` is ignored by `Text(AttributedString)`.
-    private static func appendBlockSpacer(to result: NSMutableAttributedString, fontSize: CGFloat) {
-        let spacer = NSAttributedString(
-            string: paragraphSpacerCharacter + newline,
-            attributes: [.font: UIFont.systemFont(ofSize: fontSize)]
-        )
-        result.append(spacer)
-    }
+    /// Accumulates output while the scanner walks the HTML. Block tags (`p`,
+    /// `ul`, `ol`, `li`, `br`) only shape structure, so `tagStack` holds just
+    /// the inline tags whose styles apply to text.
+    private struct Builder {
+        let baseFont: UIFont?
+        let spacerFontSize: CGFloat
+        let result = NSMutableAttributedString()
+        var tagStack: [Tag] = []
+        var paragraphStart: Int?
+        var lists: [ListContext] = []
+        var openItems: [OpenListItem] = []
+        // Keep the tags from the first space in a collapsed run. A tag may close
+        // before the space is emitted, or a different tag may open after it.
+        var pendingSpaceTags: [Tag]?
 
-    /// Ensures a visible gap precedes a block-level element opening (`<p>`,
-    /// `<ul>`, `<ol>`) when there's already content above it. No-op when:
-    /// - the document is empty (block is the very first content);
-    /// - we're inside an `<li>` whose marker prefix was just emitted (the
-    ///   block flows into the marker line; common WYSIWYG pattern).
-    private static func insertBlockSeparatorIfNeeded(
-        in result: NSMutableAttributedString,
-        listItemStarts: [OpenListItem],
-        spacerFontSize: CGFloat
-    ) {
-        if listItemStarts.last?.contentStart == result.length { return }
-        ensureTrailingNewline(in: result)
-        guard result.length > newline.count else { return }
-        appendBlockSpacer(to: result, fontSize: spacerFontSize)
-    }
+        /// The last UTF-16 unit of the output. `result.string` would copy the whole
+        /// output on every read, making parsing quadratic in the input size.
+        private var lastUnit: unichar? {
+            result.length > 0 ? result.mutableString.character(at: result.length - 1) : nil
+        }
 
-    private static func collapseHTMLWhitespace(
-        _ text: String,
-        after existingText: String,
-        pendingCollapsedWhitespace: inout Bool
-    ) -> String {
-        var collapsed = ""
-
-        for character in text {
-            if isCollapsibleHTMLWhitespace(character) {
-                if hasVisibleTextBeforePendingSpace(existingText: existingText, collapsedText: collapsed) {
-                    pendingCollapsedWhitespace = true
-                }
+        mutating func handle(_ tag: Tag) {
+            if tag.isClosing {
+                close(tag)
             } else {
-                if pendingCollapsedWhitespace,
-                   hasVisibleTextBeforePendingSpace(existingText: existingText, collapsedText: collapsed) {
-                    collapsed.append(" ")
-                }
-                pendingCollapsedWhitespace = false
-                collapsed.append(character)
+                open(tag)
             }
         }
 
-        return collapsed
-    }
+        private mutating func open(_ tag: Tag) {
+            switch tag.name {
+            case "br":
+                pendingSpaceTags = nil
+                result.append(NSAttributedString(string: "\n"))
+            case "p":
+                pendingSpaceTags = nil
+                // If a previous <p> is still open (no explicit </p>), finalize it
+                // so its range is preserved instead of overwritten.
+                finalizeParagraph()
+                insertBlockSeparatorIfNeeded()
+                // Mark the innermost open <li> as block-bearing so its closing
+                // propagates the flag to ListContext.lastClosedHadBlock.
+                if !openItems.isEmpty {
+                    openItems[openItems.count - 1].containedBlock = true
+                }
+                paragraphStart = result.length
+            case "ul", "ol":
+                pendingSpaceTags = nil
+                insertBlockSeparatorIfNeeded()
+                lists.append(ListContext(isOrdered: tag.name == "ol"))
+            case "li":
+                // An `<li>` outside a list renders as plain text.
+                guard !lists.isEmpty else { return }
+                pendingSpaceTags = nil
+                openListItem()
+            default:
+                tagStack.append(tag)
+            }
+        }
 
-    private static func trimTrailingCollapsedSpace(in result: NSMutableAttributedString) {
-        while result.string.last == " " {
-            result.deleteCharacters(in: NSRange(location: result.length - 1, length: 1))
+        private mutating func close(_ tag: Tag) {
+            switch tag.name {
+            case "p":
+                pendingSpaceTags = nil
+                finalizeParagraph()
+            case "li":
+                pendingSpaceTags = nil
+                if !lists.isEmpty, !openItems.isEmpty {
+                    finalizeListItem()
+                }
+            case "ul", "ol":
+                pendingSpaceTags = nil
+                guard !lists.isEmpty else { return }
+                // `</li>` is optional, so closing a list also ends its open items.
+                while let item = openItems.last, item.depth >= lists.count - 1 {
+                    finalizeListItem()
+                }
+                lists.removeLast()
+            default:
+                if let index = tagStack.lastIndex(where: { $0.name == tag.name }) {
+                    tagStack.remove(at: index)
+                }
+            }
+        }
+
+        // MARK: Blocks
+
+        private mutating func openListItem() {
+            let depth = lists.count - 1
+            // HTML5 allows omitting </li>, so a new sibling ends the previous one.
+            if openItems.last?.depth == depth {
+                finalizeListItem()
+            }
+            ensureTrailingNewline()
+            // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
+            // child contributes its own margin. We emit the spacer only when
+            // the prior sibling at this depth contained a block child.
+            if lists[depth].counter > 1, lists[depth].lastClosedHadBlock {
+                appendBlockSpacer()
+            }
+            // The marker inherits the active inline styles so it matches
+            // surrounding font/color/etc. (e.g. <font color=...><ul>...).
+            result.append(NSAttributedString(string: lists[depth].marker, attributes: attributes(for: tagStack)))
+            openItems.append(OpenListItem(contentStart: result.length, depth: depth))
+        }
+
+        private mutating func finalizeListItem() {
+            let item = openItems.removeLast()
+            ensureTrailingNewline()
+            if item.depth < lists.count {
+                lists[item.depth].counter += 1
+                lists[item.depth].lastClosedHadBlock = item.containedBlock
+            }
+        }
+
+        private mutating func finalizeParagraph() {
+            guard let start = paragraphStart else { return }
+            paragraphStart = nil
+            ensureTrailingNewline()
+            let range = NSRange(location: start, length: result.length - start)
+            if range.length > 0 {
+                result.addAttribute(.paragraphStyle, value: paragraphStyleForP, range: range)
+            }
+        }
+
+        /// Ensures a visible gap precedes a block-level element opening (`<p>`,
+        /// `<ul>`, `<ol>`) when there's already content above it. No-op when:
+        /// - the document is empty (block is the very first content);
+        /// - we're inside an `<li>` whose marker prefix was just emitted (the
+        ///   block flows into the marker line; common WYSIWYG pattern).
+        private func insertBlockSeparatorIfNeeded() {
+            if openItems.last?.contentStart == result.length { return }
+            ensureTrailingNewline()
+            guard result.length > 1 else { return }
+            appendBlockSpacer()
+        }
+
+        private func ensureTrailingNewline() {
+            // Drop the separator left by an empty list item before breaking the line.
+            while lastUnit == spaceUnit {
+                result.deleteCharacters(in: NSRange(location: result.length - 1, length: 1))
+            }
+            if let last = lastUnit, last != newlineUnit {
+                result.append(NSAttributedString(string: "\n"))
+            }
+        }
+
+        /// Appends a small-font NBSP + newline so SwiftUI Text renders a visible
+        /// gap between block-level elements (`<p>`, `<li>`). Used because
+        /// `NSParagraphStyle.paragraphSpacing` is ignored by `Text(AttributedString)`.
+        private func appendBlockSpacer() {
+            result.append(NSAttributedString(
+                string: paragraphSpacerCharacter + "\n",
+                attributes: [.font: UIFont.systemFont(ofSize: spacerFontSize)]
+            ))
+        }
+
+        // MARK: Inline text
+
+        /// Appends `text` with HTML whitespace collapsed to single spaces. A
+        /// space is held back until visible text follows it, so runs never
+        /// start or end with collapsed whitespace.
+        mutating func appendText(_ text: String) {
+            let endsWithVisibleText = lastUnit.map { $0 != spaceUnit && $0 != newlineUnit } ?? false
+            var run = ""
+
+            for character in text {
+                if isCollapsibleWhitespace(character) {
+                    if pendingSpaceTags == nil, endsWithVisibleText || !run.isEmpty {
+                        pendingSpaceTags = tagStack
+                    }
+                    continue
+                }
+                if let spaceTags = pendingSpaceTags {
+                    pendingSpaceTags = nil
+                    if run.isEmpty {
+                        // The space came from an earlier text node and keeps that node's style.
+                        result.append(NSAttributedString(string: " ", attributes: attributes(for: spaceTags)))
+                    } else {
+                        run.append(" ")
+                    }
+                }
+                run.append(character)
+            }
+
+            if !run.isEmpty {
+                result.append(NSAttributedString(string: run, attributes: attributes(for: tagStack)))
+            }
+        }
+
+        private func attributes(for tags: [Tag]) -> [NSAttributedString.Key: Any] {
+            var isBold = false
+            var isItalic = false
+            var attributes: [NSAttributedString.Key: Any] = [:]
+
+            for tag in tags {
+                switch tag.name {
+                case "b", "strong": isBold = true
+                case "i", "em": isItalic = true
+                case "u": attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
+                case "s", "strike": attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+                case "a":
+                    if let url = tag.attributes["href"].flatMap(URL.init(string:)) {
+                        attributes[.link] = url
+                    }
+                case "font":
+                    if let color = tag.attributes["color"] {
+                        attributes[.foregroundColor] = UIColor(hexString: color)
+                    }
+                default: break
+                }
+            }
+
+            var font = baseFont ?? .systemFont(ofSize: UIFont.systemFontSize)
+            if isBold, let bold = font.including(symbolicTraits: .traitBold) { font = bold }
+            if isItalic, let italic = font.including(symbolicTraits: .traitItalic) { font = italic }
+            attributes[.font] = font
+            return attributes
         }
     }
 
-    private static func isCollapsedWhitespaceBoundary(_ character: Character) -> Bool {
-        character == " " || character == "\n"
-    }
-
-    private static func hasVisibleTextBeforePendingSpace(existingText: String, collapsedText: String) -> Bool {
-        if let lastCollapsedCharacter = collapsedText.last {
-            return !isCollapsedWhitespaceBoundary(lastCollapsedCharacter)
-        }
-
-        return existingText.last.map { !isCollapsedWhitespaceBoundary($0) } ?? false
-    }
-
-    private static func isCollapsibleHTMLWhitespace(_ character: Character) -> Bool {
+    private static func isCollapsibleWhitespace(_ character: Character) -> Bool {
         switch character {
-        case " ", "\n", "\t", "\r", "\u{000C}":
+        case " ", "\n", "\t", "\r", "\r\n", "\u{000C}":
             return true
         default:
             return false
         }
     }
 
-    private static func applyParagraphStyles(
-        to result: NSMutableAttributedString,
-        ranges: [(NSRange, NSParagraphStyle)]
-    ) {
-        for (range, style) in ranges {
-            let clamped = NSRange(
-                location: range.location,
-                length: min(range.length, result.length - range.location)
-            )
-            guard clamped.length > 0 else { continue }
-            result.addAttribute(.paragraphStyle, value: style, range: clamped)
-        }
-    }
-
     // MARK: - Tag scanning
 
-    private static func scanTag(
-        in html: String,
-        from start: String.Index
-    ) -> (Tag, String.Index)? {
-        guard html[start] == "<" else { return nil }
+    /// Scans the tag at the start of `input`, returning it and the text after
+    /// its `>`. Returns `nil` when `input` does not start with a complete tag,
+    /// so the caller can render the `<` as text.
+    private static func scanTag(_ input: Substring) -> (Tag, Substring)? {
+        var rest = input.dropFirst()
+        let isClosing = rest.first == "/"
+        if isClosing { rest = rest.dropFirst() }
 
-        var idx = html.index(after: start)
-        guard idx < html.endIndex else { return nil }
-
-        let isClosing = html[idx] == "/"
-        if isClosing {
-            idx = html.index(after: idx)
-            guard idx < html.endIndex else { return nil }
-        }
-
-        let nameStart = idx
-        while idx < html.endIndex, html[idx].isLetter || html[idx].isNumber {
-            idx = html.index(after: idx)
-        }
-        let name = String(html[nameStart..<idx]).lowercased()
-        guard !name.isEmpty else { return nil }
+        guard let first = rest.first, first.isASCII, first.isLetter else { return nil }
+        let name = rest.prefix { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-") }
+        rest = rest[name.endIndex...]
 
         var attributes: [String: String] = [:]
+        while !isClosing {
+            rest = rest.drop(while: \.isWhitespace)
+            guard let next = rest.first, next != ">", next != "/" else { break }
 
-        if !isClosing {
-            while idx < html.endIndex, html[idx] != ">", html[idx] != "/" {
-                idx = skipWhitespace(in: html, from: idx)
-                if idx >= html.endIndex || html[idx] == ">" || html[idx] == "/" { break }
-
-                let (attrName, attrEnd) = scanWord(in: html, from: idx)
-                idx = attrEnd
-                guard !attrName.isEmpty else { idx = advanceSafely(html, idx); continue }
-
-                idx = skipWhitespace(in: html, from: idx)
-
-                if idx < html.endIndex, html[idx] == "=" {
-                    idx = html.index(after: idx)
-                    idx = skipWhitespace(in: html, from: idx)
-                    let (value, valueEnd) = scanAttributeValue(in: html, from: idx)
-                    idx = valueEnd
-                    attributes[attrName.lowercased()] = value
-                }
+            let attributeName = rest.prefix { !"=>/".contains($0) && !$0.isWhitespace }
+            guard !attributeName.isEmpty else {
+                rest = rest.dropFirst()
+                continue
             }
-        } else {
-            idx = skipWhitespace(in: html, from: idx)
-        }
+            rest = rest[attributeName.endIndex...].drop(while: \.isWhitespace)
+            guard rest.first == "=" else { continue }
+            rest = rest.dropFirst().drop(while: \.isWhitespace)
 
-        var isSelfClosing = false
-        if idx < html.endIndex, html[idx] == "/" {
-            isSelfClosing = true
-            idx = html.index(after: idx)
-        }
-        if idx < html.endIndex, html[idx] == ">" {
-            idx = html.index(after: idx)
-        }
-
-        return (
-            Tag(name: name, isClosing: isClosing, isSelfClosing: isSelfClosing, attributes: attributes),
-            idx
-        )
-    }
-
-    // MARK: - Text scanning
-
-    private static func scanText(
-        in html: String,
-        from start: String.Index
-    ) -> (String, String.Index) {
-        var idx = start
-        while idx < html.endIndex, html[idx] != "<" {
-            idx = html.index(after: idx)
-        }
-        return (String(html[start..<idx]), idx)
-    }
-
-    // MARK: - Attribute value scanning
-
-    private static func scanAttributeValue(
-        in html: String,
-        from start: String.Index
-    ) -> (String, String.Index) {
-        guard start < html.endIndex else { return ("", start) }
-
-        if html[start] == "\"" || html[start] == "'" {
-            let quote = html[start]
-            var idx = html.index(after: start)
-            let valueStart = idx
-            while idx < html.endIndex, html[idx] != quote {
-                idx = html.index(after: idx)
+            let value: Substring
+            if let quote = rest.first, quote == "\"" || quote == "'" {
+                value = rest.dropFirst().prefix { $0 != quote }
+                rest = rest[value.endIndex...].dropFirst()
+            } else {
+                value = rest.prefix { $0 != ">" && !$0.isWhitespace }
+                rest = rest[value.endIndex...]
             }
-            let value = String(html[valueStart..<idx])
-            if idx < html.endIndex { idx = html.index(after: idx) }
-            return (value, idx)
+            attributes[attributeName.lowercased()] = decodeHTMLEntities(value)
         }
 
-        var idx = start
-        while idx < html.endIndex, html[idx] != ">", html[idx] != "/", !html[idx].isWhitespace {
-            idx = html.index(after: idx)
-        }
-        return (String(html[start..<idx]), idx)
-    }
+        rest = rest.drop(while: \.isWhitespace)
+        if rest.first == "/" { rest = rest.dropFirst() }
+        guard rest.first == ">" else { return nil }
 
-    // MARK: - Attribute building
-
-    private static func buildAttributes(
-        from tagStack: [Tag],
-        baseFont: UIFont?
-    ) -> [NSAttributedString.Key: Any] {
-        var isBold = false
-        var isItalic = false
-        var isUnderline = false
-        var isStrikethrough = false
-        var linkURL: URL?
-        var foregroundColor: UIColor?
-
-        for tag in tagStack {
-            switch tag.name {
-            case "b", "strong": isBold = true
-            case "i", "em": isItalic = true
-            case "u": isUnderline = true
-            case "s", "strike": isStrikethrough = true
-            case "a":
-                if let href = tag.attributes["href"] { linkURL = URL(string: href) }
-            case "font":
-                if let color = tag.attributes["color"] { foregroundColor = UIColor(hexString: color) }
-            default: break
-            }
-        }
-
-        var attrs: [NSAttributedString.Key: Any] = [:]
-
-        let resolvedFont = baseFont ?? .systemFont(ofSize: UIFont.systemFontSize)
-        var font = resolvedFont
-        if isBold, let bold = font.including(symbolicTraits: .traitBold) { font = bold }
-        if isItalic, let italic = font.including(symbolicTraits: .traitItalic) { font = italic }
-        attrs[.font] = font
-
-        if let foregroundColor { attrs[.foregroundColor] = foregroundColor }
-        if isUnderline { attrs[.underlineStyle] = NSUnderlineStyle.single.rawValue }
-        if isStrikethrough { attrs[.strikethroughStyle] = NSUnderlineStyle.single.rawValue }
-        if let linkURL { attrs[.link] = linkURL }
-
-        return attrs
+        return (Tag(name: name.lowercased(), isClosing: isClosing, attributes: attributes), rest.dropFirst())
     }
 
     // MARK: - HTML entity decoding
 
-    private static func decodeHTMLEntities(_ text: String) -> String {
-        guard text.contains("&") else { return text }
-
+    private static func decodeHTMLEntities(_ text: Substring) -> String {
         var result = ""
-        result.reserveCapacity(text.count)
-        var idx = text.startIndex
+        var rest = text
 
-        while idx < text.endIndex {
-            if text[idx] == "&" {
-                let entityStart = idx
-                idx = text.index(after: idx)
-                var entityName = ""
-                while idx < text.endIndex, text[idx] != ";", entityName.count < 10 {
-                    entityName.append(text[idx])
-                    idx = text.index(after: idx)
-                }
-                if idx < text.endIndex, text[idx] == ";" {
-                    idx = text.index(after: idx)
-                    if let resolved = resolveEntity(entityName) {
-                        result.append(resolved)
-                    } else {
-                        result.append(contentsOf: text[entityStart..<idx])
-                    }
-                } else {
-                    result.append(contentsOf: text[entityStart..<idx])
-                }
+        while let ampersand = rest.firstIndex(of: "&") {
+            result += rest[..<ampersand]
+            rest = rest[rest.index(after: ampersand)...]
+            // Names are at most 10 characters. An unresolved `&` is kept as text
+            // and scanning resumes right after it, so it cannot hide a later entity.
+            if let semicolon = rest.prefix(11).firstIndex(of: ";"),
+               let decoded = resolveEntity(rest[..<semicolon]) {
+                result.append(decoded)
+                rest = rest[rest.index(after: semicolon)...]
             } else {
-                result.append(text[idx])
-                idx = text.index(after: idx)
+                result.append("&")
             }
         }
 
-        return result
+        return result + rest
     }
 
-    private static func resolveEntity(_ name: String) -> Character? {
-        switch name {
-        case "amp": return "&"
-        case "lt": return "<"
-        case "gt": return ">"
-        case "quot": return "\""
-        case "apos": return "'"
-        case "nbsp": return "\u{00A0}"
-        default:
-            if name.hasPrefix("#x") || name.hasPrefix("#X") {
-                let hex = String(name.dropFirst(2))
-                if let cp = UInt32(hex, radix: 16), let scalar = Unicode.Scalar(cp) {
-                    return Character(scalar)
-                }
-            } else if name.hasPrefix("#") {
-                let decimal = String(name.dropFirst(1))
-                if let cp = UInt32(decimal, radix: 10), let scalar = Unicode.Scalar(cp) {
-                    return Character(scalar)
-                }
-            }
-            return nil
+    private static func resolveEntity(_ name: Substring) -> Character? {
+        if let named = namedEntities[String(name)] { return named }
+        guard name.first == "#" else { return nil }
+
+        let number = name.dropFirst()
+        let codePoint = number.first == "x" || number.first == "X"
+            ? UInt32(number.dropFirst(), radix: 16)
+            : UInt32(number)
+        return codePoint.flatMap { Unicode.Scalar($0) }.map(Character.init)
+    }
+
+    // HTML 4 Latin-1 plus common punctuation. Greek and math symbol names are
+    // omitted; add them here if authored copy needs them.
+    private static let namedEntities: [String: Character] = {
+        var entities: [String: Character] = [
+            "amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'",
+            "OElig": "Œ", "oelig": "œ", "Scaron": "Š", "scaron": "š", "Yuml": "Ÿ", "fnof": "ƒ",
+            "circ": "ˆ", "tilde": "˜", "ensp": "\u{2002}", "emsp": "\u{2003}", "thinsp": "\u{2009}",
+            "zwnj": "\u{200C}", "zwj": "\u{200D}", "lrm": "\u{200E}", "rlm": "\u{200F}",
+            "ndash": "–", "mdash": "—", "lsquo": "‘", "rsquo": "’", "sbquo": "‚",
+            "ldquo": "“", "rdquo": "”", "bdquo": "„", "dagger": "†", "Dagger": "‡",
+            "bull": "•", "hellip": "…", "permil": "‰", "prime": "′", "Prime": "″",
+            "lsaquo": "‹", "rsaquo": "›", "euro": "€", "trade": "™", "minus": "−",
+            "larr": "←", "rarr": "→"
+        ]
+        // Names for U+00A0 through U+00FF, in code point order.
+        let latin1 = """
+            nbsp iexcl cent pound curren yen brvbar sect uml copy ordf laquo not shy reg macr
+            deg plusmn sup2 sup3 acute micro para middot cedil sup1 ordm raquo frac14 frac12 frac34 iquest
+            Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute Ecirc Euml Igrave Iacute Icirc Iuml
+            ETH Ntilde Ograve Oacute Ocirc Otilde Ouml times Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig
+            agrave aacute acirc atilde auml aring aelig ccedil egrave eacute ecirc euml igrave iacute icirc iuml
+            eth ntilde ograve oacute ocirc otilde ouml divide oslash ugrave uacute ucirc uuml yacute thorn yuml
+            """
+        for (offset, name) in latin1.split(whereSeparator: \.isWhitespace).enumerated() {
+            entities[String(name)] = Character(Unicode.Scalar(UInt8(0xA0 + offset)))
         }
-    }
-
-    // MARK: - Scanning helpers
-
-    private static func scanWord(
-        in html: String,
-        from start: String.Index
-    ) -> (String, String.Index) {
-        var idx = start
-        while idx < html.endIndex,
-              html[idx] != "=", html[idx] != ">", html[idx] != "/", !html[idx].isWhitespace {
-            idx = html.index(after: idx)
-        }
-        return (String(html[start..<idx]), idx)
-    }
-
-    private static func skipWhitespace(in html: String, from start: String.Index) -> String.Index {
-        var idx = start
-        while idx < html.endIndex, html[idx].isWhitespace { idx = html.index(after: idx) }
-        return idx
-    }
-
-    private static func advanceSafely(_ html: String, _ idx: String.Index) -> String.Index {
-        idx < html.endIndex ? html.index(after: idx) : idx
-    }
+        return entities
+    }()
 }

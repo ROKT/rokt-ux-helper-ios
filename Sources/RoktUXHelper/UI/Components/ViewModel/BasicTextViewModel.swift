@@ -27,10 +27,17 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
 
     // extracted data from `dataBinding` that's published externally
     @LazyPublished var boundValue = ""
+    // `boundValue` before the style's text transform. Each style change transforms this,
+    // so it never re-transforms the previous style's output.
+    private var untransformedValue: String
 
     @LazyPublished var styleState = StyleState.default
     @LazyPublished var breakpointIndex = 0
     var currentStylingProperties: BasicTextStyle? {
+        stylingProperties(for: styleState)
+    }
+
+    private func stylingProperties(for styleState: StyleState) -> BasicTextStyle? {
         switch styleState {
         case .hovered:
             return hoveredStyle?.count ?? -1 > breakpointIndex ? hoveredStyle?[breakpointIndex] : nil
@@ -79,6 +86,7 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         self.catalogItemContext = catalogItemContext
 
         self.boundValue = value ?? ""
+        self.untransformedValue = value ?? ""
 
         self.defaultStyle = defaultStyle
         self.pressedStyle = pressedStyle
@@ -188,8 +196,9 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
 
     // update the text to display if State changes
     private func performStyleStateBinding() {
-        $styleState.sink { [weak self] _ in
-            self?.updateBoundValueWithStyling()
+        // The publisher emits before `styleState` changes, so use the emitted state.
+        $styleState.sink { [weak self] styleState in
+            self?.applyTextTransform(for: styleState)
         }
         .store(in: &bag)
     }
@@ -204,8 +213,17 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         boundValue = expandedValue
     }
 
+    /// Call after writing new, untransformed text to `boundValue`.
     private func updateBoundValueWithStyling() {
-        boundValue = Self.transform(boundValue, using: currentStylingProperties?.text?.textTransform)
+        untransformedValue = boundValue
+        applyTextTransform(for: styleState)
+    }
+
+    private func applyTextTransform(for styleState: StyleState) {
+        boundValue = Self.transform(
+            untransformedValue,
+            using: stylingProperties(for: styleState)?.text?.textTransform
+        )
     }
 
     static func transform(_ value: String, using transform: TextTransform?) -> String {
@@ -215,9 +233,42 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
         case .lowercase:
             return value.lowercased()
         case .capitalize:
-            return value.capitalized
+            var inWord = false
+            return capitalize(value, inWord: &inWord)
         default: return value
         }
+    }
+
+    /// Transforms one piece of a longer text. `inWord` says whether the text before
+    /// `value` ended inside a word and is advanced past `value`, so a word split
+    /// across pieces is capitalized once.
+    static func transform(_ value: String, using transform: TextTransform?, inWord: inout Bool) -> String {
+        if transform == .capitalize {
+            return capitalize(value, inWord: &inWord)
+        }
+        inWord = value.reduce(inWord) { continuesWord($1, inWord: $0) }
+        return Self.transform(value, using: transform)
+    }
+
+    /// Matches CSS: capitalizes the first letter of each word and keeps the rest.
+    private static func capitalize(_ value: String, inWord: inout Bool) -> String {
+        var result = ""
+        for character in value {
+            if !inWord, character.isLetter {
+                result += String(character).capitalized
+            } else {
+                result.append(character)
+            }
+            inWord = continuesWord(character, inWord: inWord)
+        }
+        return result
+    }
+
+    /// CSS word rule: letters, digits and "_" join a word, and an apostrophe joins one
+    /// only mid-word. Anything else, including other punctuation, ends the word.
+    private static func continuesWord(_ character: Character, inWord: Bool) -> Bool {
+        character.isLetter || character.isNumber || character == "_"
+            || (inWord && (character == "'" || character == "\u{2019}"))
     }
 
     func validateFont(textStyle: TextStylingProperties?) {

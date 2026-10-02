@@ -8,8 +8,7 @@ final class TextModelTests: XCTestCase {
         let textUIModel = RichTextViewModel(value: sut.value, defaultStyle: sut.styles?.elements?.own.compactMap{ $0.default },
                                             openLinks: nil, layoutState: LayoutState(),
                                             eventService: nil)
-        textUIModel.updateBoundValueWithStyling()
-        XCTAssertEqual(textUIModel.boundValue, "ORDER NUMBER: UK171359906")
+        assertRenderedText(textUIModel, equals: "ORDER NUMBER: UK171359906")
     }
     
     func test_styledText_text_model_lowerCase() {
@@ -18,8 +17,7 @@ final class TextModelTests: XCTestCase {
                                             openLinks: nil, 
                                             layoutState: LayoutState(),
                                             eventService: nil)
-        textUIModel.updateBoundValueWithStyling()
-        XCTAssertEqual(textUIModel.boundValue, "order number: uk171359906")
+        assertRenderedText(textUIModel, equals: "order number: uk171359906")
     }
     
     func test_styledText_text_model_none() {
@@ -28,8 +26,7 @@ final class TextModelTests: XCTestCase {
                                             openLinks: nil,
                                             layoutState: LayoutState(),
                                             eventService: nil)
-        textUIModel.updateBoundValueWithStyling()
-        XCTAssertEqual(textUIModel.boundValue, "ORDER Number: Uk171359906")
+        assertRenderedText(textUIModel, equals: "ORDER Number: Uk171359906")
     }
     
     func test_styledText_text_model_capitalize() {
@@ -39,8 +36,7 @@ final class TextModelTests: XCTestCase {
                                             openLinks: nil, 
                                             layoutState: LayoutState(),
                                             eventService: nil)
-        textUIModel.updateBoundValueWithStyling()
-        XCTAssertEqual(textUIModel.boundValue, "Order Number: Uk171359906")
+        assertRenderedText(textUIModel, equals: "ORDER Number: Uk171359906")
     }
     
     func test_styledText_text_model_default_none() {
@@ -49,7 +45,15 @@ final class TextModelTests: XCTestCase {
                                             openLinks: nil, 
                                             layoutState: LayoutState(),
                                             eventService: nil)
-        textUIModel.updateBoundValueWithStyling()
-        XCTAssertEqual(textUIModel.boundValue, "OrDeR Number: Uk171359906")
+        assertRenderedText(textUIModel, equals: "OrDeR Number: Uk171359906")
+    }
+
+    private func assertRenderedText(_ model: RichTextViewModel, equals expected: String) {
+        model.transformValueToAttributedString(.light)
+        let deadline = Date().addingTimeInterval(2)
+        while model.attributedString.string.isEmpty && Date() < deadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        }
+        XCTAssertEqual(model.attributedString.string, expected)
     }
 }

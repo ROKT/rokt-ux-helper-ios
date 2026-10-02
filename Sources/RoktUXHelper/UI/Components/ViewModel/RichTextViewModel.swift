@@ -48,10 +48,18 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         return replacedText
     }
 
+    /// Plain-text fallback shown until `attributedString` is ready. Only this display copy
+    /// is case-transformed: `boundValue` is the HTML source, and transforming it would also
+    /// change tags and link URLs.
     var stateReplacedText: String {
-        TextComponentBNFHelper.replaceStates(boundValue,
-                                             currentOffer: "\(currentIndex.wrappedValue + 1)",
-                                             totalOffers: "\(totalPages)")
+        let text = TextComponentBNFHelper.replaceStates(boundValue,
+                                                        currentOffer: "\(currentIndex.wrappedValue + 1)",
+                                                        totalOffers: "\(totalPages)")
+        return BasicTextViewModel.transform(text, using: breakpointDefaultStyle?.text?.textTransform)
+    }
+
+    private var breakpointDefaultStyle: RichTextStyle? {
+        (defaultStyle?.count ?? -1 > breakpointIndex) ? defaultStyle?[breakpointIndex] : nil
     }
 
     init(
@@ -78,7 +86,6 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             ? layoutState?.items[LayoutState.viewableItemsKey] as? Binding<Int> ?? .constant(1) : .constant(1)
         self.currentIndex = catalogItemContext.map { Binding<Int>.constant($0.offerIndex) }
             ?? layoutState?.items[LayoutState.currentProgressKey] as? Binding<Int> ?? .constant(0)
-        updateBoundValueWithStyling()
         cancellable = layoutState?.itemsPublisher.sink { [weak self] newValue in
             guard let self else { return }
             self.viewableItems = self.catalogItemContext == nil
@@ -130,13 +137,11 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             processStateValue(value, isStateIndicatorPosition: isStateIndicatorPosition)
         }
 
-        updateBoundValueWithStyling()
     }
 
     private func reapplyCatalogRuntimeResolution() {
         guard let template = postMapperTemplate else { return }
         boundValue = applyCatalogRuntimeResolution(to: template)
-        updateBoundValueWithStyling()
     }
 
     private func applyCatalogRuntimeResolution(to text: String) -> String {
@@ -155,12 +160,10 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         guard let validated = OrphanedPlaceholderResolver.resolve(text: template) else {
             postMapperTemplate = ""
             boundValue = ""
-            updateBoundValueWithStyling()
             return
         }
         postMapperTemplate = validated
         boundValue = applyCatalogRuntimeResolution(to: validated)
-        updateBoundValueWithStyling()
     }
 
     // only runs if the DataBinding is STATE. this is where we do a STATE operation (eg. adding + 1)
@@ -173,22 +176,6 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
         boundValue = expandedValue
     }
 
-    func updateBoundValueWithStyling() {
-        guard defaultStyle?.count ?? -1 > breakpointIndex,
-              let transform = defaultStyle?[breakpointIndex].text?.textTransform else { return }
-
-        switch transform {
-        case .uppercase:
-            boundValue = boundValue.uppercased()
-        case .lowercase:
-            boundValue = boundValue.lowercased()
-        case .capitalize:
-            boundValue = boundValue.capitalized
-        default:
-            break
-        }
-    }
-
     func transformValueToAttributedString(_ colorMode: RoktUXConfig.ColorMode?, colorScheme: ColorScheme? = nil) {
         let customColorScheme: ColorScheme = colorScheme ?? UITraitCollection.getConfigColorSchema(colorMode: colorMode)
         transformValueToAttributedString(customColorScheme)
@@ -197,9 +184,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
     private func transformValueToAttributedString(_ colorScheme: ColorScheme) {
         let valueToTransform = boundValue
 
-        let breakpointDefaultStyle = (defaultStyle?.count ?? -1 > breakpointIndex)
-            ? defaultStyle?[breakpointIndex]
-            : nil
+        let breakpointDefaultStyle = self.breakpointDefaultStyle
 
         let shouldSelectLink = linkStyle != nil && linkStyle?.count ?? -1 > breakpointLinkIndex
         let breakpointLinkStyle = shouldSelectLink ? linkStyle?[breakpointLinkIndex] : nil
@@ -210,6 +195,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
             let htmlTransformedValue = valueToTransform.htmlToAttributedString(
                 textColorHex: breakpointDefaultStyle?.text?.textColor?.getAdaptiveColor(colorScheme),
                 uiFont: breakpointDefaultStyle?.text?.styledUIFont,
+                textTransform: breakpointDefaultStyle?.text?.textTransform,
                 linkStyles: breakpointLinkStyle?.text,
                 colorScheme: colorScheme,
                 blockSpacerHeight: breakpointDefaultStyle?.text?.lineHeight.map { CGFloat($0) }
