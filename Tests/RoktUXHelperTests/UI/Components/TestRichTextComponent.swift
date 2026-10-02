@@ -309,6 +309,22 @@ final class TestRichTextComponent: XCTestCase {
         assertRichTextSnapshot(model, height: 300)
     }
 
+    /// A lone space inside a link is underlined. When spaces occur on both
+    /// sides of the opening tag, the first (plain) space survives collapse.
+    func testSnapshot_linkWhitespaceBoundaries() {
+        let model = RichTextViewModel(
+            value: "Powered by <a href='https://example.com'>Example</a>"
+                + "<br>Read<a href='https://example.com/terms'> terms </a>now"
+                + "<br>Read <a href='https://example.com/terms'> terms </a>now",
+            defaultStyle: [richTextStyle(fontSize: 20, lineHeight: 26)],
+            linkStyle: [linkTextStyle()],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+        assertRichTextSnapshot(model, height: 180)
+    }
+
     // MARK: - Block spacing regression snapshots
 
     //
@@ -450,7 +466,11 @@ final class TestRichTextComponent: XCTestCase {
 
     // MARK: - Helpers
 
-    private func richTextStyle(fontSize: Float = 14, lineHeight: Float) -> RichTextStyle {
+    private func richTextStyle(
+        fontSize: Float = 14,
+        lineHeight: Float,
+        textTransform: TextTransform? = nil
+    ) -> RichTextStyle {
         RichTextStyle(
             dimension: nil,
             flexChild: nil,
@@ -465,12 +485,26 @@ final class TestRichTextComponent: XCTestCase {
                 horizontalTextAlign: nil,
                 baselineTextAlign: nil,
                 fontStyle: nil,
-                textTransform: nil,
+                textTransform: textTransform,
                 letterSpacing: nil,
                 textDecoration: nil,
                 lineLimit: nil
             )
         )
+    }
+
+    private func linkTextStyle(textTransform: TextTransform? = nil) -> InLineTextStyle {
+        InLineTextStyle(text: InlineTextStylingProperties(
+            textColor: ThemeColor(light: "#0066CC", dark: nil),
+            fontSize: nil,
+            fontFamily: nil,
+            fontWeight: nil,
+            baselineTextAlign: nil,
+            fontStyle: nil,
+            textTransform: textTransform,
+            letterSpacing: 1,
+            textDecoration: .underline
+        ))
     }
 
     private func assertRichTextSnapshot(
@@ -590,6 +624,84 @@ final class TestRichTextComponent: XCTestCase {
         XCTAssertNotNil(link)
     }
 
+    func test_base_transform_changes_visible_text_without_changing_link_url() {
+        let html = "<a href='https://example.com/CaseSensitive'>read terms</a>"
+        let model = RichTextViewModel(
+            value: html,
+            defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .uppercase)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "READ TERMS")
+        XCTAssertEqual(model.boundValue, html)
+        XCTAssertEqual(
+            model.attributedString.attribute(.link, at: 0, effectiveRange: nil) as? URL,
+            URL(string: "https://example.com/CaseSensitive")
+        )
+    }
+
+    func test_capitalize_continues_across_inline_style_boundaries() {
+        let model = RichTextViewModel(
+            value: "hEL<b>LO</b> wORLd",
+            defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .capitalize)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "Hello World")
+        let boldFont = model.attributedString.attribute(.font, at: 3, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_base_transform_updates_when_breakpoint_changes() {
+        let model = RichTextViewModel(
+            value: "Read <b>terms</b>",
+            defaultStyle: [
+                richTextStyle(lineHeight: 20, textTransform: .uppercase),
+                richTextStyle(lineHeight: 20)
+            ],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "READ TERMS")
+        model.breakpointIndex = 1
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "Read terms")
+    }
+
+    func test_expanding_link_transform_styles_all_characters_and_keeps_later_link() {
+        let model = RichTextViewModel(
+            value: "<a href='https://example.com/first'>ß</a> then <a href='https://example.com/second'>next</a>",
+            defaultStyle: nil,
+            linkStyle: [linkTextStyle(textTransform: .uppercase)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "SS then NEXT")
+        let text = model.attributedString
+        for index in [0, 1] {
+            XCTAssertEqual(text.attribute(.link, at: index, effectiveRange: nil) as? URL,
+                           URL(string: "https://example.com/first"))
+            XCTAssertEqual(text.attribute(.underlineStyle, at: index, effectiveRange: nil) as? Int, 1)
+            XCTAssertEqual(text.attribute(.kern, at: index, effectiveRange: nil) as? CGFloat, 1)
+        }
+        XCTAssertNil(text.attribute(.link, at: 2, effectiveRange: nil))
+        XCTAssertEqual(text.attribute(.link, at: 8, effectiveRange: nil) as? URL,
+                       URL(string: "https://example.com/second"))
+        XCTAssertEqual(text.attribute(.underlineStyle, at: 11, effectiveRange: nil) as? Int, 1)
+    }
+
     func get_model() throws -> RichTextViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let richText = try transformer.getRichText(ModelTestData.TextData.richTextHTML(), context: .outer([]))
@@ -611,6 +723,18 @@ final class TestRichTextComponent: XCTestCase {
         while model.attributedString.string.isEmpty && Date() < deadline {
             RunLoop.main.run(until: Date().addingTimeInterval(0.05))
         }
+    }
+
+    private func waitForAttributedStringConversion(
+        on model: RichTextViewModel,
+        equals expected: String,
+        timeout: TimeInterval = 2.0
+    ) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while model.attributedString.string != expected && Date() < deadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        }
+        XCTAssertEqual(model.attributedString.string, expected)
     }
     
     func get_dark_config_model() throws -> LayoutSchemaViewModel? {

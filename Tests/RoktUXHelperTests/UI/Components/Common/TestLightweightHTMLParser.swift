@@ -137,6 +137,28 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(linkRange, NSRange(location: 4, length: 6))
     }
 
+    func test_space_before_and_inside_link_keeps_first_space_outside_link() {
+        let html = "Read <a href=\"https://example.com\"> terms</a>"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read terms")
+        XCTAssertNil(result.attribute(.link, at: 4, effectiveRange: nil))
+
+        var linkRange = NSRange()
+        XCTAssertNotNil(result.attribute(.link, at: 5, effectiveRange: &linkRange))
+        XCTAssertEqual(linkRange, NSRange(location: 5, length: 5))
+    }
+
+    func test_trailing_space_inside_link_keeps_link_style() {
+        let html = "Read<a href=\"https://example.com/terms\"> terms </a>now"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read terms now")
+
+        var linkRange = NSRange()
+        XCTAssertNotNil(result.attribute(.link, at: 10, effectiveRange: &linkRange))
+        XCTAssertEqual(linkRange, NSRange(location: 4, length: 7))
+        XCTAssertNil(result.attribute(.link, at: 11, effectiveRange: nil))
+    }
+
     func test_space_before_nested_inline_tags_keeps_outer_style() {
         let html = "<b>Read </b><u><a href=\"https://example.com\">terms</a></u>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
@@ -144,7 +166,7 @@ final class TestLightweightHTMLParser: XCTestCase {
 
         let spaceIndex = 4
         let spaceFont = result.attribute(.font, at: spaceIndex, effectiveRange: nil) as? UIFont
-        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
         XCTAssertNil(result.attribute(.underlineStyle, at: spaceIndex, effectiveRange: nil))
         XCTAssertNil(result.attribute(.link, at: spaceIndex, effectiveRange: nil))
         XCTAssertNotNil(result.attribute(.link, at: spaceIndex + 1, effectiveRange: nil))
@@ -208,6 +230,13 @@ final class TestLightweightHTMLParser: XCTestCase {
     func test_self_closing_br_tag() {
         let result = LightweightHTMLParser.parse(html: "Line1<br/>Line2", baseFont: baseFont)
         XCTAssertEqual(result.string, "Line1\nLine2")
+    }
+
+    func test_other_self_closing_tags_do_not_insert_line_breaks() {
+        let result = LightweightHTMLParser.parse(html: "A<span/>B<b/>bold", baseFont: baseFont)
+        XCTAssertEqual(result.string, "ABbold")
+        let font = result.attribute(.font, at: 2, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
     }
 
     // MARK: - Paragraph tag
@@ -298,6 +327,11 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "• First Second\n")
     }
 
+    func test_crlf_and_other_html_whitespace_collapse_to_one_space() {
+        let result = LightweightHTMLParser.parse(html: "A\t\r\n  B", baseFont: baseFont)
+        XCTAssertEqual(result.string, "A B")
+    }
+
     func test_trailing_space_before_inline_closing_tags_collapses_between_words() {
         let html = "<ul><li>Prepare your skin and <strong><em>keep your face clear </em></strong>with our headband</li></ul>"
         let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
@@ -310,8 +344,8 @@ final class TestLightweightHTMLParser: XCTestCase {
 
         XCTAssertEqual(clearFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
         XCTAssertEqual(clearFont?.fontDescriptor.symbolicTraits.contains(.traitItalic), true)
-        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), false)
-        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitItalic), false)
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+        XCTAssertEqual(spaceFont?.fontDescriptor.symbolicTraits.contains(.traitItalic), true)
     }
 
     func test_whitespace_after_br_in_li_does_not_add_extra_blank_line() {
@@ -571,6 +605,28 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "&unknown;")
     }
 
+    func test_unquoted_link_url_keeps_slashes() {
+        let result = LightweightHTMLParser.parse(
+            html: "<a href=https://example.com/terms>Terms</a>", baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "Terms")
+        XCTAssertEqual(
+            result.attribute(.link, at: 0, effectiveRange: nil) as? URL,
+            URL(string: "https://example.com/terms")
+        )
+    }
+
+    func test_escaped_link_url_decodes_attribute_entities() {
+        let result = LightweightHTMLParser.parse(
+            html: "<a href='https://example.com/?a=1&amp;b=2'>Terms</a>", baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "Terms")
+        XCTAssertEqual(
+            result.attribute(.link, at: 0, effectiveRange: nil) as? URL,
+            URL(string: "https://example.com/?a=1&b=2")
+        )
+    }
+
     // MARK: - Case insensitivity
 
     func test_uppercase_tags() {
@@ -603,6 +659,21 @@ final class TestLightweightHTMLParser: XCTestCase {
         let result = LightweightHTMLParser.parse(html: "A < B", baseFont: baseFont)
         XCTAssertTrue(result.string.contains("A"))
         XCTAssertTrue(result.string.contains("B"))
+    }
+
+    func test_less_than_before_digit_remains_text() {
+        let result = LightweightHTMLParser.parse(html: "from <5 dollars", baseFont: baseFont)
+        XCTAssertEqual(result.string, "from <5 dollars")
+    }
+
+    func test_incomplete_tag_remains_text() {
+        let result = LightweightHTMLParser.parse(html: "Read <a href=broken", baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read <a href=broken")
+    }
+
+    func test_comment_is_not_displayed() {
+        let result = LightweightHTMLParser.parse(html: "Read <!-- note --> terms", baseFont: baseFont)
+        XCTAssertEqual(result.string, "Read terms")
     }
 
     func test_empty_tag() {

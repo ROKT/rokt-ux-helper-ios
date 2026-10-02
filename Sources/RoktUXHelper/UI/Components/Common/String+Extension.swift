@@ -7,6 +7,7 @@ internal extension StringProtocol {
     func htmlToAttributedString(
         textColorHex: String?,
         uiFont: UIFont?,
+        textTransform: TextTransform? = nil,
         linkStyles: InlineTextStylingProperties?,
         colorScheme: ColorScheme,
         blockSpacerHeight: CGFloat? = nil
@@ -23,7 +24,32 @@ internal extension StringProtocol {
             blockSpacerHeight: blockSpacerHeight
         )
 
-        return updateLinkStyles(linkStyles, attrStr: parsed, colorScheme: colorScheme)
+        let transformed = transformAttributedText(parsed, using: textTransform)
+        return updateLinkStyles(linkStyles, attrStr: transformed, colorScheme: colorScheme)
+    }
+
+    private func transformAttributedText(
+        _ attrStr: NSAttributedString,
+        using transform: TextTransform?
+    ) -> NSMutableAttributedString {
+        let result = NSMutableAttributedString()
+        guard attrStr.length > 0 else { return result }
+        guard transform != nil else { return NSMutableAttributedString(attributedString: attrStr) }
+
+        let original = attrStr.string as NSString
+        let transformed = BasicTextViewModel.transform(attrStr.string, using: transform) as NSString
+        attrStr.enumerateAttributes(in: NSRange(location: 0, length: attrStr.length), options: []) { attributes, range, _ in
+            // Transform the whole visible string so a word split by inline tags
+            // is capitalized once. Map each style boundary through transformed
+            // prefixes, since case conversion can change UTF-16 length.
+            let start = BasicTextViewModel.transform(original.substring(to: range.location), using: transform).utf16.count
+            let end = BasicTextViewModel.transform(original.substring(to: NSMaxRange(range)), using: transform).utf16.count
+            result.append(NSAttributedString(
+                string: transformed.substring(with: NSRange(location: start, length: end - start)),
+                attributes: attributes
+            ))
+        }
+        return result
     }
 
     private func updateLinkStyles(_ linkStyles: InlineTextStylingProperties?,
@@ -33,16 +59,25 @@ internal extension StringProtocol {
 
         guard let linkStyles else { return attrStrCopy }
 
-        let attrRange = NSRange(0..<attrStrCopy.length)
-        attrStrCopy.enumerateAttribute(.link, in: attrRange) { strValue, range, _ in
-            guard strValue != nil else { return }
+        var linkRanges: [NSRange] = []
+        attrStrCopy.enumerateAttribute(.link, in: NSRange(0..<attrStrCopy.length)) { value, range, _ in
+            if value != nil { linkRanges.append(range) }
+        }
+
+        // Work backwards so a transformed label can change length without
+        // invalidating the original ranges of links that follow it.
+        for range in linkRanges.reversed() {
+            let styledRange = setLinkTextTransform(
+                transform: linkStyles.textTransform,
+                originalStr: attrStrCopy,
+                rangeToChange: range
+            )
 
             setLinkColor(textColorHex: linkStyles.textColor?.getAdaptiveColor(colorScheme),
                          originalStr: attrStrCopy,
-                         rangeToChange: range)
-            setLinkTextTransform(transform: linkStyles.textTransform, originalStr: attrStrCopy, rangeToChange: range)
-            setLinkTextDecoration(decoration: linkStyles.textDecoration, originalStr: attrStrCopy, rangeToChange: range)
-            setLinkLetterSpacing(spacing: linkStyles.letterSpacing, originalStr: attrStrCopy, rangeToChange: range)
+                         rangeToChange: styledRange)
+            setLinkTextDecoration(decoration: linkStyles.textDecoration, originalStr: attrStrCopy, rangeToChange: styledRange)
+            setLinkLetterSpacing(spacing: linkStyles.letterSpacing, originalStr: attrStrCopy, rangeToChange: styledRange)
 
             setLinkFontProperties(
                 fontFamily: linkStyles.fontFamily,
@@ -51,7 +86,7 @@ internal extension StringProtocol {
                 fontStyle: linkStyles.fontStyle,
                 fontBaselineAlignment: linkStyles.baselineTextAlign,
                 originalStr: attrStrCopy,
-                rangeToChange: range
+                rangeToChange: styledRange
             )
         }
 
@@ -72,31 +107,13 @@ internal extension StringProtocol {
         transform: TextTransform?,
         originalStr: NSMutableAttributedString,
         rangeToChange: NSRange
-    ) {
-        guard let transform else { return }
+    ) -> NSRange {
+        guard let transform else { return rangeToChange }
 
-        let origString = originalStr.string as NSString
-        let displayText = origString.substring(with: rangeToChange)
-
-        switch transform {
-        case .uppercase:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.uppercased()
-            )
-        case .lowercase:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.lowercased()
-            )
-        case .capitalize:
-            originalStr.replaceCharacters(
-                in: rangeToChange,
-                with: displayText.capitalized
-            )
-        default:
-            break
-        }
+        let source = originalStr.attributedSubstring(from: rangeToChange)
+        let transformed = transformAttributedText(source, using: transform)
+        originalStr.replaceCharacters(in: rangeToChange, with: transformed)
+        return NSRange(location: rangeToChange.location, length: transformed.length)
     }
 
     private func setLinkTextDecoration(

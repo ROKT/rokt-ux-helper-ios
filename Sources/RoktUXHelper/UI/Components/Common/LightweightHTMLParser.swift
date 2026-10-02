@@ -60,16 +60,22 @@ enum LightweightHTMLParser {
         var paragraphStart: Int?
         var listStack: [ListContext] = []
         var listItemStarts: [OpenListItem] = []
-        var pendingCollapsedWhitespace = false
-        // Tag-stack depth at which the pending collapsed space was authored. The
-        // space is emitted with only the tags open at that depth, so a space
-        // written before `<a>` (or `<s>`, `<u>`, …) stays outside that tag.
-        var pendingWhitespaceDepth = 0
+        // Keep the tags from the first space in a collapsed run. A tag may close
+        // before the space is emitted, or a different tag may open after it.
+        var pendingWhitespaceTags: [Tag]?
         let spacerFontSize = blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio }
             ?? paragraphSpacerFontSize
 
         while index < html.endIndex {
             if html[index] == "<" {
+                if html[index...].hasPrefix("<!--") {
+                    if let end = html[index...].range(of: "-->")?.upperBound {
+                        index = end
+                    } else {
+                        index = html.endIndex
+                    }
+                    continue
+                }
                 if let (tag, nextIndex) = scanTag(in: html, from: index) {
                     index = nextIndex
                     handleTag(
@@ -78,45 +84,27 @@ enum LightweightHTMLParser {
                         result: result,
                         baseFont: baseFont,
                         spacerFontSize: spacerFontSize,
-                        pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
+                        pendingWhitespaceTags: &pendingWhitespaceTags,
                         paragraphStart: &paragraphStart,
                         listStack: &listStack,
                         listItemStarts: &listItemStarts,
                         styledRanges: &styledRanges
                     )
-                    if pendingCollapsedWhitespace {
-                        pendingWhitespaceDepth = min(pendingWhitespaceDepth, tagStack.count)
-                    }
                 } else {
-                    let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
-                    result.append(NSAttributedString(string: "<", attributes: attrs))
+                    appendCollapsedText(
+                        "<", to: result, stack: tagStack, baseFont: baseFont,
+                        pendingWhitespaceTags: &pendingWhitespaceTags
+                    )
                     index = html.index(after: index)
                 }
             } else {
                 let (text, nextIndex) = scanText(in: html, from: index)
                 index = nextIndex
                 let decoded = decodeHTMLEntities(text)
-                let wasPending = pendingCollapsedWhitespace
-                var collapsed = collapseHTMLWhitespace(
-                    decoded,
-                    after: result.string,
-                    pendingCollapsedWhitespace: &pendingCollapsedWhitespace
+                appendCollapsedText(
+                    decoded, to: result, stack: tagStack, baseFont: baseFont,
+                    pendingWhitespaceTags: &pendingWhitespaceTags
                 )
-                if wasPending, collapsed.hasPrefix(" "), pendingWhitespaceDepth < tagStack.count {
-                    let outerTags = Array(tagStack.prefix(pendingWhitespaceDepth))
-                    let outerAttrs = buildAttributes(from: outerTags, baseFont: baseFont)
-                    result.append(NSAttributedString(string: " ", attributes: outerAttrs))
-                    collapsed.removeFirst()
-                }
-                if !collapsed.isEmpty {
-                    let attrs = buildAttributes(from: tagStack, baseFont: baseFont)
-                    result.append(NSAttributedString(string: collapsed, attributes: attrs))
-                }
-                if pendingCollapsedWhitespace {
-                    pendingWhitespaceDepth = wasPending && collapsed.isEmpty
-                        ? min(pendingWhitespaceDepth, tagStack.count)
-                        : tagStack.count
-                }
             }
         }
 
@@ -129,7 +117,6 @@ enum LightweightHTMLParser {
     struct Tag {
         let name: String
         let isClosing: Bool
-        let isSelfClosing: Bool
         let attributes: [String: String]
     }
 
@@ -159,7 +146,7 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         baseFont: UIFont?,
         spacerFontSize: CGFloat,
-        pendingCollapsedWhitespace: inout Bool,
+        pendingWhitespaceTags: inout [Tag]?,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -170,14 +157,14 @@ enum LightweightHTMLParser {
                 tag,
                 stack: &stack,
                 result: result,
-                pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
+                pendingWhitespaceTags: &pendingWhitespaceTags,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
                 listItemStarts: &listItemStarts,
                 styledRanges: &styledRanges
             )
-        } else if tag.isSelfClosing || tag.name == lineBreakTag {
-            pendingCollapsedWhitespace = false
+        } else if tag.name == lineBreakTag {
+            pendingWhitespaceTags = nil
             result.append(NSAttributedString(string: newline))
         } else {
             handleOpeningTag(
@@ -186,7 +173,7 @@ enum LightweightHTMLParser {
                 result: result,
                 baseFont: baseFont,
                 spacerFontSize: spacerFontSize,
-                pendingCollapsedWhitespace: &pendingCollapsedWhitespace,
+                pendingWhitespaceTags: &pendingWhitespaceTags,
                 paragraphStart: &paragraphStart,
                 listStack: &listStack,
                 listItemStarts: &listItemStarts,
@@ -201,7 +188,7 @@ enum LightweightHTMLParser {
         result: NSMutableAttributedString,
         baseFont: UIFont?,
         spacerFontSize: CGFloat,
-        pendingCollapsedWhitespace: inout Bool,
+        pendingWhitespaceTags: inout [Tag]?,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -209,7 +196,7 @@ enum LightweightHTMLParser {
     ) {
         switch tag.name {
         case paragraphTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             // If a previous <p> is still open (no explicit </p>), finalize it
             // so its range is preserved instead of overwritten.
             finalizeOpenParagraph(
@@ -231,7 +218,7 @@ enum LightweightHTMLParser {
             paragraphStart = result.length
             stack.append(tag)
         case unorderedListTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             insertBlockSeparatorIfNeeded(
                 in: result,
                 listItemStarts: listItemStarts,
@@ -240,7 +227,7 @@ enum LightweightHTMLParser {
             listStack.append(ListContext(kind: .unordered, counter: 1, lastClosedHadBlock: false))
             stack.append(tag)
         case orderedListTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             insertBlockSeparatorIfNeeded(
                 in: result,
                 listItemStarts: listItemStarts,
@@ -257,7 +244,7 @@ enum LightweightHTMLParser {
             // If a previous <li> at the same depth is still open (no explicit </li>),
             // finalize it (HTML5 allows omitting </li>).
             if let last = listItemStarts.last, last.depth == currentDepth {
-                pendingCollapsedWhitespace = false
+                pendingWhitespaceTags = nil
                 finalizeOpenListItem(
                     last,
                     result: result,
@@ -267,7 +254,7 @@ enum LightweightHTMLParser {
                     styledRanges: &styledRanges
                 )
             }
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             ensureTrailingNewline(in: result)
             // CSS analogue: bare `<li>` has `margin: 0` (no gap), but a `<p>`
             // child contributes its own margin. We emit the spacer only when
@@ -293,7 +280,7 @@ enum LightweightHTMLParser {
         _ tag: Tag,
         stack: inout [Tag],
         result: NSMutableAttributedString,
-        pendingCollapsedWhitespace: inout Bool,
+        pendingWhitespaceTags: inout [Tag]?,
         paragraphStart: inout Int?,
         listStack: inout [ListContext],
         listItemStarts: inout [OpenListItem],
@@ -301,7 +288,7 @@ enum LightweightHTMLParser {
     ) {
         switch tag.name {
         case paragraphTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             finalizeOpenParagraph(
                 result: result,
                 paragraphStart: &paragraphStart,
@@ -309,7 +296,7 @@ enum LightweightHTMLParser {
                 styledRanges: &styledRanges
             )
         case listItemTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             if let last = listItemStarts.last, !listStack.isEmpty {
                 finalizeOpenListItem(
                     last,
@@ -321,7 +308,7 @@ enum LightweightHTMLParser {
                 )
             }
         case unorderedListTag, orderedListTag:
-            pendingCollapsedWhitespace = false
+            pendingWhitespaceTags = nil
             if !listStack.isEmpty { listStack.removeLast() }
         default:
             break
@@ -419,29 +406,41 @@ enum LightweightHTMLParser {
         appendBlockSpacer(to: result, fontSize: spacerFontSize)
     }
 
-    private static func collapseHTMLWhitespace(
+    private static func appendCollapsedText(
         _ text: String,
-        after existingText: String,
-        pendingCollapsedWhitespace: inout Bool
-    ) -> String {
-        var collapsed = ""
+        to result: NSMutableAttributedString,
+        stack: [Tag],
+        baseFont: UIFont?,
+        pendingWhitespaceTags: inout [Tag]?
+    ) {
+        var visibleRun = ""
+        let currentAttributes = buildAttributes(from: stack, baseFont: baseFont)
+        var hasVisibleText = result.string.last.map { !isCollapsedWhitespaceBoundary($0) } ?? false
+
+        func flushVisibleRun() {
+            guard !visibleRun.isEmpty else { return }
+            result.append(NSAttributedString(string: visibleRun, attributes: currentAttributes))
+            visibleRun = ""
+        }
 
         for character in text {
             if isCollapsibleHTMLWhitespace(character) {
-                if hasVisibleTextBeforePendingSpace(existingText: existingText, collapsedText: collapsed) {
-                    pendingCollapsedWhitespace = true
+                flushVisibleRun()
+                if pendingWhitespaceTags == nil, hasVisibleText {
+                    pendingWhitespaceTags = stack
                 }
             } else {
-                if pendingCollapsedWhitespace,
-                   hasVisibleTextBeforePendingSpace(existingText: existingText, collapsedText: collapsed) {
-                    collapsed.append(" ")
+                if let authoredTags = pendingWhitespaceTags {
+                    let authoredAttributes = buildAttributes(from: authoredTags, baseFont: baseFont)
+                    result.append(NSAttributedString(string: " ", attributes: authoredAttributes))
+                    pendingWhitespaceTags = nil
                 }
-                pendingCollapsedWhitespace = false
-                collapsed.append(character)
+                visibleRun.append(character)
+                hasVisibleText = true
             }
         }
 
-        return collapsed
+        flushVisibleRun()
     }
 
     private static func trimTrailingCollapsedSpace(in result: NSMutableAttributedString) {
@@ -454,17 +453,9 @@ enum LightweightHTMLParser {
         character == " " || character == "\n"
     }
 
-    private static func hasVisibleTextBeforePendingSpace(existingText: String, collapsedText: String) -> Bool {
-        if let lastCollapsedCharacter = collapsedText.last {
-            return !isCollapsedWhitespaceBoundary(lastCollapsedCharacter)
-        }
-
-        return existingText.last.map { !isCollapsedWhitespaceBoundary($0) } ?? false
-    }
-
     private static func isCollapsibleHTMLWhitespace(_ character: Character) -> Bool {
         switch character {
-        case " ", "\n", "\t", "\r", "\u{000C}":
+        case " ", "\n", "\t", "\r", "\r\n", "\u{000C}":
             return true
         default:
             return false
@@ -502,8 +493,9 @@ enum LightweightHTMLParser {
             guard idx < html.endIndex else { return nil }
         }
 
+        guard isASCIIAlpha(html[idx]) else { return nil }
         let nameStart = idx
-        while idx < html.endIndex, html[idx].isLetter || html[idx].isNumber {
+        while idx < html.endIndex, isASCIIAlpha(html[idx]) || isASCIIDigit(html[idx]) || html[idx] == "-" {
             idx = html.index(after: idx)
         }
         let name = String(html[nameStart..<idx]).lowercased()
@@ -527,24 +519,21 @@ enum LightweightHTMLParser {
                     idx = skipWhitespace(in: html, from: idx)
                     let (value, valueEnd) = scanAttributeValue(in: html, from: idx)
                     idx = valueEnd
-                    attributes[attrName.lowercased()] = value
+                    attributes[attrName.lowercased()] = decodeHTMLEntities(value)
                 }
             }
         } else {
             idx = skipWhitespace(in: html, from: idx)
         }
 
-        var isSelfClosing = false
         if idx < html.endIndex, html[idx] == "/" {
-            isSelfClosing = true
             idx = html.index(after: idx)
         }
-        if idx < html.endIndex, html[idx] == ">" {
-            idx = html.index(after: idx)
-        }
+        guard idx < html.endIndex, html[idx] == ">" else { return nil }
+        idx = html.index(after: idx)
 
         return (
-            Tag(name: name, isClosing: isClosing, isSelfClosing: isSelfClosing, attributes: attributes),
+            Tag(name: name, isClosing: isClosing, attributes: attributes),
             idx
         )
     }
@@ -583,7 +572,7 @@ enum LightweightHTMLParser {
         }
 
         var idx = start
-        while idx < html.endIndex, html[idx] != ">", html[idx] != "/", !html[idx].isWhitespace {
+        while idx < html.endIndex, html[idx] != ">", !html[idx].isWhitespace {
             idx = html.index(after: idx)
         }
         return (String(html[start..<idx]), idx)
@@ -715,5 +704,17 @@ enum LightweightHTMLParser {
 
     private static func advanceSafely(_ html: String, _ idx: String.Index) -> String.Index {
         idx < html.endIndex ? html.index(after: idx) : idx
+    }
+
+    private static func isASCIIAlpha(_ character: Character) -> Bool {
+        character.unicodeScalars.count == 1 && character.unicodeScalars.first.map {
+            (65...90).contains($0.value) || (97...122).contains($0.value)
+        } == true
+    }
+
+    private static func isASCIIDigit(_ character: Character) -> Bool {
+        character.unicodeScalars.count == 1 && character.unicodeScalars.first.map {
+            (48...57).contains($0.value)
+        } == true
     }
 }
