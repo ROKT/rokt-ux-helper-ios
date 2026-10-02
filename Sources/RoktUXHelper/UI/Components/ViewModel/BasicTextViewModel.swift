@@ -209,13 +209,31 @@ class BasicTextViewModel: Hashable, Identifiable, ObservableObject, DataBindingI
     }
 
     static func transform(_ value: String, using transform: TextTransform?) -> String {
+        var atWordStart = true
+        return Self.transform(value, using: transform, atWordStart: &atWordStart)
+    }
+
+    /// Transforms one piece of a longer text. For `.capitalize`, `atWordStart` carries
+    /// whether the next character starts a word, so a word split across pieces is
+    /// capitalized once.
+    static func transform(_ value: String, using transform: TextTransform?, atWordStart: inout Bool) -> String {
         switch transform {
         case .uppercase:
             return value.uppercased()
         case .lowercase:
             return value.lowercased()
         case .capitalize:
-            return value.capitalized
+            // Match CSS and Android: capitalize the first letter of each word, keep the rest.
+            var result = ""
+            for character in value {
+                if atWordStart {
+                    result += String(character).capitalized
+                } else {
+                    result.append(character)
+                }
+                atWordStart = character.isWhitespace
+            }
+            return result
         default: return value
         }
     }

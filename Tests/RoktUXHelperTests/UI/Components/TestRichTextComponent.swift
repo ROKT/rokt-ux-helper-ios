@@ -645,17 +645,36 @@ final class TestRichTextComponent: XCTestCase {
 
     func test_capitalize_continues_across_inline_style_boundaries() {
         let model = RichTextViewModel(
-            value: "hEL<b>LO</b> wORLd",
+            value: "hel<b>lo</b> wORLD iPhone",
             defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .capitalize)],
             openLinks: nil,
             layoutState: LayoutState(),
             eventService: nil
         )
 
+        // Like CSS and Android, only the first letter of each word changes.
         model.transformValueToAttributedString(.light)
-        waitForAttributedStringConversion(on: model, equals: "Hello World")
+        waitForAttributedStringConversion(on: model, equals: "Hello WORLD IPhone")
         let boldFont = model.attributedString.attribute(.font, at: 3, effectiveRange: nil) as? UIFont
         XCTAssertEqual(boldFont?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_base_transform_keeps_styles_when_length_changes() {
+        let model = RichTextViewModel(
+            value: "stra<b>ß</b>e",
+            defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .uppercase)],
+            openLinks: nil,
+            layoutState: LayoutState(),
+            eventService: nil
+        )
+
+        model.transformValueToAttributedString(.light)
+        waitForAttributedStringConversion(on: model, equals: "STRASSE")
+        let isBold = (0..<7).map { index in
+            let font = model.attributedString.attribute(.font, at: index, effectiveRange: nil) as? UIFont
+            return font?.fontDescriptor.symbolicTraits.contains(.traitBold) == true
+        }
+        XCTAssertEqual(isBold, [false, false, false, false, true, true, false])
     }
 
     func test_base_transform_updates_when_breakpoint_changes() {

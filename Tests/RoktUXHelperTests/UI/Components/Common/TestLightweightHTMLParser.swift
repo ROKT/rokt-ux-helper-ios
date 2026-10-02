@@ -380,6 +380,11 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "• One\n• Two\n")
     }
 
+    func test_list_close_ends_item_with_omitted_end_tag() {
+        let result = LightweightHTMLParser.parse(html: "<ul><li>One<li>Two</ul>Next", baseFont: baseFont)
+        XCTAssertEqual(result.string, "• One\n• Two\nNext")
+    }
+
     func test_ol_implicit_li_close_increments_counter() {
         // <ol><li>A<li>B</li></ol> — implicit close must still bump the counter.
         let result = LightweightHTMLParser.parse(html: "<ol><li>A<li>B</li></ol>", baseFont: baseFont)
@@ -603,6 +608,24 @@ final class TestLightweightHTMLParser: XCTestCase {
     func test_unknown_entity_preserved() {
         let result = LightweightHTMLParser.parse(html: "&unknown;", baseFont: baseFont)
         XCTAssertEqual(result.string, "&unknown;")
+    }
+
+    func test_common_named_entities() {
+        let html = "&copy; &reg; &trade; It&rsquo;s &mdash; &eacute;t&eacute; &hellip; &yuml;"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "© ® ™ It’s — été … ÿ")
+    }
+
+    func test_bare_ampersand_does_not_hide_following_entity() {
+        let result = LightweightHTMLParser.parse(
+            html: "R&D&amp;Co <a href='https://example.com/?a=1&b=2&amp;c=3'>Terms</a>",
+            baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "R&D&Co Terms")
+        XCTAssertEqual(
+            result.attribute(.link, at: 7, effectiveRange: nil) as? URL,
+            URL(string: "https://example.com/?a=1&b=2&c=3")
+        )
     }
 
     func test_unquoted_link_url_keeps_slashes() {

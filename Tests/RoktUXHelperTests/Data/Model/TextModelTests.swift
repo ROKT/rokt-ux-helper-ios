@@ -36,7 +36,7 @@ final class TextModelTests: XCTestCase {
                                             openLinks: nil, 
                                             layoutState: LayoutState(),
                                             eventService: nil)
-        assertRenderedText(textUIModel, equals: "Order Number: Uk171359906")
+        assertRenderedText(textUIModel, equals: "ORDER Number: Uk171359906")
     }
     
     func test_styledText_text_model_default_none() {

@@ -28,26 +28,25 @@ internal extension StringProtocol {
         return updateLinkStyles(linkStyles, attrStr: transformed, colorScheme: colorScheme)
     }
 
+    /// Transforms each attribute run on its own, so every style stays on the text it
+    /// covered even when case conversion changes the length (e.g. "ß" → "SS").
     private func transformAttributedText(
         _ attrStr: NSAttributedString,
         using transform: TextTransform?
     ) -> NSMutableAttributedString {
-        let result = NSMutableAttributedString()
-        guard attrStr.length > 0 else { return result }
         guard transform != nil else { return NSMutableAttributedString(attributedString: attrStr) }
 
+        let result = NSMutableAttributedString()
         let original = attrStr.string as NSString
-        let transformed = BasicTextViewModel.transform(attrStr.string, using: transform) as NSString
+        // Carried across runs so a word split by inline tags is capitalized once.
+        var atWordStart = true
         attrStr.enumerateAttributes(in: NSRange(location: 0, length: attrStr.length), options: []) { attributes, range, _ in
-            // Transform the whole visible string so a word split by inline tags
-            // is capitalized once. Map each style boundary through transformed
-            // prefixes, since case conversion can change UTF-16 length.
-            let start = BasicTextViewModel.transform(original.substring(to: range.location), using: transform).utf16.count
-            let end = BasicTextViewModel.transform(original.substring(to: NSMaxRange(range)), using: transform).utf16.count
-            result.append(NSAttributedString(
-                string: transformed.substring(with: NSRange(location: start, length: end - start)),
-                attributes: attributes
-            ))
+            let run = BasicTextViewModel.transform(
+                original.substring(with: range),
+                using: transform,
+                atWordStart: &atWordStart
+            )
+            result.append(NSAttributedString(string: run, attributes: attributes))
         }
         return result
     }
