@@ -27,19 +27,19 @@ lint:
   enabled:
     - bandit@1.9.4
     - black@26.5.1
-    - isort@9.0.1
-    - ruff@0.16.5
+    - isort@9.0.2
+    - ruff@0.16.9
     - validate-actions-versions
-    - checkov@3.3.16
-    - osv-scanner@2.5.1
-    - trufflehog@3.97.1
+    - checkov@3.3.21
+    - osv-scanner@2.6.0
+    - trufflehog@3.97.9
     - swiftformat@0.61.1
     - git-diff-check
     - markdownlint@0.49.1
-    - oxipng@10.2.0
-    - prettier@3.9.6
+    - oxipng@10.2.1
+    - prettier@3.9.9
     - shellcheck@0.11.0
-    - shfmt@3.14.0
+    - shfmt@3.14.1
     - svgo@4.1.0
     - swiftlint@0.63.2
     - actionlint@1.7.12
