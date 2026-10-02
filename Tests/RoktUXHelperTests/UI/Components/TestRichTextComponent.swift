@@ -738,6 +738,27 @@ final class TestRichTextComponent: XCTestCase {
         waitForAttributedStringConversion(on: model, equals: "underground, First and Terms Of Use")
     }
 
+    func test_link_transform_replaces_base_transform() {
+        // As in CSS, a link's own transform replaces the inherited one.
+        let cases: [(TextTransform, String)] = [
+            (.capitalize, "READ Terms Of Use"),
+            (TextTransform.none, "READ terms of use")
+        ]
+        for (linkTransform, expected) in cases {
+            let model = RichTextViewModel(
+                value: "read <a href='https://example.com/terms'>terms of use</a>",
+                defaultStyle: [richTextStyle(lineHeight: 20, textTransform: .uppercase)],
+                linkStyle: [linkTextStyle(textTransform: linkTransform)],
+                openLinks: nil,
+                layoutState: LayoutState(),
+                eventService: nil
+            )
+
+            model.transformValueToAttributedString(.light)
+            waitForAttributedStringConversion(on: model, equals: expected)
+        }
+    }
+
     func test_fallback_text_uses_base_transform() {
         let model = RichTextViewModel(
             value: "read terms",

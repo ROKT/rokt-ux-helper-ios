@@ -2,6 +2,7 @@ import XCTest
 import SwiftUI
 import ViewInspector
 import SnapshotTesting
+import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 15.0, *)
@@ -27,6 +28,61 @@ final class TestBasicTextComponent: XCTestCase {
         for (input, expected) in cases {
             XCTAssertEqual(BasicTextViewModel.transform(input, using: .capitalize), expected, input)
         }
+    }
+
+    func test_style_state_transform_starts_from_authored_text() {
+        let pressedUppercase = BasicTextViewModel(
+            value: "hello world",
+            defaultStyle: [textStyle(transform: nil)],
+            pressedStyle: [textStyle(transform: .uppercase)],
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            layoutState: nil,
+            diagnosticService: nil
+        )
+        XCTAssertEqual(pressedUppercase.boundValue, "hello world")
+        pressedUppercase.styleState = .pressed
+        XCTAssertEqual(pressedUppercase.boundValue, "HELLO WORLD")
+        pressedUppercase.styleState = .default
+        XCTAssertEqual(pressedUppercase.boundValue, "hello world")
+
+        let pressedCapitalize = BasicTextViewModel(
+            value: "hello world",
+            defaultStyle: [textStyle(transform: .uppercase)],
+            pressedStyle: [textStyle(transform: .capitalize)],
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            layoutState: nil,
+            diagnosticService: nil
+        )
+        XCTAssertEqual(pressedCapitalize.boundValue, "HELLO WORLD")
+        pressedCapitalize.styleState = .pressed
+        XCTAssertEqual(pressedCapitalize.boundValue, "Hello World")
+        pressedCapitalize.styleState = .default
+        XCTAssertEqual(pressedCapitalize.boundValue, "HELLO WORLD")
+    }
+
+    private func textStyle(transform: TextTransform?) -> BasicTextStyle {
+        BasicTextStyle(
+            dimension: nil,
+            flexChild: nil,
+            spacing: nil,
+            background: nil,
+            text: TextStylingProperties(
+                textColor: nil,
+                fontSize: nil,
+                fontFamily: nil,
+                fontWeight: nil,
+                lineHeight: nil,
+                horizontalTextAlign: nil,
+                baselineTextAlign: nil,
+                fontStyle: nil,
+                textTransform: transform,
+                letterSpacing: nil,
+                textDecoration: nil,
+                lineLimit: nil
+            )
+        )
     }
 
     func test_basic_text() throws {

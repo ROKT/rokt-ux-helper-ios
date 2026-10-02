@@ -33,8 +33,8 @@ internal extension StringProtocol {
     }
 
     /// Transforms each attribute run on its own, so every style stays on the text it
-    /// covered even when case conversion changes the length (e.g. "ß" → "SS"). Link
-    /// runs then also get `linkTransform`.
+    /// covered even when case conversion changes the length (e.g. "ß" → "SS"). As in
+    /// CSS, a link's own `linkTransform` replaces the inherited `transform`.
     private func transformAttributedText(
         _ attrStr: NSAttributedString,
         using transform: TextTransform?,
@@ -50,13 +50,8 @@ internal extension StringProtocol {
         // links is capitalized once.
         var inWord = false
         attrStr.enumerateAttributes(in: NSRange(location: 0, length: attrStr.length), options: []) { attributes, range, _ in
-            let runStartsInWord = inWord
-            var run = BasicTextViewModel.transform(original.substring(with: range), using: transform, inWord: &inWord)
-            if attributes[.link] != nil, linkTransform != nil {
-                // Case conversion keeps letters as letters, so both passes see the same words.
-                var linkInWord = runStartsInWord
-                run = BasicTextViewModel.transform(run, using: linkTransform, inWord: &linkInWord)
-            }
+            let runTransform = attributes[.link] != nil ? linkTransform ?? transform : transform
+            let run = BasicTextViewModel.transform(original.substring(with: range), using: runTransform, inWord: &inWord)
             result.append(NSAttributedString(string: run, attributes: attributes))
         }
         return result
