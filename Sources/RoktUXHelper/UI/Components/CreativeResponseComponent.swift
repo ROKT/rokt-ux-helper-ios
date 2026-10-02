@@ -214,7 +214,7 @@ struct CreativeResponseComponent: View {
     //   since it will only take up its container's finite heigh
     // if height is not specified or fit, we can't use maxHeight=infinity since it will take up all the remaining space in the screen
     private func shouldExpandToContainerOnSelfAlign() -> Bool {
-        guard let heightType = model.defaultStyle?[breakpointIndex].dimension?.height else { return false }
+        guard let heightType = model.defaultStyle?[safe: breakpointIndex]?.dimension?.height else { return false }
 
         switch heightType {
         case .fixed, .percentage:

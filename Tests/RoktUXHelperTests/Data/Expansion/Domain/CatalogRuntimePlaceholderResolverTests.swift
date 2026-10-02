@@ -146,6 +146,66 @@ final class CatalogRuntimePlaceholderResolverTests: XCTestCase {
         XCTAssertEqual(result, "Subtotal: -- / Total: --")
     }
 
+    // MARK: - Adjacent occurrences sharing a delimiter (regression: index past endIndex)
+
+    func test_adjacentOccurrencesSharingADelimiter_resolveTheFirst_andKeepTheRestLiteral() {
+        // `^%^` closes one token and opens the next off the same `%`, so the pattern matches
+        // twice over overlapping spans. Substituting both used to run the second replacement
+        // over a range the first had already shortened, trapping on a String index.
+        let text = "%^DATA.catalogRuntime.x|^%^DATA.catalogRuntime.y|^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: nil)
+
+        XCTAssertEqual(result, "^DATA.catalogRuntime.y|^%")
+    }
+
+    func test_adjacentOccurrencesSharingADelimiter_resolveTheFirstFromRuntimeData() {
+        let text = "Total %^DATA.catalogRuntime.x^%^DATA.catalogRuntime.y^% now"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["x": "$1", "y": "$2"])
+
+        XCTAssertEqual(result, "Total $1^DATA.catalogRuntime.y^% now")
+    }
+
+    func test_adjacentOccurrencesWithTheirOwnDelimiters_bothResolve() {
+        // One `%` more than the shared-delimiter case: two complete tokens, both resolve.
+        let text = "%^DATA.catalogRuntime.x^%%^DATA.catalogRuntime.y^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: ["x": "$1", "y": "$2"])
+
+        XCTAssertEqual(result, "$1$2")
+    }
+
+    // Regression: "y:badOp" is the *second* of an overlapping pair — the one BNFTokenScanner
+    // marks `isSpliceable == false`. Before the fix, that meant its chain was never evaluated,
+    // so an invalid, unresolvable catalogRuntime reference silently failed to zero the whole
+    // string as long as the placeholder sharing its delimiter happened to resolve.
+    func test_invalidOperationAsTheOverlappingSecondToken_zeroesTheWholeString() {
+        let text = "%^DATA.catalogRuntime.x|^%^DATA.catalogRuntime.y:badOp^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(text: text, catalogRuntimeData: nil)
+
+        XCTAssertEqual(result, "")
+    }
+
+    // Regression (Codex): two complete, non-overlapping tokens where the second's runtime value
+    // is a bare Unicode combining mark. Splicing it first (reverse order) attaches the mark to
+    // the `%` that closes the first token, merging them into one Swift grapheme cluster, so a
+    // subsequent lookup of the first token's still-untouched UTF-16 range would fail through
+    // Swift's grapheme-cluster-aware String APIs, silently stranding the first placeholder
+    // unresolved. Splicing through NSMutableString instead stays in UTF-16 units throughout, so
+    // the first token's range is never invalidated by the second's splice.
+    func test_runtimeValueStartingWithACombiningMark_doesNotStrandTheTokenBeforeIt() {
+        let text = "%^DATA.catalogRuntime.a^%%^DATA.catalogRuntime.b^%"
+
+        let result = CatalogRuntimePlaceholderResolver.resolve(
+            text: text,
+            catalogRuntimeData: ["a": "A", "b": "\u{0301}"]
+        )
+
+        XCTAssertEqual(result, "A\u{0301}")
+    }
+
     // MARK: - Mixed namespaces — non-runtime tokens pass through
 
     func test_nonRuntimePlaceholder_passesThroughUntouched() {

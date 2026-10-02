@@ -75,6 +75,7 @@ struct ProgressIndicatorComponent: View {
     @Binding var viewableItems: Int
     var totalItems = 0
     var totalPages: Int {
+        guard totalItems > 0, viewableItems > 0 else { return 0 }
         return Int(ceil(Double(totalItems)/Double(viewableItems)))
     }
     var accessibilityAnnouncement: String {
@@ -117,7 +118,7 @@ struct ProgressIndicatorComponent: View {
     }
 
     var body: some View {
-        if currentIndex >= startIndex, hasValidBinding {
+        if currentIndex >= startIndex, startIndex < totalPages, hasValidBinding {
             createContainer()
                 .applyLayoutModifier(
                     verticalAlignmentProperty: verticalAlignment,

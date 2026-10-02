@@ -1,11 +1,55 @@
 import XCTest
 import SwiftUI
 import SnapshotTesting
+import ViewInspector
 import DcuiSchema
 @testable import RoktUXHelper
 
 @available(iOS 15, *)
 final class TestCatalogDevicePayButtonComponent: XCTestCase {
+
+    // MARK: - Styling
+
+    @MainActor
+    func test_cardProviderWithoutStylesRendersItsChildWithoutExpandingHeight() throws {
+        // `defaultStyle: []` (no `elements.own` in schema) previously crashed on
+        // `model.defaultStyle?[breakpointIndex]` inside `shouldExpandToContainerOnSelfAlign()`.
+        let catalogItem = CatalogItem.mock(catalogItemId: "item-1")
+        let child = LayoutSchemaViewModel.basicText(
+            BasicTextViewModel(
+                value: "Pay",
+                defaultStyle: nil,
+                pressedStyle: nil,
+                hoveredStyle: nil,
+                disabledStyle: nil,
+                layoutState: MockLayoutState(),
+                diagnosticService: nil
+            )
+        )
+        let model = CatalogDevicePayButtonViewModel(
+            catalogItem: catalogItem,
+            children: [child],
+            provider: .card,
+            layoutState: MockLayoutState(),
+            eventService: MockEventService(),
+            defaultStyle: [],
+            pressedStyle: nil,
+            hoveredStyle: nil,
+            disabledStyle: nil,
+            validatorTriggerConfig: nil
+        )
+
+        let component = CatalogDevicePayButtonComponent(
+            config: .init(parent: .column, position: 1),
+            model: model,
+            parentWidth: .constant(240),
+            parentHeight: .constant(nil),
+            parentOverride: nil
+        ).environmentObject(GlobalScreenSize())
+
+        let basicTextChild = try component.inspect().find(BasicTextComponent.self).actualView()
+        XCTAssertFalse(basicTextChild.expandsToContainerOnSelfAlign)
+    }
 
     // MARK: - Snapshots
 

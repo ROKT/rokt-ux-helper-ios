@@ -109,6 +109,62 @@ final class OrphanedPlaceholderResolverTests: XCTestCase {
         XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "A B A")
     }
 
+    // MARK: - Adjacent orphans sharing a delimiter (regression: index past endIndex)
+
+    func test_adjacentOrphansSharingADelimiter_resolveTheFirst_andKeepTheRestLiteral() {
+        // `^%^` closes one token and opens the next off the same `%`, so the pattern matches
+        // twice over overlapping spans. Substituting both used to run the second replacement
+        // over a range the first had already shortened, trapping on a String index.
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b|^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "^DATA.creativeLink.b|^%")
+    }
+
+    func test_adjacentOrphansSharingADelimiter_withSurroundingCopy() {
+        let text = "Head %^DATA.creativeLink.a | A^%^DATA.creativeLink.b | B^% tail"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "Head A^DATA.creativeLink.b | B^% tail")
+    }
+
+    func test_threeOrphansSharingDelimiters_alternateBetweenSubstitutedAndLiteral() {
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b|^%^DATA.creativeLink.c|^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "^DATA.creativeLink.b|^")
+    }
+
+    func test_adjacentOrphansWithTheirOwnDelimiters_bothSubstituted() {
+        // One `%` more than the shared-delimiter case: two complete tokens, both resolve.
+        let text = "%^DATA.creativeLink.a | A^%%^DATA.creativeLink.b | B^%"
+
+        XCTAssertEqual(OrphanedPlaceholderResolver.resolve(text: text), "AB")
+    }
+
+    func test_mandatoryOrphanSharingADelimiterWithAnOptionalOne_stillZeroesLine() {
+        let text = "%^DATA.creativeLink.a^%^DATA.creativeLink.b|^%"
+
+        XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
+    }
+
+    // Regression: the mandatory placeholder here is the *second* of an overlapping pair — the
+    // one BNFTokenScanner marks `isSpliceable == false`. Before the fix, that meant its chain was
+    // never even evaluated, so a mandatory-and-unresolved placeholder silently failed to zero the
+    // line as long as the placeholder sharing its delimiter happened to resolve.
+    func test_mandatoryOrphanAsTheOverlappingSecondToken_stillZeroesLine() {
+        let text = "%^DATA.creativeLink.a|^%^DATA.creativeLink.b^%"
+
+        XCTAssertNil(OrphanedPlaceholderResolver.resolve(text: text))
+    }
+
+    // Note: Codex flagged a related concern (a replacement starting with a Unicode combining
+    // mark can merge into a preceding token's closing `%` and invalidate that token's stored
+    // range). It cannot reach this resolver in practice — every value this resolver splices in
+    // is `parsed.defaultValue`, always drawn from the matched chain's own grammar-constrained
+    // characters (`a-zA-Z0-9 .|_$-`) or the empty string, none of which can begin with a
+    // combining mark. See `CatalogRuntimePlaceholderResolverTests` for the reachable case: its
+    // replacement values come from an arbitrary host-supplied dictionary, not from the grammar.
+    // The splice here was still switched to NSMutableString to match, since it is strictly
+    // simpler than converting NSRange to a Swift String.Index and carries the same guarantee.
+
     // MARK: - Mixed: deferred + orphan
 
     func test_deferredAlongsideOptionalOrphan_substitutesOptional_keepsDeferred() {

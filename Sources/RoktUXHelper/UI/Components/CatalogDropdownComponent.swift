@@ -68,6 +68,19 @@ struct CatalogDropdownComponent: View {
         return styles[breakpointIndex].default
     }
 
+    // MARK: - Spacing Resolution
+
+    private static let defaultPadding = FrameAlignmentProperty(top: 12, right: 16, bottom: 12, left: 16)
+    private static let defaultErrorPadding = FrameAlignmentProperty(top: 4, right: 0, bottom: 0, left: 0)
+
+    /// Authored padding becomes this view's size, and that size reaches the window overlay's
+    /// UIKit frame and, on an embedded placement, a layout constraint, so it goes through the
+    /// parser that rejects the non-finite and negative edges `Float` would otherwise accept.
+    private func resolvedPadding(_ padding: String?, or fallback: FrameAlignmentProperty) -> FrameAlignmentProperty {
+        guard let padding else { return fallback }
+        return FrameAlignmentProperty.getNonNegativeFrameAlignment(padding)
+    }
+
     // MARK: - Body
 
     @ViewBuilder
@@ -161,11 +174,12 @@ struct CatalogDropdownComponent: View {
 
     private var headView: some View {
         let style = headStyle
-        let padding = style?.spacing?.padding?.paddingEdgeInsets ?? EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
+        let padding = resolvedPadding(style?.spacing?.padding, or: Self.defaultPadding)
         let bgColor = style?.background?.backgroundColor?.getAdaptiveColor(colorScheme)
         let borderColor = style?.border?.borderColor?.getAdaptiveColor(colorScheme)
         let borderRadius = CGFloat(style?.border?.borderRadius ?? 8)
-        let borderWidth = style?.border?.borderWidth?.uniformWidth ?? 1
+        let borderWidth = style?.border?.borderWidth
+            .map { FrameAlignmentProperty.getNonNegativeFrameAlignment($0).top } ?? 1
         let fontSize = CGFloat(style?.text?.fontSize ?? 14)
         let textColor = style?.text?.textColor?.getAdaptiveColor(colorScheme)
 
@@ -183,7 +197,7 @@ struct CatalogDropdownComponent: View {
 
                 chevronIcon
             }
-            .padding(padding)
+            .padding(frame: padding)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -195,7 +209,7 @@ struct CatalogDropdownComponent: View {
         .clipShape(RoundedRectangle(cornerRadius: borderRadius))
         .background(
             ViewFrameReader { frame in
-                guard frame != .zero else { return }
+                guard frame.isFinite, frame != .zero else { return }
                 DispatchQueue.main.async {
                     if buttonFrameInGlobal != frame {
                         buttonFrameInGlobal = frame
@@ -210,7 +224,7 @@ struct CatalogDropdownComponent: View {
             }
         )
         .onPreferenceChange(DropdownButtonFramePreferenceKey.self) { frame in
-            guard frame != .zero else { return }
+            guard frame.isFinite, frame != .zero else { return }
             if buttonFrameInGlobal != frame {
                 buttonFrameInGlobal = frame
             }
@@ -278,7 +292,8 @@ struct CatalogDropdownComponent: View {
         let style = optionListStyle
         let borderColor = style?.border?.borderColor?.getAdaptiveColor(colorScheme)
         let borderRadius = CGFloat(style?.border?.borderRadius ?? 8)
-        let borderWidth = style?.border?.borderWidth?.uniformWidth ?? 1
+        let borderWidth = style?.border?.borderWidth
+            .map { FrameAlignmentProperty.getNonNegativeFrameAlignment($0).top } ?? 1
         let maxHeight: CGFloat = 220
         let contentHeight = min(optionListEstimatedHeight, maxHeight)
 
@@ -306,9 +321,9 @@ struct CatalogDropdownComponent: View {
         let bgColor = style?.background?.backgroundColor?.getAdaptiveColor(colorScheme)
         let textColor = style?.text?.textColor?.getAdaptiveColor(colorScheme)
         let fontSize = CGFloat(style?.text?.fontSize ?? 14)
-        let rowPadding = style?.spacing?.padding?.paddingEdgeInsets ?? EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
+        let rowPadding = resolvedPadding(style?.spacing?.padding, or: Self.defaultPadding)
         let rowBorderColor = style?.border?.borderColor?.getAdaptiveColor(colorScheme)
-        let rowBorderWidth = style?.border?.borderWidth
+        let rowBorderWidth = FrameAlignmentProperty.getNonNegativeFrameAlignment(style?.border?.borderWidth)
 
         return Button {
             if !isDisabled {
@@ -328,11 +343,11 @@ struct CatalogDropdownComponent: View {
                         .foregroundColor(.accentColor)
                 }
             }
-            .padding(rowPadding)
+            .padding(frame: rowPadding)
             .background(Color(hex: bgColor))
             .overlay(alignment: .bottom) {
                 if let borderColor = rowBorderColor {
-                    let bottomWidth = rowBorderWidth?.bottomWidth ?? 0
+                    let bottomWidth = rowBorderWidth.bottom
                     if bottomWidth > 0 {
                         Color(hex: borderColor)
                             .frame(height: bottomWidth)
@@ -350,12 +365,12 @@ struct CatalogDropdownComponent: View {
         let style = errorStyle
         let textColor = style?.text?.textColor?.getAdaptiveColor(colorScheme)
         let fontSize = CGFloat(style?.text?.fontSize ?? 12)
-        let padding = style?.spacing?.padding?.paddingEdgeInsets ?? EdgeInsets(top: 4, leading: 0, bottom: 0, trailing: 0)
+        let padding = resolvedPadding(style?.spacing?.padding, or: Self.defaultErrorPadding)
 
         return Text(validationErrorMessage)
             .font(.system(size: fontSize))
             .foregroundColor(Color(hex: textColor))
-            .padding(padding)
+            .padding(frame: padding)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -371,40 +386,17 @@ struct CatalogDropdownComponent: View {
     }
 }
 
-// MARK: - Border Width Helpers
+// MARK: - View Frame Reader
 
-private extension String {
-    /// Parse CSS-like border-width string (e.g. "1", "0 0 1 0") and return uniform or bottom width
-    var uniformWidth: CGFloat {
-        let parts = split(separator: " ").compactMap { Float($0) }
-        guard let first = parts.first else { return 0 }
-        return CGFloat(first)
-    }
-
-    var bottomWidth: CGFloat {
-        let parts = split(separator: " ").compactMap { Float($0) }
-        switch parts.count {
-        case 1: return CGFloat(parts[0])
-        case 2: return CGFloat(parts[0]) // top-bottom, left-right
-        case 3: return CGFloat(parts[2]) // top, left-right, bottom
-        case 4: return CGFloat(parts[2]) // top, right, bottom, left
-        default: return 0
-        }
-    }
-
-    var paddingEdgeInsets: EdgeInsets {
-        let parts = split(separator: " ").compactMap { CGFloat(Float($0) ?? 0) }
-        switch parts.count {
-        case 1: return EdgeInsets(top: parts[0], leading: parts[0], bottom: parts[0], trailing: parts[0])
-        case 2: return EdgeInsets(top: parts[0], leading: parts[1], bottom: parts[0], trailing: parts[1])
-        case 3: return EdgeInsets(top: parts[0], leading: parts[1], bottom: parts[2], trailing: parts[1])
-        case 4: return EdgeInsets(top: parts[0], leading: parts[3], bottom: parts[2], trailing: parts[1])
-        default: return EdgeInsets()
-        }
+private extension CGRect {
+    /// True when every component is finite, unlike `isInfinite`, which tests only for the
+    /// infinite rectangle. A measured frame becomes the window overlay's offset and a UIKit
+    /// view frame, and any comparison against a rectangle holding NaN is true, so the change
+    /// filters on their own do not stop one.
+    var isFinite: Bool {
+        origin.x.isFinite && origin.y.isFinite && size.width.isFinite && size.height.isFinite
     }
 }
-
-// MARK: - View Frame Reader
 
 private struct DropdownButtonFramePreferenceKey: PreferenceKey {
     static var defaultValue: CGRect = .zero
@@ -442,7 +434,7 @@ private final class FrameObserverView: UIView {
         super.layoutSubviews()
         guard let superview else { return }
         let convertedFrame = superview.convert(bounds, to: nil)
-        guard convertedFrame != lastFrame else { return }
+        guard convertedFrame.isFinite, convertedFrame != lastFrame else { return }
         lastFrame = convertedFrame
         onFrameChange?(convertedFrame)
     }

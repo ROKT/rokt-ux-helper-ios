@@ -59,9 +59,10 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
 
         // Calculate initial page before super.init
         if let initialIndex = layoutState.items[LayoutState.currentProgressKey] as? Int,
-           let childrenCount = children?.count,
+           let childrenCount = children?.count, childrenCount > 0,
            let firstViewableItems = viewableItems.first.map(Int.init) {
-            let viewableItemCount = min(firstViewableItems, childrenCount)
+            // pages are strided by this count, so it can never be zero
+            let viewableItemCount = max(min(firstViewableItems, childrenCount), 1)
             if initialIndex + viewableItemCount > childrenCount - 1 {
                 self.currentPage = (childrenCount - viewableItemCount)/viewableItemCount
             } else if initialIndex >= 0 {
@@ -122,7 +123,6 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
     }
 
     func goToNextPage(_: Any?) {
-        let totalPages = calculateTotalPages()
         if currentPage < totalPages - 1 {
             self.currentPage += 1
             self.currentLeadingOfferIndex = (self.currentPage * self.viewableItems)
@@ -202,18 +202,14 @@ class CarouselViewModel: DistributionViewModel, Identifiable, ObservableObject {
         layoutState?.actionCollection[.close](nil)
     }
 
-    private func calculateTotalPages() -> Int {
-        guard let children = children, !children.isEmpty else { return 0 }
-        let viewableItemCount = Int(allBreakpointViewableItems[getGlobalBreakpointIndex(nil)])
-        return Int(ceil(Double(children.count)/Double(viewableItemCount)))
-    }
-
     private func setViewableItemsForBreakpoint() {
+        guard !allBreakpointViewableItems.isEmpty else { return }
+
         let maxViewableItemsIndex = (allBreakpointViewableItems.count) - 1
         let index = max(min(breakpointIndex, maxViewableItemsIndex), 0)
 
         let viewableItemsFromBreakpoints = Int(allBreakpointViewableItems[index])
-        // ensure viewableItems doesn't exceed totalOffers
-        viewableItems = (viewableItemsFromBreakpoints < totalOffers) ? viewableItemsFromBreakpoints : totalOffers
+        // ensure viewableItems doesn't exceed totalOffers and never reaches zero, which pages strides by
+        viewableItems = max(min(viewableItemsFromBreakpoints, totalOffers), 1)
     }
 }

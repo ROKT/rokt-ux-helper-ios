@@ -48,7 +48,30 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
     /// Largest height a sheet may occupy. Leaves the container's top safe area uncovered, which
     /// is where UIKit's .large() detent stops; "full bleed" is about the other three edges.
     static func maximumSheetHeight(containerHeight: CGFloat, topSafeArea: CGFloat) -> CGFloat {
-        max(containerHeight - topSafeArea, 0)
+        max(finiteLength(containerHeight) - finiteLength(topSafeArea), 0)
+    }
+
+    /// A length that is safe to do arithmetic with. `min` and `max` return a non-finite operand
+    /// rather than rejecting it — `max(.nan, 0)` is `.nan` — so clamping alone does not stop a
+    /// non-finite value, and one that reaches a view frame raises an exception no caller can
+    /// catch, which stops the host application.
+    private static func finiteLength(_ value: CGFloat) -> CGFloat {
+        value.isFinite ? max(value, 0) : 0
+    }
+
+    /// A height the layout or its content asked for, with a non-finite one replaced by the same
+    /// half of the available height `heightResolver` gives a layout that states no height at all,
+    /// so the sheet stays visible and can still measure itself. Callers reject a non-finite height
+    /// before it reaches here; this is the last place it can be stopped.
+    private static func finiteHeight(_ requested: CGFloat, maximum: CGFloat) -> CGFloat {
+        requested.isFinite ? requested : finiteLength(maximum)/2
+    }
+
+    /// Clamps a requested height to what the container can show, floored so the hosted content
+    /// always gets a non-zero height to lay out against.
+    static func clampedHeight(_ requested: CGFloat, maximum: CGFloat) -> CGFloat {
+        let available = finiteLength(maximum)
+        return min(max(finiteHeight(requested, maximum: available), 1), available)
     }
 
     /// Whether a layout gets SDK-owned presentation. Regular width is UIKit's centred,
@@ -97,12 +120,14 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
                            topSafeArea: CGFloat,
                            bottomSafeArea: CGFloat,
                            requestedHeight: CGFloat) -> CGRect {
-        let maximum = maximumSheetHeight(containerHeight: containerSize.height,
+        let containerHeight = finiteLength(containerSize.height)
+        let maximum = maximumSheetHeight(containerHeight: containerHeight,
                                          topSafeArea: topSafeArea)
-        let height = min(max(requestedHeight, 1) + max(bottomSafeArea, 0), maximum)
+        let requested = finiteHeight(requestedHeight, maximum: maximum)
+        let height = min(max(requested, 1) + finiteLength(bottomSafeArea), maximum)
         return CGRect(x: 0,
-                      y: containerSize.height - height,
-                      width: containerSize.width,
+                      y: containerHeight - height,
+                      width: finiteLength(containerSize.width),
                       height: height)
     }
 
@@ -115,12 +140,12 @@ final class RoktBottomSheetPresentationController: UIPresentationController {
     /// The height the sheet occupies when not expanded. Held separately so the expanded-state
     /// path can return to it after the layout collapses the sheet again.
     var collapsedHeight: CGFloat {
-        min(max(collapsedResolver(maximumSheetHeight), 1), maximumSheetHeight)
+        Self.clampedHeight(collapsedResolver(maximumSheetHeight), maximum: maximumSheetHeight)
     }
 
     /// The height the sheet currently wants, clamped to what the container can give it.
     var resolvedSheetHeight: CGFloat {
-        min(max(heightResolver(maximumSheetHeight), 1), maximumSheetHeight)
+        Self.clampedHeight(heightResolver(maximumSheetHeight), maximum: maximumSheetHeight)
     }
 
     override var frameOfPresentedViewInContainerView: CGRect {

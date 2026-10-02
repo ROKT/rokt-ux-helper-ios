@@ -60,6 +60,8 @@ class MockLayoutState: LayoutStateRepresenting {
     }
 
     func getGlobalBreakpointIndex(_ width: CGFloat?) -> Int {
+        // matches LayoutState: without a width there is no breakpoint to resolve
+        guard width != nil else { return 0 }
         return mockBreakpointIndex
     }
 

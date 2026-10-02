@@ -26,18 +26,32 @@ class TextComponentBNFHelper {
         currentOffer: String,
         totalOffers: String
     ) -> NSAttributedString {
-        let placeholdersToResolved = statePlaceholdersToResolvedValues(
-            originalString.description, currentOffer: currentOffer, totalOffers: totalOffers)
+        guard let regex = try? NSRegularExpression(pattern: BNFPlaceholder.expression) else {
+            return originalString
+        }
+
+        let tokens = BNFTokenScanner.tokens(in: originalString.string, matching: regex)
+        guard !tokens.isEmpty else { return originalString }
 
         let transformedText = originalString.mutableCopy() as! NSMutableAttributedString
 
-        placeholdersToResolved.forEach {
-            let origString = transformedText.string as NSString
-            let keyWithDelimiters = BNFSeparator.startDelimiter.rawValue + $0 + BNFSeparator.endDelimiter.rawValue
+        // Reverse-iterate, splicing right to left, so replacing a later token's range never
+        // invalidates the stored range of a token not yet processed.
+        for token in tokens.reversed() {
+            guard PropertyChainDataParser().parse(propertyChain: token.chain).parseableChains.contains(where: {
+                $0.namespace == .state
+            }) else { continue }
 
-            let range = origString.range(of: keyWithDelimiters)
+            let resolvedValue = resolveStateChain(
+                propertyChain: token.chain,
+                currentOfferString: currentOffer,
+                totalOffersString: totalOffers)
 
-            transformedText.replaceCharacters(in: range, with: $1)
+            // A token that overlaps its neighbor's shared delimiter is never spliced; its span
+            // stays in the result as literal text, same as an unmatched chain would.
+            guard token.isSpliceable else { continue }
+
+            transformedText.replaceCharacters(in: token.tokenRange, with: resolvedValue)
         }
 
         return transformedText as NSAttributedString

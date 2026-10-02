@@ -120,6 +120,101 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
         assertBasicTextSnapshot(model)
     }
 
+    func testTransform_transactionDataStructPlaceholder_resolvesToEmptyStringWithoutTrapping() {
+        // The placeholder path stops at `shippingAddress` itself rather than one of its
+        // leaf fields (e.g. `.name`), so the resolved value is the `Address` struct, not a
+        // string. `Address` is Codable only (not CustomStringConvertible), so stringifying
+        // it must fall back to an empty binding instead of trapping on the trailing cast.
+        let layoutState = LayoutState()
+        let address = Address(
+            name: "Jane Smith",
+            address1: "123 Main St",
+            address2: nil,
+            city: "New York",
+            state: "NY",
+            stateCode: "NY",
+            country: "US",
+            countryCode: "US",
+            zip: "10001"
+        )
+        let transactionData = TransactionData(
+            shippingAddress: address,
+            billingAddress: address,
+            paymentType: "paypal",
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
+        )
+        layoutState.items[LayoutState.fullOfferKey] = makeOffer(transactionData: transactionData)
+
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            value: "%^DATA.transactionData.shippingAddress^% %^DATA.transactionData.billingAddress^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, " ")
+    }
+
+    func testTransform_transactionDataStructPlaceholder_withDefault_usesDefaultInsteadOfEmpty() {
+        // Same struct-shaped resolution as above, but the placeholder also authors a default.
+        // The unstringifiable `Address` must be treated as unresolved so the default still wins,
+        // rather than the struct pre-empting the default with an empty-string binding.
+        let layoutState = LayoutState()
+        let address = Address(
+            name: "Jane Smith",
+            address1: "123 Main St",
+            address2: nil,
+            city: "New York",
+            state: "NY",
+            stateCode: "NY",
+            country: "US",
+            countryCode: "US",
+            zip: "10001"
+        )
+        let transactionData = TransactionData(
+            shippingAddress: address,
+            billingAddress: nil,
+            paymentType: "paypal",
+            supportedPaymentMethods: nil,
+            isPartnerManagedPurchase: false,
+            partnerPaymentReference: nil,
+            confirmationRef: nil,
+            metadata: [:]
+        )
+        layoutState.items[LayoutState.fullOfferKey] = makeOffer(transactionData: transactionData)
+
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            // `shippingAddress` is present but struct-shaped (unstringifiable) — must fall
+            // through to the default. `billingAddress` is absent entirely — already fell
+            // through to the default before this fix, kept here as a control.
+            value: "%^DATA.transactionData.shippingAddress | Unknown^% "
+                + "%^DATA.transactionData.billingAddress | Unknown^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: layoutState
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, "Unknown Unknown")
+    }
+
     // MARK: - OrphanedPlaceholderResolver finalize behaviour
 
     func testSnapshot_basicText_optionalOrphan_substitutesDefault() {
@@ -165,6 +260,28 @@ final class TestRuntimeAndTransactionDataPlaceholders: XCTestCase {
 
         XCTAssertEqual(model.boundValue, "")
         assertBasicTextSnapshot(model)
+    }
+
+    func testTransform_adjacentOrphansSharingADelimiter_resolvesTheFirstWithoutTrapping() {
+        // `^%^` closes one placeholder and opens the next off the same `%`, which the token
+        // pattern matches as two tokens whose delimiters overlap. The transform runs
+        // synchronously inside `loadLayout`, so a trap here takes the host app down before
+        // any UI exists. The first placeholder resolves; the remainder stays literal.
+        let basicText = BasicTextModel<WhenPredicate>(
+            styles: nil,
+            value: "Read our %^DATA.creativeLink.terms | terms^%^DATA.creativeLink.privacy | privacy^%"
+        )
+
+        let transformer = LayoutTransformer(
+            layoutPlugin: get_mock_layout_plugin(),
+            layoutState: LayoutState()
+        )
+        let model = try! transformer.getBasicText(
+            basicText,
+            context: .inner(.addToCart(makeCatalogItem()))
+        )
+
+        XCTAssertEqual(model.boundValue, "Read our terms^DATA.creativeLink.privacy | privacy^%")
     }
 
     // MARK: - Helpers

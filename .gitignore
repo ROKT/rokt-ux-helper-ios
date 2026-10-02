@@ -29,6 +29,10 @@ DerivedData
 # Bundler
 .bundle
 
+# Python (tools/)
+__pycache__/
+*.pyc
+
 aws/
 vendor/
 repositories

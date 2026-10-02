@@ -6,5 +6,6 @@ enum BNFSeparator: String {
     case namespace = "."
     case alternative = "|"
 
-    var charCount: Int { self.rawValue.count }
+    /// Length in the units `NSRegularExpression` matches in, for arithmetic on a match's `NSRange`.
+    var utf16Count: Int { self.rawValue.utf16.count }
 }
