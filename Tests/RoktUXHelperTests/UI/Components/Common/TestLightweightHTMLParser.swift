@@ -724,6 +724,16 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "text more")
     }
 
+    func test_unrecognized_tag_name_does_not_crash() {
+        // A tag name outside the documented set can be a slice of authored
+        // content (e.g. an unescaped "<"), not an actual tag; must not crash.
+        let result = LightweightHTMLParser.parse(
+            html: "<b>text</b></customer-12345> more",
+            baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "text more")
+    }
+
     // MARK: - Integration with htmlToAttributedString extension
 
     func test_htmlToAttributedString_uses_parser() {
