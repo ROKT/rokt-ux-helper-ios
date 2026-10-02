@@ -36,6 +36,17 @@ enum LightweightHTMLParser {
     private static let blockSpacerLineHeightRatio: CGFloat = 0.4
     private static let spaceUnit = unichar(0x20)
     private static let newlineUnit = unichar(0x0A)
+    /// `scanTag` accepts any ASCII letter/digit/hyphen name, not just the
+    /// documented tag set, so a misnesting/stray-tag warning must not log a
+    /// tag name verbatim — it may be a slice of authored content (e.g. an
+    /// unescaped "<" in campaign copy) rather than an actual supported tag.
+    private static let knownTagNames: Set<String> = [
+        "b", "strong", "i", "em", "u", "s", "strike", "a", "font", "br", "p", "ul", "ol", "li"
+    ]
+
+    private static func loggableTagName(_ name: String) -> String {
+        knownTagNames.contains(name) ? name : "tag"
+    }
 
     // MARK: - Public API
 
@@ -193,7 +204,21 @@ enum LightweightHTMLParser {
                 lists.removeLast()
             default:
                 if let index = tagStack.lastIndex(where: { $0.name == tag.name }) {
+                    if index != tagStack.count - 1 {
+                        let stillOpen = tagStack[(index + 1)...]
+                            .map { loggableTagName($0.name) }
+                            .joined(separator: ", ")
+                        RoktUXLogger.shared.warning(
+                            "</\(loggableTagName(tag.name))> closed while [\(stillOpen)] were still open "
+                                + "inside it; the markup is misnested and may render unexpectedly."
+                        )
+                    }
                     tagStack.remove(at: index)
+                } else {
+                    RoktUXLogger.shared.warning(
+                        "</\(loggableTagName(tag.name))> closed but no matching open tag was found; "
+                            + "the markup has a stray closing tag and this one is ignored."
+                    )
                 }
             }
         }

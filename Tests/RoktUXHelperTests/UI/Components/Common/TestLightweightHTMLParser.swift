@@ -705,6 +705,35 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertTrue(result.string.contains("After"))
     }
 
+    func test_misnested_closing_tag_does_not_crash() {
+        // Invalid markup: </a> closes while <b> and <u> opened inside it are
+        // still open. This is a best-effort recovery path (not a supported
+        // authoring pattern) that logs a warning; it must not crash or drop
+        // content.
+        let result = LightweightHTMLParser.parse(
+            html: "<a href=\"https://example.com\"><b>text <u></a>more</u></b>",
+            baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "text more")
+    }
+
+    func test_stray_closing_tag_does_not_crash() {
+        // </strong> with no matching <strong> ever opened (e.g. left over from
+        // a find-replace). Logs a warning; the stray close is simply ignored.
+        let result = LightweightHTMLParser.parse(html: "<b>text</b></strong> more", baseFont: baseFont)
+        XCTAssertEqual(result.string, "text more")
+    }
+
+    func test_unrecognized_tag_name_does_not_crash() {
+        // A tag name outside the documented set can be a slice of authored
+        // content (e.g. an unescaped "<"), not an actual tag; must not crash.
+        let result = LightweightHTMLParser.parse(
+            html: "<b>text</b></customer-12345> more",
+            baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "text more")
+    }
+
     // MARK: - Integration with htmlToAttributedString extension
 
     func test_htmlToAttributedString_uses_parser() {
