@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.4] - 2026-10-06
+
+### Fixed
+
+- Route Rokt UX Helper diagnostics to native logging ([#409](https://github.com/ROKT/rokt-ux-helper-ios/pull/409))
+- Report each missing font family once per layout ([#408](https://github.com/ROKT/rokt-ux-helper-ios/pull/408))
+- Warn on misnested or stray closing tags ([#406](https://github.com/ROKT/rokt-ux-helper-ios/pull/406))
+
+### Changed
+
+- Bump github.com/nalexn/viewinspector from 0.10.3 to 0.10.5 ([#407](https://github.com/ROKT/rokt-ux-helper-ios/pull/407))
+
 ## [2.1.3] - 2026-10-02
 
 ### Fixed
@@ -510,7 +522,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.4...HEAD
+[2.1.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.0...2.1.1
