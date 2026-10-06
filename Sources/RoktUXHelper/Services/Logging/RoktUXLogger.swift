@@ -25,7 +25,12 @@ final class RoktUXLogger: @unchecked Sendable {
     }
 
     private let lock = NSLock()
+    private let output: @Sendable (String) -> Void
     private var _logLevel: RoktUXLogLevel = .none
+
+    init(output: @escaping @Sendable (String) -> Void = { NSLog("%@", $0) }) {
+        self.output = output
+    }
 
     /// The current log level. Messages below this level will not be logged.
     /// Default is `.none` (no logging).
@@ -146,6 +151,7 @@ final class RoktUXLogger: @unchecked Sendable {
         let fname = (file as NSString).lastPathComponent
         let errorSuffix = error.map { " | Error: \($0.localizedDescription)" } ?? ""
         let sessionSuffix = sessionId.map { " | sessionId=\($0)" } ?? ""
-        print("\(prefix) [\(fname) \(function):\(line)] \(message)\(errorSuffix)\(sessionSuffix)")
+        let formattedMessage = "\(prefix) [\(fname) \(function):\(line)] \(message)\(errorSuffix)\(sessionSuffix)"
+        output(formattedMessage)
     }
 }
