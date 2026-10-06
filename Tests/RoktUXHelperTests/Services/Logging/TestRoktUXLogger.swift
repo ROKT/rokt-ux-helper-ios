@@ -3,19 +3,20 @@ import XCTest
 
 class RoktUXLoggerTests: XCTestCase {
 
+    private var originalLogger: RoktUXLogger!
+
     override func setUp() {
         super.setUp()
-        RoktUXLogger.shared.logLevel = .none
+        originalLogger = RoktUXLogger.setShared(RoktUXLogger())
     }
 
     override func tearDown() {
-        RoktUXLogger.shared.logLevel = .none
+        RoktUXLogger.setShared(originalLogger)
         super.tearDown()
     }
 
     func testDefaultLogLevelIsNone() {
-        let logger = RoktUXLogger.shared
-        logger.logLevel = .none
+        let logger = RoktUXLogger()
         XCTAssertEqual(logger.logLevel, .none)
     }
 
@@ -112,6 +113,94 @@ class RoktUXLoggerTests: XCTestCase {
         // Restore
         RoktUXLogger.setShared(original)
         XCTAssertTrue(RoktUXLogger.shared === original)
+    }
+
+    func testAllLogLevelsFilterAndEmitExactlyOnce() {
+        let levels: [RoktUXLogLevel] = [.verbose, .debug, .info, .warning, .error, .none]
+        for threshold in levels {
+            let recorder = RoktUXLogRecorder()
+            let logger = RoktUXLogger(output: recorder.record)
+            logger.logLevel = threshold
+
+            logger.verbose("message", file: "Probe.swift", function: "probe()", line: 7)
+            logger.debug("message", file: "Probe.swift", function: "probe()", line: 7)
+            logger.info("message", file: "Probe.swift", function: "probe()", line: 7)
+            logger.warning("message", file: "Probe.swift", function: "probe()", line: 7)
+            logger.error("message", file: "Probe.swift", function: "probe()", line: 7)
+
+            let expected = levels.filter { $0 != .none && $0 >= threshold }.map {
+                "[RoktUX/\($0.label)] [Probe.swift probe():7] message"
+            }
+            XCTAssertEqual(recorder.messages, expected, "Threshold: \(threshold)")
+        }
+    }
+
+    func testFormattingPreservesMessageErrorAndSession() {
+        let recorder = RoktUXLogRecorder()
+        let logger = RoktUXLogger(output: recorder.record)
+        logger.logLevel = .debug
+        let error = NSError(domain: "LoggingTest", code: 1,
+                            userInfo: [NSLocalizedDescriptionKey: "synthetic failure 100% %@"])
+        let message = "Progress 100% %@ — café 🚀\nsecond line"
+
+        logger.debug(message, error: error, sessionId: "synthetic-session",
+                     file: "/synthetic/Probe.swift", function: "probe()", line: 7)
+        logger.info("ready", file: "Probe.swift", function: "probe()", line: 8)
+
+        XCTAssertEqual(recorder.messages, [
+            "[RoktUX/DEBUG] [Probe.swift probe():7] \(message) | Error: synthetic failure 100% %@ | sessionId=synthetic-session",
+            "[RoktUX/INFO] [Probe.swift probe():8] ready"
+        ])
+    }
+
+    func testOutputCanReenterLoggerWithoutDeadlocking() {
+        let finished = expectation(description: "reentrant output completes")
+        let logger = RoktUXLogger(output: { _ in
+            RoktUXLogger.shared.logLevel = .none
+            finished.fulfill()
+        })
+        RoktUXLogger.setShared(logger)
+        logger.logLevel = .debug
+
+        DispatchQueue.global().async { logger.debug("reentrant output") }
+
+        wait(for: [finished], timeout: 5)
+        XCTAssertEqual(logger.logLevel, .none)
+    }
+
+    func testConcurrentLoggingAndConfigurationEmitsEachAcceptedMessageOnce() {
+        let recorder = RoktUXLogRecorder()
+        let logger = RoktUXLogger(output: recorder.record)
+        let finished = expectation(description: "concurrent logging completes")
+
+        DispatchQueue.global().async {
+            DispatchQueue.concurrentPerform(iterations: 100) { index in
+                logger.logLevel = index.isMultiple(of: 2) ? .verbose : .error
+                logger.error("message-\(index)", file: "Probe.swift", function: "probe()", line: 7)
+            }
+            finished.fulfill()
+        }
+
+        wait(for: [finished], timeout: 5)
+        XCTAssertEqual(recorder.messages.count, 100)
+        XCTAssertEqual(Set(recorder.messages), Set((0..<100).map { "[RoktUX/ERROR] [Probe.swift probe():7] message-\($0)" }))
+    }
+
+    func testDefaultOutputAcceptsLiteralFormatTokensAndUnicode() {
+        let logger = RoktUXLogger()
+        logger.logLevel = .debug
+        logger.debug("NSLog sink probe: 100% %@ — café 🚀\nsecond line")
+    }
+}
+
+private final class RoktUXLogRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var recordedMessages: [String] = []
+
+    var messages: [String] { lock.withLock { recordedMessages } }
+
+    func record(_ message: String) {
+        lock.withLock { recordedMessages.append(message) }
     }
 }
 
