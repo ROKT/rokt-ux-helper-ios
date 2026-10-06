@@ -341,7 +341,24 @@ final class TestEventService: XCTestCase {
         eventService.sendFontDiagnostics("Arial")
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
+    func test_font_diagnostic_reported_once_per_family() {
+        var stackTraces: [String?] = []
+        let eventService = get_mock_event_processor(startDate: startDate,
+                                                    uxEventDelegate: stubUXHelper,
+                                                    useDiagnosticEvents: true,
+                                                    eventHandler: { event in
+            stackTraces.append(event.eventData.first(where: { $0.name == "stackTrace" })?.value)
+        })
+
+        eventService.sendFontDiagnostics("Arial")
+        eventService.sendFontDiagnostics("Arial")
+        eventService.sendFontDiagnostics("Helvetica")
+        eventService.sendFontDiagnostics("Arial")
+
+        XCTAssertEqual(stackTraces, ["Font family not found: Arial", "Font family not found: Helvetica"])
+    }
+
     func test_diagnostic_processing_disabled() {
         let expectation = expectation(description: "test diagnostics")
         let eventService = get_mock_event_processor(startDate: startDate,

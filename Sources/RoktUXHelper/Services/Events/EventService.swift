@@ -45,6 +45,7 @@ class EventService: Hashable, EventDiagnosticServicing {
 
     private var devicePayCompletion: ((_ status: DevicePayStatus) -> Void)?
     private var forwardPaymentCompletion: ((_ status: ForwardPaymentStatus) -> Void)?
+    private var reportedMissingFontFamilies = Set<String>()
 
     init(pageId: String?,
          pageInstanceGuid: String,
@@ -222,6 +223,13 @@ class EventService: Hashable, EventDiagnosticServicing {
                 jwtToken: jwtToken
             )
         )
+    }
+
+    /// Every text node re-validates its font on appear and on each style change, so one missing
+    /// family would otherwise be reported once per node per render. Report it once per layout.
+    func sendFontDiagnostics(_ fontFamily: String) {
+        guard reportedMissingFontFamilies.insert(fontFamily).inserted else { return }
+        sendDiagnostics(message: kViewErrorCode, callStack: kUIFontErrorMessage + fontFamily)
     }
 
     func openURL(url: URL, type: RoktUXOpenURLType, completionHandler: @escaping () -> Void) {
