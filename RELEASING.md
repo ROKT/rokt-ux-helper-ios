@@ -38,6 +38,12 @@ git checkout -b maintenance/1.0.x 1.0.0
 git push --set-upstream origin maintenance/1.0.x
 ```
 
+Only repository admins can create `maintenance/*` branches; ask one to push the
+branch if your push is rejected. If the branch is cut from a release that
+predates the `release` environment (see [Workflow behavior](#workflow-behavior)),
+cherry-pick the `release-publish.yml` change onto it before releasing, or the
+CocoaPods publish step has no trunk token.
+
 To release a patch from that maintenance line:
 
 1. Cherry-pick or merge the required patch changes into `maintenance/X.Y.x`.
@@ -60,6 +66,10 @@ branch drafts must use a patch bump.
 
 `Release – Publish` runs only when `VERSION` changes on `main` or
 `maintenance/*`, and it ignores branch create/delete push events.
+
+`Release – Publish` runs its jobs in the `release` GitHub environment, which
+holds the `COCOAPODS_TRUNK_TOKEN` secret and only allows deployments from `main`
+and `maintenance/*`.
 
 Snapshot builds are not part of this repository's release flow. Publishing is
 tied to versioned releases.
