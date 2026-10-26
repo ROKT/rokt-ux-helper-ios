@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.5] - 2026-10-26
+
+### Fixed
+
+- Present over stacked full-screen modals ([#418](https://github.com/ROKT/rokt-ux-helper-ios/pull/418))
+
+### Changed
+
+- Bump actions/create-github-app-token from 3.2.0 to 3.3.0 ([#416](https://github.com/ROKT/rokt-ux-helper-ios/pull/416))
+- Bump github.com/pointfreeco/swift-snapshot-testing from 1.19.6 to 1.19.7 ([#417](https://github.com/ROKT/rokt-ux-helper-ios/pull/417))
+- Bump actions/upload-artifact from 7.0.1 to 7.0.2 in /.github/composite_actions/run_xcodebuild_tests ([#413](https://github.com/ROKT/rokt-ux-helper-ios/pull/413))
+- Bump futureware-tech/simulator-action from 5 to 6 in /.github/composite_actions/run_xcodebuild_tests ([#412](https://github.com/ROKT/rokt-ux-helper-ios/pull/412))
+- Bump actions/upload-artifact from 7.0.1 to 7.0.2 ([#411](https://github.com/ROKT/rokt-ux-helper-ios/pull/411))
+- Run publish jobs in the release environment ([#414](https://github.com/ROKT/rokt-ux-helper-ios/pull/414))
+
 ## [2.1.4] - 2026-10-06
 
 ### Fixed
@@ -522,7 +537,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.5...HEAD
+[2.1.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.4...2.1.5
 [2.1.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.1...2.1.2
