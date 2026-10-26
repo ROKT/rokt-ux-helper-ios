@@ -69,13 +69,16 @@ enum RoktUXPresentationResolver {
 
         let front = frontmostViewController(from: controller, isPresenterUsable: isPresenterUsable) ?? controller
 
-        // The key window root can be detached under a `.fullScreen` cover; `front` may still be the
-        // on-screen nested presenter. Walk usable `presentedViewController` from there.
+        // Walk the whole modal stack from `front` and keep the deepest usable controller. A
+        // `.fullScreen` modal detaches the view of every controller beneath it, so an unusable
+        // controller mid-stack can still have a usable one on top. Stop at a controller that is being
+        // dismissed: everything above it is leaving too.
         var bestUsable: UIViewController? = isPresenterUsable(front) ? front : nil
         var cursor = front
-        while let presented = cursor.presentedViewController {
-            guard isPresenterUsable(presented) else { break }
-            bestUsable = presented
+        while let presented = cursor.presentedViewController, !presented.isBeingDismissed {
+            if isPresenterUsable(presented) {
+                bestUsable = presented
+            }
             cursor = presented
         }
         if bestUsable == nil, logFailures {
