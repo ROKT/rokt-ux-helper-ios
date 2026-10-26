@@ -263,4 +263,68 @@ final class TestRoktUXOverlayPresentation: XCTestCase {
     private func diagnosticValue(_ name: String, in event: RoktEventRequest?) -> String? {
         event?.eventData.first(where: { $0.name == name })?.value
     }
+
+    func testTransitionCompletionResolvesReplacementPresenterOnlyOnce() {
+        let ux = RoktUX()
+        let originalHost = UIViewController()
+        let replacementHost = UIViewController()
+        var currentHost = originalHost
+        ux.topViewControllerProvider = { currentHost }
+        var transitionCompletion: (() -> Void)?
+        ux.deferOverlayPresentation = { controller, completion in
+            if controller === originalHost {
+                transitionCompletion = completion
+                return .registered
+            }
+            return .notNeeded
+        }
+        ux.scheduleOverlayRetry = { _, _ in XCTFail("a presenter is available after the transition") }
+        var presented: [UIViewController] = []
+
+        ux.attemptOverlayPresentation(eventService: nil,
+                                      onUnload: { XCTFail("must not unload") },
+                                      present: { presented.append($0) })
+        XCTAssertTrue(presented.isEmpty)
+        XCTAssertNotNil(transitionCompletion)
+
+        currentHost = replacementHost
+        transitionCompletion?()
+        transitionCompletion?()
+
+        XCTAssertEqual(presented.count, 1)
+        XCTAssertTrue(presented.first === replacementHost)
+    }
+
+    func testTransitionCompletionRetriesWhileReplacementHostIsDetached() {
+        let ux = RoktUX()
+        let originalHost = UIViewController()
+        let replacementHost = UIViewController()
+        var currentHost: UIViewController? = originalHost
+        ux.topViewControllerProvider = { currentHost }
+        var transitionCompletion: (() -> Void)?
+        ux.deferOverlayPresentation = { controller, completion in
+            if controller === originalHost {
+                transitionCompletion = completion
+                return .registered
+            }
+            return .notNeeded
+        }
+        var retry: (() -> Void)?
+        ux.scheduleOverlayRetry = { _, work in retry = work }
+        var presented: [UIViewController] = []
+
+        ux.attemptOverlayPresentation(eventService: nil,
+                                      onUnload: { XCTFail("must not unload") },
+                                      present: { presented.append($0) })
+        currentHost = nil
+        transitionCompletion?()
+        XCTAssertTrue(presented.isEmpty)
+        XCTAssertNotNil(retry)
+
+        currentHost = replacementHost
+        retry?()
+
+        XCTAssertEqual(presented.count, 1)
+        XCTAssertTrue(presented.first === replacementHost)
+    }
 }

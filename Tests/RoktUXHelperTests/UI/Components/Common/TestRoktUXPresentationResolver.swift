@@ -106,6 +106,120 @@ final class TestRoktUXPresentationResolver: XCTestCase {
 
         XCTAssertTrue(presenter === sample)
     }
+
+    /// Two stacked `.fullScreen` modals detach both the root and the first modal; the second modal is
+    /// the only controller on screen and must be resolved.
+    func testStableTopWalksPastDetachedControllerInsideModalStack() {
+        let root = StubPresentedViewController()
+        let coveredModal = StubPresentedViewController()
+        let topModal = StubPresentedViewController()
+        root.stubPresentedViewController = coveredModal
+        coveredModal.stubPresentedViewController = topModal
+
+        let presenter = RoktUXPresentationResolver.stableTopViewController(
+            startingAt: root,
+            isPresenterUsable: { $0 === topModal }
+        )
+
+        XCTAssertTrue(presenter === topModal)
+    }
+
+    /// A sheet covered by a `.fullScreen` modal is detached while the root stays on screen; resolving the
+    /// root would fail because it is already presenting.
+    func testStableTopWalksPastCoveredSheetToTopModal() {
+        let root = StubPresentedViewController()
+        let coveredSheet = StubPresentedViewController()
+        let topModal = StubPresentedViewController()
+        root.stubPresentedViewController = coveredSheet
+        coveredSheet.stubPresentedViewController = topModal
+
+        let presenter = RoktUXPresentationResolver.stableTopViewController(
+            startingAt: root,
+            isPresenterUsable: { $0 !== coveredSheet }
+        )
+
+        XCTAssertTrue(presenter === topModal)
+    }
+
+    func testStableTopStopsAtDismissingControllerInModalStack() {
+        let root = StubPresentedViewController()
+        let dismissing = StubPresentedViewController()
+        let leaving = StubPresentedViewController()
+        root.stubPresentedViewController = dismissing
+        dismissing.stubPresentedViewController = leaving
+        dismissing.stubIsBeingDismissed = true
+
+        let presenter = RoktUXPresentationResolver.stableTopViewController(
+            startingAt: root,
+            isPresenterUsable: { !$0.isBeingDismissed }
+        )
+
+        XCTAssertTrue(presenter === root)
+    }
+
+    func testStableTopWalksPastSeveralDetachedControllers() {
+        let chain = (0..<6).map { _ in StubPresentedViewController() }
+        for (presenter, presented) in zip(chain, chain.dropFirst()) {
+            presenter.stubPresentedViewController = presented
+        }
+
+        let presenter = RoktUXPresentationResolver.stableTopViewController(
+            startingAt: chain.first,
+            isPresenterUsable: { $0 === chain.last }
+        )
+
+        XCTAssertTrue(presenter === chain.last)
+    }
+
+    func testStableTopReturnsNilWhileDetachedModalStackIsDismissing() {
+        let root = StubPresentedViewController()
+        let covered = StubPresentedViewController()
+        let dismissing = StubPresentedViewController()
+        let leaving = StubPresentedViewController()
+        root.stubPresentedViewController = covered
+        covered.stubPresentedViewController = dismissing
+        dismissing.stubPresentedViewController = leaving
+        dismissing.stubIsBeingDismissed = true
+
+        let presenter = RoktUXPresentationResolver.stableTopViewController(
+            startingAt: root,
+            isPresenterUsable: { $0 === leaving }
+        )
+
+        XCTAssertNil(presenter)
+    }
+
+    func testStableTopDoesNotLoadDetachedViewsToFindPresenter() {
+        let root = StubPresentedViewController()
+        let covered = StubPresentedViewController()
+        let top = StubPresentedViewController()
+        root.stubPresentedViewController = covered
+        covered.stubPresentedViewController = top
+
+        XCTAssertNil(RoktUXPresentationResolver.stableTopViewController(startingAt: root, logFailures: false))
+        XCTAssertFalse(root.isViewLoaded)
+        XCTAssertFalse(covered.isViewLoaded)
+        XCTAssertFalse(top.isViewLoaded)
+    }
+
+    func testStableTopReturnsNilWithoutStartingController() {
+        XCTAssertNil(RoktUXPresentationResolver.stableTopViewController(startingAt: nil, logFailures: false))
+    }
+
+    func testStableTopResolvesNewModalAfterPreviousStackIsRemoved() {
+        let root = StubPresentedViewController()
+        let covered = StubPresentedViewController()
+        let oldTop = StubPresentedViewController()
+        root.stubPresentedViewController = covered
+        covered.stubPresentedViewController = oldTop
+        let usable: (UIViewController) -> Bool = { $0 !== root && $0 !== covered }
+        XCTAssertTrue(RoktUXPresentationResolver.stableTopViewController(startingAt: root, isPresenterUsable: usable) === oldTop)
+
+        let newTop = StubPresentedViewController()
+        root.stubPresentedViewController = newTop
+
+        XCTAssertTrue(RoktUXPresentationResolver.stableTopViewController(startingAt: root, isPresenterUsable: usable) === newTop)
+    }
 }
 
 private final class StubTabBarController: UITabBarController {
@@ -127,8 +241,13 @@ private final class StubNavigationController: UINavigationController {
 
 private final class StubPresentedViewController: UIViewController {
     var stubPresentedViewController: UIViewController?
+    var stubIsBeingDismissed = false
 
     override var presentedViewController: UIViewController? {
         stubPresentedViewController
+    }
+
+    override var isBeingDismissed: Bool {
+        stubIsBeingDismissed
     }
 }
