@@ -70,6 +70,64 @@ jobs:
           simulator-model: ${{ vars.CI_SIMULATOR_MODEL }}
           simulator-os: ${{ vars.CI_SIMULATOR_OS }}
 
+  coverage-comment:
+    name: Coverage comment
+    needs: [unit-test]
+    if: >-
+      !cancelled() && github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
+    concurrency:
+      group: coverage-comment-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Download coverage summary
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: coverage-summary
+          path: coverage-summary
+
+      - name: Check current PR head
+        id: current
+        if: steps.download.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          head_sha=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}" --jq '.head.sha')
+          if [[ "$head_sha" == "$EXPECTED_HEAD" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Find coverage comment
+        id: fc
+        if: steps.current.outputs.current == 'true'
+        continue-on-error: true
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: <!-- ux-helper-coverage-report -->
+
+      - name: Create or update coverage comment
+        if: steps.fc.outcome == 'success'
+        continue-on-error: true
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: coverage-summary/coverage.md
+
   frame-budget:
     name: Frame Budget
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}

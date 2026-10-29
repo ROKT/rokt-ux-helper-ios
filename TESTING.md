@@ -75,6 +75,40 @@ Check test counts and skips in the result bundle, not just a successful process 
 component tests, a local app build, current-head CI, published-dependency validation and manual
 acceptance are distinct results. A size-report job passing does not itself approve a size increase.
 
+## Code coverage
+
+The package's unit, UI component, ViewInspector, and snapshot tests run together in
+`RoktUXHelperTests`. CI enables coverage and reports one combined line-coverage figure for the
+`RoktUXHelper` production target. A line executed by any of those tests counts once. Test bundles
+and dependencies are excluded.
+
+Each test job writes the report to its job summary and retains a `coverage-summary` Markdown
+artifact for 30 days. On pull requests, a separate job posts one coverage comment and replaces it
+on subsequent runs. Fork and Dependabot pull requests still have summaries and artifacts, but
+do not get comments. Cancelled runs and outdated PR heads do not publish comments. The report
+names the measured commit and links to the workflow run so an older comment is identifiable.
+
+Coverage reporting is advisory: it has no threshold and cannot fail the test job. Failed test
+runs can still report coverage, marked as potentially incomplete. Missing or unreadable coverage
+is reported as unavailable rather than as zero coverage.
+
+To generate the same report locally, add `-enableCodeCoverage YES` to the native test command
+above, then pass its result bundle to:
+
+```bash
+python3 tools/coverage_summary.py "$TEST_OUTPUT/Tests.xcresult" --test-outcome success
+```
+
+Use `--test-outcome failure` when the test command failed; omitting the option reports the outcome
+as unknown and warns that coverage may be incomplete. The command requires Xcode's `xccov` tool
+and Python 3. It prints Markdown without publishing anything.
+
+There is currently no separate XCUITest target or coverage merge stage. If UI and unit tests
+later run separately, merge their coverage reports **and execution archives** with `xccov merge`
+before reporting the combined total. Use unchanged measured sources, matching source paths, and
+the same toolchain; adding or averaging the suites' percentages does not calculate combined
+coverage.
+
 ## Layout nesting frame budget
 
 Transforming a layout is a recursive descent, so the stack it needs is the cost of one level
