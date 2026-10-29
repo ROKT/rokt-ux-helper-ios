@@ -83,6 +83,9 @@ jobs:
           persist-credentials: false
 
       - name: Publish to CocoaPods
+        id: trunk-push
+        # CocoaPods trunk is going read-only; the GitHub release and SPM are already done.
+        continue-on-error: true
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
@@ -95,3 +98,12 @@ jobs:
           fi
 
           pod trunk push RoktUXHelper.podspec --allow-warnings
+
+      - name: Warn when the trunk push failed
+        if: steps.trunk-push.outcome == 'failure'
+        run: |
+          echo "::warning::The CocoaPods trunk push failed. The GitHub release and SPM are not affected. Check the log above for the cause, and re-run this job once it is fixed or trunk accepts pushes again."
+          {
+            echo "### CocoaPods trunk push failed"
+            echo "The GitHub release and SPM are not affected. Check the job log for the cause."
+          } >> "$GITHUB_STEP_SUMMARY"
