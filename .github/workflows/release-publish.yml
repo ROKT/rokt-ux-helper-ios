@@ -50,7 +50,6 @@ jobs:
         uses: ./.github/composite_actions/run_xcodebuild_tests
         timeout-minutes: 15
         with:
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           xcode-version: ${{ vars.CI_XCODE_VERSION }}
           simulator-model: ${{ vars.CI_SIMULATOR_MODEL }}
           simulator-os: ${{ vars.CI_SIMULATOR_OS }}
