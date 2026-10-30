@@ -82,7 +82,8 @@ jobs:
       actions: read
       pull-requests: write
     concurrency:
-      group: coverage-comment-${{ github.event.pull_request.number }}
+      # A slower, stale head must not cancel the current head's coverage comment.
+      group: coverage-comment-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
       cancel-in-progress: true
     steps:
       - name: Download coverage summary
