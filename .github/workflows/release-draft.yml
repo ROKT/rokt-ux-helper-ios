@@ -65,13 +65,16 @@ jobs:
           level: ${{ github.event.inputs.bump-type || 'patch' }}
 
       - name: Save validated version to file
+        env:
+          NEW_VERSION: ${{ steps.bump-version.outputs.new_version }}
         run: |
-          echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
+          echo "$NEW_VERSION" > VERSION
 
       - name: Update podspec version
+        env:
+          NEW_VERSION: ${{ steps.bump-version.outputs.new_version }}
         run: |
-          version="${{ steps.bump-version.outputs.new_version }}"
-          sed -i "s/s\.version[[:space:]]*=[[:space:]]*'[0-9.]*'/s.version          = '${version}'/" RoktUXHelper.podspec
+          sed -i "s/s\.version[[:space:]]*=[[:space:]]*'[0-9.]*'/s.version          = '${NEW_VERSION}'/" RoktUXHelper.podspec
 
       - name: Generate changelog from git history
         id: changelog
