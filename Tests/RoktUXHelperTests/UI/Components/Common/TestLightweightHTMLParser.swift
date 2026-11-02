@@ -734,6 +734,119 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "text more")
     }
 
+    func test_misnested_closing_tag_keeps_inner_tag_open() {
+        // </b> closes while <i> is still open inside it, so the text after it is
+        // italic but no longer bold.
+        let result = LightweightHTMLParser.parse(html: "<b><i>x</b>y</i>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "xy")
+
+        let traits = result.attribute(.font, at: 1, effectiveRange: nil)
+            .flatMap { ($0 as? UIFont)?.fontDescriptor.symbolicTraits }
+        XCTAssertEqual(traits?.contains(.traitItalic), true)
+        XCTAssertEqual(traits?.contains(.traitBold), false)
+    }
+
+    // MARK: - Nesting depth and input length
+
+    /// Parsing runs on the main thread, so its cost must stay linear in the input whatever the
+    /// markup: tags left open, long attribute values on open tags, and tags that never complete
+    /// must not make the parser reread what it has already passed. The budget sits far above a
+    /// linear parse and far below a quadratic one, so a busy simulator does not fail it.
+    func test_parse_time_stays_linear_in_input_length() {
+        let deepestFonts = String(repeating: "<font color=#ffffff>", count: 31)
+        let payloads = [
+            String(repeating: "<b>", count: 10_000) + String(repeating: "</i>", count: 10_000),
+            String(repeating: "<i>", count: 5_000) + String(repeating: "<b>", count: 5_000)
+                + String(repeating: "</i>", count: 5_000),
+            String(repeating: "<font color=f>x", count: 6_000),
+            deepestFonts + String(repeating: "<b>x</b>", count: 11_000),
+            "<a href=\"https://example.com/" + String(repeating: "a", count: 50_000) + "\">"
+                + String(repeating: "x<b></b>", count: 5_000),
+            String(repeating: "<a ", count: 30_000) + "/x>",
+            String(repeating: "<a x=\"", count: 15_000) + ">"
+        ]
+
+        for payload in payloads {
+            let start = CFAbsoluteTimeGetCurrent()
+            _ = LightweightHTMLParser.parse(html: payload, baseFont: baseFont)
+            XCTAssertLessThan(CFAbsoluteTimeGetCurrent() - start, 3.0, "payload: \(payload.prefix(20))…")
+        }
+    }
+
+    func test_inline_tags_nested_beyond_32_levels_are_ignored() {
+        let html = String(repeating: "<u>", count: 32) + "<i>x</i>" + String(repeating: "</u>", count: 32)
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "x")
+
+        XCTAssertNotNil(result.attribute(.underlineStyle, at: 0, effectiveRange: nil))
+        let font = result.attribute(.font, at: 0, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitItalic), false)
+    }
+
+    func test_closing_more_tags_than_the_depth_limit_restores_base_style() {
+        let html = String(repeating: "<b>", count: 40) + "x" + String(repeating: "</b>", count: 40) + "y"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "xy")
+
+        let boldAt = { (index: Int) in
+            (result.attribute(.font, at: index, effectiveRange: nil) as? UIFont)?
+                .fontDescriptor.symbolicTraits.contains(.traitBold)
+        }
+        XCTAssertEqual(boldAt(0), true)
+        XCTAssertEqual(boldAt(1), false)
+    }
+
+    func test_closing_an_ignored_tag_keeps_the_outer_tag_of_the_same_name_open() {
+        let html = "<b>" + String(repeating: "<u>", count: 31) + "<b>x</b>y"
+            + String(repeating: "</u>", count: 31) + "</b>z"
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string, "xyz")
+
+        let boldAt = { (index: Int) in
+            (result.attribute(.font, at: index, effectiveRange: nil) as? UIFont)?
+                .fontDescriptor.symbolicTraits.contains(.traitBold)
+        }
+        XCTAssertEqual(boldAt(1), true)
+        XCTAssertEqual(boldAt(2), false)
+    }
+
+    func test_closing_tags_of_ignored_tags_are_not_reported_as_stray() {
+        let recorder = RoktUXLogRecorder()
+        let logger = RoktUXLogger(output: recorder.record)
+        logger.logLevel = .warning
+        let original = RoktUXLogger.setShared(logger)
+        defer { RoktUXLogger.setShared(original) }
+
+        let html = String(repeating: "<b>", count: 40) + "x" + String(repeating: "</b>", count: 40)
+        _ = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+
+        // Only the warning that the nesting limit was exceeded.
+        XCTAssertEqual(recorder.messages.count, 1, "\(recorder.messages)")
+    }
+
+    func test_input_longer_than_100_000_characters_is_truncated() {
+        let html = String(repeating: "😀", count: 100_010)
+        let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+        XCTAssertEqual(result.string.count, 100_000)
+    }
+
+    func test_lt_inside_tag_renders_as_text() {
+        let result = LightweightHTMLParser.parse(html: "<a x <b>bold</b>", baseFont: baseFont)
+        XCTAssertEqual(result.string, "<a x bold")
+
+        let font = result.attribute(.font, at: 5, effectiveRange: nil) as? UIFont
+        XCTAssertEqual(font?.fontDescriptor.symbolicTraits.contains(.traitBold), true)
+    }
+
+    func test_lt_inside_quoted_attribute_renders_tag_as_text() {
+        let result = LightweightHTMLParser.parse(
+            html: "<a href=\"https://example.com/?q=<b>\">link</a>",
+            baseFont: baseFont
+        )
+        XCTAssertEqual(result.string, "<a href=\"https://example.com/?q=\">link")
+        XCTAssertNil(result.attribute(.link, at: result.length - 1, effectiveRange: nil))
+    }
+
     // MARK: - Integration with htmlToAttributedString extension
 
     func test_htmlToAttributedString_uses_parser() {

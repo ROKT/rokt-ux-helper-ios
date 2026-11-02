@@ -36,6 +36,12 @@ enum LightweightHTMLParser {
     private static let blockSpacerLineHeightRatio: CGFloat = 0.4
     private static let spaceUnit = unichar(0x20)
     private static let newlineUnit = unichar(0x0A)
+    /// Inline tags nested deeper than this are ignored. Authored copy nests a handful of levels;
+    /// the limit bounds the open tags that closing a tag and styling a run of text walk.
+    private static let maxInlineDepth = 32
+    /// Longer input is truncated before parsing, bounding the work done on the main thread.
+    private static let maxHTMLLength = 100_000
+
     /// `scanTag` accepts any ASCII letter/digit/hyphen name, not just the
     /// documented tag set, so a misnesting/stray-tag warning must not log a
     /// tag name verbatim — it may be a slice of authored content (e.g. an
@@ -64,10 +70,15 @@ enum LightweightHTMLParser {
             baseFont: baseFont,
             spacerFontSize: blockSpacerHeight.map { $0 * blockSpacerLineHeightRatio } ?? paragraphSpacerFontSize
         )
-        var rest = html[...]
+        var rest = html.prefix(maxHTMLLength)
+        if rest.endIndex != html.endIndex {
+            RoktUXLogger.shared.warning(
+                "Rich text is longer than \(maxHTMLLength) characters; the rest is not rendered."
+            )
+        }
         // A tag needs a closing ">". After the last one, a "<" can only be text,
         // so skip the scan instead of rereading the rest of the input each time.
-        let lastTagEnd = html.utf8.lastIndex(of: UInt8(ascii: ">"))
+        let lastTagEnd = rest.utf8.lastIndex(of: UInt8(ascii: ">"))
 
         while !rest.isEmpty {
             if rest.hasPrefix("<!--") {
@@ -93,6 +104,14 @@ enum LightweightHTMLParser {
         let name: String
         let isClosing: Bool
         let attributes: [String: String]
+    }
+
+    /// An open inline tag with its link and colour resolved once, so that styling each run of
+    /// text does not parse attribute values again.
+    private struct InlineTag {
+        let name: String
+        let link: URL?
+        let color: UIColor?
     }
 
     private struct ListContext {
@@ -131,13 +150,17 @@ enum LightweightHTMLParser {
         let baseFont: UIFont?
         let spacerFontSize: CGFloat
         let result = NSMutableAttributedString()
-        var tagStack: [Tag] = []
+        var tagStack: [InlineTag] = []
+        /// Opening tags ignored for exceeding `maxInlineDepth`, by name. In well-nested markup they
+        /// are the innermost open tags, so a closing tag with the same name closes one of them first.
+        var ignoredInlineTags: [String: Int] = [:]
+        var hasWarnedAboutDepth = false
         var paragraphStart: Int?
         var lists: [ListContext] = []
         var openItems: [OpenListItem] = []
         // Keep the tags from the first space in a collapsed run. A tag may close
         // before the space is emitted, or a different tag may open after it.
-        var pendingSpaceTags: [Tag]?
+        var pendingSpaceTags: [InlineTag]?
 
         /// The last UTF-16 unit of the output. `result.string` would copy the whole
         /// output on every read, making parsing quadratic in the input size.
@@ -180,7 +203,21 @@ enum LightweightHTMLParser {
                 pendingSpaceTags = nil
                 openListItem()
             default:
-                tagStack.append(tag)
+                guard tagStack.count < maxInlineDepth else {
+                    ignoredInlineTags[tag.name, default: 0] += 1
+                    if !hasWarnedAboutDepth {
+                        hasWarnedAboutDepth = true
+                        RoktUXLogger.shared.warning(
+                            "Inline tags are nested more than \(maxInlineDepth) levels deep; deeper tags are ignored."
+                        )
+                    }
+                    return
+                }
+                tagStack.append(InlineTag(
+                    name: tag.name,
+                    link: tag.name == "a" ? tag.attributes["href"].flatMap(URL.init(string:)) : nil,
+                    color: tag.name == "font" ? tag.attributes["color"].map(UIColor.init(hexString:)) : nil
+                ))
             }
         }
 
@@ -203,7 +240,9 @@ enum LightweightHTMLParser {
                 }
                 lists.removeLast()
             default:
-                if let index = tagStack.lastIndex(where: { $0.name == tag.name }) {
+                if let ignored = ignoredInlineTags[tag.name] {
+                    ignoredInlineTags[tag.name] = ignored > 1 ? ignored - 1 : nil
+                } else if let index = tagStack.lastIndex(where: { $0.name == tag.name }) {
                     if index != tagStack.count - 1 {
                         let stillOpen = tagStack[(index + 1)...]
                             .map { loggableTagName($0.name) }
@@ -328,7 +367,7 @@ enum LightweightHTMLParser {
             }
         }
 
-        private func attributes(for tags: [Tag]) -> [NSAttributedString.Key: Any] {
+        private func attributes(for tags: [InlineTag]) -> [NSAttributedString.Key: Any] {
             var isBold = false
             var isItalic = false
             var attributes: [NSAttributedString.Key: Any] = [:]
@@ -340,12 +379,12 @@ enum LightweightHTMLParser {
                 case "u": attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
                 case "s", "strike": attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
                 case "a":
-                    if let url = tag.attributes["href"].flatMap(URL.init(string:)) {
-                        attributes[.link] = url
+                    if let link = tag.link {
+                        attributes[.link] = link
                     }
                 case "font":
-                    if let color = tag.attributes["color"] {
-                        attributes[.foregroundColor] = UIColor(hexString: color)
+                    if let color = tag.color {
+                        attributes[.foregroundColor] = color
                     }
                 default: break
                 }
@@ -372,7 +411,9 @@ enum LightweightHTMLParser {
 
     /// Scans the tag at the start of `input`, returning it and the text after
     /// its `>`. Returns `nil` when `input` does not start with a complete tag,
-    /// so the caller can render the `<` as text.
+    /// so the caller can render the `<` as text. A `<` before the closing `>`
+    /// also returns `nil`: the scan then never passes the next `<`, where the
+    /// caller resumes, so no part of the input is scanned twice as a tag.
     private static func scanTag(_ input: Substring) -> (Tag, Substring)? {
         var rest = input.dropFirst()
         let isClosing = rest.first == "/"
@@ -386,8 +427,9 @@ enum LightweightHTMLParser {
         while !isClosing {
             rest = rest.drop(while: \.isWhitespace)
             guard let next = rest.first, next != ">", next != "/" else { break }
+            if next == "<" { return nil }
 
-            let attributeName = rest.prefix { !"=>/".contains($0) && !$0.isWhitespace }
+            let attributeName = rest.prefix { !"=></".contains($0) && !$0.isWhitespace }
             guard !attributeName.isEmpty else {
                 rest = rest.dropFirst()
                 continue
@@ -398,10 +440,12 @@ enum LightweightHTMLParser {
 
             let value: Substring
             if let quote = rest.first, quote == "\"" || quote == "'" {
-                value = rest.dropFirst().prefix { $0 != quote }
-                rest = rest[value.endIndex...].dropFirst()
+                value = rest.dropFirst().prefix { $0 != quote && $0 != "<" }
+                rest = rest[value.endIndex...]
+                guard rest.first == quote else { return nil }
+                rest = rest.dropFirst()
             } else {
-                value = rest.prefix { $0 != ">" && !$0.isWhitespace }
+                value = rest.prefix { $0 != ">" && $0 != "<" && !$0.isWhitespace }
                 rest = rest[value.endIndex...]
             }
             attributes[attributeName.lowercased()] = decodeHTMLEntities(value)
