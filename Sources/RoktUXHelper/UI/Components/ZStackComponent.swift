@@ -124,6 +124,7 @@ struct ZStackComponent: View {
                                 stretchChildren: containerStyle?.alignItems == .stretch
                             )
                     )
+                    .environment(\.useContentHeightForPercentages, false)
                 }
             }
         }

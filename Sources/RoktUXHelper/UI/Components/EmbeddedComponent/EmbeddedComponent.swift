@@ -35,6 +35,7 @@ struct EmbeddedComponent: View {
                                   parentWidth: $availableWidth,
                                   parentHeight: $availableHeight,
                                   styleState: .constant(.default))
+                .environment(\.useContentHeightForPercentages, true)
         }
         .frame(maxWidth: .infinity)
         .readSize { size in

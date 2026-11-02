@@ -614,6 +614,8 @@ public class RoktUX: UXEventsDelegate {
                 if let layoutLoader {
 
                     let onSizeChange = { [weak layoutLoader] (size: CGFloat) in
+                        // A non-finite height raises an exception in UIKit, which stops the app.
+                        guard size.isFinite else { return }
                         // Round once here so the height applied to the embedded view's own
                         // constraint and the height published to the host are always identical.
                         // A host that constrains the view to the published height would otherwise

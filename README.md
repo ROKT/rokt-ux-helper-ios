@@ -142,6 +142,8 @@ For a detailed guide on adding new snapshots, see [TESTING.md](./TESTING.md).
 2. **Error Handling**:
    - Schema parsing errors are handled gracefully but may result in empty views
 
+3. **Percentage Heights**: Give a column a fixed or bounded height to size its children by percentage. Wrapping columns use their children's content heights to avoid a sizing feedback loop. Rows and overlapping stacks continue to resolve percentage heights against their measured height.
+
 ### How to Update the Layouts Schema File
 
 1. Confirm the intended version is available from both the [Swift schema package](https://github.com/ROKT/dcui-swift-schema) and CocoaPods. A Swift tag alone does not establish that the matching pod was published.
