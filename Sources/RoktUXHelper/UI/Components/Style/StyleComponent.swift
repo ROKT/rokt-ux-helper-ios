@@ -11,6 +11,7 @@ internal extension View {
         parentWidth: CGFloat?,
         defaultHeight: HeightFitProperty,
         parentHeight: CGFloat?,
+        useContentHeightForPercentages: Bool = false,
         horizontalAxisAlignment: Alignment,
         verticalAxisAlignment: Alignment,
         alignSelf: FlexAlignment?,
@@ -83,7 +84,7 @@ internal extension View {
         }
 
         // update with percentage height
-        let percentageHeight = PercentageHeightModifier(height: parentHeight,
+        let percentageHeight = PercentageHeightModifier(height: useContentHeightForPercentages ? nil : parentHeight,
                                                         percentage: dimension?.height,
                                                         verticalAxisAlignment: verticalAxisAlignment,
                                                         margin: margin)
@@ -354,7 +355,7 @@ struct PercentageWidthModifier {
             return nil
         }
 
-        return (width * CGFloat(value/100)) - (margin?.horizontalSpacing ?? 0)
+        return PercentageLength.resolve(value, of: width, margin: margin?.horizontalSpacing ?? 0)
     }
 }
 
@@ -382,7 +383,20 @@ struct PercentageHeightModifier {
         else {
             return nil
         }
-        return height * CGFloat(value/100) - (margin?.verticalSpacing ?? 0)
+        return PercentageLength.resolve(value, of: height, margin: margin?.verticalSpacing ?? 0)
+    }
+}
+
+/// Resolves percentage dimensions to finite, nonnegative lengths.
+enum PercentageLength {
+    /// Twice the longest side of the largest iPad (1376 pt), as a final sizing safeguard.
+    static let maximum: CGFloat = 2 * 1376
+
+    static func resolve(_ percentage: Float, of parentLength: CGFloat, margin: CGFloat) -> CGFloat {
+        let share = CGFloat(min(max(percentage, 0), 100))/100
+        let length = parentLength * share - margin
+        guard !length.isNaN else { return 0 }
+        return min(max(length, 0), maximum)
     }
 }
 

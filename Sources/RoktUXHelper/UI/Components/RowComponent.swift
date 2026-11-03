@@ -201,6 +201,7 @@ struct RowComponent: View {
                                 stretchChildren: containerStyle?.alignItems == .stretch
                             )
                     )
+                    .environment(\.useContentHeightForPercentages, false)
                 }
             }
         }

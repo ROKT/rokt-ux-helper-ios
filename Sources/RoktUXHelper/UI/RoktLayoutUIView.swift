@@ -188,7 +188,7 @@ extension RoktLayoutUIView: LayoutLoader {
     /// Updates the size of the embedded view.
     /// - Parameter size: The new height for the embedded view.
     public func updateEmbeddedSize(_ size: CGFloat) {
-        if roktEmbeddedSwiftUIView != nil {
+        if roktEmbeddedSwiftUIView != nil, size.isFinite {
             heightConstraint.constant = size
             RoktUXLogger.shared.debug("Embedded height resized to \(size)")
         }
