@@ -9,6 +9,9 @@ The draft workflow updates `VERSION`, `RoktUXHelper.podspec`, and
 merged, the publish workflow creates the GitHub release and tag used by Swift
 Package Manager, then publishes the podspec to CocoaPods.
 
+`Release – Draft` offers `patch`, `minor`, and `major` version bumps from `main`.
+Maintenance branches accept `patch` only.
+
 ## Standard releases from main
 
 Use this flow for normal patch, minor, or major releases on the main release
@@ -63,6 +66,9 @@ releases from `main` update the latest release badge.
 
 `Release – Draft` can run from `main` or `maintenance/*` branches. Maintenance
 branch drafts must use a patch bump.
+
+`Release – Draft` creates and manages `release/<version>` branches for release
+PRs. Merge changes into the intended base branch before running it.
 
 `Release – Publish` runs only when `VERSION` changes on `main` or
 `maintenance/*`, and it ignores branch create/delete push events.
