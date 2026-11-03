@@ -193,7 +193,7 @@ class RoktUXLoggerTests: XCTestCase {
     }
 }
 
-private final class RoktUXLogRecorder: @unchecked Sendable {
+final class RoktUXLogRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var recordedMessages: [String] = []
 
