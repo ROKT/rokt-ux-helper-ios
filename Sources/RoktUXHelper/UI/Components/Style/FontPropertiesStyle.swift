@@ -61,6 +61,20 @@ extension TextStylingProperties {
         }
     }
 
+    /// Spacing SwiftUI adds between lines so each line is `lineHeight` tall. `lineHeight` scales with
+    /// Dynamic Type like the font does; a fixed one goes negative at large sizes and lines overlap.
+    /// - Parameter contentSize: Dynamic Type size to measure at; `nil` uses the current setting.
+    func lineSpacing(contentSize: UIContentSizeCategory? = nil) -> CGFloat {
+        guard let lineHeight, let font = styledUIFont else { return 0 }
+        let fontSize = (fontSize ?? 17).getAsScaledFontSize(contentSize: contentSize)
+        return lineHeight.getAsScaledFontSize(contentSize: contentSize) - font.withSize(fontSize).lineHeight
+    }
+
+    /// Vertical padding that gives a single line its `lineHeight`; zero when the font is taller.
+    func lineHeightPadding(contentSize: UIContentSizeCategory? = nil) -> CGFloat {
+        max(0, lineSpacing(contentSize: contentSize))/2
+    }
+
     var baselineOffset: CGFloat {
         guard let baselineTextAlign else { return 0 }
 
