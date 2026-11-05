@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.6] - 2026-11-05
+
+### Fixed
+
+- Scale line height with Dynamic Type so lines don't overlap ([#427](https://github.com/ROKT/rokt-ux-helper-ios/pull/427))
+- Keep HTML parsing linear and bound input length ([#426](https://github.com/ROKT/rokt-ux-helper-ios/pull/426))
+- Keep percentage sizes and embedded height finite ([#425](https://github.com/ROKT/rokt-ux-helper-ios/pull/425))
+
+### Changed
+
+- Simplify release workflows and fix shell inputs ([#424](https://github.com/ROKT/rokt-ux-helper-ios/pull/424))
+- Upgrade trunk ([#423](https://github.com/ROKT/rokt-ux-helper-ios/pull/423))
+- Report combined test coverage on pull requests ([#422](https://github.com/ROKT/rokt-ux-helper-ios/pull/422))
+- Remove Codecov ([#420](https://github.com/ROKT/rokt-ux-helper-ios/pull/420))
+- Keep releases green when the CocoaPods trunk push fails ([#421](https://github.com/ROKT/rokt-ux-helper-ios/pull/421))
+
 ## [2.1.5] - 2026-10-26
 
 ### Fixed
@@ -537,7 +553,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.5...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.6...HEAD
+[2.1.6]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.5...2.1.6
 [2.1.5]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.4...2.1.5
 [2.1.4]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/ROKT/rokt-ux-helper-ios/compare/2.1.2...2.1.3
