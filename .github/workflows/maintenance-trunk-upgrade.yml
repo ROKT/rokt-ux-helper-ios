@@ -35,6 +35,8 @@ jobs:
 
   trunk-check:
     name: Trunk code check
+    permissions:
+      contents: read
     runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-latest' }}
     steps:
       - name: Checkout
