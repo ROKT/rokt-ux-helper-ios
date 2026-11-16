@@ -39,16 +39,24 @@ struct Base64Image: View {
         return nil
     }
 
-    /// Classifies a base64-encoded image payload as `.decoded`, `.unsupportedFormat` (valid
-    /// in-limit base64 payload whose container type `ImageIO` does not recognise, such as SVG),
-    /// or `.rejected` (empty, invalid base64, exceeding `maxBase64PayloadBytes`, corrupt raster
-    /// header, or exceeding pixel dimension limits).
+    /// Classifies a base64-encoded image payload as `.decoded`, `.unsupportedFormat` (in-limit
+    /// payload that is not decodable base64 after percent-decoding and whitespace removal, or
+    /// whose container type `ImageIO` does not recognise, such as SVG), or `.rejected` (empty,
+    /// exceeding `maxBase64PayloadBytes`, corrupt raster header, or exceeding pixel dimension limits).
     static func decodeResult(base64String: String) -> DecodeResult {
         let trimmedPayload = base64String.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedPayload.isEmpty,
-              trimmedPayload.utf8.count <= maxBase64PayloadBytes,
-              let data = Data(base64Encoded: trimmedPayload),
-              !data.isEmpty,
+              trimmedPayload.utf8.count <= maxBase64PayloadBytes
+        else {
+            return .rejected
+        }
+
+        let normalizedPayload = (trimmedPayload.removingPercentEncoding ?? trimmedPayload)
+            .filter { !$0.isWhitespace }
+        guard let data = Data(base64Encoded: normalizedPayload) else {
+            return .unsupportedFormat
+        }
+        guard !data.isEmpty,
               data.count <= maxBase64PayloadBytes
         else {
             return .rejected

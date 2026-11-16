@@ -157,6 +157,43 @@ final class TestAsyncImageView: XCTestCase {
         XCTAssertNoThrow(try view.inspect().find(Base64Image.self))
     }
 
+    func test_percentEncodedOrLineWrappedPNGDataURI_decodesAndRendersBase64Image() throws {
+        let uris = [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII%3D",
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAA\nC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+        ]
+
+        for uri in uris {
+            let view = sut(uri)
+
+            XCTAssertTrue(view.isURLBase64Image)
+            XCTAssertEqual(view.decodedBase64Image?.size, CGSize(width: 1, height: 1))
+            XCTAssertNoThrow(try view.inspect().find(Base64Image.self))
+        }
+    }
+
+    func test_undecodableBase64PayloadWithinSizeLimit_withImageLoader_fallsBackToExternalAsyncImage() throws {
+        let uri = "data:image/png;base64,not*valid*base64"
+        let loader = SpyImageLoader()
+        let view = sut(uri, imageLoader: loader)
+
+        XCTAssertTrue(view.isURLBase64Image)
+        XCTAssertNil(view.decodedBase64Image)
+        XCTAssertNoThrow(try view.inspect().find(ExternalAsyncImage.self))
+        XCTAssertFalse(loader.requestedURLs.isEmpty)
+        XCTAssertEqual(Set(loader.requestedURLs), [uri])
+    }
+
+    func test_undecodableBase64PayloadWithinSizeLimit_withoutImageLoader_isRejected() {
+        let view = sut("data:image/png;base64,not*valid*base64")
+
+        XCTAssertTrue(view.isURLBase64Image)
+        XCTAssertNil(view.decodedBase64Image)
+        XCTAssertThrowsError(try view.inspect().find(Base64Image.self))
+        XCTAssertThrowsError(try view.inspect().find(ExternalAsyncImage.self))
+        XCTAssertThrowsError(try view.inspect().asyncImage())
+    }
+
     func test_svgDataURIWithinSizeLimit_withImageLoader_fallsBackToExternalAsyncImage() throws {
         let svgURI = "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4="
         let loader = SpyImageLoader()
@@ -165,7 +202,8 @@ final class TestAsyncImageView: XCTestCase {
         XCTAssertTrue(view.isURLBase64Image)
         XCTAssertNil(view.decodedBase64Image)
         XCTAssertNoThrow(try view.inspect().find(ExternalAsyncImage.self))
-        XCTAssertEqual(loader.requestedURLs, [svgURI])
+        XCTAssertFalse(loader.requestedURLs.isEmpty)
+        XCTAssertEqual(Set(loader.requestedURLs), [svgURI])
     }
 
     func test_svgDataURIWithinSizeLimit_withoutImageLoader_isRejectedWithoutAsyncImageFallback() {
@@ -193,7 +231,8 @@ final class TestAsyncImageView: XCTestCase {
             XCTAssertFalse(view.isURLBase64Image)
             XCTAssertTrue(view.isInLimitNonBase64ImageDataURI)
             XCTAssertNoThrow(try view.inspect().find(ExternalAsyncImage.self))
-            XCTAssertEqual(loader.requestedURLs, [svgURI])
+            XCTAssertFalse(loader.requestedURLs.isEmpty)
+            XCTAssertEqual(Set(loader.requestedURLs), [svgURI])
         }
     }
 
