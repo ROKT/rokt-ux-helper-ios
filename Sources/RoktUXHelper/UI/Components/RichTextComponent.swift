@@ -27,24 +27,9 @@ struct RichTextComponent: View {
         return Int(lineLimit)
     }
 
-    var lineHeight: CGFloat {
-        guard let lineHeight = style?.text?.lineHeight,
-              let fontLineHeight = style?.text?.styledUIFont?.lineHeight
-        else {
-            return 0
-        }
-        return CGFloat(lineHeight) - fontLineHeight
-    }
+    var lineHeight: CGFloat { style?.text?.lineSpacing() ?? 0 }
 
-    var lineHeightPadding: CGFloat {
-        guard let lineHeight = style?.text?.lineHeight,
-              let fontLineHeight = style?.text?.styledUIFont?.lineHeight,
-              CGFloat(lineHeight) > fontLineHeight
-        else {
-            return 0
-        }
-        return (CGFloat(lineHeight) - fontLineHeight)/2
-    }
+    var lineHeightPadding: CGFloat { style?.text?.lineHeightPadding() ?? 0 }
 
     let config: ComponentConfig
     @ObservedObject var model: RichTextViewModel

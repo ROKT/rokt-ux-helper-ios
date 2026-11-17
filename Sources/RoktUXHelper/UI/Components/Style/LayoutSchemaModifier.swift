@@ -1,8 +1,20 @@
 import SwiftUI
 import DcuiSchema
 
+private struct ContentHeightForPercentagesKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var useContentHeightForPercentages: Bool {
+        get { self[ContentHeightForPercentagesKey.self] }
+        set { self[ContentHeightForPercentagesKey.self] = newValue }
+    }
+}
+
 @available(iOS 15, *)
 struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
+    @SwiftUI.Environment(\.useContentHeightForPercentages) private var useContentHeightForPercentages
     let verticalAlignmentProperty: VerticalAlignmentProperty
     let horizontalAlignmentProperty: HorizontalAlignmentProperty
 
@@ -35,8 +47,31 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
     let clipsToBounds: Bool
     let imageLoader: RoktUXImageLoader?
 
+    private var usesContentHeightForPercentages: Bool {
+        if dimension?.maxHeight != nil {
+            return false
+        }
+        let fillsHeight = (parent == .column && (flex?.weight ?? 0) != 0)
+            || (parent == .row && (flex?.alignSelf == .stretch || parentOverride?.stretchChildren == true))
+        if fillsHeight {
+            return useContentHeightForPercentages
+        }
+        switch dimension?.height {
+        case .fixed:
+            return false
+        case .percentage, .fit(.fitHeight):
+            return useContentHeightForPercentages
+        case .fit(.wrapContent):
+            return true
+        default:
+            return defaultHeight != .fitHeight || useContentHeightForPercentages
+        }
+    }
+
     func body(content: Content) -> some View {
         content
+            // Wrapping columns need content-height children to avoid a sizing feedback loop.
+            .environment(\.useContentHeightForPercentages, usesContentHeightForPercentages)
             .padding(frame: getPadding())
             // HAS TO BE APPLIED BEFORE BACKGROUND
             .frame(dimension: dimension,
@@ -46,6 +81,7 @@ struct LayoutSchemaModifier: ViewModifier, SpacingStyleable {
                    parentWidth: parentWidth,
                    defaultHeight: defaultHeight,
                    parentHeight: parentHeight,
+                   useContentHeightForPercentages: useContentHeightForPercentages,
                    horizontalAxisAlignment: horizontalAlignmentProperty.getAlignment(),
                    verticalAxisAlignment: verticalAlignmentProperty.getAlignment(),
                    alignSelf: flex?.alignSelf,

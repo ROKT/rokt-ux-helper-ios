@@ -198,7 +198,7 @@ class RichTextViewModel: Hashable, Identifiable, ObservableObject, ScreenSizeAda
                 textTransform: breakpointDefaultStyle?.text?.textTransform,
                 linkStyles: breakpointLinkStyle?.text,
                 colorScheme: colorScheme,
-                blockSpacerHeight: breakpointDefaultStyle?.text?.lineHeight.map { CGFloat($0) }
+                blockSpacerHeight: breakpointDefaultStyle?.text?.lineHeight?.getAsScaledFontSize()
             )
 
             self.attributedString = htmlTransformedValue

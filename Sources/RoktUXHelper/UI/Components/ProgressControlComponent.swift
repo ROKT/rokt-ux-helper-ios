@@ -7,6 +7,7 @@ private let kPreviousButtonAnnouncement = "Previous"
 @available(iOS 15, *)
 struct ProgressControlComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @SwiftUI.Environment(\.useContentHeightForPercentages) private var useContentHeightForPercentages
 
     @State var styleState: StyleState = .default
     @State var isHovered: Bool = false
@@ -187,6 +188,7 @@ struct ProgressControlComponent: View {
                                                 stretchChildren: containerStyle?.alignItems == .stretch
                                             ),
                                           expandsToContainerOnSelfAlign: shouldExpandToContainerOnSelfAlign())
+                        .environment(\.useContentHeightForPercentages, useContentHeightForPercentages)
                 }
             }
         }

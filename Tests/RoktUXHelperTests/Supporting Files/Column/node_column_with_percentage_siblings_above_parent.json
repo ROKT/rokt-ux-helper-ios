@@ -1,0 +1,92 @@
+{
+  "styles": {
+    "elements": {
+      "own": [
+        {
+          "default": {
+            "background": {
+              "backgroundColor": {
+                "light": "#F5C1C4"
+              }
+            },
+            "container": {
+              "alignItems": "stretch"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "First share",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "height": {
+                      "type": "percentage",
+                      "value": 60
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#D92D20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "BasicText",
+      "node": {
+        "value": "Second share",
+        "styles": {
+          "elements": {
+            "own": [
+              {
+                "default": {
+                  "text": {
+                    "fontSize": 18,
+                    "fontWeight": "700",
+                    "textColor": {
+                      "light": "#FFFFFF"
+                    },
+                    "horizontalTextAlign": "center"
+                  },
+                  "dimension": {
+                    "height": {
+                      "type": "percentage",
+                      "value": 60
+                    }
+                  },
+                  "background": {
+                    "backgroundColor": {
+                      "light": "#2E90FA"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

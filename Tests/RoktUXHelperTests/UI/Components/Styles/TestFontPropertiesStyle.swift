@@ -140,6 +140,53 @@ final class TestFontPropertiesStyle: XCTestCase {
         XCTAssertGreaterThan(large, 10)
         XCTAssertLessThan(small, 10)
         XCTAssertEqual(medium, 10)
-        
+
+    }
+
+    func test_lineSpacing_growsWithDynamicType_soLinesNeverOverlap() throws {
+        let text = TextStylingProperties(
+            textColor: nil,
+            fontSize: 12,
+            fontFamily: nil,
+            fontWeight: nil,
+            lineHeight: 16,
+            horizontalTextAlign: nil,
+            baselineTextAlign: nil,
+            fontStyle: nil,
+            textTransform: nil,
+            letterSpacing: nil,
+            textDecoration: nil,
+            lineLimit: nil
+        )
+        let font = try XCTUnwrap(text.styledUIFont)
+        let defaultSpacing = text.lineSpacing()
+        XCTAssertEqual(defaultSpacing, 16 - font.lineHeight, accuracy: 0.01)
+        XCTAssertEqual(text.lineHeightPadding(), defaultSpacing/2, accuracy: 0.01)
+
+        let largest = UIContentSizeCategory.accessibilityExtraExtraExtraLarge
+        let scale = Float(12).getAsScaledFontSize(contentSize: largest)/12
+        XCTAssertGreaterThan(scale, 2)
+        // The gap scales with the text instead of going negative and drawing lines over each other.
+        XCTAssertEqual(text.lineSpacing(contentSize: largest), defaultSpacing * scale, accuracy: 0.5)
+        XCTAssertEqual(text.lineHeightPadding(contentSize: largest), defaultSpacing * scale/2, accuracy: 0.5)
+    }
+
+    func test_lineSpacing_isZeroWithoutLineHeight() {
+        let text = TextStylingProperties(
+            textColor: nil,
+            fontSize: 12,
+            fontFamily: nil,
+            fontWeight: nil,
+            lineHeight: nil,
+            horizontalTextAlign: nil,
+            baselineTextAlign: nil,
+            fontStyle: nil,
+            textTransform: nil,
+            letterSpacing: nil,
+            textDecoration: nil,
+            lineLimit: nil
+        )
+        XCTAssertEqual(text.lineSpacing(), 0)
+        XCTAssertEqual(text.lineHeightPadding(), 0)
     }
 }

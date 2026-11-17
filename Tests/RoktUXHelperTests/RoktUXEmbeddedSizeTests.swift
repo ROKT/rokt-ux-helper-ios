@@ -90,6 +90,34 @@ final class RoktUXEmbeddedSizeTests: XCTestCase {
 
         XCTAssertEqual(publishedHeights, [164, 164, 100, 250, 0])
     }
+
+    /// A non-finite height must reach neither the embedded view's constraint nor the host:
+    /// UIKit raises an exception for a non-finite constraint constant, which stops the app.
+    func test_embeddedSizeChange_ignoresNonFiniteHeights() throws {
+        var publishedHeights: [CGFloat] = []
+        let layoutLoader = try loadEmbeddedLayout { _, height in publishedHeights.append(height) }
+        let onSizeChanged = try XCTUnwrap(layoutLoader.capturedOnSizeChanged)
+
+        for size in [.infinity, -.infinity, .nan, 120] as [CGFloat] {
+            onSizeChanged(size)
+        }
+
+        XCTAssertEqual(publishedHeights, [120])
+        XCTAssertEqual(layoutLoader.appliedHeights, [120])
+    }
+
+    func test_layoutUIView_updateEmbeddedSize_ignoresNonFiniteHeights() {
+        let layoutView = RoktLayoutUIView(frame: .zero)
+        layoutView.load(onSizeChanged: { _ in }, injectedView: { Text("Embedded") })
+        layoutView.updateEmbeddedSize(120)
+
+        for size in [.infinity, -.infinity, .nan] as [CGFloat] {
+            layoutView.updateEmbeddedSize(size)
+        }
+
+        let heightConstraint = layoutView.constraints.first { $0.firstAttribute == .height && $0.secondItem == nil }
+        XCTAssertEqual(heightConstraint?.constant, 120)
+    }
 }
 
 @available(iOS 15, *)

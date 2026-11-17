@@ -7,9 +7,9 @@ The RoktUXHelper enables partner applications to render tailored user experience
 - James Newman - <james.newman@rokt.com>
 - Thomson Thomas - <thomson.thomas@rokt.com>
 
-| Environment | Build                                                                                                                                                                                     | Coverage                                                                                                                                    |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| main        | [![Build status](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml/badge.svg)](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-ios/graph/badge.svg?token=xFMumIDkv8)](https://codecov.io/gh/ROKT/rokt-ux-helper-ios) |
+| Environment | Build                                                                                                                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| main        | [![Build status](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml/badge.svg)](https://github.com/ROKT/rokt-ux-helper-ios/actions/workflows/pull-request.yml) |
 
 ## Requirements
 
@@ -141,6 +141,8 @@ For a detailed guide on adding new snapshots, see [TESTING.md](./TESTING.md).
 
 2. **Error Handling**:
    - Schema parsing errors are handled gracefully but may result in empty views
+
+3. **Percentage Heights**: Give a column a fixed or bounded height to size its children by percentage. Wrapping columns use their children's content heights to avoid a sizing feedback loop. Rows and overlapping stacks continue to resolve percentage heights against their measured height.
 
 ### How to Update the Layouts Schema File
 

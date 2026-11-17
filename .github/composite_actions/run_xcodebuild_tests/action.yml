@@ -5,9 +5,6 @@ description: Action runs `xcodebuild test`
 # inputs, since `vars` isn't readable inside a composite action).
 
 inputs:
-  codecov-token:
-    description: Codecov token
-    required: false
   xcode-version:
     description: Wired from repo variable CI_XCODE_VERSION by the caller workflow.
     required: true
@@ -39,13 +36,16 @@ runs:
         shutdown_after_job: true
 
     - name: Run unit tests
+      id: tests
       env:
         TEST_RUNNER_SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/snapshot-failures
+        RESULT_BUNDLE_PATH: ${{ runner.temp }}/RoktUXHelperTests.xcresult
       run: >
         set -o pipefail &&
         xcodebuild -skipPackagePluginValidation -scheme RoktUXHelper
         -destination 'id=${{ steps.simulator.outputs.udid }}'
         -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+        -resultBundlePath "$RESULT_BUNDLE_PATH"
         | xcbeautify --renderer github-actions
       shell: bash
 
@@ -57,40 +57,28 @@ runs:
         path: snapshot-failures/
         if-no-files-found: warn
 
-    # The .xcresult bundle is written asynchronously, so coverage extraction can
-    # race it. Coverage is non-fatal for that reason; test outcome comes from the
-    # test step, not from these.
-    - name: Install xcresultparser
-      if: ${{ inputs.codecov-token != '' }}
+    - name: Generate coverage summary
+      id: coverage
+      if: ${{ !cancelled() }}
       continue-on-error: true
-      run: brew install xcresultparser
-      shell: bash
-
-    - name: Process coverage report
-      if: ${{ inputs.codecov-token != '' }}
-      id: process-coverage
-      continue-on-error: true
-      shell: bash
+      env:
+        TEST_OUTCOME: ${{ steps.tests.outcome }}
+        WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
       run: |
-        mkdir -p artifacts
-        xcresultparser --output-format cobertura "$(find DerivedData/Logs/Test -name '*.xcresult' | head -n 1)" --project-root "$(pwd)" > "artifacts/coverage.xml"
+        mkdir -p "$RUNNER_TEMP/coverage-summary"
+        python3 tools/coverage_summary.py "$RUNNER_TEMP/RoktUXHelperTests.xcresult" \
+          --test-outcome "${TEST_OUTCOME:-skipped}" \
+          --commit "$GITHUB_SHA" --run-url "$WORKFLOW_RUN_URL" \
+          > "$RUNNER_TEMP/coverage-summary/coverage.md"
+        cat "$RUNNER_TEMP/coverage-summary/coverage.md" >> "$GITHUB_STEP_SUMMARY"
+      shell: bash
 
-    - name: Upload coverage report
-      if: ${{ inputs.codecov-token != '' && steps.process-coverage.outcome == 'success' }}
-      id: upload-coverage
+    - name: Upload coverage summary
+      if: ${{ !cancelled() && steps.coverage.outcome == 'success' }}
       continue-on-error: true
-      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
-        token: ${{ inputs.codecov-token }}
-        files: ./artifacts/coverage.xml
-        flags: unittests
-        fail_ci_if_error: true
-
-    - name: Warn on coverage post-processing failure
-      if: >-
-        ${{ inputs.codecov-token != '' &&
-            (steps.process-coverage.outcome == 'failure' ||
-             steps.upload-coverage.outcome == 'failure') }}
-      shell: bash
-      run: |
-        echo "::warning::Coverage report generation or upload failed after the test step already completed. Test results are unaffected; see the earlier step logs for details."
+        name: coverage-summary
+        path: ${{ runner.temp }}/coverage-summary/coverage.md
+        retention-days: 30
+        if-no-files-found: warn

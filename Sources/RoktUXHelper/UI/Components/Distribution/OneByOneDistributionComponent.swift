@@ -4,6 +4,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct OneByOneDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @SwiftUI.Environment(\.useContentHeightForPercentages) private var useContentHeightForPercentages
 
     var style: OneByOneDistributionStyles? {
         return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
@@ -104,6 +105,7 @@ struct OneByOneDistributionComponent: View {
                                       parentHeight: $parentHeight,
                                       styleState: $styleState,
                                       parentOverride: parentOverride?.updateBackground(passableBackgroundStyle))
+                .environment(\.useContentHeightForPercentages, useContentHeightForPercentages)
                 .applyLayoutModifier(verticalAlignmentProperty: verticalAlignment,
                                      horizontalAlignmentProperty: horizontalAlignment,
                                      spacing: spacingStyle,

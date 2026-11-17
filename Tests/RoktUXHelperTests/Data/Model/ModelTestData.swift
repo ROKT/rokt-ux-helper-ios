@@ -177,6 +177,14 @@ class ModelTestData: NSObject {
             let data = toData(jsonFilename: "node_scrollable_column_with_percentage_children")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
         }
+        static func columnWithPercentageHeightAboveParent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_column_with_percentage_height_above_parent")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
+        static func columnWithPercentageSiblingsAboveParent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
+            let data = toData(jsonFilename: "node_column_with_percentage_siblings_above_parent")
+            return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)
+        }
         static func scrollableColumnCentersShortContent() -> ColumnModel<LayoutSchemaModel, WhenPredicate> {
             let data = toData(jsonFilename: "node_scrollable_column_centers_short_content")
             return try! JSONDecoder().decode(ColumnModel<LayoutSchemaModel, WhenPredicate>.self, from: data)

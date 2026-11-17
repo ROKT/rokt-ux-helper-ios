@@ -60,6 +60,28 @@ final class TestColumnComponent: XCTestCase {
         )
     }
     
+    /// A child sized at 200% of a column that wraps it renders at the column's height once
+    /// layout settles, instead of growing on every pass.
+    func testSnapshot_percentageHeightAboveParent() throws {
+        let column = ModelTestData.ColumnData.columnWithPercentageHeightAboveParent()
+        let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
+        let model = try transformer.getColumn(
+            column.styles,
+            children: transformer.transformChildren(column.children, context: .outer([]))
+        )
+        let view = TestPlaceHolder(layout: LayoutSchemaViewModel.column(model))
+            .frame(width: 350, height: 350)
+
+        let hostingController = UIHostingController(rootView: view)
+        assertSnapshot(
+            of: hostingController,
+            as: .wait(
+                for: 1,
+                on: .image(on: snapshotDevice, precision: snapshotPrecision, perceptualPrecision: snapshotPerceptualPrecision)
+            )
+        )
+    }
+
     func get_model() throws -> ColumnViewModel {
         let transformer = LayoutTransformer(layoutPlugin: get_mock_layout_plugin())
         let column = ModelTestData.ColumnData.columnWithBasicText()

@@ -4,6 +4,7 @@ import DcuiSchema
 @available(iOS 15, *)
 struct GroupedDistributionComponent: View {
     @SwiftUI.Environment(\.colorScheme) var colorScheme
+    @SwiftUI.Environment(\.useContentHeightForPercentages) private var useContentHeightForPercentages
 
     var style: GroupedDistributionStyles? {
         return model.defaultStyle?.count ?? -1 > breakpointIndex ? model.defaultStyle?[breakpointIndex] : nil
@@ -204,6 +205,7 @@ struct GroupedDistributionComponent: View {
                                           parentHeight: $parentHeight,
                                           styleState: $styleState,
                                           parentOverride: parentOverride?.updateBackground(passableBackgroundStyle))
+                    .environment(\.useContentHeightForPercentages, useContentHeightForPercentages)
                     .opacity(getOpacity())
                     .onLoad {
                         toggleTransition = true
