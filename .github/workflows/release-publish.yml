@@ -64,6 +64,8 @@ jobs:
         with:
           makeLatest: ${{ steps.release-stability.outputs.is-stable == 'true' && github.ref_name == 'main' }}
           tag: ${{ steps.version-file.outputs.release-version }}
+          # Tag the commit this run releases, not main's tip when the step runs.
+          commit: ${{ github.sha }}
           body: |
             ## Release notes:
             ${{ steps.extract-release-notes.outputs.release_notes }}
