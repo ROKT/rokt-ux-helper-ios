@@ -699,6 +699,21 @@ final class TestLightweightHTMLParser: XCTestCase {
         XCTAssertEqual(result.string, "Read terms")
     }
 
+    func test_comment_edge_cases() {
+        let cases = [
+            ("a<!-->b", "ab"),
+            ("a<!---->b", "ab"),
+            ("a<!-- x - y -- z -->b", "ab"),
+            ("a<!--<b>x</b>-->b", "ab"),
+            ("a<!--x--><!--y-->b", "ab"),
+            ("a<!-- never closed", "a")
+        ]
+        for (html, expected) in cases {
+            let result = LightweightHTMLParser.parse(html: html, baseFont: baseFont)
+            XCTAssertEqual(result.string, expected, "html: \(html)")
+        }
+    }
+
     func test_empty_tag() {
         let result = LightweightHTMLParser.parse(html: "Before<>After", baseFont: baseFont)
         XCTAssertTrue(result.string.contains("Before"))
@@ -749,8 +764,10 @@ final class TestLightweightHTMLParser: XCTestCase {
     // MARK: - Nesting depth and input length
 
     /// Parsing runs on the main thread, so its cost must stay linear in the input whatever the
-    /// markup: tags left open, long attribute values on open tags, and tags that never complete
-    /// must not make the parser reread what it has already passed. The budget sits far above a
+    /// markup: tags left open, long attribute values on open tags, tags that never complete,
+    /// and many comments before a long tail must not make the parser reread what it has already
+    /// passed. A base letter with many combining marks is one character, so the tail stays under
+    /// the length limit while being hundreds of kilobytes long. The budget sits far above a
     /// linear parse and far below a quadratic one, so a busy simulator does not fail it.
     func test_parse_time_stays_linear_in_input_length() {
         let deepestFonts = String(repeating: "<font color=#ffffff>", count: 31)
@@ -763,7 +780,8 @@ final class TestLightweightHTMLParser: XCTestCase {
             "<a href=\"https://example.com/" + String(repeating: "a", count: 50_000) + "\">"
                 + String(repeating: "x<b></b>", count: 5_000),
             String(repeating: "<a ", count: 30_000) + "/x>",
-            String(repeating: "<a x=\"", count: 15_000) + ">"
+            String(repeating: "<a x=\"", count: 15_000) + ">",
+            String(repeating: "<!-->", count: 15_000) + "e" + String(repeating: "\u{0301}", count: 200_000)
         ]
 
         for payload in payloads {

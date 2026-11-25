@@ -82,7 +82,7 @@ enum LightweightHTMLParser {
 
         while !rest.isEmpty {
             if rest.hasPrefix("<!--") {
-                rest = rest[(rest.range(of: "-->")?.upperBound ?? rest.endIndex)...]
+                rest = rest[commentEnd(in: rest)...]
             } else if rest.first == "<", let lastTagEnd, rest.startIndex < lastTagEnd,
                       let (tag, afterTag) = scanTag(rest) {
                 builder.handle(tag)
@@ -405,6 +405,23 @@ enum LightweightHTMLParser {
         default:
             return false
         }
+    }
+
+    // MARK: - Comment skipping
+
+    /// The index just past the `-->` that ends the comment at the start of `input`, or the end of
+    /// `input` when the comment is never closed. Searches in place: Foundation's `range(of:)` can
+    /// copy all of the remaining input on each call, so input with many comments parsed in
+    /// quadratic time.
+    private static func commentEnd(in input: Substring) -> Substring.Index {
+        var searchStart = input.startIndex
+        while let dash = input[searchStart...].firstIndex(of: "-") {
+            if input[dash...].starts(with: "-->") {
+                return input.index(dash, offsetBy: 3)
+            }
+            searchStart = input.index(after: dash)
+        }
+        return input.endIndex
     }
 
     // MARK: - Tag scanning
